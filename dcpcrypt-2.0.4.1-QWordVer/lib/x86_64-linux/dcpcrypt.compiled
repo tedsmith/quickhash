@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="/usr/bin/fpc" Date="1397983219"/>
+  <Params Value=" -MDelphi -Sah -O1 -g -gl -vewnhi -Fu/home/ted/Documents/Programming/QuickHash/QuickHash-2.5.2-Linux-32/dcpcrypt-2.0.4.1-QWordVer/Ciphers -Fu/home/ted/Documents/Programming/QuickHash/QuickHash-2.5.2-Linux-32/dcpcrypt-2.0.4.1-QWordVer/Hashes -Fu/home/ted/Documents/Programming/QuickHash/QuickHash-2.5.2-Linux-32/dcpcrypt-2.0.4.1-QWordVer/lib/x86_64-linux -Fu/usr/share/lazarus/1.2.2/packager/units/x86_64-linux -Fu/home/ted/Documents/Programming/QuickHash/QuickHash-2.5.2-Linux-32/dcpcrypt-2.0.4.1-QWordVer/ -FU/home/ted/Documents/Programming/QuickHash/QuickHash-2.5.2-Linux-32/dcpcrypt-2.0.4.1-QWordVer/lib/x86_64-linux/ -l -Xd dcpcrypt.pas"/>
+</CONFIG>

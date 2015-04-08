@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="11">
+      <Unit0>
+        <Filename Value="DiskModule.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DiskModule"/>
+        <UsageCount Value="90"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmDiskHashingModule"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="DiskModuleUnit1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="0"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="42"/>
+        <CursorPos X="35" Y="63"/>
+        <UsageCount Value="90"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\packages\hash\src\sha1.pp"/>
+        <UnitName Value="sha1"/>
+        <EditorIndex Value="5"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="242"/>
+        <CursorPos X="1" Y="246"/>
+        <UsageCount Value="42"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\win\wininc\unifun.inc"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="91"/>
+        <CursorPos X="1" Y="116"/>
+        <UsageCount Value="5"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\unit2.pas"/>
+        <UnitName Value="Unit2"/>
+        <EditorIndex Value="3"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="24"/>
+        <CursorPos X="1" Y="1"/>
+        <UsageCount Value="38"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\md5customised.pas"/>
+        <UnitName Value="md5customised"/>
+        <EditorIndex Value="4"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="532"/>
+        <CursorPos X="1" Y="1"/>
+        <UsageCount Value="38"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="sha1customised.pas"/>
+        <UnitName Value="sha1Customised"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="236"/>
+        <CursorPos X="21" Y="261"/>
+        <UsageCount Value="38"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\win\wininc\redef.inc"/>
+        <EditorIndex Value="2"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="256"/>
+        <CursorPos X="10" Y="768"/>
+        <UsageCount Value="36"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\RoastLamb - Beta2.6 - Compartmentalised\unit1.pas"/>
+        <UnitName Value="unit1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="327"/>
+        <CursorPos X="62" Y="359"/>
+        <UsageCount Value="21"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\RoastLamb - Beta2.6 - Compartmentalised\truecrypt_parser.pas"/>
+        <UnitName Value="truecrypt_parser"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="22"/>
+        <CursorPos X="33" Y="12"/>
+        <UsageCount Value="6"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\objpas\sysutils\filutilh.inc"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="58"/>
+        <CursorPos X="10" Y="85"/>
+        <UsageCount Value="35"/>
+        <Loaded Value="True"/>
+      </Unit10>
+    </Units>
+    <General>
+      <ActiveWindowIndexAtStart Value="0"/>
+    </General>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="110" Column="54" TopLine="84"/>
+      </Position1>
+      <Position2>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="107" Column="39" TopLine="81"/>
+      </Position2>
+      <Position3>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="102" Column="3" TopLine="76"/>
+      </Position3>
+      <Position4>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="101" Column="3" TopLine="75"/>
+      </Position4>
+      <Position5>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="118" Column="1" TopLine="92"/>
+      </Position5>
+      <Position6>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="119" Column="1" TopLine="93"/>
+      </Position6>
+      <Position7>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="121" Column="1" TopLine="95"/>
+      </Position7>
+      <Position8>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="107" Column="64" TopLine="81"/>
+      </Position8>
+      <Position9>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="117" Column="7" TopLine="104"/>
+      </Position9>
+      <Position10>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="185" Column="80" TopLine="176"/>
+      </Position10>
+      <Position11>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="183" Column="114" TopLine="157"/>
+      </Position11>
+      <Position12>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="187" Column="1" TopLine="157"/>
+      </Position12>
+      <Position13>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="183" Column="77" TopLine="157"/>
+      </Position13>
+      <Position14>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="184" Column="11" TopLine="169"/>
+      </Position14>
+      <Position15>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="183" Column="64" TopLine="169"/>
+      </Position15>
+      <Position16>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="116" Column="52" TopLine="81"/>
+      </Position16>
+      <Position17>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="185" Column="102" TopLine="160"/>
+      </Position17>
+      <Position18>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="186" Column="56" TopLine="169"/>
+      </Position18>
+      <Position19>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="187" Column="41" TopLine="162"/>
+      </Position19>
+      <Position20>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="186" Column="64" TopLine="161"/>
+      </Position20>
+      <Position21>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="187" Column="42" TopLine="161"/>
+      </Position21>
+      <Position22>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="185" Column="55" TopLine="162"/>
+      </Position22>
+      <Position23>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="243" Column="29" TopLine="200"/>
+      </Position23>
+      <Position24>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="176" Column="111" TopLine="151"/>
+      </Position24>
+      <Position25>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="242" Column="64" TopLine="217"/>
+      </Position25>
+      <Position26>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="252" Column="42" TopLine="192"/>
+      </Position26>
+      <Position27>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="253" Column="42" TopLine="204"/>
+      </Position27>
+      <Position28>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="191" Column="9" TopLine="161"/>
+      </Position28>
+      <Position29>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="190" Column="9" TopLine="160"/>
+      </Position29>
+      <Position30>
+        <Filename Value="diskmoduleunit1.pas"/>
+        <Caret Line="189" Column="9" TopLine="159"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+  <Debugging>
+    <Watches Count="1">
+      <Item1>
+        <Expression Value="ProgressCounter"/>
+      </Item1>
+    </Watches>
+  </Debugging>
+  <EditorMacros Count="0"/>
+</CONFIG>

@@ -1,0 +1,178 @@
+object Form1: TForm1
+  Left = 427
+  Height = 580
+  Top = 322
+  Width = 589
+  Caption = 'QuickHash 2.4.0 (2011 - 2014) (c) Ted Smith - Disk Hashing Module'
+  ClientHeight = 580
+  ClientWidth = 589
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '1.2.2.0'
+  object ListBox1: TListBox
+    Left = 16
+    Height = 280
+    Hint = 'Double click your entry to start hashing. '#13#10#13#10'Click "Refresh Disk List" if you need to hash another disk'
+    Top = 64
+    Width = 557
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 0
+    OnDblClick = ListBox1DblClick
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 0
+  end
+  object btnListDisks: TButton
+    Left = 16
+    Height = 25
+    Top = 16
+    Width = 192
+    Caption = 'Scan for Disks \ Refresh Disk List'
+    OnClick = btnListDisksClick
+    TabOrder = 1
+  end
+  object GroupBox1: TGroupBox
+    Left = 16
+    Height = 137
+    Top = 360
+    Width = 555
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Status'
+    ClientHeight = 119
+    ClientWidth = 551
+    TabOrder = 2
+    object lblDiskNameA: TLabel
+      Left = 8
+      Height = 13
+      Top = 8
+      Width = 43
+      Caption = 'Disk ID : '
+      ParentColor = False
+    end
+    object lblDiskNameB: TLabel
+      Left = 104
+      Height = 13
+      Top = 8
+      Width = 12
+      Caption = '...'
+      ParentColor = False
+    end
+    object lblByteCapacityA: TLabel
+      Left = 8
+      Height = 13
+      Top = 34
+      Width = 77
+      Caption = 'Byte Capacity : '
+      ParentColor = False
+    end
+    object lblByteCapacityB: TLabel
+      Left = 104
+      Height = 13
+      Top = 34
+      Width = 12
+      Caption = '...'
+      ParentColor = False
+    end
+    object lblBytesLeftToHashA: TLabel
+      Left = 9
+      Height = 13
+      Top = 56
+      Width = 95
+      Caption = 'Bytes left to hash : '
+      ParentColor = False
+    end
+    object lblBytesLeftToHashB: TLabel
+      Left = 104
+      Height = 13
+      Top = 56
+      Width = 12
+      Caption = '...'
+      ParentColor = False
+    end
+    object lblEndTimeA: TLabel
+      Left = 328
+      Height = 13
+      Top = 32
+      Width = 50
+      Caption = 'End Time :'
+      ParentColor = False
+    end
+    object lblEndTimeB: TLabel
+      Left = 391
+      Height = 13
+      Top = 32
+      Width = 12
+      Caption = '...'
+      ParentColor = False
+    end
+    object lblStartTimeA: TLabel
+      Left = 328
+      Height = 13
+      Top = 10
+      Width = 56
+      Caption = 'Start Time :'
+      ParentColor = False
+    end
+    object lblStartTimeB: TLabel
+      Left = 391
+      Height = 13
+      Top = 10
+      Width = 12
+      Caption = '...'
+      ParentColor = False
+    end
+    object btbStop: TButton
+      Left = 248
+      Height = 25
+      Top = 80
+      Width = 75
+      Caption = 'S&top!'
+      OnClick = btbStopClick
+      TabOrder = 0
+    end
+    object lblSpeedA: TLabel
+      Left = 328
+      Height = 13
+      Top = 56
+      Width = 34
+      Caption = 'Speed:'
+      ParentColor = False
+    end
+    object lblSpeedB: TLabel
+      Left = 391
+      Height = 13
+      Top = 56
+      Width = 12
+      Caption = '...'
+      ParentColor = False
+    end
+    object lblPercentageComplete: TLabel
+      Left = 104
+      Height = 13
+      Top = 80
+      Width = 12
+      Caption = '...'
+      ParentColor = False
+    end
+  end
+  object Label1: TLabel
+    Left = 16
+    Height = 13
+    Top = 528
+    Width = 92
+    Caption = 'Computed Hash:'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object edtComputedHash: TEdit
+    Left = 128
+    Height = 21
+    Top = 528
+    Width = 400
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 3
+    Text = '...'
+  end
+end

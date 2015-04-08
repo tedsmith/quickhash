@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\lazarus\fpc\2.6.4\bin\i386-win32\fpc.exe" Date="1150455029"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -Xs -WG -vewnhi -FiC:\Users\Ted\Documents\Personal\Programming\QuickHash\QuickHash-2.5.1-Windows\DiskModule\lib\i386-win32 -FuC:\lazarus\lcl\units\i386-win32\win32 -FuC:\lazarus\lcl\units\i386-win32 -FuC:\lazarus\components\lazutils\lib\i386-win32 -FuC:\lazarus\packager\units\i386-win32 -FuC:\Users\Ted\Documents\Personal\Programming\QuickHash\QuickHash-2.5.1-Windows\DiskModule\ -FUC:\Users\Ted\Documents\Personal\Programming\QuickHash\QuickHash-2.5.1-Windows\DiskModule\lib\i386-win32\ -l -dLCL -dLCLwin32 DiskModule.lpr"/>
+  <Complete Value="False"/>
+</CONFIG>
