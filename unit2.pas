@@ -137,6 +137,8 @@ type
     GroupBox4: TGroupBox;
     gbDirectoryComparisons: TGroupBox;
     Label1: TLabel;
+    lbleExpectedHash: TLabeledEdit;
+    lbleExpectedHashText: TLabeledEdit;
     lblURLBanner: TLabel;
     Label7: TLabel;
     Label8: TLabel;
@@ -253,9 +255,7 @@ type
     procedure btnStopScan1Click(Sender: TObject);
     procedure btnClipboardResultsClick(Sender: TObject);
     procedure btnStopScan2Click(Sender: TObject);
-    {$ifdef Windows}
     procedure btnCallDiskHasherModuleClick(Sender: TObject);
-    {$endif}
     procedure btnCompareClick(Sender: TObject);
     procedure btnClearTextAreaClick(Sender: TObject);
     procedure Button6SelectSourceClick(Sender: TObject);
@@ -427,13 +427,30 @@ end;
 
 
 procedure TMainForm.HashText(Sender: TObject);
+var
+  strHashValueText : string;
 begin
   if Length(memoHashText.Text) = 0 then
-   begin
-    StrHashValue.Caption := 'Awaiting input in text field...';
-   end
-   else
-     StrHashValue.Caption := CalcTheHashString(memoHashText.Text);
+    begin
+      StrHashValue.Caption := 'Awaiting input in text field...';
+    end
+    else
+      begin
+       strHashValueText := Trim(Uppercase(CalcTheHashString(memoHashText.Text)));
+       StrHashValue.Caption := strHashValueText;
+
+       if lbleExpectedHashText.Text <> '...' then
+       begin
+       if strHashValueText = Trim(Uppercase(lbleExpectedHashText.Text)) then
+         begin
+           Showmessage('Expected hash matches the generated text hash, OK');
+         end
+       else
+         begin
+           Showmessage('Expected hash DOES NOT match the generated text hash!');
+         end;
+      end;
+    end;
 end;
 
 procedure TMainForm.btnHashFileClick(Sender: TObject);
@@ -455,28 +472,43 @@ begin
   memFileHashField.Clear;
 
   if FileExistsUTF8(filename) then
-   begin
-     start := Now;
-     lblTimeTaken1.Caption := 'Started at  : '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
+  begin
+    start := Now;
+    lblTimeTaken1.Caption := 'Started at  : '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
 
-     edtFileNameToBeHashed.Caption := (filename);
-     label1.Caption := 'Hashing file... ';
-     StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
-     Application.ProcessMessages;
-     fileHashValue := CalcTheHashFile(Filename); // Custom function
-     memFileHashField.Lines.Add(UpperCase(fileHashValue));
-     label1.Caption := 'Complete.';
-     StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
-     OpenDialog1.Close;
+    edtFileNameToBeHashed.Caption := (filename);
+    label1.Caption := 'Hashing file... ';
+    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
+    Application.ProcessMessages;
+    fileHashValue := CalcTheHashFile(Filename); // Custom function
+    memFileHashField.Lines.Add(UpperCase(fileHashValue));
+    label1.Caption := 'Complete.';
+    StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
-     stop := Now;
-     elapsed := stop - start;
-     lblTimeTaken2.Caption := 'Time taken : '+ TimeToStr(elapsed);
-     Application.ProcessMessages;
-   end
+    OpenDialog1.Close;
+
+    stop := Now;
+    elapsed := stop - start;
+
+    // If the user has ane existing hash to check, compare it here
+    if lbleExpectedHash.Text <> '...' then
+    begin
+      if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
+        begin
+          Showmessage('Expected hash matches the computed file hash, OK');
+        end
+    else
+      begin
+        Showmessage('Expected hash DOES NOT match the computed file hash!');
+      end;
+    end;
+
+    lblTimeTaken2.Caption := 'Time taken : '+ TimeToStr(elapsed);
+    Application.ProcessMessages;
+  end
   else
     ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
- end;
+  end;
 
 procedure TMainForm.btnLaunchDiskModuleClick(Sender: TObject);
 begin
@@ -852,11 +884,12 @@ begin
 end;
 
 
-{$ifdef Windows}
 // Calls the 'frmDiskHashingModule' Form used for disk hashing in Windows.
 // It also clears all labels from any previous runs of the form.
 procedure TMainForm.btnCallDiskHasherModuleClick(Sender: TObject);
 begin
+
+{$ifdef Windows}
   DiskModuleUnit1.frmDiskHashingModule.lbledtStartAtTime.Text := 'HH:MM';
   DiskModuleUnit1.frmDiskHashingModule.ListBox1.Clear;
   DiskModuleUnit1.frmDiskHashingModule.lblSpeedB.Caption             := '...';
@@ -874,8 +907,9 @@ begin
   DiskModuleUnit1.frmDiskHashingModule.lblManufacturerB.Caption      := '...';
   DiskModuleUnit1.frmDiskHashingModule.edtComputedHash.Text          := '...';
   DiskModuleUnit1.frmDiskHashingModule.Show;
+  {$Endif}
 end;
- {$Endif}
+
 
  // btnCompareClick : Will compare the listings of two directories, inc hidden files
  // The user is not presented with a choice for hiddne files because a comparison
@@ -1159,12 +1193,12 @@ var
   MissingHash, ExtractedFileName : string;
 
 begin
-  i := 0;
-  indexA := 0;
-  indexB := 0;
-  HashPosStart := 0;
-  FileNameAndPathPosStart := 0;
-  FileNameAndPathPosEnd := 0;
+  i                        := 0;
+  indexA                   := 0;
+  indexB                   := 0;
+  HashPosStart             := 0;
+  FileNameAndPathPosStart  := 0;
+  FileNameAndPathPosEnd    := 0;
 
   try
     MismatchList := TStringList.Create;
@@ -1229,7 +1263,10 @@ end;
 procedure TMainForm.Button6SelectSourceClick(Sender: TObject);
 begin
   // Now enable directory selection of source
-  ShowMessage('NOTE: This feature is designed for hashing and copying typical user space files and not OS system critical files or files currently in use. Attempting to copy such files may result in failure. Click OK to proceed beyond this warning and then either continue with your directory selection or click cancel to abort');
+  ShowMessage('NOTE: This feature is designed for hashing and copying typical user space files' + #13#10 +
+              'and not OS system critical files, or files currently in use. Attempting to copy such files may result in failure.' + #13#10 +
+              'Click OK to proceed beyond this warning and then either continue with your directory selection or click cancel to abort');
+
   SelectDirectoryDialog2.Title := 'Select SOURCE directory to copy FROM ';
   if SelectDirectoryDialog2.Execute then
     begin
@@ -1268,25 +1305,25 @@ end;
 
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
 begin
-  CopyAndHashGrid.Visible      := false; // Hide the grid if it was left visible from an earlier run
-  lblNoOfFilesToExamine.Caption:= '';
-  lblNoOfFilesToExamine2.Caption  := '';
-  lblFilesCopiedPercentage.Caption:= '';
-  lblDataCopiedSoFar.Caption   := '';
-  lblTimeTaken6A.Caption       := '...';
-  lblTimeTaken6B.Caption       := '...';
-  lblTimeTaken6C.Caption       := '...';
-  Label3.Caption := ('Counting files...please wait');
-  StatusBar3.Caption := ('Counting files...please wait');
+  CopyAndHashGrid.Visible          := false; // Hide the grid if it was left visible from an earlier run
+  lblNoOfFilesToExamine.Caption    := '';
+  lblNoOfFilesToExamine2.Caption   := '';
+  lblFilesCopiedPercentage.Caption := '';
+  lblDataCopiedSoFar.Caption       := '';
+  lblTimeTaken6A.Caption           := '...';
+  lblTimeTaken6B.Caption           := '...';
+  lblTimeTaken6C.Caption           := '...';
+  Label3.Caption                   := ('Counting files...please wait');
+  StatusBar3.Caption               := ('Counting files...please wait');
   Application.ProcessMessages;
   ProcessDir(SourceDir);
-  Label3.Caption := ('Finished.');
+  Label3.Caption                   := ('Finished.');
 
   // Clear the variables for the next run if it is run again without restarting
-  SourceDir := '';
-  DestDir := '';
+  SourceDir      := '';
+  DestDir        := '';
   SourceDirValid := FALSE;
-  DestDirValid := FALSE;
+  DestDirValid   := FALSE;
 
   if SourceDirValid AND DestDirValid = FALSE then
     begin
@@ -1513,8 +1550,8 @@ function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
     varSHA256Hash: TDCP_SHA256;
     varSHA512Hash: TDCP_SHA512;
 
-    DigestMD5: array[0..31] of byte;     // MD5 produces a 128 bit digest (32 byte output)
-    DigestSHA1: array[0..31] of byte;    // SHA1 produces a 160 bit digest (32 byte output)
+    DigestMD5:    array[0..31] of byte;  // MD5 produces a 128 bit digest (32 byte output)
+    DigestSHA1:   array[0..31] of byte;  // SHA1 produces a 160 bit digest (32 byte output)
     DigestSHA256: array[0..31] of byte;  // SHA256 produces a 256 bit digest (32 byte output)
     DigestSHA512: array[0..63] of byte;  // SHA512 produces a 512 bit digest (64 byte output)
 
@@ -1600,7 +1637,7 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
   begin
     SourceDataSHA256 := nil;
     SourceDataSHA512 := nil;
-    GeneratedHash := '';
+    GeneratedHash    := '';
 
     case PageControl1.TabIndex of
       0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
@@ -1696,15 +1733,15 @@ var
   SG : TStringGrid;
 
 begin
-  SG := TStringGrid.Create(self);
-  SizeOfFile := 0;
+  SG            := TStringGrid.Create(self);
+  SizeOfFile    := 0;
   fileHashValue := '';
 
   if StopScan1 = FALSE then    // If Stop button clicked, cancel scan
     begin
     NameOfFileToHashFull := FileIterator.FileName;
-    PathOnly := FileIterator.Path;
-    NameOnly := ExtractFileName(FileIterator.FileName);
+    PathOnly   := FileIterator.Path;
+    NameOnly   := ExtractFileName(FileIterator.FileName);
     SizeOfFile := FileIterator.FileInfo.Size;
 
     // This function is called by all three tabs seperately but I dont know how
@@ -2246,7 +2283,7 @@ begin
         SaveDialog3.Title := 'DONE! Save your CSV text log of results as...';
         // Try to help make sure the log file goes to the users destination dir and NOT source dir!:
         SaveDialog3.InitialDir := DestDir;
-        SaveDialog3.Filter := 'Comma Sep|*.csv|Text file|*.txt';
+        SaveDialog3.Filter     := 'Comma Sep|*.csv|Text file|*.txt';
         SaveDialog3.DefaultExt := 'csv';
         if SaveDialog3.Execute then
           begin

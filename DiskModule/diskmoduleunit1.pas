@@ -82,7 +82,7 @@ type
     ListBox1: TListBox;
     SaveResultsDialog: TSaveDialog;
     Timer1: TTimer;
-
+    {$ifdef Windows}
     procedure btbStopClick(Sender: TObject);
     procedure btnSaveResultsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -101,7 +101,7 @@ type
     function getManufacturer(const inStr:String):string;
     function getInterfaceType(const inStr:String):string;
     function ElapsedTimeAsString(t: Double): String;
-
+    {$endif}
   private
     { private declarations }
   public
@@ -123,6 +123,7 @@ uses unit2; // Just for form sharing between disk module and QuickHash main
 
 { TfrmDiskHashingModule }
 
+{$ifdef Windows}
 procedure TfrmDiskHashingModule.FormCreate(Sender: TObject);
 begin
   Stop := false;
@@ -705,6 +706,7 @@ begin
   // ShowMessage('Sector Count: ' + IntToStr(SectorCount));
   result := SectorCount;
 end;
+{$endif}
 
 end.
 

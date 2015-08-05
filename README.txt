@@ -1,3 +1,15 @@
+V2.6.2 – August 2015
+
+As per feature request #15, and in part request #7, added an 'Expected Hash Value' field to “Text” and “File” tabs to enable the user to paste an already computed hash value (perhaps from another tool, e-mail, webpage) into QuickHash. If the field contains anything other than three dots, once the data hash is generated in QuickHash, it will compare it against the expected hash in this field and report match or mis-match. 
+
+Corrected the fact that that the values for “Total Files in Dir A” and “Dir B” in the comparison of two directories, were the wrong way round. 
+
+Updated copyright date range in the form captions for both the disk hashing module and QuickHash itself
+
+Minor GUI improvements like anchoring.
+
+User manual updated 
+
 V2.6.1 – 31/03/15
 
 Added two buttons for copying the grid content of “Compare Directories” to the clipboard, to enable the user to simply paste the results of one or both grids to another tool like Excel, Notepad etc. See ticket ref #9 (https://sourceforge.net/p/quickhash/feature-requests/8/)

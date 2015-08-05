@@ -1,13 +1,13 @@
 object frmDiskHashingModule: TfrmDiskHashingModule
-  Left = 705
+  Left = 788
   Height = 600
-  Top = 149
+  Top = 225
   Width = 691
-  Caption = 'QuickHash 2.6.0 (2011 - 2014) (c) Ted Smith - Disk Hashing Module'
+  Caption = 'QuickHash 2.6.2 (2011 - 2015) (c) Ted Smith - Disk Hashing Module'
   ClientHeight = 600
   ClientWidth = 691
   Position = poScreenCenter
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.0.4'
   object ListBox1: TListBox
     Left = 16
     Height = 208
@@ -19,6 +19,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     OnClick = ListBox1Click
     OnDblClick = ListBox1DblClick
     ParentShowHint = False
+    ScrollWidth = 657
     ShowHint = True
     TabOrder = 0
   end
@@ -276,21 +277,20 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     Height = 21
     Hint = 'This timer only takes effect IF YOU ALSO'#13#10' SPECIFY A 24hr START TIME --->'
     Top = 32
-    Width = 80
-    DialogTitle = 'Select a start date'
+    Width = 96
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
     OKCaption = 'OK'
     CancelCaption = 'Cancel'
     DefaultToday = True
     DateOrder = doDMY
     ButtonWidth = 23
-    CharCase = ecNormal
     DirectInput = False
     NumGlyphs = 1
     MaxLength = 10
     ParentShowHint = False
     ShowHint = True
     TabOrder = 5
+    Text = '05/08/2015'
   end
   object Label2: TLabel
     Left = 288
