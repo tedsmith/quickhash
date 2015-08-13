@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Compiler Value="C:\lazarus\fpc\2.6.4\bin\i386-win32\fpc.exe" Date="1184004117"/>
-  <Params Value=" -MObjFPC -Scgi -O3 -Xs -WG -l -vewnhibq -FuZ:\Programming\QuickHash\QuickHash-2.6.2-Linux\DiskModule -FuC:\lazarus\lcl\units\i386-win32\win32 -FuC:\lazarus\lcl\units\i386-win32 -FuC:\lazarus\components\lazutils\lib\i386-win32 -FuC:\lazarus\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32 -FuC:\lazarus\packager\units\i386-win32 -FuZ:\Programming\QuickHash\QuickHash-2.6.2-Linux\ -dLCL -dLCLwin32 -OoREGVAR -OoPEEPHOLE project1.lpr"/>
+  <Compiler Value="/usr/bin/fpc" Date="1397983219"/>
+  <Params Value=" -MObjFPC -Scgi -Cg -O3 -Xs -l -vewnhibq -Fl/opt/gnome/lib -Fu/home/ted/Documents/Programming/QuickHash/QuickHash-2.6.2-Linux/DiskModule -Fu/usr/share/lazarus/1.4.0/lcl/units/x86_64-linux/gtk2 -Fu/usr/share/lazarus/1.4.0/lcl/units/x86_64-linux -Fu/usr/share/lazarus/1.4.0/components/lazutils/lib/x86_64-linux -Fu/home/ted/Documents/Programming/dcpcrypt-2.0.4.1-QWordVer/lib/x86_64-linux -Fu/usr/share/lazarus/1.4.0/packager/units/x86_64-linux -Fu/home/ted/Documents/Programming/QuickHash/QuickHash-2.6.2-Linux/ -dLCL -dLCLgtk2 -OoREGVAR -OoPEEPHOLE project1.lpr"/>
 </CONFIG>

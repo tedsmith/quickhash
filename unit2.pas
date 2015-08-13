@@ -1657,7 +1657,13 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
            else
            if FileSize(FileToBeHashed) = 0 then
              begin
-             GeneratedHash := 'Not computed, zero byte file';
+               {$ifdef UNIX}
+               // On Linux, block devices like disks often report 0 byte size but need to be accessed still
+               if Pos('/dev/', FileToBeHashed) > 0 then
+                 GeneratedHash := MD5Print(MD5File(FileToBeHashed, 2097152));
+               {$else ifdef Windows}
+               GeneratedHash := 'Not computed, zero byte file';
+               {$endif}
              end
            else
             GeneratedHash := MD5Print(MD5File(FileToBeHashed));            //1024 bytes buffer
@@ -1670,7 +1676,13 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
            else
            if FileSize(FileToBeHashed) = 0 then
              begin
-             GeneratedHash := 'Not computed, zero byte file';
+               {$ifdef UNIX}
+               // On Linux, block devices like disks often report 0 byte size but need to be accessed still
+               if Pos('/dev/', FileToBeHashed) > 0 then
+                 GeneratedHash := SHA1Print(SHA1File(FileToBeHashed, 2097152));
+               {$else ifdef Windows}
+               GeneratedHash := 'Not computed, zero byte file';
+               {$endif}
              end
            else
              GeneratedHash := SHA1Print(SHA1File(FileToBeHashed))            //1024 bytes buffer
@@ -1694,7 +1706,22 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
            // with a "not computed" message, rather than a 'fake' hash.
            if SourceDataSHA256.Size = 0 then
              begin
+             {$ifdef UNIX}
+              // On Linux, block devices like disks often report 0 byte size but need to be accessed still
+              if Pos('/dev/', SourceDataSHA256.FileName) > 0 then
+                begin
+                   i := 0;
+                   varSHA256Hash := TDCP_SHA256.Create(nil);
+                   varSHA256Hash.Init;
+                   varSHA256Hash.UpdateStream(SourceDataSHA256, SourceDataSHA256.Size);
+                   varSHA256Hash.Final(DigestSHA256);
+                   varSHA256Hash.Free;
+                   for i := 0 to 31 do                        // 64 character output
+                     GeneratedHash := GeneratedHash + IntToHex(DigestSHA256[i],2);
+                   end;
+             {$else ifdef Windows}
              GeneratedHash := 'Not computed, zero byte file';
+             {$endif}
              end;
          SourceDataSHA256.Free;
          end;
@@ -1717,7 +1744,22 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
             // with a "not computed" message, rather than a 'fake' hash.
             if SourceDataSHA512.Size = 0 then
               begin
-              GeneratedHash := 'Not computed, zero byte file';
+              {$ifdef UNIX}
+              // On Linux, block devices like disks often report 0 byte size but need to be accessed still
+              if Pos('/dev/', SourceDataSHA512.FileName) > 0 then
+                begin
+                   i := 0;
+                   varSHA512Hash := TDCP_SHA512.Create(nil);
+                   varSHA512Hash.Init;
+                   varSHA512Hash.UpdateStream(SourceDataSHA512, SourceDataSHA512.Size);
+                   varSHA512Hash.Final(DigestSHA512);
+                   varSHA512Hash.Free;
+                   for i := 0 to 31 do                        // 64 character output
+                     GeneratedHash := GeneratedHash + IntToHex(DigestSHA512[i],2);
+                   end;
+               {$else ifdef Windows}
+               GeneratedHash := 'Not computed, zero byte file';
+               {$endif}
               end;
           SourceDataSHA512.Free;
           end;
