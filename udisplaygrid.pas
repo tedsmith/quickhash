@@ -1,0 +1,36 @@
+unit uDisplayGrid;
+{ A new unit added in QuickHash 2.6.3 to better enable the seperate display of
+  results when copying files from Source to Destination folders. Allows the main
+  form to contain treeview explorer style charts for source and destination.
+}
+{$mode objfpc}
+
+interface
+
+uses
+  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
+  Grids, StdCtrls;
+
+type
+
+  { TfrmDisplayGrid1 }
+
+  TfrmDisplayGrid1 = class(TForm)
+    btnClipboardResults2: TButton;
+    CopyAndHashGrid: TStringGrid;
+  private
+    { private declarations }
+  public
+    { public declarations }
+  end;
+
+var
+  frmDisplayGrid1: TfrmDisplayGrid1;
+
+implementation
+
+initialization
+  {$I uDisplayGrid.lrs}
+
+end.
+
