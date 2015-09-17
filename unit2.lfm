@@ -16,10 +16,10 @@ object MainForm: TMainForm
     Height = 650
     Top = 24
     Width = 996
-    ActivePage = TabSheet6
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight]
     ParentShowHint = False
-    TabIndex = 5
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
@@ -171,16 +171,16 @@ object MainForm: TMainForm
         end
         object Label6: TLabel
           Left = 496
-          Height = 48
+          Height = 51
           Top = 16
-          Width = 311
+          Width = 356
           Caption = 'As root, this section can be used to hash disks in Linux'#13#10'i.e. /dev/sdX. or /dev/sdaX, or /dev/hdX'#13#10'Windows users, see ''Disk Hashing'' tab'
           ParentColor = False
           WordWrap = True
         end
         object lblTimeTaken1: TLabel
           Left = 224
-          Height = 16
+          Height = 17
           Top = 16
           Width = 12
           Caption = '...'
@@ -188,7 +188,7 @@ object MainForm: TMainForm
         end
         object lblTimeTaken2: TLabel
           Left = 224
-          Height = 16
+          Height = 17
           Top = 40
           Width = 12
           Caption = '...'
@@ -196,7 +196,7 @@ object MainForm: TMainForm
         end
         object edtFileNameToBeHashed: TEdit
           Left = 6
-          Height = 24
+          Height = 27
           Top = 96
           Width = 814
           Anchors = [akTop, akLeft, akRight]
@@ -207,10 +207,10 @@ object MainForm: TMainForm
         end
         object btnHashFile: TButton
           Left = 6
-          Height = 23
+          Height = 27
           Hint = 'Choose a single file to hash (or Linux physical device e.g. /dev/sda)'
           Top = 16
-          Width = 83
+          Width = 80
           AutoSize = True
           Caption = 'Select &File'
           Color = 8454016
@@ -223,16 +223,16 @@ object MainForm: TMainForm
         end
         object StatusBar1: TStatusBar
           Left = 0
-          Height = 20
+          Height = 23
           Top = 261
-          Width = 826
+          Width = 828
           Panels = <>
         end
         object lblDragAndDropNudge: TLabel
           Left = 6
-          Height = 16
+          Height = 17
           Top = 48
-          Width = 179
+          Width = 198
           Caption = '(or "drag and drop" a file here)'
           ParentColor = False
         end
@@ -250,7 +250,7 @@ object MainForm: TMainForm
         end
         object lbleExpectedHash: TLabeledEdit
           Left = 6
-          Height = 24
+          Height = 27
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated file hash matches it, or not. '
           Top = 224
           Width = 814
@@ -260,8 +260,8 @@ object MainForm: TMainForm
           EditLabel.AnchorSideRight.Side = asrBottom
           EditLabel.AnchorSideBottom.Control = lbleExpectedHash
           EditLabel.Left = 6
-          EditLabel.Height = 16
-          EditLabel.Top = 205
+          EditLabel.Height = 17
+          EditLabel.Top = 204
           EditLabel.Width = 814
           EditLabel.Caption = 'Expected Hash Value (paste from other utility)'
           EditLabel.ParentColor = False
@@ -661,7 +661,7 @@ object MainForm: TMainForm
             TabOrder = 5
           end
           object FileMaskField: TEdit
-            Left = 448
+            Left = 464
             Height = 25
             Hint = 'Use an asterix, full stop and the file type '#10'extension, seperated by a semi-colon.'#10'NO space characters'
             Top = 64
@@ -705,18 +705,8 @@ object MainForm: TMainForm
             Caption = '% Complete:'
             ParentColor = False
           end
-          object btnStopScan2: TButton
-            Left = 288
-            Height = 23
-            Hint = 'Click to abort the hash as soon as the'#10'current file hashing action completes. '
-            Top = 121
-            Width = 75
-            Caption = 'St&op'
-            OnClick = btnStopScan2Click
-            TabOrder = 7
-          end
           object lblTimeTaken5A: TLabel
-            Left = 448
+            Left = 464
             Height = 15
             Top = 97
             Width = 71
@@ -724,7 +714,7 @@ object MainForm: TMainForm
             ParentColor = False
           end
           object lblTimeTaken5B: TLabel
-            Left = 448
+            Left = 464
             Height = 15
             Top = 121
             Width = 69
@@ -732,7 +722,7 @@ object MainForm: TMainForm
             ParentColor = False
           end
           object lblTimeTaken6A: TLabel
-            Left = 528
+            Left = 560
             Height = 15
             Top = 97
             Width = 12
@@ -740,7 +730,7 @@ object MainForm: TMainForm
             ParentColor = False
           end
           object lblTimeTaken6B: TLabel
-            Left = 528
+            Left = 560
             Height = 15
             Top = 121
             Width = 12
@@ -748,7 +738,7 @@ object MainForm: TMainForm
             ParentColor = False
           end
           object lblTimeTaken5C: TLabel
-            Left = 448
+            Left = 464
             Height = 15
             Top = 145
             Width = 71
@@ -756,7 +746,7 @@ object MainForm: TMainForm
             ParentColor = False
           end
           object lblTimeTaken6C: TLabel
-            Left = 528
+            Left = 560
             Height = 15
             Top = 145
             Width = 12
@@ -802,7 +792,7 @@ object MainForm: TMainForm
             Top = 9
             Width = 140
             Caption = 'Don''t rebuild path?'
-            TabOrder = 8
+            TabOrder = 7
           end
           object chkCopyHidden: TCheckBox
             Left = 624
@@ -811,14 +801,14 @@ object MainForm: TMainForm
             Top = 40
             Width = 134
             Caption = 'Copy hidden files?'
-            TabOrder = 9
+            TabOrder = 8
           end
         end
         object Button8CopyAndHash: TButton
-          Left = 296
+          Left = 384
           Height = 23
           Hint = 'Only enabled once a valid source and destination directory are chosen or just a valid source if only a list generation is needed. '
-          Top = 264
+          Top = 288
           Width = 80
           Caption = '&Go!'
           Color = 9042569
@@ -830,33 +820,20 @@ object MainForm: TMainForm
           ShowHint = True
           TabOrder = 0
         end
-        object Label3: TLabel
-          Left = 24
-          Height = 1
-          Top = 248
-          Width = 1
-          Font.Color = clRed
-          Font.Height = -16
-          Font.Style = [fsBold]
-          ParentColor = False
-          ParentFont = False
-        end
         object Edit2SourcePath: TEdit
           Left = 16
           Height = 25
           Top = 216
-          Width = 272
-          Anchors = [akTop, akLeft, akRight]
+          Width = 357
           Color = clSilver
           TabOrder = 1
           Text = 'Select source directory'
         end
         object Edit3DestinationPath: TEdit
-          Left = 392
+          Left = 480
           Height = 25
           Top = 216
-          Width = 256
-          Anchors = [akTop, akLeft, akRight]
+          Width = 357
           Color = clSilver
           TabOrder = 2
           Text = 'Select destination directory '
@@ -872,22 +849,38 @@ object MainForm: TMainForm
         object DirListA: TShellTreeView
           Left = 16
           Height = 272
+          Hint = 'Single click where to copy files FROM'
           Top = 264
-          Width = 272
+          Width = 357
           FileSortType = fstAlphabet
+          HotTrack = True
+          ReadOnly = True
           TabOrder = 5
           OnClick = DirListAClick
+          Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+          TreeLinePenStyle = psSolid
           ObjectTypes = [otFolders]
         end
         object DirListB: TShellTreeView
-          Left = 392
+          Left = 480
           Height = 272
+          Hint = 'Single click where to copy files TO'
           Top = 264
-          Width = 256
+          Width = 357
           FileSortType = fstAlphabet
           TabOrder = 6
           OnClick = DirListBClick
           ObjectTypes = [otFolders]
+        end
+        object btnStopScan2: TButton
+          Left = 386
+          Height = 23
+          Hint = 'Click to abort the hash as soon as the'#10'current file hashing action completes. '
+          Top = 328
+          Width = 78
+          Caption = 'St&op'
+          OnClick = btnStopScan2Click
+          TabOrder = 7
         end
       end
       object AlgorithmChoiceRadioBox4: TRadioGroup
@@ -1252,8 +1245,8 @@ object MainForm: TMainForm
           Left = 140
           Height = 15
           Top = 8
-          Width = 12
-          Caption = '...'
+          Width = 20
+          Caption = '  ...'
           ParentColor = False
         end
         object lblHashMatchA: TLabel
@@ -1268,8 +1261,8 @@ object MainForm: TMainForm
           Left = 140
           Height = 15
           Top = 36
-          Width = 12
-          Caption = '...'
+          Width = 20
+          Caption = '  ...'
           ParentColor = False
         end
         object lblTimeStartA: TLabel
@@ -1337,7 +1330,7 @@ object MainForm: TMainForm
           Top = 8
           Width = 70
           Anchors = [akTop, akLeft, akRight]
-          Caption = '...'
+          Caption = '  ...'
           ParentColor = False
         end
         object lblTotalFileCountB: TLabel
@@ -1357,7 +1350,7 @@ object MainForm: TMainForm
           Top = 40
           Width = 70
           Anchors = [akTop, akLeft, akRight]
-          Caption = '...'
+          Caption = '  ...'
           ParentColor = False
         end
         object btnCopyToClipboardA: TButton
@@ -1513,7 +1506,7 @@ object MainForm: TMainForm
     top = 696
   end
   object SaveDialog6: TSaveDialog
-    left = 472
-    top = 576
+    left = 552
+    top = 456
   end
 end

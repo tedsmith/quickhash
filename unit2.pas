@@ -104,12 +104,12 @@ type
     btnRecursiveDirectoryHashing: TButton;
     btnClipboardResults: TButton;
     btnCallDiskHasherModule: TButton;
-    btnStopScan2: TButton;
     btnClearTextArea: TButton;
     btnCopyToClipboardA: TButton;
     btnCopyToClipboardB: TButton;
     btnSaveComparisons: TButton;
     btnStopScan1: TButton;
+    btnStopScan2: TButton;
     Button8CopyAndHash: TButton;
     chkHiddenFiles: TCheckBox;
     chkCopyHidden: TCheckBox;
@@ -182,7 +182,6 @@ type
     lblTimeTaken4: TLabel;
     lblTimeTaken3: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -278,6 +277,7 @@ type
     function  CalcTheHashFile(FileToBeHashed:string):string;
     function  FormatByteSize(const bytes: QWord): string;
     procedure SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
+    procedure EmptyDisplayGrid(Grid : TStringGrid);
 
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
@@ -1306,6 +1306,15 @@ begin
     end;
 end;
 
+// EmptyDisplayGrid will quickly empty the display grid from previous runs
+procedure TMainForm.EmptyDisplayGrid(Grid : TStringGrid);
+var
+  i : integer;
+begin
+  for i := 0 to Grid.ColCount - 1 do
+    Grid.Cols[i].Clear;
+end;
+
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
 begin
   frmDisplayGrid1.CopyAndHashGrid.Visible := false; // Hide the grid if it was left visible from an earlier run
@@ -1316,15 +1325,16 @@ begin
   lblTimeTaken6A.Caption           := '...';
   lblTimeTaken6B.Caption           := '...';
   lblTimeTaken6C.Caption           := '...';
-  Label3.Caption                   := ('Counting files...please wait');
   StatusBar3.Caption               := ('Counting files...please wait');
   Application.ProcessMessages;
-  ProcessDir(SourceDir);
-  Label3.Caption                   := ('Finished.');
+  // In case the user changes either the source or destination after already
+  // running a job once, and so without necessarily clicking with the mouse,
+  // get the source and destination paths again
+  DirListAClick(Sender);
+  DirListBClick(Sender);
 
-  // Clear the variables for the next run if it is run again without restarting
-  SourceDir      := '';
-  DestDir        := '';
+  // Now process the selected source and destination
+  ProcessDir(SourceDir);
 
   if SourceDirValid AND DestDirValid = FALSE then
     begin
@@ -2076,7 +2086,6 @@ begin
     begin
     strNoOfFilesToExamine := IntToStr(FilesFoundToCopy.Count);
     lblTimeTaken6A.Caption := FormatDateTime('dd/mm/yy hh:mm:ss', SystemDate);
-    Label3.Caption := ('Processing files...please wait');
     Application.ProcessMessages;
 
     try

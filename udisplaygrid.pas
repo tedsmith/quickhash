@@ -18,6 +18,7 @@ type
   TfrmDisplayGrid1 = class(TForm)
     btnClipboardResults2: TButton;
     CopyAndHashGrid: TStringGrid;
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
   private
     { private declarations }
   public
@@ -28,6 +29,14 @@ var
   frmDisplayGrid1: TfrmDisplayGrid1;
 
 implementation
+
+{ TfrmDisplayGrid1 }
+
+procedure TfrmDisplayGrid1.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  CopyAndHashGrid.Clear;
+end;
 
 initialization
   {$I uDisplayGrid.lrs}

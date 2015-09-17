@@ -1,11 +1,12 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 363
+  Left = 383
   Height = 425
-  Top = 199
+  Top = 281
   Width = 996
   Caption = 'QuickHash - Copy Results'
   ClientHeight = 425
   ClientWidth = 996
+  OnClose = FormClose
   Position = poDesktopCenter
   LCLVersion = '1.4.0.4'
   object CopyAndHashGrid: TStringGrid
