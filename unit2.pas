@@ -52,8 +52,9 @@ uses
     {$ENDIF}
   {$ENDIF}
 
-    Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Menus, ComCtrls, Grids, ExtCtrls, sysconst, LazUTF8Classes, lclintf,
+    Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
+    Graphics, Dialogs, StdCtrls, Menus, ComCtrls, Grids, ExtCtrls, sysconst,
+    LazUTF8Classes, lclintf, ShellCtrls, uDisplayGrid,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -102,16 +103,13 @@ type
     btnHashFile: TButton;
     btnRecursiveDirectoryHashing: TButton;
     btnClipboardResults: TButton;
-    btnClipboardResults2: TButton;
     btnCallDiskHasherModule: TButton;
     btnStopScan2: TButton;
     btnClearTextArea: TButton;
     btnCopyToClipboardA: TButton;
     btnCopyToClipboardB: TButton;
     btnSaveComparisons: TButton;
-    Button6SelectSource: TButton;
     btnStopScan1: TButton;
-    Button7SelectDestination: TButton;
     Button8CopyAndHash: TButton;
     chkHiddenFiles: TCheckBox;
     chkCopyHidden: TCheckBox;
@@ -121,7 +119,6 @@ type
     chkNoRecursiveCopy: TCheckBox;
     chkNoPathReconstruction: TCheckBox;
     chkRecursiveDirOverride: TCheckBox;
-    CopyAndHashGrid: TStringGrid;
     CopyFilesHashingGroupBox: TGroupBox;
     DirectoryHashingGroupBox: TGroupBox;
     DirSelectedField: TEdit;
@@ -175,7 +172,6 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
-    Label14: TLabel;
     Label15: TLabel;
     lblTimeTaken6C: TLabel;
     lblTimeTaken5C: TLabel;
@@ -203,6 +199,8 @@ type
     SelectDirectoryDialog4: TSelectDirectoryDialog;
     SelectDirectoryDialog5: TSelectDirectoryDialog;
     sgDirB: TStringGrid;
+    DirListA: TShellTreeView;
+    DirListB: TShellTreeView;
     StatusBar1: TStatusBar;
     StatusBar2: TStatusBar;
     StatusBar3: TStatusBar;
@@ -263,6 +261,8 @@ type
     procedure Button8CopyAndHashClick(Sender: TObject);
     procedure CheckBoxListOfDirsAndFilesOnlyChange(Sender: TObject);
     procedure CheckBoxListOfDirsOnlyChange(Sender: TObject);
+    procedure DirListAClick(Sender: TObject);
+    procedure DirListBClick(Sender: TObject);
     procedure FileTypeMaskCheckBox1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of String);
@@ -824,6 +824,7 @@ begin
              slHTMLOutput.Add('</tr>');
          end;
        slHTMLOutput.Add('</table>');
+       slHTMLOutput.Add('<p>Total Files : ' + IntToStr(sgDirA.Rowcount -1) + '</p>');
 
        // Grid B content to HTML
 
@@ -845,6 +846,8 @@ begin
              slHTMLOutput.Add('</tr>');
          end;
        slHTMLOutput.Add('</table>');
+       slHTMLOutput.Add('<p>Total Files : ' + IntToStr(sgDirB.Rowcount -1) + '</p>');
+       slHTMLOutput.Add('<p>Result? : ' + lblHashMatchB.Caption + '</p>');
        slHTMLOutput.Add('</body>');
        slHTMLOutput.Add('</html>');
        slHTMLOutput.SaveToFile(HTMLLogFile3);
@@ -1305,7 +1308,7 @@ end;
 
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
 begin
-  CopyAndHashGrid.Visible          := false; // Hide the grid if it was left visible from an earlier run
+  frmDisplayGrid1.CopyAndHashGrid.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
   lblNoOfFilesToExamine2.Caption   := '';
   lblFilesCopiedPercentage.Caption := '';
@@ -1322,8 +1325,6 @@ begin
   // Clear the variables for the next run if it is run again without restarting
   SourceDir      := '';
   DestDir        := '';
-  SourceDirValid := FALSE;
-  DestDirValid   := FALSE;
 
   if SourceDirValid AND DestDirValid = FALSE then
     begin
@@ -1361,7 +1362,7 @@ end;
 procedure TMainForm.btnClipboardResults2Click(Sender: TObject);
 begin
   try
-    CopyAndHashGrid.CopyToClipboard();
+    frmDisplayGrid1.CopyAndHashGrid.CopyToClipboard();
   finally
     ShowMessage('Grid content now in clipboard...Paste (Ctrl+V) into spreadsheet or text editor')
   end
@@ -2092,15 +2093,15 @@ begin
               {$IFDEF Windows}
               CrDateModDateAccDate := DateAttributesOfCurrentFile(CurrentFile);
               {$ENDIF}
-              CopyAndHashGrid.rowcount    := i + 1;
-              CopyAndHashGrid.Cells[0, i] := IntToStr(i);
-              CopyAndHashGrid.Cells[1, i] := FilesFoundToCopy.Strings[i];
-              CopyAndHashGrid.Cells[5, i] := CrDateModDateAccDate;
-              CopyAndHashGrid.row         := i;
-              CopyAndHashGrid.col         := 1;
+              frmDisplayGrid1.CopyAndHashGrid.rowcount    := i + 1;
+              frmDisplayGrid1.CopyAndHashGrid.Cells[0, i] := IntToStr(i);
+              frmDisplayGrid1.CopyAndHashGrid.Cells[1, i] := FilesFoundToCopy.Strings[i];
+              frmDisplayGrid1.CopyAndHashGrid.Cells[5, i] := CrDateModDateAccDate;
+              frmDisplayGrid1.CopyAndHashGrid.row         := i;
+              frmDisplayGrid1.CopyAndHashGrid.col         := 1;
             end;
           ShowMessage('An attempt to compute file date attributes was also conducted. Scroll to the right if they are not visible.');
-          btnClipboardResults2.Enabled := true;
+          frmDisplayGrid1.btnClipboardResults2.Enabled := true;
         end
       else
       // 2nd if : User wants to just generate a list of directories
@@ -2114,14 +2115,14 @@ begin
           try
             for i := 0 to DirectoriesFoundList.Count -1 do
               begin
-                CopyAndHashGrid.rowcount    := i + 1;
-                CopyAndHashGrid.Cells[0, i] := IntToStr(i);
-                CopyAndHashGrid.Cells[1, i] := DirectoriesFoundList.Strings[i];
-                CopyAndHashGrid.Row         := i;
-                CopyAndHashGrid.col         := 1;
+                frmDisplayGrid1.CopyAndHashGrid.rowcount    := i + 1;
+                frmDisplayGrid1.CopyAndHashGrid.Cells[0, i] := IntToStr(i);
+                frmDisplayGrid1.CopyAndHashGrid.Cells[1, i] := DirectoriesFoundList.Strings[i];
+                frmDisplayGrid1.CopyAndHashGrid.Row         := i;
+                frmDisplayGrid1.CopyAndHashGrid.col         := 1;
               end;
           finally
-            btnClipboardResults2.Enabled := true;
+            frmDisplayGrid1.btnClipboardResults2.Enabled := true;
             DirectoriesFoundList.free;
           end;
         end
@@ -2278,15 +2279,15 @@ begin
               else if SourceFileHasHash = DestinationFileHasHash then
                 begin
                 // With the display grid, adding one to each value ensures the first row headings do not conceal the first file
-                  CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
-                  CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
-                  CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
-                  CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
-                  CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
-                  CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
-                  CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
-                  CopyAndHashGrid.row           := i + 1; //NoOfFilesCopiedOK +1 ;
-                  CopyAndHashGrid.col           := 1;
+                  frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
+                  frmDisplayGrid1.CopyAndHashGrid.row           := i + 1; //NoOfFilesCopiedOK +1 ;
+                  frmDisplayGrid1.CopyAndHashGrid.col           := 1;
                 end;
 
               // Progress Status Elements:
@@ -2311,12 +2312,14 @@ begin
       // Now we can show the grid. Having it displayed for every file as it goes
       // wastes time and isn't especially necessary given the other progress indicators
 
-      CopyAndHashGrid.Visible := true;
+      frmDisplayGrid1.CopyAndHashGrid.Visible := true;
+      frmDisplayGrid1.Show;
       EndTime := Now;
       lblTimeTaken6B.Caption  := FormatDateTime('dd/mm/yy hh:mm:ss', EndTime);
       TimeDifference          := EndTime - StartTime;
       strTimeDifference       := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference);
       lblTimeTaken6C.Caption  := strTimeDifference;
+
 
       // Now lets save the generated values to a CSV file.
 
@@ -2330,7 +2333,7 @@ begin
         if SaveDialog3.Execute then
           begin
             CSVLogFile2 := SaveDialog3.FileName;
-            SaveOutputAsCSV(CSVLogFile2, CopyAndHashGrid);
+            SaveOutputAsCSV(CSVLogFile2, frmDisplayGrid1.CopyAndHashGrid);
           end;
       end;
 
@@ -2363,11 +2366,11 @@ begin
                  Add('<td>' + 'Destination Name');
                  Add('<td>' + 'Destination Hash');
                  Add('<td>' + 'Source Date Attributes');
-                 for i := 0 to CopyAndHashGrid.RowCount-1 do
+                 for i := 0 to frmDisplayGrid1.CopyAndHashGrid.RowCount-1 do
                    begin
                      Add('<tr>');
-                     for j := 0 to CopyAndHashGrid.ColCount-1 do
-                       Add('<td>' + CopyAndHashGrid.Cells[j,i] + '</td>');
+                     for j := 0 to frmDisplayGrid1.CopyAndHashGrid.ColCount-1 do
+                       Add('<td>' + frmDisplayGrid1.CopyAndHashGrid.Cells[j,i] + '</td>');
                        add('</tr>');
                    end;
                  Add('</table>');
@@ -2393,7 +2396,7 @@ begin
         FilesFoundToCopy.Free;
         SLCopyErrors.Free;
         StatusBar3.SimpleText := 'Finished.';
-        btnClipboardResults2.Enabled := true;
+        frmDisplayGrid1.btnClipboardResults2.Enabled := true;
       end;
     ShowMessage('Files copied (zero based counter): ' + IntToStr(NoOfFilesCopiedOK) + '. Copy errors : ' + IntToStr(FileCopyErrors) + '. Hash mismatches: ' + IntToStr(HashMismtachCount) + '. Zero byte files: '+ (IntToStr(ZeroByteFilesCounter)));
     end
@@ -2487,16 +2490,16 @@ procedure TMainForm.CheckBoxListOfDirsAndFilesOnlyChange(Sender: TObject);
 begin
   if CheckBoxListOfDirsAndFilesOnly.Checked then
     begin
-      Button7SelectDestination.Visible := false;
       CheckBoxListOfDirsOnly.Hide;
       Button8CopyAndHash.Enabled := true;
       Edit3DestinationPath.Text := '';
+      DirListB.Visible := false;
       DestDir := ''
     end
     else if CheckBoxListOfDirsAndFilesOnly.Checked = false then
       begin
-        Button7SelectDestination.Visible := true;
         CheckBoxListOfDirsOnly.Visible := true;
+        DirListB.Visible := true;
       end;
 end;
 
@@ -2504,17 +2507,47 @@ procedure TMainForm.CheckBoxListOfDirsOnlyChange(Sender: TObject);
 begin
   if CheckBoxListOfDirsOnly.Checked then
     begin
-      Button7SelectDestination.Visible := false;
       CheckBoxListOfDirsAndFilesOnly.Hide;
       Button8CopyAndHash.Enabled := true;
       Edit3DestinationPath.Text := '';
+      DirListB.Visible := false;
       DestDir := ''
     end
   else if CheckBoxListOfDirsOnly.Checked = false then
     begin
-      Button7SelectDestination.Visible := true;
       CheckBoxListOfDirsAndFilesOnly.Visible := true;
+      DirListB.Visible := true;
     end;
+end;
+
+procedure TMainForm.DirListAClick(Sender: TObject);
+begin
+  SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
+  if DirectoryExists(SourceDir) then
+   begin
+     Edit2SourcePath.Text := SourceDir;
+     SourceDirValid := TRUE;
+     if SourceDirValid AND DestDirValid = TRUE then
+       begin
+         // Now enable the 'Go!' button as both SourceDir and DestDir are valid
+         Button8CopyAndHash.Enabled := true;
+      end;
+   end;
+end;
+
+procedure TMainForm.DirListBClick(Sender: TObject);
+begin
+  DestDir := UTF8ToSys(DirListB.GetSelectedNodePath);
+  if DirectoryExists(DestDir) then
+   begin
+     Edit3DestinationPath.Text := DestDir;
+     DestDirValid := TRUE;
+     if SourceDirValid AND DestDirValid = TRUE then
+       begin
+         // Now enable the 'Go!' button as both SourceDir and DestDir are valid
+         Button8CopyAndHash.Enabled := true;
+      end;
+   end;
 end;
 
 function TMainForm.FormatByteSize(const bytes: QWord): string;

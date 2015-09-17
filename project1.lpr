@@ -7,7 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit2, sha1Customised, diskmoduleunit1, FindAllFilesEnhanced;
+  Forms, Unit2, sha1Customised, diskmoduleunit1, FindAllFilesEnhanced,
+uDisplayGrid;
 
 //{$IFDEF WINDOWS}{$R project1.rc}{$ENDIF}
 
@@ -20,6 +21,7 @@ begin
   {$IFDEF Windows}
   Application.CreateForm(TfrmDiskHashingModule, frmDiskHashingModule);
   {$ENDIF Windows} // Disk hash form, needed only for Windows
+  Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);
   Application.Run;
 end.
 
