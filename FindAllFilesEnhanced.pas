@@ -49,6 +49,7 @@ begin
   Result   := TStringList.Create;
   Searcher := TListFileSearcher.Create(Result);
   Searcher.DirectoryAttribute := Searcher.DirectoryAttribute or faHidden;
+ // Searcher.FileAttribute := Searcher.FileAttribute or faHidden;
   try
     Searcher.Search(SearchPath, SearchMask, SearchSubDirs);
   finally
