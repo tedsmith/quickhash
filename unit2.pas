@@ -111,6 +111,7 @@ type
     btnStopScan1: TButton;
     btnStopScan2: TButton;
     Button8CopyAndHash: TButton;
+    FileTypeMaskCheckBox2: TCheckBox;
     chkUNCMode: TCheckBox;
     chkHiddenFiles: TCheckBox;
     chkCopyHidden: TCheckBox;
@@ -128,6 +129,7 @@ type
     FileHashingGroupBox: TGroupBox;
     edtFileNameToBeHashed: TEdit;
     FileMaskField: TEdit;
+    FileMaskField2: TEdit;
     FileTypeMaskCheckBox1: TCheckBox;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
@@ -265,6 +267,7 @@ type
     procedure Edit2SourcePathEnter(Sender: TObject);
     procedure Edit3DestinationPathEnter(Sender: TObject);
     procedure FileTypeMaskCheckBox1Change(Sender: TObject);
+    procedure FileTypeMaskCheckBox2Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of String);
     procedure HashFile(FileIterator: TFileIterator);
@@ -324,10 +327,14 @@ type
     {$IFDEF Darwin}
     const
       LongPathOverride : string = '';     // MAX_PATH is 4096 is Linux & Mac, so not needed
-    {$else}
+      LongPathOverrideA : string = '';
+      LongPathOverrideB : string = '';
+      {$else}
         {$IFDEF UNIX and !$ifdef Darwin}
         const
           LongPathOverride : string = '';
+          LongPathOverrideA : string = '';
+          LongPathOverrideB : string = '';
         {$ENDIF}
    {$ENDIF}
    {$ENDIF}
@@ -373,58 +380,73 @@ begin
   DirListA.AlphaSort;
   DirListB.AlphaSort;
 
-  {
   // Better to have some folder icons for each node of the tree but
   // I can't work out at the moment how to do it for ever folder.
   // The following only does the root nodes.
 
   // Place a folder icon for each node of the trees
-  z := 0;
+ { z := 0;
   for z := 0 to DirListA.Items.Count -1 do
   begin
     DirListA.Items[z].ImageIndex := 0; // Add the folder icon for each DirListA node
+    if DirListA.Items[z].HasChildren then
+      for y := 0 to DirListA.Items[y].Count do
+      begin
+        DirListA.Items[y].Index:=;
+      end;
   end;
 
   z := 0;
   for z := 0 to DirListB.Items.Count -1 do
   begin
     DirListB.Items[z].ImageIndex := 0; // Add the folder icon for each DirListB node
-  end;
-  }
+  end;  }
 
   {$IFDEF WINDOWS}
-  Label8.Caption        := '';
-  chkCopyHidden.Enabled := false;
-  chkCopyHidden.ShowHint:= true;
-  chkCopyHidden.Hint:= 'On Windows, QuickHash finds hidden files and folders by default';
-
+    Label8.Caption        := '';
+    chkCopyHidden.Enabled := false;
+    chkCopyHidden.ShowHint:= true;
+    chkCopyHidden.Hint:= 'On Windows, QuickHash finds hidden files and folders by default';
+    // Remove the advice about using the File tab for hashing files.
+    Label6.Caption := '';
   {$ENDIF}
 
   {$IFDEF LINUX}
 
- // For Linux users, we don't want them trying to use the Windows Disk hashing module
- // created for Windows users.
-  Tabsheet5.Enabled     := true;
-  Tabsheet5.Visible     := true;
-  btnCallDiskHasherModule.Enabled := false;
-  Label8.Caption        := 'LINUX USERS - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
-  chkCopyHidden.Enabled := true;
-  chkCopyHidden.ShowHint:= true;
-  chkCopyHidden.Hint:= 'In Linux, tick this to ensure hidden directories and hidden files in them are detected, if you want them';
- {$Endif}
+   // For Linux users, we don't want them trying to use the Windows Disk hashing module
+   // created for Windows users.
+   btnCallDiskHasherModule.Enabled := false;
+   Label8.Caption         := 'LINUX USERS - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
+   Tabsheet5.Enabled      := true;
+   Tabsheet5.Visible      := true;
+   chkCopyHidden.Enabled  := true;
+   chkCopyHidden.ShowHint := true;
+   chkCopyHidden.Hint     := 'In Linux, tick this to ensure hidden directories and hidden files in them are detected, if you want them';
+
+   // UNC mode is for Windows only so disable in Linux
+   chkUNCMode.Enabled        := false;
+   chkUNCMode.Visible        := false;
+   Edit2SourcePath.Text      := 'Source directory selection';
+   Edit3DestinationPath.Text := 'Destination directory selection';
+  {$Endif}
 
  {$ifdef UNIX}
     {$ifdef Darwin}
-    // For Apple Mac users, we don't want them trying to use the Windows Disk hashing module
-    // created for Windows users.
-    Tabsheet5.Enabled     := true;
-    Tabsheet5.Visible     := true;
-    btnCallDiskHasherModule.Enabled := false;
-    Label8.Caption        := 'Apple Mac Users - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
-    chkCopyHidden.Enabled := true;
-    chkCopyHidden.ShowHint:= true;
-    chkCopyHidden.Hint:= 'In Apple Mac, tick this to ensure hidden directories and hidden files in them are detected, if you want them';
+      // For Apple Mac users, we don't want them trying to use the Windows Disk hashing module
+      // created for Windows users.
+      btnCallDiskHasherModule.Enabled := false;
+      Tabsheet5.Enabled      := true;
+      Tabsheet5.Visible      := true;
+      Label8.Caption         := 'Apple Mac Users - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
+      chkCopyHidden.Enabled  := true;
+      chkCopyHidden.ShowHint := true;
+      chkCopyHidden.Hint     := 'In Apple Mac, tick this to ensure hidden directories and hidden files in them are detected, if you want them';
 
+      // UNC mode is for Windows only so disable in Apple Mac
+      chkUNCMode.Enabled        := false;
+      chkUNCMode.Visible        := false;
+      Edit2SourcePath.Text      := 'Source directory selection';
+      Edit3DestinationPath.Text := 'Destination directory selection';
     {$ENDIF}
  {$ENDIF}
 
@@ -599,12 +621,12 @@ end;
 procedure TMainForm.btnRecursiveDirectoryHashingClick(Sender: TObject);
 
 var
-  DirToHash, CSVLogFile, HTMLLogFile1 : string;
-  FS                                  : TFileSearcher;
-  TotalFilesToExamine, slDuplicates   : TStringList;
-  start, stop, elapsed                : TDateTime;
-  j, i, DuplicatesDeleted             : integer;
-  DeleteResult                        : Boolean;
+  DirToHash, CSVLogFile, HTMLLogFile1, SearchMask : string;
+  FS                                              : TFileSearcher;
+  TotalFilesToExamine, slDuplicates               : TStringList;
+  start, stop, elapsed                            : TDateTime;
+  j, i, DuplicatesDeleted                         : integer;
+  DeleteResult                                    : Boolean;
 
   begin
   FileCounter                   := 1;
@@ -624,6 +646,7 @@ var
       DirSelectedField.Caption := SelectDirectoryDialog1.FileName;
       DirToHash := SelectDirectoryDialog1.FileName;
 
+      {$ifdef Windows}
       // If chosen path is a UNC path, we need to append the UNC prefix to the
       // Unicode 32K long API call of \\?\
       if (Pos('\\', DirToHash) > 0) then
@@ -631,6 +654,7 @@ var
         LongPathOverride := '\\?\UNC\';
         Delete(DirToHash, 1, 2); // Delete the \\ from the DirToHash path (otherwise it becomes '\\?\UNC\\\')
       end;
+      {$endif}
 
       RecursiveDisplayGrid1.Visible := false;
       RecursiveDisplayGrid1.rowcount := 0;
@@ -639,7 +663,7 @@ var
         begin
         // Now lets recursively count each file,
          start := Now;
-         lblTimeTaken3.Caption := 'Started at : '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
+         lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
          StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
          Label5.Visible        := true;
          Application.ProcessMessages;
@@ -681,26 +705,36 @@ var
            FS := TFileSearcher.Create;
 
            // Set parameters for searching for hidden or non-hidden files and dirs
+           // and (since v2.6.4) with a mask, or not
            if chkHiddenFiles.Checked then
              begin
+               if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
                FS.DirectoryAttribute := faAnyFile or faHidden;
                FS.FileAttribute := faAnyFile or faHidden;
                FS.OnFileFound := @HashFile;
              end
            else
              begin
+               if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
                FS.FileAttribute := faAnyFile;
                FS.OnFileFound := @HashFile;
              end;
 
-           // Set parameters for searching recursivley or not
+           // Set parameters for searching recursivley or not, and (since v2.6.4)
+           // with a mask, or not
            if chkRecursiveDirOverride.Checked then
              begin
-               FS.Search(LongPathOverride+DirToHash, '*', False);
+               if FileTypeMaskCheckBox2.Checked then
+                 SearchMask := FileMaskField2.Text
+                 else SearchMask := '';
+               FS.Search(LongPathOverride+DirToHash, SearchMask, False, False);
              end
            else
              begin
-               FS.Search(LongPathOverride+DirToHash, '*', True);
+               if FileTypeMaskCheckBox2.Checked then
+                 SearchMask := FileMaskField2.Text
+                 else SearchMask := '';
+               FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
              end;
          finally
            // Hashing complete. Now free resources
@@ -1022,6 +1056,7 @@ begin
   DirA                             := lblDirAName.Caption;
   DirB                             := lblDirBName.Caption;
 
+  {$ifdef Windows}
   // Check if a UNC server path is given for either DirA or DirB.
   // If so, adjust LongPathOverride and append the UNC prefix to ensure that both
   // the 32K path length limit and the UNC rules are adhered to
@@ -1037,6 +1072,7 @@ begin
     LongPathOverrideB := '\\?\UNC\';
     Delete(DirB, 1, 2); // Delete the \\ from the DirB path
   end;
+  {$endif}
 
   StartTime                        := Now;
   sgDirA.Clean;
@@ -1077,7 +1113,16 @@ begin
         FileAndHashListA.Add(FullPathAndName + ':' + FileHashA + ':');
         // Populate display grid for DirA
         sgDirA.Cells[0, i+1] := IntToStr(i+1);
-        sgDirA.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideA);
+        {$IFDEF Windows}
+          sgDirA.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
+        {$ENDIF}
+        {$IFDEF Darwin}
+           sgDirA.Cells[1, i+1] := FullPathAndName;
+        {$else}
+          {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+            sgDirA.Cells[1, i+1] := FullPathAndName;
+          {$ENDIF}
+        {$ENDIF}
         sgDirA.Cells[2, i+1] := UpperCase(FileHashA);
         sgDirA.Row           := i;
         sgDirA.col           := 1;
@@ -1114,7 +1159,17 @@ begin
           FileAndHashListB.Add(FullPathAndName + ':' + FileHashB + ':');
           // Populate display grid for DirB
           sgDirB.Cells[0, i+1] := IntToStr(i+1);
-          sgDirB.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
+           {$IFDEF Windows}
+             sgDirB.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
+          {$ENDIF}
+          {$IFDEF Darwin}
+             sgDirB.Cells[1, i+1] := FullPathAndName;
+          {$else}
+            {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+            sgDirB.Cells[1, i+1] := FullPathAndName;
+            {$ENDIF}
+          {$ENDIF}
+
           sgDirB.Cells[2, i+1] := Uppercase(FileHashB);
           sgDirB.Row           := i;
           sgDirB.col           := 1;
@@ -1392,6 +1447,7 @@ begin
       SourceDir := Edit2SourcePath.Text;
       DestDir   := Edit3DestinationPath.Text;
 
+      {$ifdef Windows}
       // If chosen path is a UNC path, we need to append the UNC prefix to the
       // Unicode 32K long API call of \\?\
       if (Pos('\\', SourceDir) > 0) then
@@ -1399,6 +1455,7 @@ begin
         LongPathOverride := '\\?\UNC\';
         Delete(SourceDir, 1, 2); // Delete the \\ from the DirToHash path (otherwise it becomes '\\?\UNC\\\')
       end;
+      {$endif}
       // Now process the copy and paste in UNC mode
       ProcessDir(SourceDir);
     end
@@ -1433,9 +1490,9 @@ begin
     FileMaskField.Visible := true;
     end;
   {$IFDEF LINUX}
-  if FileTypeMaskCheckBox1.Checked then
-    ShowMessage('Remember *.JPG and *.jpg are different extension types in Linux!');
- {$ENDIF}
+    if FileTypeMaskCheckBox1.Checked then
+      ShowMessage('Remember *.JPG and *.jpg are different extension types in Linux!');
+  {$ENDIF}
 
   {$ifdef UNIX}
     {$ifdef Darwin}
@@ -1444,6 +1501,12 @@ begin
 
     {$ENDIF}
  {$ENDIF}
+end;
+
+procedure TMainForm.FileTypeMaskCheckBox2Change(Sender: TObject);
+begin
+  if FileTypeMaskCheckBox2.Checked then FileMaskField2.Visible := true
+  else FileMaskField2.Visible := false;
 end;
 
 procedure TMainForm.btnCompareTwoFilesClick(Sender: TObject);
@@ -1884,7 +1947,16 @@ begin
 
     RecursiveDisplayGrid1.Cells[0,FileCounter] := IntToStr(FileCounter);
     RecursiveDisplayGrid1.Cells[1,FileCounter] := NameOnly;
-    RecursiveDisplayGrid1.Cells[2,FileCounter] := RemoveLongPathOverrideChars(PathOnly, LongPathOverride);
+    {$IFDEF Windows}
+      RecursiveDisplayGrid1.Cells[2,FileCounter] := RemoveLongPathOverrideChars(PathOnly, LongPathOverride);
+    {$ENDIF}
+      {$IFDEF Darwin}
+        RecursiveDisplayGrid1.Cells[2,FileCounter] := PathOnly;
+      {$else}
+        {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+           RecursiveDisplayGrid1.Cells[2,FileCounter] := PathOnly;
+        {$ENDIF}
+      {$ENDIF}
     RecursiveDisplayGrid1.Cells[3,FileCounter] := FileHashValue;
     RecursiveDisplayGrid1.Cells[4,FileCounter] := IntToStr(SizeOfFile) + ' bytes ' + '(' + FormatByteSize(SizeOfFile) + ')';
 
@@ -2162,7 +2234,9 @@ begin
               frmDisplayGrid1.CopyAndHashGrid.row         := i;
               frmDisplayGrid1.CopyAndHashGrid.col         := 1;
             end;
+          {$IFDEF Windows}
           ShowMessage('An attempt to compute file date attributes was also conducted. Scroll to the right if they are not visible.');
+          {$endif}
           frmDisplayGrid1.btnClipboardResults2.Enabled := true;
         end
       else
@@ -2199,9 +2273,21 @@ begin
             SourceFileHasHash := '';
             DestinationFileHasHash := '';
 
-            // Get the file size using a stream, because the traditional FileSize
-            // function can't injest the Long Path prefix of '\\?\' or '\\?\UNC\'
-            m := FileSizeWithLongPath(FilesFoundToCopy.Strings[i]);
+            {$IFDEF WINDOWS}
+              // Get the file size using a stream, because the traditional FileSize
+              // function can't injest the Long Path prefix of '\\?\' or '\\?\UNC\'
+              m := FileSizeWithLongPath(FilesFoundToCopy.Strings[i]);
+            {$else}
+              {$IFDEF Darwin}
+                // Not long path stupidity for Apple Mac
+                m := FileSize(FilesFoundToCopy.Strings[i]);
+              {$else}
+                {$IFDEF UNIX and !$ifdef Darwin}
+                  // Not long path stupidity for Linux, either
+                  m := FileSize(FilesFoundToCopy.Strings[i]);
+                {$ENDIF}
+              {$ENDIF}
+            {$ENDIF}
 
             if m >= 0 then
               begin
@@ -2216,7 +2302,19 @@ begin
                 in case the user generates several seperate outputs to the same parent dir
               }
                 // Firstly, compute the original filename and path, less trailing slash
-                SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride)));
+
+                {$IFDEF WINDOWS}
+                   SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride)));
+                {$else}
+                   {$IFDEF Darwin}
+                     SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(FilesFoundToCopy.Strings[i]));
+                   {$else}
+                     {$IFDEF UNIX and !$ifdef Darwin}
+                       SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(FilesFoundToCopy.Strings[i]));
+                     {$ENDIF}
+                   {$ENDIF}
+                {$ENDIF}
+
 
                 // Now reformulate the source sub-dir structure, from the selected dir downwards
                 // but only if the user has not checked the box "Dont rebuild path?"
@@ -2275,19 +2373,16 @@ begin
               CrDateModDateAccDate := DateAttributesOfCurrentFile(SourceDirectoryAndFileName);
 
               {$ENDIF}
-
-              {$IFDEF LINUX}
-              // Get the 'Last Modified' date, only, for Linux files
-              CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-              {$ENDIF}
-
-              {$IFDEF UNIX}
-                {$IFDEF Darwin}
-              // Get the 'Last Modified' date, only, for Apple Mac files
-              CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-
+                {$IFDEF LINUX}
+                // Get the 'Last Modified' date, only, for Linux files
+                CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
                 {$ENDIF}
-              {$ENDIF}
+                  {$IFDEF UNIX}
+                    {$IFDEF Darwin}
+                      // Get the 'Last Modified' date, only, for Apple Mac files
+                      CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
+                    {$ENDIF}
+                  {$ENDIF}
               // Determine the filename string of the file to be copied
               FinalisedFileName := ExtractFileName(FilesFoundToCopy.Strings[i]);
 
@@ -2349,7 +2444,17 @@ begin
                 // With the display grid, adding one to each value ensures the first row headings do not conceal the first file
                   frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
                   frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+                  {$IFDEF WINDOWS}
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+                  {$else}
+                     {$IFDEF Darwin}
+                       frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                     {$else}
+                       {$IFDEF UNIX and !$ifdef Darwin}
+                         frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                       {$ENDIF}
+                     {$ENDIF}
+                  {$ENDIF}
                   frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
                   frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
                   frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
