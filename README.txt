@@ -1,3 +1,21 @@
+V2.6.4 Nov 2015
+
+QuickHash can now READ and WRITE from and to folders that exceed the MAX_PATH limit of MS Windows, which is 260 characters. A limit of 32K is now adhered to with QuickHash 2.6.4, meaning files may be found on filesystems that were put there by software that is able to bypass the MAX_PATH limit even if regular software like Windows Explorer is unaware of their existence. 
+
+“UNC Mode” added to the “Copy” tab, specifically to enable the user to operate in pure UNC mode but with the new 32K path length limits. Useful for comparing data on multiple network nodes that may not be mapped as a drive letter. Windows only feature (not needed for Linux and Apple Mac). 
+
+The tree view in the copy tab are now sorted alphabetically. 
+
+The “Choose file types” option that has existed in the “Copy” tab for a while has now been added to the “Files” tab by user request. Meaning the user can now recursively hash a folder and sub-folder of files but choose which files to include and which to include. Extension basis only and not file type signature analysis. 
+
+Further GUI anchoring improvements, to make the program display elements better when maximised, with less overlapping hopefully. 
+
+Some historic error messages updated and improved, and made more OS specific.  
+
+User manual updated and revised for v2.6.4
+
+Some other minor improvements
+
 V2.6.3 – Sept 2015
 
 NEW: Replaced two buttons with two treeview panes in the 'Copy' tab. Left pane is for the user to choose where to copy files FROM. Right pane is for the user to choose where to copy files TO. On appropriate selection, the user needs just press 'Go' and on completion a new form shows the results. 
