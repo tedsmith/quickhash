@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 96
   Width = 1018
   AllowDropFiles = True
-  Caption = 'Quick Hash v2.6.4 (c) 2011-2015 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
+  Caption = 'Quick Hash v2.6.4-a (c) 2011-2015 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
   ClientHeight = 689
   ClientWidth = 1018
   OnCreate = FormCreate

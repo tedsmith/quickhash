@@ -1,12 +1,16 @@
+ÔªøV2.6.4-a Dec 2015
+
+Bug #16 (https://sourceforge.net/p/quickhash/tickets/16/) highlighted an issues with the ‚ÄúDon't rebuild path' option of the ‚ÄúCopy‚Äù tab wherein the copy failed. This was tracked back to v2.6.3 when the new treeview feature was added, replacing the former button path selection functionality. The bug was caused as a result to a path parameter that no longer existed. That was fixed. 
+
 V2.6.4 Nov 2015
 
 QuickHash can now READ and WRITE from and to folders that exceed the MAX_PATH limit of MS Windows, which is 260 characters. A limit of 32K is now adhered to with QuickHash 2.6.4, meaning files may be found on filesystems that were put there by software that is able to bypass the MAX_PATH limit even if regular software like Windows Explorer is unaware of their existence. 
 
-ìUNC Modeî added to the ìCopyî tab, specifically to enable the user to operate in pure UNC mode but with the new 32K path length limits. Useful for comparing data on multiple network nodes that may not be mapped as a drive letter. Windows only feature (not needed for Linux and Apple Mac). 
+‚ÄúUNC Mode‚Äù added to the ‚ÄúCopy‚Äù tab, specifically to enable the user to operate in pure UNC mode but with the new 32K path length limits. Useful for comparing data on multiple network nodes that may not be mapped as a drive letter. Windows only feature (not needed for Linux and Apple Mac). 
 
 The tree view in the copy tab are now sorted alphabetically. 
 
-The ìChoose file typesî option that has existed in the ìCopyî tab for a while has now been added to the ìFilesî tab by user request. Meaning the user can now recursively hash a folder and sub-folder of files but choose which files to include and which to include. Extension basis only and not file type signature analysis. 
+The ‚ÄúChoose file types‚Äù option that has existed in the ‚ÄúCopy‚Äù tab for a while has now been added to the ‚ÄúFiles‚Äù tab by user request. Meaning the user can now recursively hash a folder and sub-folder of files but choose which files to include and which to include. Extension basis only and not file type signature analysis. 
 
 Further GUI anchoring improvements, to make the program display elements better when maximised, with less overlapping hopefully. 
 
@@ -16,7 +20,7 @@ User manual updated and revised for v2.6.4
 
 Some other minor improvements
 
-V2.6.3 ñ Sept 2015
+V2.6.3 ‚Äì Sept 2015
 
 NEW: Replaced two buttons with two treeview panes in the 'Copy' tab. Left pane is for the user to choose where to copy files FROM. Right pane is for the user to choose where to copy files TO. On appropriate selection, the user needs just press 'Go' and on completion a new form shows the results. 
 
@@ -25,15 +29,15 @@ FIX: In the 'Compare Directories' tab, the save button will now also save the ha
 FIX: In the 'Compare Directories' tab, the file counts of the grids and difference counts were overlapping with the labels when high file counts were examined (tens of thousands upwards). Fixed by anchoring the elements. 
 
 
-V2.6.2.b ñ August 2015 ñ Linux only
+V2.6.2.b ‚Äì August 2015 ‚Äì Linux only
 
 The exclusion of files that were zero bytes (functionality that was introduced in v2.1 back in 2013) meant that block devices in Linux, like /dev/sda or /dev/sda1, were simply ignored if selected by the user and not hashed. A new compiler directive added to ensure that if the file is reported as zero byte that a secondary check is then done to see if its a block device in Linux. If so, it will be hashed providing QuickHash is ran as root or sudo.  
 
-V2.6.2 ñ August 2015
+V2.6.2 ‚Äì August 2015
 
-As per feature request #15, and in part request #7, added an 'Expected Hash Value' field to ìTextî and ìFileî tabs to enable the user to paste an already computed hash value (perhaps from another tool, e-mail, webpage) into QuickHash. If the field contains anything other than three dots, once the data hash is generated in QuickHash, it will compare it against the expected hash in this field and report match or mis-match. 
+As per feature request #15, and in part request #7, added an 'Expected Hash Value' field to ‚ÄúText‚Äù and ‚ÄúFile‚Äù tabs to enable the user to paste an already computed hash value (perhaps from another tool, e-mail, webpage) into QuickHash. If the field contains anything other than three dots, once the data hash is generated in QuickHash, it will compare it against the expected hash in this field and report match or mis-match. 
 
-Corrected the fact that that the values for ìTotal Files in Dir Aî and ìDir Bî in the comparison of two directories, were the wrong way round. 
+Corrected the fact that that the values for ‚ÄúTotal Files in Dir A‚Äù and ‚ÄúDir B‚Äù in the comparison of two directories, were the wrong way round. 
 
 Updated copyright date range in the form captions for both the disk hashing module and QuickHash itself
 
@@ -41,17 +45,17 @@ Minor GUI improvements like anchoring.
 
 User manual updated 
 
-V2.6.1 ñ 31/03/15
+V2.6.1 ‚Äì 31/03/15
 
-Added two buttons for copying the grid content of ìCompare Directoriesî to the clipboard, to enable the user to simply paste the results of one or both grids to another tool like Excel, Notepad etc. See ticket ref #9 (https://sourceforge.net/p/quickhash/feature-requests/8/)
+Added two buttons for copying the grid content of ‚ÄúCompare Directories‚Äù to the clipboard, to enable the user to simply paste the results of one or both grids to another tool like Excel, Notepad etc. See ticket ref #9 (https://sourceforge.net/p/quickhash/feature-requests/8/)
 
-Added a ìSave to Filesî button in the same tab to allow the content of grids A and B to be saved as two seperate CSV files (one for each grid) and a single combined HTML file (with the content of table A displayed in one table, the content of table B displayed in the other). 
+Added a ‚ÄúSave to Files‚Äù button in the same tab to allow the content of grids A and B to be saved as two seperate CSV files (one for each grid) and a single combined HTML file (with the content of table A displayed in one table, the content of table B displayed in the other). 
 
 Throughout all of Quickhash, a line is automatically inserted into both CSV and HTML output stating the name and version of QuickHash used and the date the log file was generated. See ticket ref 7 (https://sourceforge.net/p/quickhash/feature-requests/7/) 
 
-Fixed the truncation of ìTotal Files in DirAî and ìTotal Files in DirBî in Compare Directories tab, where counts more than 99 (i.e. 100+) were being truncated. So 150 files was being written as ì15î. Note this only affected the user display ñ not the log or display grid. 
+Fixed the truncation of ‚ÄúTotal Files in DirA‚Äù and ‚ÄúTotal Files in DirB‚Äù in Compare Directories tab, where counts more than 99 (i.e. 100+) were being truncated. So 150 files was being written as ‚Äú15‚Äù. Note this only affected the user display ‚Äì not the log or display grid. 
 
-Ensured that if the user re-runs a comparison of two directories using the ìCompare Directoriesî tab, any values from the previous comparisons are cleared, such as the values in the display grids, the time ended, the hash match status, etc. Prior to 2.6.1, once a scan had been conducted, the display was not updated until the second scan had finished, as opposed to clearing it at the start of the subsequent scan. 
+Ensured that if the user re-runs a comparison of two directories using the ‚ÄúCompare Directories‚Äù tab, any values from the previous comparisons are cleared, such as the values in the display grids, the time ended, the hash match status, etc. Prior to 2.6.1, once a scan had been conducted, the display was not updated until the second scan had finished, as opposed to clearing it at the start of the subsequent scan. 
 
 Added a clickable link to the QuickHash projects homepage at sourceforge. 
 
@@ -59,7 +63,7 @@ V2.6.0
 
 New tab added titled 'Compare Two Files' to allow the user to check if two files in two different places (folders) are identical, or not, without having to hash all the other files in those respective folders. For example, C:\Data\FileA.doc and C:\BackupFiles\FileA.doc
 
-Fixed column mis-alignment for HTML output of the ìFileSî tab; the mis-alignment was caused by the seperation of file name and file path into two different columns in v2.5.2. where the seperation in the grid was not carried forward to the HTML output.  
+Fixed column mis-alignment for HTML output of the ‚ÄúFileS‚Äù tab; the mis-alignment was caused by the seperation of file name and file path into two different columns in v2.5.2. where the seperation in the grid was not carried forward to the HTML output.  
 
 Added the ability to delete duplicate files where found, if the user chooses to detect duplicate files only. 
 
@@ -77,17 +81,17 @@ Several hints on various buttons and labels corrected to show informative instru
 
 The file type mask told users to separate extensions with a space, when no space is needed. In fact, adding a space might case file types not to be found.   
 
-The ìDisksî tab was made accessible in the Linux version, but the button disabled and a descriptor to users to just use the ìFileî tab instead, because users were confused thinking they could use the tab on the Linux platform but they were unsure why it was greyed out. 
+The ‚ÄúDisks‚Äù tab was made accessible in the Linux version, but the button disabled and a descriptor to users to just use the ‚ÄúFile‚Äù tab instead, because users were confused thinking they could use the tab on the Linux platform but they were unsure why it was greyed out. 
 
-When hashing individual files in the ìFileî tab, if the user single clicked a file, but then clicked 'Cancel', the file was still being passed to the hashing procedures. That was fixed so that if the user cancels, the file is not hashed. 
+When hashing individual files in the ‚ÄúFile‚Äù tab, if the user single clicked a file, but then clicked 'Cancel', the file was still being passed to the hashing procedures. That was fixed so that if the user cancels, the file is not hashed. 
 
 v2.5.2 October 2014
 
 For the Windows version only : Implemented a scheduler for disk hashing, allowing the user the ability to schedule a start time for their chosen disk. Useful, for example, if a disk is currently being used or examined with an estimated completion time of 2 hours which is after the examining user may have gone home and unable to start the disk hashing process. Now, the user can specify a start date and time that is two or 3 hours after the estimated end time of the other task, and QuickHash will then commence hashing automatically without the need for the user to start it. If no valid start time is entered, the program starts hashing as soon as the chosen disk is double clicked, as normal. 
 
-For all versions : At user request, added an additional column to ìFileSî tab to seperate the path from the filename. So now the FileName column contains just the filename. And the new 'Path' column contains the files path.  
+For all versions : At user request, added an additional column to ‚ÄúFileS‚Äù tab to seperate the path from the filename. So now the FileName column contains just the filename. And the new 'Path' column contains the files path.  
 
-Added an option in ìCopyî tab called ìDon't rebuild path?î. If checked, the files in the source directory and all sub-directories will simply be dumped into the root of the destination directory without having the original path rebuilt. Any files with the same name will be appended with 'Filename.ext_DuplicatedFileNameX'. 
+Added an option in ‚ÄúCopy‚Äù tab called ‚ÄúDon't rebuild path?‚Äù. If checked, the files in the source directory and all sub-directories will simply be dumped into the root of the destination directory without having the original path rebuilt. Any files with the same name will be appended with 'Filename.ext_DuplicatedFileNameX'. 
 
 Changed progress status labelling to look neater and more compact. 
 
@@ -164,7 +168,7 @@ All versions prior to 2.1 suffered a 32-bit 4Gb limitation when copying (as part
 
 International language support added for filenames and directories that contain or might be created of a non-English nature by use of UTF8 casting. For example, the destination directory for "Hash, Copy, Hash" can now contain non-English characters. 
 
-All hashing in Quick Hash utilises MerkleñDamgÂrd constructions (http://en.wikipedia.org/wiki/Merkle%E2%80%93Damg%C3%A5rd_construction). 
+All hashing in Quick Hash utilises Merkle‚ÄìDamg√•rd constructions (http://en.wikipedia.org/wiki/Merkle%E2%80%93Damg%C3%A5rd_construction). 
 As such, zero byte files will always generate a predetermined hash, depending on the algorithm; sha-1, for example, is always da39a3ee5e6b4b0d3255bfef95601890afd80709. To avoid confusion, if a file is zero bytes, it is not hashed at all and the entry 'Not computed, zero byte file' is enetered into the results. Though I acknowledge some users may feel it is necessary to hash zero byte files for security reasons, on the whole, I don't think it is for 99% of users. 
 
 Files of zero bytes are now copied as part of the "Hash, Copy, Hash" routine to facilitate those who wish to use QuickHash as a backup system where, on occasion, zero byte files are created by software and are required in order to function properly. 

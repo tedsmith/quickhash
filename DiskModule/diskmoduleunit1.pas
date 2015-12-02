@@ -28,7 +28,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, EditBtn, strutils, sha1Customised, DateUtils,
+  ExtCtrls, EditBtn, strutils, sha1Customised, DateUtils;
   {$ifdef Windows}
   // For physical disk access in Windows:
   ActiveX, ComObj, Variants, Windows;

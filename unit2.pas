@@ -2348,7 +2348,7 @@ begin
                   end
                 else
                   begin
-                     FinalisedDestDir := SelectDirectoryDialog3.FileName;
+                     FinalisedDestDir := SubDirStructureParent;
                   end;
 
               {$IFDEF Windows}
