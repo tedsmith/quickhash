@@ -110,6 +110,7 @@ type
     btnSaveComparisons: TButton;
     btnStopScan1: TButton;
     btnStopScan2: TButton;
+    btnLBL: TButton;
     Button8CopyAndHash: TButton;
     FileTypeMaskCheckBox2: TCheckBox;
     chkUNCMode: TCheckBox;
@@ -199,6 +200,7 @@ type
     memFileHashField: TMemo;
     SaveDialog5: TSaveDialog;
     SaveDialog6: TSaveDialog;
+    SaveDialog7: TSaveDialog;
     SelectDirectoryDialog4: TSelectDirectoryDialog;
     SelectDirectoryDialog5: TSelectDirectoryDialog;
     sgDirB: TStringGrid;
@@ -250,6 +252,7 @@ type
     //procedure btnHashTextClick(Sender: TObject);
     procedure btnHashFileClick(Sender: TObject);
     procedure btnLaunchDiskModuleClick(Sender: TObject);
+    procedure btnLBLClick(Sender: TObject);
     procedure btnRecursiveDirectoryHashingClick(Sender: TObject);
     procedure btnSaveComparisonsClick(Sender: TObject);
     procedure btnStopScan1Click(Sender: TObject);
@@ -590,6 +593,36 @@ begin
 procedure TMainForm.btnLaunchDiskModuleClick(Sender: TObject);
 begin
 
+end;
+
+// Hash each line of text in the input area line-by-line and save to output CSV file
+// Useful for users who need to generate hashes of lists of names or e-mail addresses
+// Google Adsense, for example, requires this as a SHA256. So QuickHash will enable this
+// https://support.google.com/adwords/answer/6276125?hl=en-GB
+procedure TMainForm.btnLBLClick(Sender: TObject);
+var
+  slLBL : TStringList;
+  i : Longword;
+begin
+  try
+    slLBL := TStringList.Create;
+    for i := 0 to memoHashText.Lines.Count -1 do
+      begin
+        slLBL.Add(memoHashText.Lines[i] + ',' + Trim(Uppercase(CalcTheHashString(memoHashText.Lines[i]))));
+      end;
+  finally
+    SaveDialog7.Title := 'Save line-by-line results as...';
+    SaveDialog7.InitialDir := GetCurrentDir;
+    SaveDialog7.Filter := 'Comma Sep|*.csv';
+    SaveDialog7.DefaultExt := 'csv';
+
+    if SaveDialog7.Execute then
+      begin
+        slLBL.SaveToFile(SaveDialog7.FileName)
+      end
+    else ShowMessage('Unable to save file ' + SaveDialog7.FileName);
+    slLBL.Free;
+  end;
 end;
 
 // Procedure SaveOutputAsCSV
@@ -1808,7 +1841,9 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
                {$endif}
              end
            else
+           begin
             GeneratedHash := MD5Print(MD5File(FileToBeHashed));            //1024 bytes buffer
+           end;
          end;
       1: begin
            if FileSize(FileToBeHashed) > 1048576 then
