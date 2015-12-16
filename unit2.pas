@@ -602,13 +602,13 @@ end;
 procedure TMainForm.btnLBLClick(Sender: TObject);
 var
   slLBL : TStringList;
-  i : Longword;
+  i     : Longword;
 begin
   try
     slLBL := TStringList.Create;
     for i := 0 to memoHashText.Lines.Count -1 do
       begin
-        slLBL.Add(memoHashText.Lines[i] + ',' + Trim(Uppercase(CalcTheHashString(memoHashText.Lines[i]))));
+        slLBL.Add(memoHashText.Lines[i] + ',' + Trim(CalcTheHashString(memoHashText.Lines[i])));
       end;
   finally
     SaveDialog7.Title := 'Save line-by-line results as...';
