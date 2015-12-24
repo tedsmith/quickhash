@@ -111,6 +111,7 @@ type
     btnStopScan1: TButton;
     btnStopScan2: TButton;
     btnLBL: TButton;
+    btnFLBL: TButton;
     Button8CopyAndHash: TButton;
     FileTypeMaskCheckBox2: TCheckBox;
     chkUNCMode: TCheckBox;
@@ -198,6 +199,7 @@ type
     lblTotalFileCountNumberA: TLabel;
     lblTotalFileCountNumberB: TLabel;
     memFileHashField: TMemo;
+    FLBLDialog: TOpenDialog;
     SaveDialog5: TSaveDialog;
     SaveDialog6: TSaveDialog;
     SaveDialog7: TSaveDialog;
@@ -261,6 +263,7 @@ type
     procedure btnCallDiskHasherModuleClick(Sender: TObject);
     procedure btnCompareClick(Sender: TObject);
     procedure btnClearTextAreaClick(Sender: TObject);
+    procedure btnFLBLClick(Sender: TObject);
     procedure Button8CopyAndHashClick(Sender: TObject);
     procedure CheckBoxListOfDirsAndFilesOnlyChange(Sender: TObject);
     procedure CheckBoxListOfDirsOnlyChange(Sender: TObject);
@@ -291,6 +294,8 @@ type
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
     function FileTimeToDTime(FTime: TFileTime): TDateTime;
+    function GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in GB, with 2 decimals }
+
     {$ENDIF}
     {$IFDEF LINUX}
     function DateAttributesOfCurrentFileLinux(var SourceDirectoryAndFileName:string):string;
@@ -623,6 +628,78 @@ begin
     else ShowMessage('Unable to save file ' + SaveDialog7.FileName);
     slLBL.Free;
   end;
+end;
+
+// Load a text file and hash it line by line, outputting to the memo field
+// Similar to the procedure for hashing the memo line-by-line in "Text" tab
+procedure TMainForm.btnFLBLClick(Sender: TObject);
+var
+  slFLBLInput, slFLBLOutput : TStringList; // FLBL = File, Line by Line
+  i : Longword;
+begin
+  i := 0;
+  ShowMessage(GetSystemMem);
+  if FLBLDialog.Execute then
+    begin
+      try
+      slFLBLInput := TStringList.Create;
+      slFLBLOutput:= TStringList.Create;
+      slFLBLInput.Sorted:= false;
+      slFLBLOutput.Sorted:= false;
+
+      // Load the input file to memory
+      slFLBLInput.LoadFromFile(FLBLDialog.FileName);
+
+      // Write the input to a new stringlist, hash each line
+      for i := 0 to slFLBLInput.Count -1 do
+        begin
+          slFLBLOutput.Add(slFLBLInput.Strings[i] + ',' + Trim(CalcTheHashString(slFLBLInput.Strings[i])));
+        end;
+
+      // If the putput is smaller than 30Mb, load it to the screen
+      if Length(slFLBLOutput.Text) < 30000000 then
+        begin
+        for i := 0 to slFLBLOutput.Count -1 do
+          begin
+            memoHashText.Lines.Add(slFLBLOutput.Strings[i]);
+          end;
+        memoHashText.Clear;
+        memoHashText.Perform(EM_SCROLLCARET, 0, i);
+        end
+      else
+      // Otherwise, just save it and be done with it
+        begin
+          memoHashText.Clear;
+          memoHashText.Lines.Add('Data set too large for display. Save the output file');
+        end;
+      finally
+        SaveDialog7.Title      := 'Save files line-by-line results as...';
+        SaveDialog7.InitialDir := GetCurrentDir;
+        SaveDialog7.Filter     := 'Comma Sep|*.csv';
+        SaveDialog7.DefaultExt := 'csv';
+        SaveDialog7.FileName   := 'Output';
+        if SaveDialog7.Execute then
+          begin
+            slFLBLOutput.SaveToFile(SaveDialog7.FileName)
+          end
+        else ShowMessage('Unable to save output file ' + SaveDialog7.FileName);
+        slFLBLOutput.Free;
+        slFLBLInput.Free;
+      end;
+    end
+  else ShowMessage('Unable to open text file for line-by-line analysis');
+end;
+
+// http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
+function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
+VAR
+  MS_Ex : MemoryStatus;
+begin
+ FillChar (MS_Ex, SizeOf(MemoryStatus), #0);
+ MS_Ex.dwLength := SizeOf(MemoryStatus);
+ GlobalMemoryStatus(MS_Ex);
+ //Result:= FormatByteSize(MS_Ex.dwAvailVirtual);
+ Result:= FormatByteSize(MS_Ex.dwTotalPhys);
 end;
 
 // Procedure SaveOutputAsCSV

@@ -112,10 +112,22 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Click to generate hash values line by line. '#13#10'Results are saved to text file'
           Top = 208
-          Width = 152
-          Caption = 'Hash Line-By-Line'
+          Width = 128
+          Caption = 'Line-By-Line'
           OnClick = btnLBLClick
           TabOrder = 4
+        end
+        object btnFLBL: TButton
+          Left = 328
+          Height = 25
+          Hint = 'Load a text of delimited text file'#13#10'Hash the content, line-by-line,'#13#10'and save the results to a new file'
+          Top = 208
+          Width = 120
+          Caption = 'File Line-By-Line'
+          OnClick = btnFLBLClick
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 5
         end
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
@@ -152,19 +164,19 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Hint = 'Hash a single file (useful for hashing disks in Linux)'
       Caption = 'F&ile'
-      ClientHeight = 617
-      ClientWidth = 990
+      ClientHeight = 624
+      ClientWidth = 988
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 144
         Height = 302
         Hint = 'To hash physical disks, run the program as root or sudo'#13#10'and then navigate to /dev/sdX (where X might be a, b, c etc)'#13#10'for physical disks or /dev/sdaX (where X might be 1, 2, 3 etc) '#13#10'for logical drives. '#13#10#13#10'Some distributions use /dev/h... rather than /dev/s...'
         Top = 10
-        Width = 830
+        Width = 828
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Single File Hashing'
         ClientHeight = 281
-        ClientWidth = 826
+        ClientWidth = 824
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -181,16 +193,16 @@ object MainForm: TMainForm
         end
         object Label6: TLabel
           Left = 521
-          Height = 34
+          Height = 32
           Top = 31
-          Width = 301
+          Width = 264
           Caption = 'As root, this section can be used to hash disks'#10'e.g. /dev/sdX or /dev/sdaX, or /dev/hdX'
           ParentColor = False
           WordWrap = True
         end
         object lblTimeTaken1: TLabel
           Left = 224
-          Height = 17
+          Height = 16
           Top = 16
           Width = 12
           Caption = '...'
@@ -198,7 +210,7 @@ object MainForm: TMainForm
         end
         object lblTimeTaken2: TLabel
           Left = 224
-          Height = 17
+          Height = 16
           Top = 40
           Width = 12
           Caption = '...'
@@ -206,9 +218,9 @@ object MainForm: TMainForm
         end
         object edtFileNameToBeHashed: TEdit
           Left = 6
-          Height = 27
+          Height = 24
           Top = 96
-          Width = 816
+          Width = 814
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           ReadOnly = True
@@ -217,10 +229,10 @@ object MainForm: TMainForm
         end
         object btnHashFile: TButton
           Left = 6
-          Height = 27
+          Height = 23
           Hint = 'Choose a single file to hash (or Linux physical device e.g. /dev/sda)'
           Top = 16
-          Width = 80
+          Width = 83
           AutoSize = True
           Caption = 'Select &File'
           Color = 8454016
@@ -233,16 +245,16 @@ object MainForm: TMainForm
         end
         object StatusBar1: TStatusBar
           Left = 0
-          Height = 23
+          Height = 20
           Top = 261
-          Width = 828
+          Width = 824
           Panels = <>
         end
         object lblDragAndDropNudge: TLabel
           Left = 6
-          Height = 17
+          Height = 16
           Top = 48
-          Width = 198
+          Width = 179
           Caption = '(or "drag and drop" a file here)'
           ParentColor = False
         end
@@ -250,7 +262,7 @@ object MainForm: TMainForm
           Left = 6
           Height = 58
           Top = 136
-          Width = 814
+          Width = 812
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           Lines.Strings = (
@@ -260,19 +272,19 @@ object MainForm: TMainForm
         end
         object lbleExpectedHash: TLabeledEdit
           Left = 6
-          Height = 27
+          Height = 24
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated file hash matches it, or not. '
           Top = 224
-          Width = 816
+          Width = 814
           Anchors = [akTop, akLeft, akRight]
           EditLabel.AnchorSideLeft.Control = lbleExpectedHash
           EditLabel.AnchorSideRight.Control = lbleExpectedHash
           EditLabel.AnchorSideRight.Side = asrBottom
           EditLabel.AnchorSideBottom.Control = lbleExpectedHash
           EditLabel.Left = 6
-          EditLabel.Height = 17
-          EditLabel.Top = 204
-          EditLabel.Width = 816
+          EditLabel.Height = 16
+          EditLabel.Top = 205
+          EditLabel.Width = 814
           EditLabel.Caption = 'Expected Hash Value (paste from other utility)'
           EditLabel.ParentColor = False
           TabOrder = 4
@@ -1641,7 +1653,11 @@ object MainForm: TMainForm
     }
   end
   object SaveDialog7: TSaveDialog
-    left = 544
+    left = 632
+    top = 456
+  end
+  object FLBLDialog: TOpenDialog
+    left = 664
     top = 280
   end
 end
