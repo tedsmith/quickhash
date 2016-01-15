@@ -3,7 +3,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   Height = 600
   Top = 185
   Width = 691
-  Caption = 'QuickHash 2.6.4-a (2011 - 2015) (c) Ted Smith - Disk Hashing Module'
+  Caption = 'QuickHash 2.6.6 BETA (2011 - 2015) (c) Ted Smith - Disk Hashing Module'
   ClientHeight = 600
   ClientWidth = 691
   Position = poScreenCenter
@@ -22,7 +22,6 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     ScrollWidth = 657
     ShowHint = True
     TabOrder = 0
-    TopIndex = -1
   end
   object btnListDisks: TButton
     Left = 16
@@ -40,20 +39,20 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     Width = 657
     Anchors = [akTop, akLeft, akRight]
     Caption = 'Status'
-    ClientHeight = 185
-    ClientWidth = 655
+    ClientHeight = 183
+    ClientWidth = 653
     TabOrder = 2
     object lblDiskNameA: TLabel
       Left = 8
-      Height = 15
+      Height = 13
       Top = 8
-      Width = 54
+      Width = 43
       Caption = 'Disk ID : '
       ParentColor = False
     end
     object lblDiskNameB: TLabel
       Left = 104
-      Height = 15
+      Height = 13
       Top = 8
       Width = 12
       Caption = '...'
@@ -61,15 +60,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblByteCapacityA: TLabel
       Left = 8
-      Height = 15
+      Height = 13
       Top = 80
-      Width = 95
+      Width = 77
       Caption = 'Byte Capacity : '
       ParentColor = False
     end
     object lblByteCapacityB: TLabel
       Left = 104
-      Height = 15
+      Height = 13
       Top = 80
       Width = 12
       Caption = '...'
@@ -77,15 +76,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblBytesLeftToHashA: TLabel
       Left = 9
-      Height = 15
+      Height = 13
       Top = 102
-      Width = 117
+      Width = 95
       Caption = 'Bytes left to hash : '
       ParentColor = False
     end
     object lblBytesLeftToHashB: TLabel
       Left = 104
-      Height = 15
+      Height = 13
       Top = 102
       Width = 12
       Caption = '...'
@@ -93,15 +92,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblEndTimeA: TLabel
       Left = 368
-      Height = 15
+      Height = 13
       Top = 128
-      Width = 65
+      Width = 50
       Caption = 'End Time :'
       ParentColor = False
     end
     object lblEndTimeB: TLabel
       Left = 463
-      Height = 15
+      Height = 13
       Top = 128
       Width = 12
       Caption = '...'
@@ -109,15 +108,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblStartTimeA: TLabel
       Left = 368
-      Height = 15
+      Height = 13
       Top = 80
-      Width = 71
+      Width = 56
       Caption = 'Start Time :'
       ParentColor = False
     end
     object lblStartTimeB: TLabel
       Left = 463
-      Height = 15
+      Height = 13
       Top = 80
       Width = 12
       Caption = '...'
@@ -134,15 +133,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblSpeedA: TLabel
       Left = 368
-      Height = 15
+      Height = 13
       Top = 102
-      Width = 42
+      Width = 34
       Caption = 'Speed:'
       ParentColor = False
     end
     object lblSpeedB: TLabel
       Left = 463
-      Height = 15
+      Height = 13
       Top = 102
       Width = 12
       Caption = '...'
@@ -150,7 +149,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblInterfaceB: TLabel
       Left = 463
-      Height = 15
+      Height = 13
       Top = 32
       Width = 12
       Caption = '...'
@@ -158,15 +157,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblModelA: TLabel
       Left = 9
-      Height = 15
+      Height = 13
       Top = 32
-      Width = 43
+      Width = 35
       Caption = 'Model :'
       ParentColor = False
     end
     object lblModelB: TLabel
       Left = 104
-      Height = 15
+      Height = 13
       Top = 32
       Width = 12
       Caption = '...'
@@ -174,15 +173,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblMediaTypeA: TLabel
       Left = 368
-      Height = 15
+      Height = 13
       Top = 8
-      Width = 70
+      Width = 59
       Caption = 'Media Type:'
       ParentColor = False
     end
     object lblMediaTypeB: TLabel
       Left = 463
-      Height = 15
+      Height = 13
       Top = 8
       Width = 12
       Caption = '...'
@@ -190,23 +189,23 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblInterfaceA: TLabel
       Left = 368
-      Height = 15
+      Height = 13
       Top = 32
-      Width = 58
+      Width = 49
       Caption = 'Interface:'
       ParentColor = False
     end
     object lblManufacturerA: TLabel
       Left = 9
-      Height = 15
+      Height = 13
       Top = 56
-      Width = 85
+      Width = 69
       Caption = 'Manufacturer:'
       ParentColor = False
     end
     object lblManufacturerB: TLabel
       Left = 104
-      Height = 15
+      Height = 13
       Top = 56
       Width = 12
       Caption = '...'
@@ -214,15 +213,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblSectorsA: TLabel
       Left = 368
-      Height = 15
+      Height = 13
       Top = 56
-      Width = 49
+      Width = 40
       Caption = 'Sectors:'
       ParentColor = False
     end
     object lblSectorsB: TLabel
       Left = 463
-      Height = 15
+      Height = 13
       Top = 56
       Width = 12
       Caption = '...'
@@ -230,15 +229,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object lblTimeTakenA: TLabel
       Left = 368
-      Height = 15
+      Height = 13
       Top = 152
-      Width = 71
+      Width = 58
       Caption = 'Time Taken:'
       ParentColor = False
     end
     object lblTimeTakenB: TLabel
       Left = 463
-      Height = 15
+      Height = 13
       Top = 152
       Width = 12
       Caption = '...'
@@ -247,9 +246,9 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object Label1: TLabel
     Left = 16
-    Height = 15
+    Height = 13
     Top = 528
-    Width = 159
+    Width = 130
     Caption = 'Computed SHA-1 Hash:'
     Font.Style = [fsBold]
     ParentColor = False
@@ -257,7 +256,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object edtComputedHash: TEdit
     Left = 168
-    Height = 25
+    Height = 21
     Top = 528
     Width = 400
     Font.Style = [fsBold]
@@ -275,7 +274,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object DateEdit1: TDateEdit
     Left = 416
-    Height = 25
+    Height = 21
     Hint = 'This timer only takes effect IF YOU ALSO'#13#10' SPECIFY A 24hr START TIME --->'
     Top = 32
     Width = 96
@@ -295,15 +294,15 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object Label2: TLabel
     Left = 288
-    Height = 15
+    Height = 13
     Top = 32
-    Width = 151
+    Width = 118
     Caption = 'Don''t start hashing until:'
     ParentColor = False
   end
   object lbledtStartAtTime: TLabeledEdit
     Left = 536
-    Height = 25
+    Height = 21
     Hint = 'Enter a 24hr time here to use the timer'#13#10'e.g. 06:15 or 09:45 or 18:35 or 22:00'
     Top = 32
     Width = 80
@@ -312,9 +311,9 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = lbledtStartAtTime
     EditLabel.Left = 536
-    EditLabel.Height = 15
+    EditLabel.Height = 13
     EditLabel.Hint = 'Enter 4-digit start time. For example: '#13#10'18:25 or 02:35 or 19:55 or 23:00'
-    EditLabel.Top = 14
+    EditLabel.Top = 16
     EditLabel.Width = 80
     EditLabel.Caption = 'Start At Time:'
     EditLabel.ParentColor = False
@@ -326,9 +325,9 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object Label3: TLabel
     Left = 418
-    Height = 15
+    Height = 13
     Top = 16
-    Width = 83
+    Width = 68
     Caption = 'Start At Date:'
     ParentColor = False
   end

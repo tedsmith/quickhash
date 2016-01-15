@@ -87,6 +87,18 @@ type
 
   { TMainForm }
 
+   MEMORYSTATUSEX = record
+     dwLength : DWORD;
+     dwMemoryLoad : DWORD;
+     ullTotalPhys : uint64;
+     ullAvailPhys : uint64;
+     ullTotalPageFile : uint64;
+     ullAvailPageFile : uint64;
+     ullTotalVirtual : uint64;
+     ullAvailVirtual : uint64;
+     ullAvailExtendedVirtual : uint64;
+  end;
+
    TMainForm = class(TForm)
     AlgorithmChoiceRadioBox3: TRadioGroup;
     AlgorithmChoiceRadioBox4: TRadioGroup;
@@ -138,8 +150,10 @@ type
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     gbDirectoryComparisons: TGroupBox;
+    SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
     Label1: TLabel;
+    lblRAM: TLabel;
     lbleExpectedHash: TLabeledEdit;
     lbleExpectedHashText: TLabeledEdit;
     lblURLBanner: TLabel;
@@ -240,6 +254,7 @@ type
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
+    sysRAMTimer: TTimer;
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
     procedure btnClipboardHashValueClick(Sender: TObject);
@@ -295,7 +310,6 @@ type
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
     function FileTimeToDTime(FTime: TFileTime): TDateTime;
     function GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in GB, with 2 decimals }
-
     {$ENDIF}
     {$IFDEF LINUX}
     function DateAttributesOfCurrentFileLinux(var SourceDirectoryAndFileName:string):string;
@@ -307,6 +321,7 @@ type
     {$ENDIF}
     function CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTime: Boolean): Boolean;
     procedure SHA1RadioButton3Change(Sender: TObject);
+    procedure sysRAMTimerTimer(Sender: TObject);
     procedure TabSheet3ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
 
@@ -352,6 +367,11 @@ var
   MainForm: TMainForm;
 
 implementation
+
+{$IFDEF WINDOWS}
+// Populate interface with quick view to RAM status
+function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; external 'kernel32' name 'GlobalMemoryStatusEx';
+{$ENDIF}
 
 { TMainForm }
 
@@ -417,6 +437,8 @@ begin
     chkCopyHidden.Hint:= 'On Windows, QuickHash finds hidden files and folders by default';
     // Remove the advice about using the File tab for hashing files.
     Label6.Caption := '';
+    lblRAM.Caption := GetSystemMem;
+
   {$ENDIF}
 
   {$IFDEF LINUX}
@@ -638,7 +660,6 @@ var
   i : Longword;
 begin
   i := 0;
-  ShowMessage(GetSystemMem);
   if FLBLDialog.Execute then
     begin
       try
@@ -663,7 +684,6 @@ begin
           begin
             memoHashText.Lines.Add(slFLBLOutput.Strings[i]);
           end;
-        memoHashText.Clear;
         memoHashText.Perform(EM_SCROLLCARET, 0, i);
         end
       else
@@ -690,17 +710,32 @@ begin
   else ShowMessage('Unable to open text file for line-by-line analysis');
 end;
 
+{$IFDEF WINDOWS}
+procedure TMainForm.sysRAMTimerTimer(Sender: TObject);
+var
+  MemFigures : string;
+begin
+  MemFigures := GetSystemMem;
+  lblRAM.Caption := MemFigures;
+end;
+
 // http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
 function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
 VAR
-  MS_Ex : MemoryStatus;
+  MS_Ex : MemoryStatusEx;
+  strTotalPhysMem, strTotalPhysAvail, strTotalFreeMem : string;
 begin
- FillChar (MS_Ex, SizeOf(MemoryStatus), #0);
- MS_Ex.dwLength := SizeOf(MemoryStatus);
- GlobalMemoryStatus(MS_Ex);
- //Result:= FormatByteSize(MS_Ex.dwAvailVirtual);
- Result:= FormatByteSize(MS_Ex.dwTotalPhys);
+ FillChar (MS_Ex, SizeOf(MemoryStatusEx), #0);
+ MS_Ex.dwLength := SizeOf(MemoryStatusEx);
+ GlobalMemoryStatusEx(MS_Ex);
+ strTotalPhysMem := FormatByteSize(MS_Ex.ullTotalPhys);
+ strTotalFreeMem := FormatByteSize(MS_Ex.ullAvailVirtual);
+ strTotalPhysAvail := FormatByteSize(MS_Ex.ullAvailPhys);
+ Result:= strTotalPhysMem + ' total' + #10#13 +
+          strTotalPhysAvail + ' avail' + #10#13 +
+          strTotalFreeMem + ' free' + #10#13;
 end;
+{$ENDIF}
 
 // Procedure SaveOutputAsCSV
 // An object orientated way to save any given display grid to CSV to save me
