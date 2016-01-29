@@ -246,6 +246,7 @@ type
     SelectDirectoryDialog3: TSelectDirectoryDialog;
     RecursiveDisplayGrid1: TStringGrid;
     sgDirA: TStringGrid;
+    sysRAMTimer: TTimer;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -254,7 +255,7 @@ type
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
-    sysRAMTimer: TTimer;
+    procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
     procedure btnClipboardHashValueClick(Sender: TObject);
@@ -321,7 +322,6 @@ type
     {$ENDIF}
     function CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTime: Boolean): Boolean;
     procedure SHA1RadioButton3Change(Sender: TObject);
-    procedure sysRAMTimerTimer(Sender: TObject);
     procedure TabSheet3ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
 
@@ -437,6 +437,8 @@ begin
     chkCopyHidden.Hint:= 'On Windows, QuickHash finds hidden files and folders by default';
     // Remove the advice about using the File tab for hashing files.
     Label6.Caption := '';
+    SystemRAMGroupBox.Visible := true;
+    sysRAMTimer.enabled := true;
     lblRAM.Caption := GetSystemMem;
 
   {$ENDIF}
@@ -458,7 +460,11 @@ begin
    chkUNCMode.Visible        := false;
    Edit2SourcePath.Text      := 'Source directory selection';
    Edit3DestinationPath.Text := 'Destination directory selection';
-  {$Endif}
+
+   // RAM status stuff needs to be disabled on Linux
+   sysRAMTimer.enabled       := false;
+   SystemRAMGroupBox.Visible := false;
+   {$Endif}
 
  {$ifdef UNIX}
     {$ifdef Darwin}
@@ -684,7 +690,9 @@ begin
           begin
             memoHashText.Lines.Add(slFLBLOutput.Strings[i]);
           end;
-        memoHashText.Perform(EM_SCROLLCARET, 0, i);
+        {$ifdef Windows}
+          memoHashText.Perform(EM_SCROLLCARET, 0, i);
+        {$endif}
         end
       else
       // Otherwise, just save it and be done with it
@@ -710,15 +718,19 @@ begin
   else ShowMessage('Unable to open text file for line-by-line analysis');
 end;
 
-{$IFDEF WINDOWS}
+
 procedure TMainForm.sysRAMTimerTimer(Sender: TObject);
 var
   MemFigures : string;
 begin
+  {$IFDEF WINDOWS}
   MemFigures := GetSystemMem;
   lblRAM.Caption := MemFigures;
+  {$ENDIF}
+  // Do nothing with Linux
 end;
 
+{$IFDEF WINDOWS}
 // http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
 function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
 VAR
