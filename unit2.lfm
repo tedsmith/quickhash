@@ -1,10 +1,10 @@
 object MainForm: TMainForm
-  Left = 283
+  Left = 250
   Height = 689
-  Top = 96
+  Top = 97
   Width = 1018
   AllowDropFiles = True
-  Caption = 'Quick Hash v2.6.6 BETA (c) 2011-2015 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
+  Caption = 'Quick Hash v2.6.6 (c) 2011-2015 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
   ClientHeight = 689
   ClientWidth = 1018
   OnCreate = FormCreate
@@ -110,7 +110,7 @@ object MainForm: TMainForm
         object btnLBL: TButton
           Left = 168
           Height = 25
-          Hint = 'Click to generate hash values line by line. '#13#10'Results are saved to text file'
+          Hint = 'Generate hash values line by line'#13#10'of the text in the text field above. '#13#10'Results are saved to text file.'
           Top = 208
           Width = 128
           Caption = 'Line-By-Line'
@@ -120,7 +120,7 @@ object MainForm: TMainForm
         object btnFLBL: TButton
           Left = 328
           Height = 25
-          Hint = 'Load a text file, hash the content '#13#10'line-by-line, and save the results '#13#10'to a new file'
+          Hint = 'Load a text file, hash the content '#13#10'of it line-by-line, and save the results '#13#10'to a new file.'
           Top = 208
           Width = 144
           Caption = 'Txt File Line-By-Line'
@@ -1675,7 +1675,7 @@ object MainForm: TMainForm
     top = 456
   end
   object FLBLDialog: TOpenDialog
-    left = 664
+    left = 904
     top = 280
   end
   object sysRAMTimer: TTimer

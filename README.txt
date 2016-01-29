@@ -1,4 +1,17 @@
-V2.6.5
+V2.6.6 - Jan 2016
+
+Added the ability to hash the content of a text file line-by-line (an expansion of the ability to hash pasted text line by line). This means the user can select a file full of a list of names or e-mails addresses or whatever, and each line will be hashed seperately. Carriage return line feeds and nulled space should be trimmed from the end of each line. 
+
+Added a RAM status field (Windows only) that updates itself every few seconds with the RAM status of the computer. Useful if particular large data sets are being dealt with. 
+
+Ever since 2011, Quickhash has only been shipped as a 32-bit version for Windows, in the knowledge that all the internal 64-bit requirements are dealt with and the fact that QH doesn't need the extra RAM and so on provided by 64-bit systems. However, a bug was reported (#17 - http://sourceforge.net/p/quickhash/tickets/17/) that highlighted an issue with 32-bit versions of QH running on 64-bit Windows with regard to the content of the Windows\System32 folder. The files in here are presented differently to 32-bit programs than 64-bit ones using the SysWoW64 system. 
+
+"The operating system uses the %SystemRoot%\system32 directory for its 64-bit library and executable files. This is done for backward compatibility reasons, as many legacy applications are hardcoded to use that path. When executing 32-bit applications (like Quickhash, which doesn't need to be 64-bit), WoW64 transparently redirects 32-bit DLLs to %SystemRoot%\SysWoW64, which contains 32-bit libraries and executables. 32-bit applications are generally not aware that they are running on a 64-bit operating system. 32-bit applications can access %SystemRoot%\System32 through the pseudo directory %SystemRoot%\sysnative."
+https://en.wikipedia.org/wiki/WoW64 
+
+This means, essentially, that the 32-bit mode of QH, when run on 64-bit systems, is presented with different data to what it is expecting by the filename natively. The users affected by this are minimal (perhaps none except the user who reported it) because it only impacts upon files in that specific folder. Other folders are not affected. Nevertheless, to resolve this, as of v2.6.6, a dedicated 32-bit and 64-bit executable are now provided for Windows. Users are encouraged to use the appropriate executable for their system, but in 99% of cases the 32-bit one should work fine in 32-bit emulated mode, unless the content of C:\Windows\System32 is to be examined.  
+
+V2.6.5 – Dec 2015
 
 At user request, the "Text" tab now allows line-by-line hashing of each line. The results are saved to a comma separated text file that can be opened in a text file editor or spreadsheet software.
 
