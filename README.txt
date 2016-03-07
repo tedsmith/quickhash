@@ -1,3 +1,7 @@
+V2.6.6-b – Mar 2016
+
+Windows Only : Removed one element from the RAM box because it was reporting incorrect amount of free RAM and it wasn't really that necessary anyway.
+
 V2.6.6 - Jan 2016
 
 Added the ability to hash the content of a text file line-by-line (an expansion of the ability to hash pasted text line by line). This means the user can select a file full of a list of names or e-mails addresses or whatever, and each line will be hashed seperately. Carriage return line feeds and nulled space should be trimmed from the end of each line. 

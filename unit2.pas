@@ -735,17 +735,18 @@ end;
 function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
 VAR
   MS_Ex : MemoryStatusEx;
-  strTotalPhysMem, strTotalPhysAvail, strTotalFreeMem : string;
+  strTotalPhysMem, strTotalPhysAvail : string;
 begin
  FillChar (MS_Ex, SizeOf(MemoryStatusEx), #0);
  MS_Ex.dwLength := SizeOf(MemoryStatusEx);
- GlobalMemoryStatusEx(MS_Ex);
- strTotalPhysMem := FormatByteSize(MS_Ex.ullTotalPhys);
- strTotalFreeMem := FormatByteSize(MS_Ex.ullAvailVirtual);
- strTotalPhysAvail := FormatByteSize(MS_Ex.ullAvailPhys);
- Result:= strTotalPhysMem + ' total' + #10#13 +
-          strTotalPhysAvail + ' avail' + #10#13 +
-          strTotalFreeMem + ' free' + #10#13;
+ if GlobalMemoryStatusEx(MS_Ex) then
+   begin
+     strTotalPhysMem := FormatByteSize(MS_Ex.ullTotalPhys);
+     strTotalPhysAvail := FormatByteSize(MS_Ex.ullAvailPhys);
+     Result:= strTotalPhysMem + ' total' + #10#13 +
+              strTotalPhysAvail + ' avail' + #10#13;
+   end
+ else Result := 'No Data';
 end;
 {$ENDIF}
 
@@ -2581,8 +2582,10 @@ begin
                   end;
 
               // Now copy the file, either to the reconstructed path or to the root
-
-              if not FileUtil.CopyFile(SourceDirectoryAndFileName, CopiedFilePathAndName) then
+              // Note that FileCopyEx from JawWindows unit is better for monitoring copy progress.
+              // though it seems unable to adjust created date from Vol1 to Vol2 too, same as CopyFile from FileUtil
+              // But one day, look at adding it for user feedback when copying large files if nothing else
+              if not FileUtil.CopyFile(SourceDirectoryAndFileName, CopiedFilePathAndName, true) then
                 begin
                   ShowMessage('Failed to copy file : ' + SourceDirectoryAndFileName + ' Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
                   SLCopyErrors.Add('Failed to copy: ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash);
