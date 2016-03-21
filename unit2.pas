@@ -105,6 +105,7 @@ type
     AlgorithmChoiceRadioBox1: TRadioGroup;
     AlgorithmChoiceRadioBox6: TRadioGroup;
     AlgorithmChoiceRadioBox5: TRadioGroup;
+    btnClearTextArea: TButton;
     btnCompare: TButton;
     btnCompareTwoFiles: TButton;
     btnCompareTwoFilesSaveAs: TButton;
@@ -112,19 +113,19 @@ type
     btnDirB: TButton;
     btnFileACompare: TButton;
     btnFileBCompare: TButton;
+    btnFLBL: TButton;
     btnHashFile: TButton;
+    btnLBL: TButton;
     btnRecursiveDirectoryHashing: TButton;
     btnClipboardResults: TButton;
     btnCallDiskHasherModule: TButton;
-    btnClearTextArea: TButton;
     btnCopyToClipboardA: TButton;
     btnCopyToClipboardB: TButton;
     btnSaveComparisons: TButton;
     btnStopScan1: TButton;
     btnStopScan2: TButton;
-    btnLBL: TButton;
-    btnFLBL: TButton;
     Button8CopyAndHash: TButton;
+    cbToggleInputDataToOutputFile: TCheckBox;
     FileTypeMaskCheckBox2: TCheckBox;
     chkUNCMode: TCheckBox;
     chkHiddenFiles: TCheckBox;
@@ -150,6 +151,7 @@ type
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     gbDirectoryComparisons: TGroupBox;
+    GroupBox5: TGroupBox;
     SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
     Label1: TLabel;
@@ -255,6 +257,7 @@ type
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
+    procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
@@ -508,7 +511,7 @@ begin
 
    begin
     filename := FileNames[0];
-    if DirectoryExists(filename) then
+    if DirectoryExistsUTF8(filename) then
     begin
       ShowMessage('Drag and drop of folders is not supported in this tab.');
     end
@@ -531,10 +534,24 @@ begin
        stop := Now;
        elapsed := stop - start;
        lblTimeTaken2.Caption := 'Time taken : '+ TimeToStr(elapsed);
+
+        // If the user has ane existing hash to check against the drag n drop file
+        // compare it here
+       if lbleExpectedHash.Text <> '...' then
+       begin
+         if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
+           begin
+             Showmessage('Expected hash matches the computed file hash, OK');
+           end
+       else
+         begin
+           Showmessage('Expected hash DOES NOT match the computed file hash!');
+         end;
        Application.ProcessMessages;
      end
     else
       ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
+     end;
    end;
 end;
 
@@ -634,15 +651,31 @@ end;
 // https://support.google.com/adwords/answer/6276125?hl=en-GB
 procedure TMainForm.btnLBLClick(Sender: TObject);
 var
-  slLBL : TStringList;
+  slLBL : TStringListUTF8;
   i     : Longword;
 begin
+  if memoHashText.Lines.Count = 0 then
+    begin
+    ShowMessage('Enter text into the text field first.');
+    exit;
+    end;
+
   try
-    slLBL := TStringList.Create;
-    for i := 0 to memoHashText.Lines.Count -1 do
+    slLBL := TStringListUTF8.Create;
+    if not cbToggleInputDataToOutputFile.Checked then
       begin
-        slLBL.Add(memoHashText.Lines[i] + ',' + Trim(CalcTheHashString(memoHashText.Lines[i])));
-      end;
+      for i := 0 to memoHashText.Lines.Count -1 do
+        begin
+          slLBL.Add(memoHashText.Lines[i] + ',' + Trim(CalcTheHashString(memoHashText.Lines[i])));
+        end;
+      end
+    else
+    begin
+      for i := 0 to memoHashText.Lines.Count -1 do
+        begin
+          slLBL.Add(Trim(CalcTheHashString(memoHashText.Lines[i])));
+        end;
+    end;
   finally
     SaveDialog7.Title := 'Save line-by-line results as...';
     SaveDialog7.InitialDir := GetCurrentDir;
@@ -651,7 +684,8 @@ begin
 
     if SaveDialog7.Execute then
       begin
-        slLBL.SaveToFile(SaveDialog7.FileName)
+        slLBL.SaveToFile(SaveDialog7.FileName);
+        memoHashText.Text := 'See output file ' + SaveDialog7.FileName + ' for results.';
       end
     else ShowMessage('Unable to save file ' + SaveDialog7.FileName);
     slLBL.Free;
@@ -662,15 +696,15 @@ end;
 // Similar to the procedure for hashing the memo line-by-line in "Text" tab
 procedure TMainForm.btnFLBLClick(Sender: TObject);
 var
-  slFLBLInput, slFLBLOutput : TStringList; // FLBL = File, Line by Line
+  slFLBLInput, slFLBLOutput : TStringListUTF8; // FLBL = File, Line by Line
   i : Longword;
 begin
   i := 0;
   if FLBLDialog.Execute then
     begin
       try
-      slFLBLInput := TStringList.Create;
-      slFLBLOutput:= TStringList.Create;
+      slFLBLInput := TStringListUTF8.Create;
+      slFLBLOutput:= TStringListUTF8.Create;
       slFLBLInput.Sorted:= false;
       slFLBLOutput.Sorted:= false;
 
@@ -678,12 +712,24 @@ begin
       slFLBLInput.LoadFromFile(FLBLDialog.FileName);
 
       // Write the input to a new stringlist, hash each line
-      for i := 0 to slFLBLInput.Count -1 do
+      if not cbToggleInputDataToOutputFile.Checked then
         begin
-          slFLBLOutput.Add(slFLBLInput.Strings[i] + ',' + Trim(CalcTheHashString(slFLBLInput.Strings[i])));
-        end;
-
-      // If the putput is smaller than 30Mb, load it to the screen
+          for i := 0 to slFLBLInput.Count -1 do
+            begin
+             if Length(slFLBLInput.Strings[i]) > 0 then
+              slFLBLOutput.Add(slFLBLInput.Strings[i] + ',' + Trim(CalcTheHashString(slFLBLInput.Strings[i])));
+            end;
+        end
+      else
+        begin
+         for i := 0 to slFLBLInput.Count -1 do
+          begin
+            if Length(slFLBLInput.Strings[i]) > 0 then
+            begin
+              slFLBLOutput.Add(Trim(CalcTheHashString(slFLBLInput.Strings[i])));
+            end;
+          end;
+      // If the output is smaller than 30Mb, load it to the screen
       if Length(slFLBLOutput.Text) < 30000000 then
         begin
         for i := 0 to slFLBLOutput.Count -1 do
@@ -700,17 +746,27 @@ begin
           memoHashText.Clear;
           memoHashText.Lines.Add('Data set too large for display. Save the output file');
         end;
+      end;
+
       finally
-        SaveDialog7.Title      := 'Save files line-by-line results as...';
+        SaveDialog7.Title      := 'Save line-by-line hashing results as...';
         SaveDialog7.InitialDir := GetCurrentDir;
         SaveDialog7.Filter     := 'Comma Sep|*.csv';
         SaveDialog7.DefaultExt := 'csv';
         SaveDialog7.FileName   := 'Output';
         if SaveDialog7.Execute then
           begin
-            slFLBLOutput.SaveToFile(SaveDialog7.FileName)
+            slFLBLOutput.SaveToFile(SaveDialog7.FileName);
+            memoHashText.Lines.Add('Results saved to file : ' + SaveDialog7.FileName);
+            // If MS Windows, launch 'Windows Explorer' to show the output file.
+            {$ifdef windows}
+            SysUtils.ExecuteProcess(UTF8ToSys('explorer.exe'), '/select,'+ SaveDialog7.FileName, []);
+            {$endif}
           end
-        else ShowMessage('Unable to save output file ' + SaveDialog7.FileName);
+        else
+          begin
+            ShowMessage('Unable to save output file ' + SaveDialog7.FileName);
+          end;
         slFLBLOutput.Free;
         slFLBLInput.Free;
       end;
@@ -728,6 +784,13 @@ begin
   lblRAM.Caption := MemFigures;
   {$ENDIF}
   // Do nothing with Linux
+end;
+
+procedure TMainForm.cbToggleInputDataToOutputFileChange(Sender: TObject);
+begin
+  if cbToggleInputDataToOutputFile.Checked then
+    cbToggleInputDataToOutputFile.Caption := 'Source text EXcluded in output'
+  else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
 end;
 
 {$IFDEF WINDOWS}

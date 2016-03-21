@@ -1,3 +1,11 @@
+V2.6.7 Mar 2016
+
+The 'Expected Hash' comparison didn't kick in when the user drag and dropped a file into the 'File' tab in that QuickHash wouldn't report to the user whether the computed hash matched what he was expecting though obviously the user could still look by eye at the computed hash but nevertheless, it needed to be fixed. Ticket number 21 refers (https://sourceforge.net/p/quickhash/tickets/21/).
+
+Added a toggle for text line-by-line hashing. Users asked if it would be possible to give them a choice when outputting the results of either including the original source text with the computed hashes or excluding it resulting in a just a list of hashes. So now there is an option that toggles between 'Source text INcluded in output' or 'Source text EXcluded in output'. It, along with the two line-by-line text buttons have been put in their own group box within the 'Text' tab. Non-ASCII\ANSI characters accepted allowing for Western, Eastern and Asian language encoding. Ticket number 22 refers (https://sourceforge.net/p/quickhash/feature-requests/22/)
+
+Some other minor improvements.  
+
 V2.6.6-b – Mar 2016
 
 Windows Only : Removed one element from the RAM box because it was reporting incorrect amount of free RAM and it wasn't really that necessary anyway.

@@ -19,7 +19,7 @@
       <MajorVersionNr Value="2"/>
       <MinorVersionNr Value="6"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="7"/>
+      <BuildNr Value="8"/>
       <Language Value="0809"/>
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software" CompanyName="Ted Smith (Ted Technology on Sourceforge)" FileDescription="File hashing GUI for Linux &amp; Windows" LegalCopyright="2011 - 2015 (c) Ted Smith" ProductName="QuickHash" ProductVersion="2.6.2.b"/>
     </VersionInfo>
@@ -62,25 +62,25 @@
         <ResourceBaseClass Value="Form"/>
         <TopLine Value="1353"/>
         <CursorPos X="25" Y="777"/>
-        <UsageCount Value="180"/>
+        <UsageCount Value="179"/>
       </Unit1>
       <Unit2>
         <Filename Value="../../../lazarus/lcl/grids.pas"/>
         <TopLine Value="1081"/>
         <CursorPos X="22" Y="1106"/>
-        <UsageCount Value="277"/>
+        <UsageCount Value="276"/>
       </Unit2>
       <Unit3>
         <Filename Value="../AmazonUtil/unit1.pas"/>
         <TopLine Value="210"/>
         <CursorPos X="7" Y="240"/>
-        <UsageCount Value="274"/>
+        <UsageCount Value="273"/>
       </Unit3>
       <Unit4>
         <Filename Value="../RoastLamb - Alpha 8.0 - Distributed 12-11-29/unit1.pas"/>
         <TopLine Value="3047"/>
         <CursorPos X="57" Y="3077"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit4>
       <Unit5>
         <Filename Value="unit2.pas"/>
@@ -90,8 +90,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="2562"/>
-        <CursorPos X="84" Y="2580"/>
+        <TopLine Value="1778"/>
+        <CursorPos X="40" Y="1806"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -100,61 +100,61 @@
         <Filename Value="../dcpcrypt-2.0.4.1/dcpcrypt2.pas"/>
         <TopLine Value="299"/>
         <CursorPos X="46" Y="306"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit6>
       <Unit7>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcphaval.pas"/>
         <TopLine Value="275"/>
         <CursorPos X="54" Y="299"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit7>
       <Unit8>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcpmd4.pas"/>
         <TopLine Value="168"/>
         <CursorPos X="52" Y="192"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit8>
       <Unit9>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcpmd5.pas"/>
         <TopLine Value="185"/>
         <CursorPos X="52" Y="209"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit9>
       <Unit10>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcpripemd128.pas"/>
         <TopLine Value="251"/>
         <CursorPos X="58" Y="275"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit10>
       <Unit11>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcpripemd160.pas"/>
         <TopLine Value="612"/>
         <CursorPos X="58" Y="636"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit11>
       <Unit12>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcpsha1.pas"/>
         <TopLine Value="204"/>
         <CursorPos X="53" Y="228"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit12>
       <Unit13>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcpsha256.pas"/>
         <TopLine Value="10"/>
         <CursorPos Y="10"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit13>
       <Unit14>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcpsha512.pas"/>
         <TopLine Value="185"/>
         <CursorPos X="59" Y="209"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit14>
       <Unit15>
         <Filename Value="../dcpcrypt-2.0.4.1/Hashes/dcptiger.pas"/>
         <TopLine Value="231"/>
         <CursorPos X="26" Y="265"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit15>
       <Unit16>
         <Filename Value="sha1customised.pas"/>
@@ -179,79 +179,78 @@
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/objpas/classes/classesh.inc"/>
         <TopLine Value="903"/>
         <CursorPos X="17" Y="928"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit18>
       <Unit19>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcpsha512.pas"/>
         <TopLine Value="20"/>
         <CursorPos X="47" Y="42"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit19>
       <Unit20>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcpsha256.pas"/>
         <TopLine Value="27"/>
         <CursorPos X="15" Y="49"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit20>
       <Unit21>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/dcpcrypt2.pas"/>
         <TopLine Value="299"/>
         <CursorPos X="62" Y="325"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit21>
       <Unit22>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcphaval.pas"/>
         <TopLine Value="277"/>
         <CursorPos X="54" Y="299"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit22>
       <Unit23>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcpmd4.pas"/>
         <TopLine Value="170"/>
         <CursorPos X="52" Y="192"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit23>
       <Unit24>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcpmd5.pas"/>
         <TopLine Value="187"/>
         <CursorPos X="52" Y="209"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit24>
       <Unit25>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcpripemd128.pas"/>
         <TopLine Value="253"/>
         <CursorPos X="58" Y="275"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit25>
       <Unit26>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcpripemd160.pas"/>
         <TopLine Value="614"/>
         <CursorPos X="58" Y="636"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit26>
       <Unit27>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcpsha1.pas"/>
         <TopLine Value="206"/>
         <CursorPos X="53" Y="228"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit27>
       <Unit28>
         <Filename Value="/lazarus/dcpcrypt-2.0.4.1/Hashes/dcptiger.pas"/>
         <TopLine Value="241"/>
         <CursorPos X="131" Y="248"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit28>
       <Unit29>
         <Filename Value="dcpcrypt-2.0.4.1-QWordVer/Hashes/dcpsha256.pas"/>
         <TopLine Value="201"/>
         <CursorPos X="55" Y="231"/>
-        <UsageCount Value="5"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
+        <UsageCount Value="4"/>
       </Unit29>
       <Unit30>
         <Filename Value="DiskModule/diskmoduleunit1.lfm"/>
         <EditorIndex Value="7"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="40"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit30>
@@ -263,8 +262,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="DiskModuleUnit1"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="24"/>
-        <CursorPos X="58" Y="31"/>
+        <TopLine Value="456"/>
+        <CursorPos X="99" Y="464"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -273,19 +272,19 @@
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/objpas/dateutil.inc"/>
         <TopLine Value="236"/>
         <CursorPos X="10" Y="262"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit32>
       <Unit33>
         <Filename Value="DiskModule/sha1customised.pas"/>
         <TopLine Value="10"/>
         <CursorPos X="41" Y="267"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="11"/>
       </Unit33>
       <Unit34>
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/objpas/sysutils/filutilh.inc"/>
         <TopLine Value="63"/>
         <CursorPos X="10" Y="88"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit34>
       <Unit35>
         <Filename Value="Tmp-ScrShots/forforum.pas"/>
@@ -298,112 +297,112 @@
         <Filename Value="DiskModule/sha1AssemblyCustomised.pas"/>
         <TopLine Value="77"/>
         <CursorPos X="20" Y="105"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit36>
       <Unit37>
         <Filename Value="DiskModule/SHA1Disks.pas"/>
         <CursorPos X="23" Y="66"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="10"/>
       </Unit37>
       <Unit38>
         <Filename Value="sha1transform-AssemblyCode.pas"/>
         <CursorPos X="10" Y="2"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit38>
       <Unit39>
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/objpas/types.pp"/>
         <TopLine Value="105"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit39>
       <Unit40>
         <Filename Value="MD5TransformEnhancedAssemblyCode.pas"/>
         <CursorPos Y="2"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit40>
       <Unit41>
         <Filename Value="findallfilesenhancedunit.pas"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="43" Y="15"/>
-        <UsageCount Value="134"/>
+        <UsageCount Value="143"/>
       </Unit41>
       <Unit42>
         <Filename Value="FindAllFilesEnhanced.pas"/>
         <EditorIndex Value="2"/>
         <TopLine Value="24"/>
         <CursorPos Y="52"/>
-        <UsageCount Value="59"/>
+        <UsageCount Value="64"/>
         <Loaded Value="True"/>
       </Unit42>
       <Unit43>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/control.inc"/>
         <TopLine Value="2698"/>
         <CursorPos Y="2722"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="14"/>
       </Unit43>
       <Unit44>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/grids.pas"/>
         <TopLine Value="8911"/>
         <CursorPos Y="8927"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="10"/>
       </Unit44>
       <Unit45>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/fileutil.pas"/>
         <TopLine Value="141"/>
         <CursorPos X="5" Y="165"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="14"/>
       </Unit45>
       <Unit46>
         <Filename Value="/lazarus/components/lazutils/fileutil.pas"/>
         <TopLine Value="154"/>
         <CursorPos X="3" Y="191"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit46>
       <Unit47>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/customcheckbox.inc"/>
         <TopLine Value="104"/>
         <CursorPos Y="117"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit47>
       <Unit48>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/wincontrol.inc"/>
         <TopLine Value="6341"/>
         <CursorPos Y="6356"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit48>
       <Unit49>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
         <TopLine Value="927"/>
         <CursorPos Y="949"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit49>
       <Unit50>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/fileutil.inc"/>
         <TopLine Value="1128"/>
         <CursorPos Y="1143"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit50>
       <Unit51>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/masks.pas"/>
         <TopLine Value="515"/>
         <CursorPos Y="528"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit51>
       <Unit52>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/lazutf8.pas"/>
         <TopLine Value="294"/>
         <CursorPos Y="299"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit52>
       <Unit53>
         <Filename Value="unit2.lrs"/>
         <CursorPos X="868" Y="383"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit53>
       <Unit54>
         <Filename Value="/lazarus/lcl/grids.pas"/>
         <TopLine Value="10446"/>
         <CursorPos X="22" Y="10477"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit54>
       <Unit55>
         <Filename Value="udisplaygrid.pas"/>
@@ -415,7 +414,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="13"/>
         <CursorPos X="3" Y="30"/>
-        <UsageCount Value="68"/>
+        <UsageCount Value="77"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit55>
@@ -424,35 +423,35 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos X="10" Y="24"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit56>
       <Unit57>
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/inc/wstrings.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="922"/>
         <CursorPos X="5" Y="947"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit57>
       <Unit58>
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/objpas/sysutils/sysstrh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="201"/>
         <CursorPos X="15" Y="218"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="14"/>
       </Unit58>
       <Unit59>
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/objpas/sysutils/sysstr.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2620"/>
         <CursorPos X="15" Y="2645"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="14"/>
       </Unit59>
       <Unit60>
         <Filename Value="/lazarus/components/lazutils/fileutil.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="91"/>
         <CursorPos X="35" Y="93"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit60>
       <Unit61>
         <Filename Value="/lazarus/components/lazutils/lazfileutils.pas"/>
@@ -460,13 +459,13 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="77"/>
         <CursorPos X="11" Y="98"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit61>
       <Unit62>
         <Filename Value="/lazarus/components/lazutils/winlazfileutils.inc"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="14" Y="8"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit62>
       <Unit63>
         <Filename Value="/usr/share/lazarus/1.4.4/components/lazutils/fileutil.pas"/>
@@ -474,14 +473,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="159"/>
         <CursorPos X="15" Y="170"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="11"/>
       </Unit63>
       <Unit64>
         <Filename Value="/lazarus/fpc/2.6.4/source/rtl/win/wininc/struct.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="4238"/>
         <CursorPos X="18" Y="4535"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="10"/>
       </Unit64>
       <Unit65>
         <Filename Value="/usr/share/lazarus/1.4.4/lcl/controls.pp"/>
@@ -489,136 +488,136 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1516"/>
         <CursorPos X="15" Y="1528"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit65>
       <Unit66>
         <Filename Value="/usr/share/lazarus/1.4.4/lcl/include/control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1439"/>
         <CursorPos X="3" Y="1447"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit66>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="unit2.pas"/>
-        <Caret Line="464" Column="15" TopLine="452"/>
+        <Caret Line="1939" TopLine="1917"/>
       </Position1>
       <Position2>
         <Filename Value="unit2.pas"/>
-        <Caret Line="322" Column="25" TopLine="299"/>
+        <Caret Line="1940" TopLine="1917"/>
       </Position2>
       <Position3>
         <Filename Value="unit2.pas"/>
-        <Caret Line="236" Column="48" TopLine="230"/>
+        <Caret Line="1939" TopLine="1917"/>
       </Position3>
       <Position4>
         <Filename Value="unit2.pas"/>
-        <Caret Line="249" Column="16" TopLine="230"/>
+        <Caret Line="1940" TopLine="1917"/>
       </Position4>
       <Position5>
         <Filename Value="unit2.pas"/>
-        <Caret Line="308" Column="3" TopLine="292"/>
+        <Caret Line="1939" TopLine="1917"/>
       </Position5>
       <Position6>
         <Filename Value="unit2.pas"/>
-        <Caret Line="258" Column="31" TopLine="246"/>
+        <Caret Line="1940" TopLine="1917"/>
       </Position6>
       <Position7>
         <Filename Value="unit2.pas"/>
-        <Caret Line="732" Column="27" TopLine="722"/>
+        <Caret Line="1939" TopLine="1917"/>
       </Position7>
       <Position8>
         <Filename Value="unit2.pas"/>
-        <Caret Line="731" TopLine="718"/>
+        <Caret Line="1940" TopLine="1917"/>
       </Position8>
       <Position9>
         <Filename Value="unit2.pas"/>
-        <Caret Line="730" Column="42" TopLine="720"/>
+        <Caret Line="1939" TopLine="1917"/>
       </Position9>
       <Position10>
         <Filename Value="unit2.pas"/>
-        <Caret Line="293" Column="25" TopLine="281"/>
+        <Caret Line="1940" TopLine="1917"/>
       </Position10>
       <Position11>
         <Filename Value="unit2.pas"/>
-        <Caret Line="445" Column="32" TopLine="444"/>
+        <Caret Line="1928" Column="11" TopLine="1917"/>
       </Position11>
       <Position12>
         <Filename Value="unit2.pas"/>
-        <Caret Line="26" Column="17" TopLine="9"/>
+        <Caret Line="716" Column="35" TopLine="704"/>
       </Position12>
       <Position13>
         <Filename Value="unit2.pas"/>
-        <Caret Line="32" Column="17" TopLine="9"/>
+        <Caret Line="1963" TopLine="1946"/>
       </Position13>
       <Position14>
         <Filename Value="unit2.pas"/>
-        <Caret Line="153" Column="14" TopLine="125"/>
+        <Caret Line="719" TopLine="702"/>
       </Position14>
       <Position15>
         <Filename Value="unit2.pas"/>
-        <Caret Line="156" Column="11" TopLine="128"/>
+        <Caret Line="1963" TopLine="1946"/>
       </Position15>
       <Position16>
         <Filename Value="unit2.pas"/>
-        <Caret Line="249" Column="16" TopLine="221"/>
+        <Caret Line="719" TopLine="702"/>
       </Position16>
       <Position17>
         <Filename Value="unit2.pas"/>
-        <Caret Line="258" Column="31" TopLine="230"/>
+        <Caret Line="1963" TopLine="1946"/>
       </Position17>
       <Position18>
         <Filename Value="unit2.pas"/>
-        <Caret Line="727" Column="28" TopLine="700"/>
+        <Caret Line="719" TopLine="702"/>
       </Position18>
       <Position19>
         <Filename Value="unit2.pas"/>
-        <Caret Line="313" Column="26" TopLine="297"/>
+        <Caret Line="306" Column="32" TopLine="290"/>
       </Position19>
       <Position20>
         <Filename Value="unit2.pas"/>
-        <Caret Line="442" Column="35" TopLine="414"/>
+        <Caret Line="569" Column="60" TopLine="541"/>
       </Position20>
       <Position21>
         <Filename Value="unit2.pas"/>
-        <Caret Line="313" Column="26" TopLine="297"/>
+        <Caret Line="669" Column="73" TopLine="641"/>
       </Position21>
       <Position22>
         <Filename Value="unit2.pas"/>
-        <Caret Line="442" Column="35" TopLine="414"/>
+        <Caret Line="676" Column="43" TopLine="648"/>
       </Position22>
       <Position23>
         <Filename Value="unit2.pas"/>
-        <Caret Line="727" Column="29" TopLine="699"/>
+        <Caret Line="719" Column="85" TopLine="691"/>
       </Position23>
       <Position24>
         <Filename Value="unit2.pas"/>
-        <Caret Line="742" Column="2" TopLine="717"/>
+        <Caret Line="724" Column="50" TopLine="696"/>
       </Position24>
       <Position25>
         <Filename Value="unit2.pas"/>
-        <Caret Line="373" Column="121" TopLine="356"/>
+        <Caret Line="1963" TopLine="1940"/>
       </Position25>
       <Position26>
         <Filename Value="unit2.pas"/>
-        <Caret Line="742" Column="21" TopLine="714"/>
+        <Caret Line="735" Column="11" TopLine="702"/>
       </Position26>
       <Position27>
         <Filename Value="unit2.pas"/>
-        <Caret Line="373" Column="121" TopLine="356"/>
+        <Caret Line="720" Column="32" TopLine="697"/>
       </Position27>
       <Position28>
         <Filename Value="unit2.pas"/>
-        <Caret Line="367" Column="32" TopLine="346"/>
+        <Caret Line="517" Column="43" TopLine="503"/>
       </Position28>
       <Position29>
         <Filename Value="unit2.pas"/>
-        <Caret Line="2162" Column="13" TopLine="2134"/>
+        <Caret Line="733" Column="9" TopLine="714"/>
       </Position29>
       <Position30>
         <Filename Value="unit2.pas"/>
-        <Caret Line="2188" Column="11" TopLine="2161"/>
+        <Caret Line="730" Column="19" TopLine="718"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
