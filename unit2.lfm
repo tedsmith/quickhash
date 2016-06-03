@@ -1,10 +1,10 @@
 object MainForm: TMainForm
-  Left = 250
+  Left = 270
   Height = 689
-  Top = 97
+  Top = 57
   Width = 1018
   AllowDropFiles = True
-  Caption = 'Quick Hash v2.6.7 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
+  Caption = 'Quick Hash v2.6.8 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
   ClientHeight = 689
   ClientWidth = 1018
   OnCreate = FormCreate
@@ -21,6 +21,7 @@ object MainForm: TMainForm
     ParentShowHint = False
     TabIndex = 0
     TabOrder = 0
+    OnChange = PageControl1Change
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
       Caption = 'Te&xt'
@@ -689,19 +690,19 @@ object MainForm: TMainForm
     object TabSheet4: TTabSheet
       Hint = 'Choose a directory, have its content hashed, files are copied to destination, and re-hashed.'
       Caption = '&Copy'
-      ClientHeight = 617
-      ClientWidth = 990
+      ClientHeight = 624
+      ClientWidth = 988
       ParentShowHint = False
       ShowHint = True
       object CopyFilesHashingGroupBox: TGroupBox
         Left = 120
         Height = 598
         Top = 8
-        Width = 860
+        Width = 858
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Hash files in chosen directory, copy them, and re-hash the copied files (recursive by default) '
         ClientHeight = 580
-        ClientWidth = 856
+        ClientWidth = 854
         Color = clForm
         ParentColor = False
         ParentFont = False
@@ -710,10 +711,10 @@ object MainForm: TMainForm
           Left = 16
           Height = 176
           Top = 16
-          Width = 817
+          Width = 815
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 176
-          ClientWidth = 817
+          ClientWidth = 815
           TabOrder = 3
           object CheckBoxListOfDirsOnly: TCheckBox
             Left = 14
@@ -949,7 +950,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 20
           Top = 560
-          Width = 856
+          Width = 854
           Anchors = [akRight]
           Panels = <>
         end
@@ -965,7 +966,7 @@ object MainForm: TMainForm
           ReadOnly = True
           TabOrder = 5
           OnClick = DirListAClick
-          Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+          Options = [tvoAllowMultiselect, tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
           TreeLinePenStyle = psSolid
           ObjectTypes = [otFolders, otHidden]
         end

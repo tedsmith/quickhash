@@ -258,6 +258,7 @@ type
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
+    procedure PageControl1Change(Sender: TObject);
     procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
@@ -297,7 +298,7 @@ type
     procedure FormDropFiles(Sender: TObject; const FileNames: array of String);
     procedure HashFile(FileIterator: TFileIterator);
     procedure lblURLBannerClick(Sender: TObject);
-    procedure ProcessDir(const SourceDirName: string);
+    procedure ProcessDir(SourceDirName: string);
     procedure MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
     procedure CompareTwoHashes(FileAHash, FileBHash : string);
     procedure HashText(Sender: TObject);
@@ -340,6 +341,8 @@ type
     DirA, DirB : string;
    sValue1 : string; // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
 
+   slMultipleDirNames : TStringList;
+   MultipleDirsChosen : boolean;
   const
   {$IFDEF WINDOWS}
     // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
@@ -791,6 +794,11 @@ begin
   if cbToggleInputDataToOutputFile.Checked then
     cbToggleInputDataToOutputFile.Caption := 'Source text EXcluded in output'
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
+end;
+
+procedure TMainForm.PageControl1Change(Sender: TObject);
+begin
+
 end;
 
 {$IFDEF WINDOWS}
@@ -1311,7 +1319,7 @@ begin
   try
     // First, list and hash the files in DirA
     lblStatusB.Caption      := 'Counting files in ' + DirA + ' ...please wait';
-    TotalFilesDirA          := TStringList.Create;
+    TotalFilesDirA          := TStringListUTF8.Create;
     TotalFilesDirA.Sorted   := true;
     TotalFilesDirA          := FindAllFilesEx(LongPathOverrideA+DirA, '*', True, True);
     TotalFilesDirA.Sort;
@@ -1357,7 +1365,7 @@ begin
 
     // Then, list and hash the files in DirB
     lblStatusB.Caption       := 'Counting and examining files in ' + DirB + ' ...please wait';
-    TotalFilesDirB           := TStringList.Create;
+    TotalFilesDirB           := TStringListUTF8.Create;
     TotalFilesDirB.Sorted    := true;
     TotalFilesDirB           := FindAllFilesEx(LongPathOverrideB+DirB, '*', True, True);
     TotalFilesDirB.Sort;
@@ -1651,6 +1659,8 @@ begin
 end;
 
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
+var
+  i : integer;
 begin
   frmDisplayGrid1.CopyAndHashGrid.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
@@ -1660,6 +1670,7 @@ begin
   lblTimeTaken6A.Caption           := '...';
   lblTimeTaken6B.Caption           := '...';
   lblTimeTaken6C.Caption           := '...';
+  i                                := 0;
   StatusBar3.Caption               := ('Counting files...please wait');
   Application.ProcessMessages;
 
@@ -1688,8 +1699,22 @@ begin
     DirListAClick(Sender);
     DirListBClick(Sender);
 
-    // Now process the selected source and destination in non-UNC mode
-    ProcessDir(SourceDir);
+    // Now process the selected source and destination folders in non-UNC mode
+    // If the user has chosen multiple folders...
+    if MultipleDirsChosen then
+      try
+      if slMultipleDirNames.Count > 0 then
+        begin
+          // give ProcessDir function the first folder name in the list for now...
+          // ProcessDir will then do the itterations itself using the same stringlist
+          SourceDir := slMultipleDirNames.Strings[0];
+          ProcessDir(SourceDir);
+        end
+      finally
+        if assigned(slMultipleDirNames) then slMultipleDirNames.free;
+      end
+    // or copy single selected folder as normal if only one folder selected
+    else ProcessDir(SourceDir);
 
     if SourceDirValid AND DestDirValid = FALSE then
       begin
@@ -2214,7 +2239,7 @@ begin
   OpenURL(QuickHashURL);
 end;
 
-procedure TMainForm.ProcessDir(const SourceDirName: string);
+procedure TMainForm.ProcessDir(SourceDirName: string);
 
 {$IFDEF WINDOWS}
 type
@@ -2234,7 +2259,7 @@ var
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
-  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
+  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors, slTemp : TStringList;
 
   {$IFDEF WINDOWS}
   DriveLetter : char;  // For MS Windows drive letter irritances only
@@ -2258,7 +2283,7 @@ begin
   k                       := 0;
   m                       := 0;
 
-  SLCopyErrors := TStringList.Create;
+  SLCopyErrors := TStringListUTF8.Create;
 
   // Ensures the selected source directory is set as the directory to be searched
   // and then finds all the files and directories within, storing as a StringList.
@@ -2286,7 +2311,7 @@ begin
   // On Linux, though, we need different behaviour - see IFDEF below
   if chkNoRecursiveCopy.Checked then          // Does not want recursive
     begin
-      if FileTypeMaskCheckBox1.Checked then   // ...and does want a file mask
+      if FileTypeMaskCheckBox1.Checked then     // ...and does want a file mask
         begin
           FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, False, True);
         end
@@ -2296,17 +2321,77 @@ begin
         end;
     end;
 
-  if not chkNoRecursiveCopy.Checked then     // Does want recursive
+  if MultipleDirsChosen = false then              // User has only selected one folder
     begin
-      if FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
+      if not chkNoRecursiveCopy.Checked then        // and does want recursive copy
         begin
-          FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
-        end
-      else                                    // but does not want a file mask
-        begin
-          FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
+          if FileTypeMaskCheckBox1.Checked then       // ...but does want a file mask
+            begin
+              FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
+            end
+          else                                      // ... but does NOT want a file mask
+            begin
+              FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
+            end;
         end;
+    end
+  else                                            // User has selected multiple folders to copy
+  begin
+    if not chkNoRecursiveCopy.Checked then          // and does want recursive
+     begin
+       if FileTypeMaskCheckBox1.Checked then          // ...but does want a file mask for all selected folders
+         begin
+           FilesFoundToCopy := TStringListUTF8.Create;
+           FilesFoundToCopy.Sorted := true;
+           for i := 0 to slMultipleDirNames.Count -1 do
+             begin
+               SourceDirName := slMultipleDirNames.Strings[i];
+               slTemp        := TStringListUTF8.Create;
+               slTemp.Sorted := true;
+               slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
+               for j := 0 to slTemp.Count -1 do
+                 begin
+                   FilesFoundToCopy.Add(slTemp.Strings[j]);
+                 end;
+               slTemp.Free;
+             end;
+         end
+       else                                          // ... but does NOT want a file mask for all selected folders
+         begin
+           FilesFoundToCopy := TStringListUTF8.Create;
+           FilesFoundToCopy.Sorted := true;
+           for i := 0 to slMultipleDirNames.Count -1 do
+             begin
+               SourceDirName    := slMultipleDirNames.Strings[i];
+               slTemp           := TStringListUTF8.Create;
+               slTemp.Sorted    := true;
+               slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
+               for j := 0 to slTemp.Count -1 do
+                 begin
+                   FilesFoundToCopy.Add(slTemp.Strings[j]);
+                 end;
+               slTemp.Free;
+             end;
+         end;
+     end
+    else // User does not want recursive but does want a multiple selection. i.e sub directories of multiple dirs are to be ignored.
+    begin
+      FilesFoundToCopy := TStringListUTF8.Create;
+      FilesFoundToCopy.Sorted := true;
+      for i := 0 to slMultipleDirNames.Count -1 do
+       begin
+         SourceDirName    := slMultipleDirNames.Strings[i];
+         slTemp           := TStringListUTF8.Create;
+         slTemp.Sorted    := true;
+         slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', False, True);
+         for j := 0 to slTemp.Count -1 do
+           begin
+             FilesFoundToCopy.Add(slTemp.Strings[j]);
+           end;
+         slTemp.Free;
+       end;
     end;
+  end;
   {$ENDIF}
 
   {$IFDEF LINUX}
@@ -2966,19 +3051,54 @@ begin
 end;
 
 procedure TMainForm.DirListAClick(Sender: TObject);
+var
+  NoOfDirsSelected, i : integer;
 begin
-  SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
-  if DirectoryExists(SourceDir) then
-   begin
-     Edit2SourcePath.Text := SourceDir;
-     SourceDirValid := TRUE;
-     if SourceDirValid AND DestDirValid = TRUE then
+  MultipleDirsChosen := false;
+  NoOfDirsSelected := DirListA.SelectionCount;
+  // If only one folder selected, do as as we always have
+  if NoOfDirsSelected = 1 then
+    begin
+      MultipleDirsChosen := false;
+      SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
+      if DirectoryExists(SourceDir) then
        begin
-         // Now enable the 'Go!' button as both SourceDir and DestDir are valid
-         Button8CopyAndHash.Enabled := true;
+         Edit2SourcePath.Text := SourceDir;
+         SourceDirValid := TRUE;
+         if SourceDirValid AND DestDirValid = TRUE then
+           begin
+             // Now enable the 'Go!' button as both SourceDir and DestDir are valid
+             Button8CopyAndHash.Enabled := true;
+          end;
+       end;
+   end
+  else if NoOfDirsSelected > 1 then
+    // The number of folders selected is greater than 1 so we must itterate
+    try
+      slMultipleDirNames := TStringList.Create;
+      begin
+        MultipleDirsChosen := true;
+        for i := 0 to NoOfDirsSelected -1 do
+          begin
+            {$ifdef Windows}
+            slMultipleDirNames.Add(StringReplace(DirListA.Selections[i].GetTextPath, '/', '\', [rfReplaceAll]));
+            {$else}
+              {$IFDEF Darwin}
+                slMultipleDirNames.Add(DirListA.Selections[i].GetTextPath);
+              {$else}
+                {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+                  slMultipleDirNames.Add(DirListA.Selections[i].GetTextPath);
+                {$ENDIF}
+              {$ENDIF}
+            {$endif}
+          end;
       end;
-   end;
+    finally
+      // nothing to do
+    end
+  else MultipleDirsChosen := false;
 end;
+
 
 procedure TMainForm.DirListBClick(Sender: TObject);
 begin
