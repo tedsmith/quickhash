@@ -343,30 +343,33 @@ type
 
    slMultipleDirNames : TStringList;
    MultipleDirsChosen : boolean;
-  const
-  {$IFDEF WINDOWS}
-    // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
-    // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes
-    LongPathOverride : string = '\\?\';
-    // A and B below are for the Directory Comparison tab only
-    LongPathOverrideA : string = '\\?\';
-    LongPathOverrideB : string = '\\?\';
+
+   {$IFDEF WINDOWS}
+   // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
+   // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes. LongPathOverride
+   // will always either be '\\?\' or '\\?\UNC\'
+   // A and B below are for the Directory Comparison tab only
+
+   LongPathOverride, LongPathOverrideA, LongPathOverrideB : string;
 
    {$else}
     {$IFDEF Darwin}
-    const
-      LongPathOverride : string = '';     // MAX_PATH is 4096 is Linux & Mac, so not needed
-      LongPathOverrideA : string = '';
-      LongPathOverrideB : string = '';
-      {$else}
-        {$IFDEF UNIX and !$ifdef Darwin}
-        const
-          LongPathOverride : string = '';
-          LongPathOverrideA : string = '';
-          LongPathOverrideB : string = '';
-        {$ENDIF}
-   {$ENDIF}
-   {$ENDIF}
+      const
+        LongPathOverride : string = '';     // MAX_PATH is 4096 is Linux & Mac, so not needed
+        LongPathOverrideA : string = '';
+        LongPathOverrideB : string = '';
+        {$else}
+          {$IFDEF UNIX and !$ifdef Darwin}
+          const
+            LongPathOverride : string = '';
+            LongPathOverrideA : string = '';
+            LongPathOverrideB : string = '';
+          {$ENDIF}
+     {$ENDIF}
+  {$ENDIF}
+
+
+
    end;
 
 var
@@ -385,6 +388,7 @@ function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; extern
 procedure TMainForm.FormCreate(Sender: TObject);
 var
   x, y, z : integer;
+
 begin
   x := screen.Width;
   y := screen.Height;
@@ -406,6 +410,11 @@ begin
 
   btnCopyToClipboardA.Enabled := false;
   btnCopyToClipboardB.Enabled := false;
+
+  LongPathOverride := '\\?\';
+  // A and B below are for the Directory Comparison tab only
+  LongPathOverrideA := '\\?\';
+  LongPathOverrideB := '\\?\';
 
   // In Lazarus versions  < 1.4.4, the 'FileSortType' property of ShellTreeViews
   // would cause the listing to be doubled if anything other than fstNone was chosen
