@@ -259,6 +259,7 @@ type
     TextHashingGroupBox: TGroupBox;
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
+    procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
@@ -310,7 +311,7 @@ type
     function  RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     procedure SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
     procedure EmptyDisplayGrid(Grid : TStringGrid);
-    function FileSizeWithLongPath(strFileName : string) : Int64;
+    // function FileSizeWithLongPath(strFileName : string) : Int64;
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
     function FileTimeToDTime(FTime: TFileTime): TDateTime;
@@ -810,6 +811,11 @@ begin
 
 end;
 
+procedure TMainForm.Panel1CopyAndHashOptionsClick(Sender: TObject);
+begin
+
+end;
+
 {$IFDEF WINDOWS}
 // http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
 function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
@@ -890,7 +896,7 @@ var
       if (Pos('\\', DirToHash) > 0) then
       begin
         LongPathOverride := '\\?\UNC\';
-        Delete(DirToHash, 1, 2); // Delete the \\ from the DirToHash path (otherwise it becomes '\\?\UNC\\\')
+        Delete(DirToHash, 1, 2); // Delete the \\ from the UNC DirToHash path which always start \\path (otherwise it becomes '\\?\UNC\\\')
       end;
       {$endif}
 
@@ -1680,7 +1686,7 @@ begin
   lblTimeTaken6B.Caption           := '...';
   lblTimeTaken6C.Caption           := '...';
   i                                := 0;
-  StatusBar3.Caption               := ('Counting files...please wait');
+  StatusBar3.SimpleText            := ('Counting files first...please wait');
   Application.ProcessMessages;
 
   if chkUNCMode.Checked then
@@ -1689,12 +1695,18 @@ begin
       DestDir   := Edit3DestinationPath.Text;
 
       {$ifdef Windows}
-      // If chosen path is a UNC path, we need to append the UNC prefix to the
+      // If chosen source path is a UNC path, we need to append the UNC prefix to the
       // Unicode 32K long API call of \\?\
       if (Pos('\\', SourceDir) > 0) then
       begin
         LongPathOverride := '\\?\UNC\';
-        Delete(SourceDir, 1, 2); // Delete the \\ from the DirToHash path (otherwise it becomes '\\?\UNC\\\')
+        Delete(SourceDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
+      end;
+      // If chosen destination path is a UNC path too, we need to append the UNC prefix
+      if (Pos('\\', DestDir) > 0) then
+      begin
+        LongPathOverride := '\\?\UNC\';
+        Delete(DestDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
       end;
       {$endif}
       // Now process the copy and paste in UNC mode
@@ -2585,30 +2597,18 @@ begin
 
       for i := 0 to FilesFoundToCopy.Count -1 do
         begin
-          if StopScan1 = FALSE then
+          // StopScan2 is set to false if the "Stop" button in 'Copy' tab is pressed
+          if StopScan2 = FALSE then
             begin
-            SourceFileHasHash := '';
+            SourceFileHasHash      := '';
             DestinationFileHasHash := '';
 
-            {$IFDEF WINDOWS}
-              // Get the file size using a stream, because the traditional FileSize
-              // function can't injest the Long Path prefix of '\\?\' or '\\?\UNC\'
-              m := FileSizeWithLongPath(FilesFoundToCopy.Strings[i]);
-            {$else}
-              {$IFDEF Darwin}
-                // Not long path stupidity for Apple Mac
-                m := FileSize(FilesFoundToCopy.Strings[i]);
-              {$else}
-                {$IFDEF UNIX and !$ifdef Darwin}
-                  // Not long path stupidity for Linux, either
-                  m := FileSize(FilesFoundToCopy.Strings[i]);
-                {$ENDIF}
-              {$ENDIF}
-            {$ENDIF}
+            // Check the file has a size greater than 0 bytes to avoid default hash values.
+            m := FileSize(FilesFoundToCopy.Strings[i]);
 
             if m >= 0 then
               begin
-              StatusBar3.SimpleText := 'Currently hashing and copying: ' + RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+              StatusBar3.SimpleText := 'Processing: ' + RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
               Application.ProcessMessages;
               { Now we have some output directory jiggery pokery to deal with, that
                 needs to accomodate both OS's. Firstly,
@@ -2671,35 +2671,42 @@ begin
               {$IFDEF Windows}
               { Due to the nonsensories of Windows drive lettering, we have to allow
                 for driver lettering in the finalised destination path.
+
+                We only do this if UNC mode is not selected though, because if
+                it isn't, drive letters should not be needed anyway.
+
                 This loop finds 'C:' in the middle of the concatanated path and
                 return its position. It then deletes 'C:' of 'C:\' if found, or any
                 other A-Z drive letter, leaving the '\' for the path
                 So, C:\SrcDir\SubDirA becomes E:\NewDestDir\SrcDir\SubDirA instead of
                 E:\NewDestDir\C:SrcDir\SubDirA. UNC paths are taken care of by ForceDirectories }
 
-              for DriveLetter in TRange do
-                begin
-                  k := posex(DriveLetter+':', FinalisedDestDir, 4);
-                  Delete(FinalisedDestDir, k, 2);
-                end;
+                if chkUNCMode.Checked = false then
+                  begin
+                    for DriveLetter in TRange do
+                      begin
+                        k := posex(DriveLetter+':', FinalisedDestDir, 4);
+                        Delete(FinalisedDestDir, k, 2);
+                      end;
+                  end;
 
               {Now, again, only if Windows, obtain the Created, Modified and Last Accessed
               dates from the sourcefile by calling custom function 'DateAttributesOfCurrentFile'
               Linux does not have 'Created Dates' so this does not need to run on Linux platforms}
 
               CrDateModDateAccDate := DateAttributesOfCurrentFile(SourceDirectoryAndFileName);
-
               {$ENDIF}
-                {$IFDEF LINUX}
-                // Get the 'Last Modified' date, only, for Linux files
-                CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-                {$ENDIF}
-                  {$IFDEF UNIX}
-                    {$IFDEF Darwin}
-                      // Get the 'Last Modified' date, only, for Apple Mac files
-                      CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-                    {$ENDIF}
+
+              {$IFDEF LINUX}
+              // Get the 'Last Modified' date, only, for Linux files
+              CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
+              {$ENDIF}
+                {$IFDEF UNIX}
+                  {$IFDEF Darwin}
+                    // Get the 'Last Modified' date, only, for Apple Mac files
+                    CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
                   {$ENDIF}
+                {$ENDIF}
               // Determine the filename string of the file to be copied
               FinalisedFileName := ExtractFileName(FilesFoundToCopy.Strings[i]);
 
@@ -2710,10 +2717,13 @@ begin
 
               if not DirectoryExistsUTF8(FinalisedDestDir) then
                 begin
-                  if not CustomisedForceDirectoriesUTF8(FinalisedDestDir, true) then
-                    begin
-                      ShowMessage(FinalisedDestDir+' cannot be created. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-                    end;
+                  try
+                    if not CustomisedForceDirectoriesUTF8(LongPathOverride+FinalisedDestDir, true) then
+                      begin
+                        ShowMessage(FinalisedDestDir+' cannot be created. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
+                      end;
+                  finally
+                  end;
                 end;
 
               // Now copy the file to the newly formed or already existing destination dir
@@ -2725,17 +2735,17 @@ begin
 
               if chkNoPathReconstruction.Checked = false then
                 begin
-                  CopiedFilePathAndName := IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName;
+                  CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
                 end
                 else
                   begin
-                    if FileExists(IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName) then
+                    if FileExists(IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName) then
                     begin
                       DupCount := DupCount + 1;
-                      CopiedFilePathAndName := IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName + '_DuplicatedName' + IntToStr(DupCount);
+                      CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName + '_DuplicatedName' + IntToStr(DupCount);
                     end
                     else
-                    CopiedFilePathAndName := IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName;
+                    CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
                   end;
 
               // Now copy the file, either to the reconstructed path or to the root
@@ -2775,7 +2785,7 @@ begin
                      {$ENDIF}
                   {$ENDIF}
                   frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
                   frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
                   frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
                   frmDisplayGrid1.CopyAndHashGrid.row           := i + 1; //NoOfFilesCopiedOK +1 ;
@@ -2789,19 +2799,27 @@ begin
               SizeOfFile2 := FileSize(FilesFoundToCopy.Strings[i]);
               TotalBytesRead2 := TotalBytesRead2 + SizeOfFile2;
               lblDataCopiedSoFar.Caption := FormatByteSize(TotalBytesRead2);
-              lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
+              // When or if the stop button is pressed, we need to prevent any
+              // division by zero, thus the count check next...
+              if FilesFoundToCopy.Count > 0 then
+                lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
               Application.ProcessMessages;
               end; // End of the if m > 0 then statement
 
             // Otherwise file is probably a zero byte file
             if m = 0 then
               begin
-              ZeroByteFilesCounter := ZeroByteFilesCounter + 1; // A file of zero bytes was found in this loop
+                ZeroByteFilesCounter := ZeroByteFilesCounter + 1; // A file of zero bytes was found in this loop
               end;
-          end; // End of the "If Stop button pressed" if
+          end // End of the "If Stop button not pressed" if
+          else
+            begin
+              StatusBar3.SimpleText:= 'Aborted by user';
+              lblFilesCopiedPercentage.Caption := lblFilesCopiedPercentage.Caption + ' (aborted by user)';
+            end;
         end;   // End of the 'for Count' of Memo StringList loop
 
-      // Now we can show the grid. Having it displayed for every file as it goes
+      // Now we can show the grid. Having it display for every file as it processes
       // wastes time and isn't especially necessary given the other progress indicators
 
       frmDisplayGrid1.CopyAndHashGrid.Visible := true;
@@ -2811,7 +2829,6 @@ begin
       TimeDifference          := EndTime - StartTime;
       strTimeDifference       := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference);
       lblTimeTaken6C.Caption  := strTimeDifference;
-
 
       // Now lets save the generated values to a CSV file.
 
@@ -2890,30 +2907,38 @@ begin
         StatusBar3.SimpleText := 'Finished.';
         frmDisplayGrid1.btnClipboardResults2.Enabled := true;
       end;
-    ShowMessage('Files copied (zero based counter): ' + IntToStr(NoOfFilesCopiedOK) + '. Copy errors : ' + IntToStr(FileCopyErrors) + '. Hash mismatches: ' + IntToStr(HashMismtachCount) + '. Zero byte files: '+ (IntToStr(ZeroByteFilesCounter)));
+    ShowMessage('Files copied : '   + IntToStr(NoOfFilesCopiedOK -1) + #13#10 +
+                'Copy errors : '    + IntToStr(FileCopyErrors)       + #13#10 +
+                'Hash mismatches: ' + IntToStr(HashMismtachCount)    + #13#10 +
+                'Zero byte files: ' + IntToStr(ZeroByteFilesCounter));
     end
   else // End of Proceed Message dialog "Yes, No, Cancel".
-   ShowMessage('Process aborted by user.');
-   Button8CopyAndHash.Enabled := true;
+   begin
+     ShowMessage('Process aborted by user.');
+     Button8CopyAndHash.Enabled := true;
+   end;
 end;
 
-// Since adding the LongPathOverride prefix to deal with any file in any folder
-// up to length of 32K chars, the FileSize function can't deal with the prefix
-// to size obtained by use of a stream instead.
 // Returns the size of the file in bytes on success. -1 otherwise.
+// Needed only if the UNC prefixes cause a problem which they used to but seem not
+// to anymore. So I just use FileSize now for all three operating systems.
+{
 function TMainForm.FileSizeWithLongPath(strFileName : string) : Int64;
 var
   fs : TFileStream;
+  FileSize : Int64;
 begin
   result := -1;
   try
-    fs := TFileStreamUTF8.Create(strFileName, faReadOnly);
-    result := fs.size;
+    fs := TFileStream.Create(strFileName, faReadOnly);
+    FileSize := 0;
+    FileSize := fs.size;
   finally
     fs.free;
   end;
+  if FileSize > 0 then result := FileSize;
 end;
-
+}
 {$IFDEF Windows}
 // FUNCTION FileTimeToDTime - Windows specific,
 // kindly acknowledged from xenblaise @ http://forum.lazarus.freepascal.org/index.php?topic=10869.0
@@ -3034,11 +3059,11 @@ begin
   if chkUNCMode.Checked then
     begin
     Edit2SourcePath.Color      := clWhite;
-    Edit2SourcePath.Text       := 'Enter source UNC path, prefixed with \\';
-
+    Edit2SourcePath.Text       := 'Enter source UNC path (e.g. \\DCSERVER\DATA-1)';
+    Edit2SourcePath.Visible    := true;
     Edit3DestinationPath.Color := clWhite;
-    Edit3DestinationPath.Text  := 'Enter destination UNC path, prefixed with \\';;
-
+    Edit3DestinationPath.Text  := 'Enter destination UNC path (e.g \\FILESERVER\DATA-2';;
+    Edit3DestinationPath.Visible:=true;
     Button8CopyAndHash.Enabled := true;
     DirListA.Enabled           := false;
     DirListA.Visible           := false;
@@ -3047,15 +3072,15 @@ begin
     end
   else
     begin
-    Edit2SourcePath.Color      := clSilver;
-    Edit3DestinationPath.Color := clSilver;
-    Edit2SourcePath.Text       := 'Select source directory ';
-    Edit3DestinationPath.Text  := 'Select source directory ';
-    Button8CopyAndHash.Enabled := false;
-    DirListA.Enabled           := true;
-    DirListA.Visible           := true;
-    DirListB.Enabled           := true;
-    DirListB.Visible           := true;
+      Edit2SourcePath.Color      := clSilver;
+      Edit3DestinationPath.Color := clSilver;
+      Edit2SourcePath.Text       := 'Select source directory ';
+      Edit3DestinationPath.Text  := 'Select destitnation directory ';
+      Button8CopyAndHash.Enabled := false;
+      DirListA.Enabled           := true;
+      DirListA.Visible           := true;
+      DirListB.Enabled           := true;
+      DirListB.Visible           := true;
     end;
 end;
 

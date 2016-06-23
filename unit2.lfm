@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 57
   Width = 1018
   AllowDropFiles = True
-  Caption = 'Quick Hash v2.6.8 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
+  Caption = 'Quick Hash v2.6.8  BETA 3 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
   ClientHeight = 689
   ClientWidth = 1018
   OnCreate = FormCreate
@@ -16,10 +16,10 @@ object MainForm: TMainForm
     Height = 650
     Top = 24
     Width = 996
-    ActivePage = TabSheet1
+    ActivePage = TabSheet4
     Anchors = [akTop, akLeft, akRight]
     ParentShowHint = False
-    TabIndex = 0
+    TabIndex = 3
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -716,6 +716,7 @@ object MainForm: TMainForm
           ClientHeight = 176
           ClientWidth = 815
           TabOrder = 3
+          OnClick = Panel1CopyAndHashOptionsClick
           object CheckBoxListOfDirsOnly: TCheckBox
             Left = 14
             Height = 17
@@ -935,6 +936,7 @@ object MainForm: TMainForm
           OnEnter = Edit2SourcePathEnter
           TabOrder = 1
           Text = 'Select source directory (or enter UNC path)'
+          Visible = False
         end
         object Edit3DestinationPath: TEdit
           Left = 480
@@ -945,14 +947,17 @@ object MainForm: TMainForm
           OnEnter = Edit3DestinationPathEnter
           TabOrder = 2
           Text = 'Select destination directory (or enter UNC path)'
+          Visible = False
         end
         object StatusBar3: TStatusBar
           Left = 0
           Height = 20
           Top = 560
           Width = 854
-          Anchors = [akRight]
+          Anchors = [akLeft, akRight]
+          AutoSize = False
           Panels = <>
+          ParentShowHint = False
         end
         object DirListA: TShellTreeView
           Left = 16
