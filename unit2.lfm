@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 57
   Width = 1018
   AllowDropFiles = True
-  Caption = 'Quick Hash v2.6.8  BETA 3 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
+  Caption = 'Quick Hash v2.6.8 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
   ClientHeight = 689
   ClientWidth = 1018
   OnCreate = FormCreate
@@ -16,10 +16,10 @@ object MainForm: TMainForm
     Height = 650
     Top = 24
     Width = 996
-    ActivePage = TabSheet4
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight]
     ParentShowHint = False
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -32,11 +32,11 @@ object MainForm: TMainForm
         Left = 136
         Height = 438
         Top = 10
-        Width = 814
+        Width = 812
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Text Hashing'
         ClientHeight = 417
-        ClientWidth = 810
+        ClientWidth = 808
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -47,7 +47,7 @@ object MainForm: TMainForm
           Height = 175
           Hint = 'Type or paste and watch hash value change.'#13#10'For amounts larger than several hundred Kb, save'#13#10'data to a file and use File Hashing instead. '
           Top = 17
-          Width = 761
+          Width = 757
           Anchors = [akTop, akLeft, akRight]
           Lines.Strings = (
             'Type or paste text here - hash will update as you type'
@@ -65,7 +65,7 @@ object MainForm: TMainForm
           Height = 56
           Hint = 'This is the hash of ALL THE TEXT in the textarea above'#13#10'For line-by-line analysis, use the button'#13#10#13#10'The hash value can be copied from here'#13#10'to clipboard (highlight and press Ctrl + C or right click ''Copy'''
           Top = 352
-          Width = 761
+          Width = 757
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           Font.Height = -13
@@ -82,7 +82,7 @@ object MainForm: TMainForm
           Height = 24
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated hash matches the computed.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3 dots only)'
           Top = 304
-          Width = 761
+          Width = 757
           Anchors = [akTop, akLeft, akRight]
           EditLabel.AnchorSideLeft.Control = lbleExpectedHashText
           EditLabel.AnchorSideRight.Control = lbleExpectedHashText
@@ -91,7 +91,7 @@ object MainForm: TMainForm
           EditLabel.Left = 18
           EditLabel.Height = 16
           EditLabel.Top = 285
-          EditLabel.Width = 761
+          EditLabel.Width = 757
           EditLabel.Caption = 'Expected Hash Value (paste from other utility)'
           EditLabel.ParentColor = False
           ParentShowHint = False
@@ -205,8 +205,8 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Hint = 'Hash a single file (useful for hashing disks in Linux)'
       Caption = 'F&ile'
-      ClientHeight = 624
-      ClientWidth = 988
+      ClientHeight = 617
+      ClientWidth = 990
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 144
@@ -363,8 +363,8 @@ object MainForm: TMainForm
     object TabSheet3: TTabSheet
       Hint = 'Compute hashes for multiple files in a directory'#13#10'recursively, or just those in the root of the directory'
       Caption = 'FileS'
-      ClientHeight = 624
-      ClientWidth = 988
+      ClientHeight = 617
+      ClientWidth = 990
       ParentShowHint = False
       ShowHint = True
       object DirectoryHashingGroupBox: TGroupBox
@@ -1036,8 +1036,8 @@ object MainForm: TMainForm
     end
     object TabSheet7: TTabSheet
       Caption = 'Compare Two Files'
-      ClientHeight = 624
-      ClientWidth = 988
+      ClientHeight = 617
+      ClientWidth = 990
       object GroupBox3: TGroupBox
         AnchorSideRight.Control = TabSheet7
         AnchorSideRight.Side = asrBottom
@@ -1195,8 +1195,8 @@ object MainForm: TMainForm
     object TabSheet6: TTabSheet
       Hint = 'Choose Directory A and compare it against Directory B to see if their contents are both the same'
       Caption = 'Compare Directories'
-      ClientHeight = 624
-      ClientWidth = 988
+      ClientHeight = 617
+      ClientWidth = 990
       object GroupBox1: TGroupBox
         Left = 16
         Height = 471
@@ -1538,8 +1538,8 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 624
-      ClientWidth = 988
+      ClientHeight = 617
+      ClientWidth = 990
       object btnCallDiskHasherModule: TButton
         Left = 376
         Height = 25

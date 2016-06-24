@@ -18,7 +18,7 @@
     Stackoverflow forums who helped me with the methodology of hashing in buffers
     and Taazz who pointed out where I'd made some daft mistakes. Thanks guys!
 
-    Copyright (C) 2011-2015  Ted Smith https://sourceforge.net/users/tedtechnology
+    Copyright (C) 2011-2016  Ted Smith https://sourceforge.net/users/tedtechnology
 
     NOTE: Date and time values, as computed in recursive directory hashing, are not
     daylight saving time adjusted. Source file date and time values are recorded.
@@ -26,7 +26,7 @@
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version. You are not granted permission to create
+    any later version. You are not granted permission to create
     another disk or file hashing tool based on this code and call it 'QuickHash'.
 
     This program is distributed in the hope that it will be useful,
@@ -411,12 +411,15 @@ begin
 
   btnCopyToClipboardA.Enabled := false;
   btnCopyToClipboardB.Enabled := false;
-
+  {$ifdef Windows}
+  // These are the default values to be prefixed before a path to invoke the 32K
+  // NTFS filename length over the 260 MAX_PATH. Where the user opts for UNC paths
+  // as well, it becomes '\\?\UNC\'
   LongPathOverride := '\\?\';
   // A and B below are for the Directory Comparison tab only
   LongPathOverrideA := '\\?\';
   LongPathOverrideB := '\\?\';
-
+  {$endif}
   // In Lazarus versions  < 1.4.4, the 'FileSortType' property of ShellTreeViews
   // would cause the listing to be doubled if anything other than fstNone was chosen
   // So this will ensure I have sorting until that is fixed.
@@ -465,6 +468,15 @@ begin
    // created for Windows users.
    btnCallDiskHasherModule.Enabled := false;
    Label8.Caption         := 'LINUX USERS - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
+
+   // For Linux users, it's helpful for the user to see as a full path the folder
+   // they have chosen, so make source and destination edit fields visible, but
+   // disabled, as we don't want them to be used.
+   Edit2SourcePath.Visible:= true;
+   Edit2SourcePath.Enabled:= false;
+   Edit3DestinationPath.Visible:=true;
+   Edit3DestinationPath.Enabled:=false;
+
    Tabsheet5.Enabled      := true;
    Tabsheet5.Visible      := true;
    chkCopyHidden.Enabled  := true;
@@ -568,7 +580,6 @@ begin
    end;
 end;
 
-
 procedure TMainForm.HashText(Sender: TObject);
 var
   strHashValueText : string;
@@ -669,8 +680,8 @@ var
 begin
   if memoHashText.Lines.Count = 0 then
     begin
-    ShowMessage('Enter text into the text field first.');
-    exit;
+      ShowMessage('Enter text into the text field first.');
+      exit;
     end;
 
   try
@@ -2785,7 +2796,17 @@ begin
                      {$ENDIF}
                   {$ENDIF}
                   frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
+                  {$IFDEF WINDOWS}
                   frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                  {$else}
+                    {$IFDEF Darwin}
+                      frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                    {$else}
+                       {$IFDEF UNIX and !$ifdef Darwin}
+                         frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                       {$endif}
+                    {$endif}
+                  {$endif}
                   frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
                   frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
                   frmDisplayGrid1.CopyAndHashGrid.row           := i + 1; //NoOfFilesCopiedOK +1 ;

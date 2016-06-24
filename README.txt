@@ -1,3 +1,20 @@
+V2.6.8 – June 2016
+
+In the 'Copy' tab, users can now select multiple source folders so that multiple folder content can be hashed, copied to a single destination folder, and then hashed again. Note that an experimental limit exists – if the list of files in memory exceeds 2Gb, Quickhash will likely crash. Please report such instances. If they are too many, I will implement another technique. 
+
+In the copy tab, a bug was fixed for UNC paths when long path names were encountered. Seemingly my earlier efforts to correct this issue had not worked. Now, as of v2.6.8, long paths should not be a problem with UNC mode in the 'Copy' tab for either source or destination locations. 
+
+For Linux users, made the UNC path fields visible, allbeit disabled, just to illustrate more clearly to the suer the full path currently selected in the treeview. 
+
+For MD5 and SHA-1 hashes, if the handle to the file fails, a more meaningful error should be displayed rather than a standard error message that didn't tell the user or the developer much as to why the handle failed.  
+
+The 'Stop' button in the 'Copy' tab didn't work at all I noticed! Now it does (it will abort after the file that was being copied at the time of the button press was conducted has been copied, before the next file copy starts). 
+
+The status bar at the bottom of the 'Copy' tab now alerts the user that files are being counted after the user presses 'Go', rather than displaying nothing. 
+
+More of the lists used in memory are Unicode enabled which may reduce crashes. 	
+
+
 V2.6.7 Mar 2016
 
 The 'Expected Hash' comparison didn't kick in when the user drag and dropped a file into the 'File' tab in that QuickHash wouldn't report to the user whether the computed hash matched what he was expecting though obviously the user could still look by eye at the computed hash but nevertheless, it needed to be fixed. Ticket number 21 refers (https://sourceforge.net/p/quickhash/tickets/21/).
