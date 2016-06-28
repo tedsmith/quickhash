@@ -2770,6 +2770,7 @@ begin
               // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
               // So we just reduce it back to one, to follow immediately after the prefix.
               // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
+              // We add a Windows compiler directive because UNC mode isnt in the Linux version
 
               // Now copy the file to the newly formed or already existing destination dir
               // and hash it. Then check that source and destination hashes match.
@@ -2777,12 +2778,13 @@ begin
               // If the user chooses not to reconstruct source dir structure,
               // check for filename conflicts, create an incrementer to ensure uniqueness,
               // and rename to "name.ext_DuplicatedNameX". Otherwise, reconstruct source path
-
+              {$ifdef Windows}
               CopiedFilePathAndName := LongPathOverride+CopiedFilePathAndName;
               if Pos('\\\', CopiedFilePathAndName) > 0 then
               begin
                 CopiedFilePathAndName := StringReplace(CopiedFilePathAndName, '\\\', '\', [rfReplaceAll]);
               end;
+              {$endif}
 
               if chkNoPathReconstruction.Checked = false then
                 begin
