@@ -1,10 +1,10 @@
 object MainForm: TMainForm
-  Left = 270
+  Left = 642
   Height = 689
-  Top = 57
+  Top = 188
   Width = 1018
   AllowDropFiles = True
-  Caption = 'Quick Hash v2.6.8 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
+  Caption = 'Quick Hash v2.6.9 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
   ClientHeight = 689
   ClientWidth = 1018
   OnCreate = FormCreate
@@ -27,6 +27,7 @@ object MainForm: TMainForm
       Caption = 'Te&xt'
       ClientHeight = 624
       ClientWidth = 988
+      OnContextPopup = TabSheet1ContextPopup
       ParentShowHint = False
       object TextHashingGroupBox: TGroupBox
         Left = 136
@@ -955,7 +956,6 @@ object MainForm: TMainForm
           Top = 560
           Width = 854
           Anchors = [akLeft, akRight]
-          AutoSize = False
           Panels = <>
           ParentShowHint = False
         end

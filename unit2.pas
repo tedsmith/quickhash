@@ -73,7 +73,7 @@ uses
   {$IFDEF Windows}
     Windows,
     // For Windows, this is a specific disk hashing tab for QuickHash. Not needed for Linux
-    DiskModuleUnit1;
+    DiskModuleUnit1, types;
   {$ENDIF}
   {$IFDEF Darwin}
     MacOSAll;
@@ -327,6 +327,8 @@ type
     {$ENDIF}
     function CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTime: Boolean): Boolean;
     procedure SHA1RadioButton3Change(Sender: TObject);
+    procedure TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
     procedure TabSheet3ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
 
@@ -1705,23 +1707,36 @@ begin
       SourceDir := Edit2SourcePath.Text;
       DestDir   := Edit3DestinationPath.Text;
 
-      {$ifdef Windows}
-      // If chosen source path is a UNC path, we need to append the UNC prefix to the
-      // Unicode 32K long API call of \\?\
-      if (Pos('\\', SourceDir) > 0) then
-      begin
-        LongPathOverride := '\\?\UNC\';
-        Delete(SourceDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
-      end;
-      // If chosen destination path is a UNC path too, we need to append the UNC prefix
-      if (Pos('\\', DestDir) > 0) then
-      begin
-        LongPathOverride := '\\?\UNC\';
-        Delete(DestDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
-      end;
-      {$endif}
-      // Now process the copy and paste in UNC mode
-      ProcessDir(SourceDir);
+      if Pos(':', SourceDir) > 0 then
+        begin
+          ShowMessage('Drive letter detected in source path but UNC mode selected');
+          StatusBar3.SimpleText := 'Aborted due drive letter in source UNC path selection';
+        end
+        else if Pos(':', DestDir) > 0 then
+          begin
+            ShowMessage('Drive letter detected in destination path but UNC mode selected');
+            StatusBar3.SimpleText := 'Aborted due to drive letter in destinatination UNC path selection';
+          end
+          else
+            begin
+              {$ifdef Windows}
+              // If chosen source path is a UNC path, we need to append the UNC prefix to the
+              // Unicode 32K long API call of \\?\
+              if (Pos('\\', SourceDir) > 0) then
+              begin
+                LongPathOverride := '\\?\UNC\';
+                Delete(SourceDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
+              end;
+              // If chosen destination path is a UNC path too, we need to append the UNC prefix
+              if (Pos('\\', DestDir) > 0) then
+              begin
+                LongPathOverride := '\\?\UNC\';
+                Delete(DestDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
+              end;
+              {$endif}
+              // Now process the copy and paste in UNC mode
+              ProcessDir(SourceDir);
+            end;
     end
   else
   begin
@@ -2701,6 +2716,18 @@ begin
                       end;
                   end;
 
+              // *** SOURCE DIRECTORY ***
+              // SourceDirectoryAndFileName may include '\\' at the start, which
+              // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
+              // So we just reduce it back to one, to follow immediately after the prefix.
+              // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
+
+              SourceDirectoryAndFileName := LongPathOverride+SourceDirectoryAndFileName;
+              if Pos('\\\', SourceDirectoryAndFileName) > 0 then
+              begin
+                SourceDirectoryAndFileName := StringReplace(SourceDirectoryAndFileName, '\\\', '\', [rfReplaceAll]);
+              end;
+
               {Now, again, only if Windows, obtain the Created, Modified and Last Accessed
               dates from the sourcefile by calling custom function 'DateAttributesOfCurrentFile'
               Linux does not have 'Created Dates' so this does not need to run on Linux platforms}
@@ -2722,6 +2749,7 @@ begin
               FinalisedFileName := ExtractFileName(FilesFoundToCopy.Strings[i]);
 
               // Before copying the file and creating storage areas, lets hash the source file
+
               SourceFileHasHash := Uppercase(CalcTheHashFile(SourceDirectoryAndFileName));
 
               // Now create the destination directory structure, if it is not yet created.
@@ -2737,12 +2765,24 @@ begin
                   end;
                 end;
 
+              // *** DESTINATION DIRECTORY ***
+              // CopiedFilePathAndName may include '\\' at the start, which
+              // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
+              // So we just reduce it back to one, to follow immediately after the prefix.
+              // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
+
               // Now copy the file to the newly formed or already existing destination dir
               // and hash it. Then check that source and destination hashes match.
               // Then total up how many copied and hashed OK, or not.
               // If the user chooses not to reconstruct source dir structure,
               // check for filename conflicts, create an incrementer to ensure uniqueness,
               // and rename to "name.ext_DuplicatedNameX". Otherwise, reconstruct source path
+
+              CopiedFilePathAndName := LongPathOverride+CopiedFilePathAndName;
+              if Pos('\\\', CopiedFilePathAndName) > 0 then
+              begin
+                CopiedFilePathAndName := StringReplace(CopiedFilePathAndName, '\\\', '\', [rfReplaceAll]);
+              end;
 
               if chkNoPathReconstruction.Checked = false then
                 begin
@@ -2773,15 +2813,46 @@ begin
               DestinationFileHasHash := UpperCase(CalcTheHashFile(CopiedFilePathAndName));
               NoOfFilesCopiedOK := NoOfFilesCopiedOK + 1;
 
-              // Check for hash errors
+              // Check for hash errors. Does source and destination hashes match?
+              // If not, log it to text file and also display in grid.
               if SourceFileHasHash <> DestinationFileHasHash then
                 begin
                   HashMismtachCount := HashMismtachCount + 1;
                   SLCopyErrors.Add('Hash mismatch. Source file ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash + ' Hash of copied file: ' + CopiedFilePathAndName + ' ' + DestinationFileHasHash);
+                  frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
+                    {$IFDEF WINDOWS}
+                      frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+                    {$else}
+                       {$IFDEF Darwin}
+                         frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                       {$else}
+                         {$IFDEF UNIX and !$ifdef Darwin}
+                           frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                         {$ENDIF}
+                       {$ENDIF}
+                    {$ENDIF}
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
+                    {$IFDEF WINDOWS}
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                    {$else}
+                      {$IFDEF Darwin}
+                        frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                      {$else}
+                         {$IFDEF UNIX and !$ifdef Darwin}
+                           frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                         {$endif}
+                      {$endif}
+                    {$endif}
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
+                    frmDisplayGrid1.CopyAndHashGrid.row           := i + 1;
+                    frmDisplayGrid1.CopyAndHashGrid.col           := 1;
                 end
+              // Else, no errors. No need to log to file but still display to user
               else if SourceFileHasHash = DestinationFileHasHash then
                 begin
-                // With the display grid, adding one to each value ensures the first row headings do not conceal the first file
+                  // With the display grid, adding one to each value ensures the first row headings do not conceal the first file
                   frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
                   frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
                   {$IFDEF WINDOWS}
@@ -2836,7 +2907,6 @@ begin
           else
             begin
               StatusBar3.SimpleText:= 'Aborted by user';
-              lblFilesCopiedPercentage.Caption := lblFilesCopiedPercentage.Caption + ' (aborted by user)';
             end;
         end;   // End of the 'for Count' of Memo StringList loop
 
@@ -2914,11 +2984,18 @@ begin
            end;
         end;
 
-      // If there is one or more errors, display them to the user and save to a log file
+      // If there is one or more errors, save them to a log file of users choosing
       if Length(SLCopyErrors.Text) > 0 then
        begin
-        SLCopyErrors.SaveToFile(IncludeTrailingPathDelimiter(DestDir)+'QHErrorsLog.txt');
-        ShowMessage(SLCopyErrors.Text);
+         ShowMessage('Errors detected! You will now be prompted to save a text log...');
+         if SaveDialog7.Execute then
+           begin
+             SaveDialog7.Title := 'Save error log...';
+             SaveDialog7.InitialDir := GetCurrentDir;
+             SaveDialog7.Filter := 'Text|*.txt';
+             SaveDialog7.DefaultExt := 'txt';
+             SLCopyErrors.SaveToFile(SaveDialog7.FileName);
+           end;
       end;
 
       // All done. End the loops, free resources and notify user
@@ -3271,6 +3348,12 @@ begin
 end;
 
 procedure TMainForm.SHA1RadioButton3Change(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
 begin
 
 end;

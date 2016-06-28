@@ -628,7 +628,8 @@ begin
     if filerec(f).handle = INVALID_HANDLE_VALUE then
     begin
       //RaiseLastOSError;
-      ShowMessage('Could not get handle to file. OS error and code : ' + SysErrorMessageUTF8(GetLastOSError));
+      ShowMessage('Could not get handle to file ' + FileName + #13#10 +
+                  '. OS error and code : ' + SysErrorMessageUTF8(GetLastOSError));
     end;
   end;
   {$endif windows}
