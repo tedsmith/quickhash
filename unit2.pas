@@ -1349,6 +1349,7 @@ begin
     lblStatusB.Caption      := 'Counting files in ' + DirA + ' ...please wait';
     TotalFilesDirA          := TStringListUTF8.Create;
     TotalFilesDirA.Sorted   := true;
+    Application.ProcessMessages;
     TotalFilesDirA          := FindAllFilesEx(LongPathOverrideA+DirA, '*', True, True);
     TotalFilesDirA.Sort;
     sgDirA.RowCount         := TotalFilesDirA.Count + 1;
@@ -1357,7 +1358,7 @@ begin
     HashListA.Sorted        := true;
     FileAndHashListA.Sorted := true;
 
-    lblStatusB.Caption      := 'Examining files in ' + DirA + ' ...please wait';
+    lblStatusB.Caption      := 'Now, hashing files in ' + DirA + ' ...please wait';
     Application.ProcessMessages;
 
     for i := 0 to TotalFilesDirA.Count -1 do
@@ -1389,12 +1390,11 @@ begin
 
     lblTotalFileCountNumberA.Caption := IntToStr(TotalFilesDirA.Count);
 
-    Application.ProcessMessages;
-
     // Then, list and hash the files in DirB
-    lblStatusB.Caption       := 'Counting and examining files in ' + DirB + ' ...please wait';
+    lblStatusB.Caption       := 'Counting files in ' + DirB + ' ...please wait';
     TotalFilesDirB           := TStringListUTF8.Create;
     TotalFilesDirB.Sorted    := true;
+    Application.ProcessMessages;
     TotalFilesDirB           := FindAllFilesEx(LongPathOverrideB+DirB, '*', True, True);
     TotalFilesDirB.Sort;
     sgDirB.RowCount          := TotalFilesDirB.Count + 1;
@@ -1404,8 +1404,10 @@ begin
     HashListB.Sorted         := true;
     FileAndHashListB.Sorted  := true;
 
-    lblStatusB.Caption       := 'Counting and examining files in ' + DirB + ' ...please wait';
+    lblStatusB.Caption       := 'Now, hashing files in ' + DirB + ' ...please wait';
     lblStatusB.Refresh;
+    Application.ProcessMessages;
+
     for i := 0 to TotalFilesDirB.Count -1 do
         begin
           FilePath             := ExtractFilePath(TotalFilesDirB.Strings[i]);
@@ -1459,7 +1461,7 @@ begin
     }
     if ((TotalFilesDirB.Count - TotalFilesDirA.Count) = 0) or ((TotalFilesDirA.Count - TotalFilesDirB.Count) = 0) then
       begin
-      // We compare the hashlists using the developers choice of hash alg, i.e. SHA1
+      // We compare the hashlists using SHA-1 to see if they match.
       HashOfListA    := SHA1Print(SHA1String(HashListA.Text));
       HashOfListB    := SHA1Print(SHA1String(HashListB.Text));
       if HashOfListA = HashOfListB then
@@ -1494,26 +1496,24 @@ begin
     if sgDirB.RowCount > 1 then btnCopyToClipboardB.Enabled := true;
     if (sgDirA.RowCount > 1) or (sgDirB.RowCount > 1) then
       btnSaveComparisons.Enabled  := true;
-    Application.ProcessMessages;
-  end;
-
-  try
+    // Free lists
     HashListA.Free;
     TotalFilesDirA.Free;
     FileAndHashListA.Free;
-
     TotalFilesDirB.Free;
     FileAndHashListB.Free;
     HashListB.Free;
-  finally
-    // Compute timings and display them
-    EndTime                  := Now;
-    lblTimeFinishedB.Caption := FormatDateTime('dd/mm/yy hh:mm:ss', EndTime);
-    TimeTaken                := EndTime - StartTime;
-    strTimeTaken             := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeTaken);
-    lblTimeTakenB.Caption    := strTimeTaken;
+
     Application.ProcessMessages;
   end;
+
+  // Compute timings and display them
+  EndTime                  := Now;
+  lblTimeFinishedB.Caption := FormatDateTime('dd/mm/yy hh:mm:ss', EndTime);
+  TimeTaken                := EndTime - StartTime;
+  strTimeTaken             := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeTaken);
+  lblTimeTakenB.Caption    := strTimeTaken;
+  Application.ProcessMessages;
 end;
 
 // btnClearTextAreaClick : Clears the whole text field if the user requests to do so

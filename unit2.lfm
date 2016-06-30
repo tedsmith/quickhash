@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 642
+  Left = 421
   Height = 689
-  Top = 188
+  Top = 110
   Width = 1018
   AllowDropFiles = True
   Caption = 'Quick Hash v2.6.9 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
@@ -1036,8 +1036,8 @@ object MainForm: TMainForm
     end
     object TabSheet7: TTabSheet
       Caption = 'Compare Two Files'
-      ClientHeight = 617
-      ClientWidth = 990
+      ClientHeight = 624
+      ClientWidth = 988
       object GroupBox3: TGroupBox
         AnchorSideRight.Control = TabSheet7
         AnchorSideRight.Side = asrBottom
@@ -1195,17 +1195,17 @@ object MainForm: TMainForm
     object TabSheet6: TTabSheet
       Hint = 'Choose Directory A and compare it against Directory B to see if their contents are both the same'
       Caption = 'Compare Directories'
-      ClientHeight = 617
-      ClientWidth = 990
+      ClientHeight = 624
+      ClientWidth = 988
       object GroupBox1: TGroupBox
         Left = 16
-        Height = 471
+        Height = 478
         Top = 24
-        Width = 952
+        Width = 950
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Compare Two Directories'
-        ClientHeight = 453
-        ClientWidth = 948
+        ClientHeight = 460
+        ClientWidth = 946
         TabOrder = 0
         object AlgorithmChoiceRadioBox6: TRadioGroup
           Left = 12
@@ -1238,9 +1238,9 @@ object MainForm: TMainForm
           AnchorSideRight.Control = GroupBox1
           AnchorSideRight.Side = asrBottom
           Left = 0
-          Height = 137
+          Height = 144
           Top = 168
-          Width = 948
+          Width = 946
           Anchors = [akTop, akLeft, akRight, akBottom]
           ColCount = 3
           ColumnClickSorts = True
@@ -1261,9 +1261,9 @@ object MainForm: TMainForm
           AnchorSideRight.Control = GroupBox1
           AnchorSideRight.Side = asrBottom
           Left = 0
-          Height = 118
+          Height = 125
           Top = 320
-          Width = 948
+          Width = 946
           Anchors = [akTop, akLeft, akRight, akBottom]
           ColCount = 3
           ColumnClickSorts = True
@@ -1306,11 +1306,11 @@ object MainForm: TMainForm
           Left = 136
           Height = 121
           Top = 10
-          Width = 812
+          Width = 810
           Anchors = [akTop, akLeft, akRight]
           Caption = 'Choose two Directories to Compare'
           ClientHeight = 103
-          ClientWidth = 808
+          ClientWidth = 806
           TabOrder = 3
           object lblDirAName: TLabel
             Left = 184
@@ -1366,11 +1366,11 @@ object MainForm: TMainForm
         Left = 16
         Height = 120
         Top = 496
-        Width = 952
+        Width = 950
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Summary'
         ClientHeight = 102
-        ClientWidth = 948
+        ClientWidth = 946
         TabOrder = 1
         object lblFileCountDiffA: TLabel
           Left = 8
@@ -1458,7 +1458,7 @@ object MainForm: TMainForm
         end
         object lblTotalFileCountA: TLabel
           AnchorSideRight.Control = lblTotalFileCountNumberA
-          Left = 832
+          Left = 830
           Height = 13
           Top = 8
           Width = 98
@@ -1472,7 +1472,7 @@ object MainForm: TMainForm
           AnchorSideLeft.Side = asrBottom
           AnchorSideRight.Control = GroupBox2
           AnchorSideRight.Side = asrBottom
-          Left = 930
+          Left = 928
           Height = 13
           Top = 8
           Width = 18
@@ -1482,7 +1482,7 @@ object MainForm: TMainForm
         end
         object lblTotalFileCountB: TLabel
           AnchorSideRight.Control = lblTotalFileCountNumberB
-          Left = 833
+          Left = 831
           Height = 13
           Top = 40
           Width = 97
@@ -1495,7 +1495,7 @@ object MainForm: TMainForm
           AnchorSideLeft.Side = asrBottom
           AnchorSideRight.Control = GroupBox2
           AnchorSideRight.Side = asrBottom
-          Left = 930
+          Left = 928
           Height = 13
           Top = 40
           Width = 18
@@ -1709,7 +1709,7 @@ object MainForm: TMainForm
   object sysRAMTimer: TTimer
     Interval = 5000
     OnTimer = sysRAMTimerTimer
-    left = 80
-    top = 208
+    left = 120
+    top = 192
   end
 end
