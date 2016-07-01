@@ -3,7 +3,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   Height = 600
   Top = 155
   Width = 691
-  Caption = 'QuickHash 2.6.8 (2011 - 2015) (c) Ted Smith - Disk Hashing Module'
+  Caption = 'QuickHash 2.6.9 (2011 - 2015) (c) Ted Smith - Disk Hashing Module'
   ClientHeight = 600
   ClientWidth = 691
   Position = poScreenCenter

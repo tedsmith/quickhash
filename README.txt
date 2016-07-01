@@ -1,3 +1,17 @@
+
+V2.6.9 – July 2016
+
+The UNC and long path name fixes still had not entirely worked as hoped when tested on big data sets. Further fixes implemented to ensure the filename and path to an existing file in a very long path is detected, and likewise re-created when copied. 
+
+Improvements made to the way QH reports errors. Errors are generally quite rare except when dealing with very large volumes of network data in a dynamic environment. Prior to v2.6.9, a message window would appear which was not very useful if there were over a few dozen errors because the list was too big for the screen and the automatic saving of that data seemed to go wrong and generate save errors. That was fixed to a simple warning that errors were found and the user is now prompted to save a text file in a place of their choosing.  
+
+If QuickHash fails to initiate a handle to a file at the time of hashing, not only will the user be told that there was an error initiating a handle (as it did before) but it will now tell you which file is causing the problem. 
+
+If the user pastes the path of a mounted drive as a UNC path (e.g. M:\MyServer\MyDataShare\MyFolder) as either source or destination, the user will now be told to fix it to a true UNC path rather than simply crashing out!  
+
+Status bar in the bottom of the Copy tab (the part that shows the user what file is currently being hashed) was being truncated if the path length was particularly long, and was still truncated even if maximised to the full screen size on a 40” monitor! That has been improved. 
+
+
 V2.6.8 – June 2016
 
 In the 'Copy' tab, users can now select multiple source folders so that multiple folder content can be hashed, copied to a single destination folder, and then hashed again. Note that an experimental limit exists – if the list of files in memory exceeds 2Gb, Quickhash will likely crash. Please report such instances. If they are too many, I will implement another technique. 
