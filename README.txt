@@ -1,4 +1,10 @@
 
+V2.6.9.1 – August 2016
+
+Fixed a drag n drop error that occurred even when there was no error with dragging and dropping – it was introduced in error with v2.6.9
+
+Converted all file saves in the 'Compare Directories' tab to a streamed creation and save to avoid QuickHash running out of memory during large folder comparisons. Known issue : a strange insertion of data above the top table in HTML mode. 
+
 V2.6.9 – July 2016
 
 The UNC and long path name fixes still had not entirely worked as hoped when tested on big data sets. Further fixes implemented to ensure the filename and path to an existing file in a very long path is detected, and likewise re-created when copied. 

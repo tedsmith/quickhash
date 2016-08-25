@@ -570,15 +570,14 @@ begin
            begin
              Showmessage('Expected hash matches the computed file hash, OK');
            end
-       else
+         else
          begin
            Showmessage('Expected hash DOES NOT match the computed file hash!');
          end;
        Application.ProcessMessages;
+       end
      end
-    else
-      ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-     end;
+    else ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
    end;
 end;
 
@@ -850,26 +849,15 @@ end;
 {$ENDIF}
 
 // Procedure SaveOutputAsCSV
-// An object orientated way to save any given display grid to CSV to save me
-// retyping the same code over and over!
+// Save any given display grid to CSV with a timestamped header
 procedure TMainForm.SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
-var
-  slTmpLoadedFromOutput : TStringLIst;
-  InsTextPos : integer;
 begin
-  // Here we save the grid to CSV, then load into memory, insert
-  // the title line and version number of QuickHash, then save it
-  // back to CSV. A bit round the houses but best I can think of for now
-  InsTextPos := 0;
+  // Here we insert the title line and version number of QuickHash, then save it
+  // back to CSV.
   try
+    Gridname.InsertRowWithValues(0, MainForm.Caption + '. Log generated: ' + DateTimeToStr(Now));
     GridName.SaveToCSVFile(FileName);
-    slTmpLoadedFromOutput := TStringLIst.Create;
-    slTmpLoadedFromOutput.LoadFromFile(FileName);
-    slTmpLoadedFromOutput.Insert(InsTextPos, MainForm.Caption + '. Log generated: ' + DateTimeToStr(Now));
   finally
-    // Write back the original data with the newly inserted first line
-    slTmpLoadedFromOutput.SaveToFile(FileName);
-    slTmpLoadedFromOutput.Free;
   end;
 end;
 
@@ -1123,12 +1111,24 @@ end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
 var
-  slHTMLOutput : TStringList;
-  HTMLLogFile3 : string;
-  i, j         : integer;
+  fsHTMLOutput : TFileStream;
+  i, j, k, l   : longword;
+  strHTMLHeader, strTableHeader : string;
+
+{  const
+    strHTMLHeader : string = '<html><title>QuickHash HTML Output</title><body><br />' +
+                             '<p><strong>' + MainForm.Caption + '. Log Created: ' +
+                             DateTimeToStr(Now)+ '</strong></p><p><strong>File and Hash Comparisons of ' +
+                             lblDirAName.Caption + ' and ' + lblDirBName.Caption + '</strong></p><p>Table A</p>'; }
+
 begin
+  i := 0;
+  j := 0;
+  k := 0;
+  l := 0;
+
   SaveDialog6.Title := 'Save Grid A as CSV log file as...';
-  SaveDialog6.InitialDir := GetCurrentDir;
+  SaveDialog6.InitialDir := GetCurrentDir;   // The chosen location will be saved now for the rest of the files
   SaveDialog6.Filter := 'Comma Sep|*.csv|Text file|*.txt';
   SaveDialog6.DefaultExt := 'csv';
   ShowMessage('You will now be prompted to save two seperate CSV files and one combined HTML file...');
@@ -1139,6 +1139,7 @@ begin
     end;
 
   SaveDialog6.Title := 'Save Grid B as CSV log file as...';
+  SaveDialog6.Filename := '';
   if SaveDialog6.Execute then
     begin
       SaveOutputAsCSV(SaveDialog6.FileName, sgDirB);
@@ -1146,70 +1147,66 @@ begin
 
   // HTML Output
   SaveDialog6.Title := 'Save Grids A and B as HTML log file as...';
-  SaveDialog6.InitialDir := GetCurrentDir;
   SaveDialog6.Filter := 'HTML|*.html';
+  SaveDialog6.Filename := '';
   SaveDialog6.DefaultExt := 'html';
   if SaveDialog6.Execute then
     begin
-      HTMLLogFile3 := SaveDialog6.FileName;
-      slHTMLOutput := TStringList.Create;
+      if not FileExists(SaveDialog6.FileName) then
+        fsHTMLOutput := TFileStreamUTF8.Create(SaveDialog6.FileName, fmCreate)
+      else fsHTMLOutput := TFileStreamUTF8.Create(SaveDialog6.FileName, fmOpenReadWrite);
+
       try
-       slHTMLOutput.Add('<html>');
-       slHTMLOutput.Add('<title>QuickHash HTML Output</title>');
-       slHTMLOutput.Add('<body>');
-       slHTMLOutput.Add('<br />');
-       slHTMLOutput.Add('<p><strong>' + MainForm.Caption + '. ' + 'Log Created: ' + DateTimeToStr(Now)+'</strong></p>');
-       slHTMLOutput.Add('<p><strong>File and Hash Comparisons of ' + lblDirAName.Caption + ' and ' + lblDirBName.Caption + '</strong></p>');
+       strHTMLHeader := '<html><title>QuickHash HTML Output</title><body>' +
+                        '<p><strong>' + MainForm.Caption + '. Log Created: ' +
+                         DateTimeToStr(Now)+ '</strong></p><p><strong>File and Hash Comparisons of "' +
+                         lblDirAName.Caption + '" and "' + lblDirBName.Caption + '"</strong></p><p>Table A</p>';
+
+       fsHTMLOutput.WriteAnsiString(strHTMLHeader);
 
        // Grid A content to HTML
-
-       slHTMLOutput.Add('<p>Table A</p>');
-       slHTMLOutput.Add('<table border=1>');
-       slHTMLOutput.Add('<tr>');
-       slHTMLOutput.Add('<td>' + 'ID');
-       slHTMLOutput.Add('<td>' + 'File Path & Name');
-       slHTMLOutput.Add('<td>' + 'Hash');
+       strTableHeader := '<table border=1><tr><td>ID</td><td>File Path and Name</td><td>Hash</td></tr>';
+       fsHTMLOutput.WriteAnsiString(strTableHeader);
 
        i := 0;
        j := 0;
-       for i := 0 to sgDirA.RowCount-1 do
+       // We use 1 to RowCount instead of 0 to RowCount because a line is added by custom function SaveGridToCSV
+       for i := 1 to sgDirA.RowCount-1 do
          begin
-           slHTMLOutput.Add('<tr>');
            for j := 0 to sgDirA.ColCount-1 do
-             slHTMLOutput.Add('<td>' + sgDirA.Cells[j,i] + '</td>');
-             slHTMLOutput.Add('</tr>');
+             fsHTMLOutput.WriteAnsiString('<td>' + sgDirA.Cells[j,i] + '</td>');
+             fsHTMLOutput.WriteAnsiString('</tr>');
          end;
-       slHTMLOutput.Add('</table>');
-       slHTMLOutput.Add('<p>Total Files : ' + IntToStr(sgDirA.Rowcount -1) + '</p>');
+       fsHTMLOutput.WriteAnsiString('</table>');
+       fsHTMLOutput.WriteAnsiString('<p>Total Files : ' + IntToStr(sgDirA.Rowcount -1) + '</p>');
 
        // Grid B content to HTML
 
-       slHTMLOutput.Add('<p>Table B</p>');
-       slHTMLOutput.Add('<table border=1>');
-       slHTMLOutput.Add('<tr>');
-       slHTMLOutput.Add('<td>' + 'ID');
-       slHTMLOutput.Add('<td>' + 'File Path & Name');
-       slHTMLOutput.Add('<td>' + 'Hash');
-       slHTMLOutput.Add('</tr>');
+       fsHTMLOutput.WriteAnsiString('<p>Table B</p>');
+       fsHTMLOutput.WriteAnsiString('<table border=1>');
+       fsHTMLOutput.WriteAnsiString('<tr>');
+       fsHTMLOutput.WriteAnsiString('<td>' + 'ID' + '</td>');
+       fsHTMLOutput.WriteAnsiString('<td>' + 'File Path & Name' + '</td>');
+       fsHTMLOutput.WriteAnsiString('<td>' + 'Hash' + '</td>');
+       fsHTMLOutput.WriteAnsiString('</tr>');
 
-       i := 0;
-       j := 0;
-       for i := 0 to sgDirB.RowCount-1 do
+       k := 0;
+       l := 0;
+       // We use 1 to RowCount instead of 0 to RowCount because a line is added by custom function SaveGridToCSV
+       for k := 1 to sgDirB.RowCount-1 do
          begin
-           slHTMLOutput.Add('<tr>');
-           for j := 0 to sgDirB.ColCount-1 do
-             slHTMLOutput.Add('<td>' + sgDirB.Cells[j,i] + '</td>');
-             slHTMLOutput.Add('</tr>');
+           for l := 0 to sgDirB.ColCount-1 do
+             fsHTMLOutput.WriteAnsiString('<td>' + sgDirB.Cells[l,k] + '</td>');
+             fsHTMLOutput.WriteAnsiString('</tr>');
          end;
-       slHTMLOutput.Add('</table>');
-       slHTMLOutput.Add('<p>Total Files : ' + IntToStr(sgDirB.Rowcount -1) + '</p>');
-       slHTMLOutput.Add('<p>Result? : ' + lblHashMatchB.Caption + '</p>');
-       slHTMLOutput.Add('</body>');
-       slHTMLOutput.Add('</html>');
-       slHTMLOutput.SaveToFile(HTMLLogFile3);
+       fsHTMLOutput.WriteAnsiString('</table>');
+       fsHTMLOutput.WriteAnsiString('<p>Total Files : ' + IntToStr(sgDirB.Rowcount -1) + '</p>');
+       fsHTMLOutput.WriteAnsiString('<p>Result? : ' + lblHashMatchB.Caption + '</p>');
+       fsHTMLOutput.WriteAnsiString('</body>');
+       fsHTMLOutput.WriteAnsiString('</html>');
+
       finally
-       slHTMLOutput.Free;
-       HTMLLogFile3 := '';
+       fsHTMLOutput.Free;
       end;
     end; // End of Savedialog6.Execute for HTML
 end;
