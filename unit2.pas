@@ -54,7 +54,7 @@ uses
 
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, Grids, ExtCtrls, sysconst,
-    LazUTF8Classes, lclintf, ShellCtrls, uDisplayGrid,
+    LazUTF8Classes, lclintf, ShellCtrls, XMLPropStorage, uDisplayGrid,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -126,6 +126,7 @@ type
     btnStopScan2: TButton;
     Button8CopyAndHash: TButton;
     cbToggleInputDataToOutputFile: TCheckBox;
+    cbShowDetailsOfAllComparisons: TCheckBox;
     FileTypeMaskCheckBox2: TCheckBox;
     chkUNCMode: TCheckBox;
     chkHiddenFiles: TCheckBox;
@@ -152,6 +153,11 @@ type
     GroupBox4: TGroupBox;
     gbDirectoryComparisons: TGroupBox;
     GroupBox5: TGroupBox;
+    Label15: TLabel;
+    pbFileS: TProgressBar;
+    pbCopy: TProgressBar;
+    pbCompareDirA: TProgressBar;
+    pbCompareDirB: TProgressBar;
     SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
     Label1: TLabel;
@@ -194,7 +200,6 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
-    Label15: TLabel;
     lblTimeTaken6C: TLabel;
     lblTimeTaken5C: TLabel;
     lblTimeTaken6A: TLabel;
@@ -257,6 +262,8 @@ type
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
+    QH_MainFormXMLPropStorage: TXMLPropStorage;
+    procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
@@ -311,6 +318,7 @@ type
     function  RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     procedure SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
     procedure EmptyDisplayGrid(Grid : TStringGrid);
+
     // function FileSizeWithLongPath(strFileName : string) : Int64;
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
@@ -517,6 +525,8 @@ begin
  {$ENDIF}
 
 end;
+
+
 // FormDropFiles is the same as btnHashFileClick, except it disables the OpenDialog
 // element and computes the filename from the drag n drop variable and hashes the file.
 procedure TMainForm.FormDropFiles(Sender: TObject;
@@ -818,6 +828,12 @@ begin
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
 end;
 
+procedure TMainForm.cbShowDetailsOfAllComparisonsChange(Sender: TObject);
+begin
+  if cbShowDetailsOfAllComparisons.Checked then cbShowDetailsOfAllComparisons.Caption := 'Tabulate only encountered errors instead of all files (faster)?'
+  else cbShowDetailsOfAllComparisons.Caption:= 'Details of all files will be tabulated (slower). Click again to change.';
+end;
+
 procedure TMainForm.PageControl1Change(Sender: TObject);
 begin
 
@@ -939,6 +955,7 @@ var
                  TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', true);
                end;
            end;
+
          lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
          NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
          RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
@@ -1300,13 +1317,16 @@ var
     FileAndHashListA, FileAndHashListB, // Stringlists for the combined lists of both hashes with filenames
     MisMatchList : TStringList;
 
-  i : integer;
+  i, FilesProcessed : integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
   i                                := 0;
+  FilesProcessed                   := 0;
+  FileHashA                        := '';
+  FileHashB                        := '';
   DirA                             := lblDirAName.Caption;
   DirB                             := lblDirBName.Caption;
 
@@ -1360,30 +1380,37 @@ begin
 
     for i := 0 to TotalFilesDirA.Count -1 do
       begin
+        inc(FilesProcessed, 1);
         FilePath            := ExtractFilePath(TotalFilesDirA.Strings[i]);
         FileName            := ExtractFileName(TotalFilesDirA.Strings[i]);
         FullPathAndName     := FilePath + FileName;
-        FileHashA           := CalcTheHashFile(FullPathAndName);
+        FileHashA           := '';
+        FileHashA           := UpperCase(CalcTheHashFile(FullPathAndName));
         HashListA.Add(FileHashA);
         FileAndHashListA.Add(FullPathAndName + ':' + FileHashA + ':');
-        // Populate display grid for DirA
-        sgDirA.Cells[0, i+1] := IntToStr(i+1);
-        {$IFDEF Windows}
-          sgDirA.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
-        {$ENDIF}
-        {$IFDEF Darwin}
-           sgDirA.Cells[1, i+1] := FullPathAndName;
-        {$else}
-          {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
-            sgDirA.Cells[1, i+1] := FullPathAndName;
+        // Populate display grid for DirA if user has chosen to have all details tabulated
+        if cbShowDetailsOfAllComparisons.Checked = false then
+          begin
+          sgDirA.Cells[0, i+1] := IntToStr(i+1);
+          {$IFDEF Windows}
+            sgDirA.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
           {$ENDIF}
-        {$ENDIF}
-        sgDirA.Cells[2, i+1] := UpperCase(FileHashA);
-        sgDirA.Row           := i;
-        sgDirA.col           := 1;
-        end;
-
-    HashListA.Sort;
+          {$IFDEF Darwin}
+             sgDirA.Cells[1, i+1] := FullPathAndName;
+          {$else}
+            {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+              sgDirA.Cells[1, i+1] := FullPathAndName;
+            {$ENDIF}
+          {$ENDIF}
+          sgDirA.Cells[2, i+1] := UpperCase(FileHashA);
+          sgDirA.Row           := i;
+          sgDirA.col           := 1;
+          end;
+      pbCompareDirA.Position := ((FilesProcessed * 100) DIV TotalFilesDirA.Count);
+      end;
+   FilesProcessed := 0;
+   // HashListA.Sort;
+   // FileAndHashListA.Sort;
 
     lblTotalFileCountNumberA.Caption := IntToStr(TotalFilesDirA.Count);
 
@@ -1394,7 +1421,8 @@ begin
     Application.ProcessMessages;
     TotalFilesDirB           := FindAllFilesEx(LongPathOverrideB+DirB, '*', True, True);
     TotalFilesDirB.Sort;
-    sgDirB.RowCount          := TotalFilesDirB.Count + 1;
+    if cbShowDetailsOfAllComparisons.Checked = false then
+      sgDirB.RowCount        := TotalFilesDirB.Count + 1;
 
     HashListB                := TStringList.Create;
     FileAndHashListB         := TStringList.Create;
@@ -1407,31 +1435,39 @@ begin
 
     for i := 0 to TotalFilesDirB.Count -1 do
         begin
+          inc(FilesProcessed, 1);
           FilePath             := ExtractFilePath(TotalFilesDirB.Strings[i]);
           FileName             := ExtractFileName(TotalFilesDirB.Strings[i]);
           FullPathAndName      := FilePath + FileName;
-          FileHashB            := CalcTheHashFile(FullPathAndName);
+          FileHashB            := '';
+          FileHashB            := UpperCase(CalcTheHashFile(FullPathAndName));
           HashListB.Add(FileHashB);
           FileAndHashListB.Add(FullPathAndName + ':' + FileHashB + ':');
-          // Populate display grid for DirB
-          sgDirB.Cells[0, i+1] := IntToStr(i+1);
-           {$IFDEF Windows}
-             sgDirB.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
-          {$ENDIF}
-          {$IFDEF Darwin}
-             sgDirB.Cells[1, i+1] := FullPathAndName;
-          {$else}
-            {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
-            sgDirB.Cells[1, i+1] := FullPathAndName;
+          // Populate display grid for DirB if user has chosen to have all details tabulated
+          if cbShowDetailsOfAllComparisons.Checked = false then
+          begin
+            sgDirB.Cells[0, i+1] := IntToStr(i+1);
+             {$IFDEF Windows}
+               sgDirB.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
             {$ENDIF}
-          {$ENDIF}
+            {$IFDEF Darwin}
+               sgDirB.Cells[1, i+1] := FullPathAndName;
+            {$else}
+              {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+              sgDirB.Cells[1, i+1] := FullPathAndName;
+              {$ENDIF}
+            {$ENDIF}
 
-          sgDirB.Cells[2, i+1] := Uppercase(FileHashB);
-          sgDirB.Row           := i;
-          sgDirB.col           := 1;
+            sgDirB.Cells[2, i+1] := Uppercase(FileHashB);
+            sgDirB.Row           := i;
+            sgDirB.col           := 1;
+          end;
+        pbCompareDirB.Position := ((FilesProcessed * 100) DIV TotalFilesDirB.Count);
         end;
-    HashListB.Sort;
-    FileAndHashListB.Sort;
+
+
+    //HashListB.Sort;
+    //FileAndHashListB.Sort;
 
     lblTotalFileCountNumberB.Caption := IntToStr(TotalFilesDirB.Count);
     lblStatusB.Caption := 'Comparing files in ' + DirA + ' against files in ' + DirB + ' ...please wait';
@@ -1466,6 +1502,14 @@ begin
         lblStatusB.Caption := 'Finished examining files. ' + DirA + ' matches ' + DirB;
         lblStatusB.Refresh;
         lblHashMatchB.Caption:= 'MATCH!';
+        // If user only wanted errors to be tabulated, then there is nothing in
+        // grids to save, so disable the save buttons
+        if cbShowDetailsOfAllComparisons.Checked then
+          begin
+            btnCopyToClipboardA.Enabled := false;
+            btnCopyToClipboardB.Enabled := false;
+            btnSaveComparisons.Enabled  := false;
+          end;
         end
       else
         begin
@@ -1525,22 +1569,26 @@ begin
   if memoHashText.Lines[0] = 'Type or paste text here - hash will update as you type' then memoHashText.Clear;
 end;
 
-// MisMatchCompare takes two hash lists generated from two directories, along with
+// MisMatchFileCountCompare takes two hash lists generated from two directories, along with
 // two other lists that include both the hashes and the filenames, and it compares
 // one pair against the other and highlights the mis matches.
 procedure TMainForm.MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
+  OnlyTabulateErrors : boolean;
 
 begin
   i := 0;
+  j := 0;
   indexA := 0;
   indexB := 0;
   HashPosStart := 0;
   FileNameAndPathPosStart := 0;
   FileNameAndPathPosEnd := 0;
+
+  if cbShowDetailsOfAllComparisons.Checked then OnlyTabulateErrors := true;
 
   try
     MismatchList := TStringList.Create;
@@ -1553,6 +1601,7 @@ begin
      begin
        if not HashListA.Find(HashListB.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListB.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListB.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListB.Text, HashPosStart);
@@ -1560,10 +1609,24 @@ begin
            if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
                ExtractedFileName := Copy(FileAndHashListB.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
-               MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+               if OnlyTabulateErrors then
+                 begin
+                   MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                   sgDirA.Cells[0, j] := IntToStr(j);
+                   sgDirA.Cells[1, j] := 'File in DirB but found in Dir A : ' + ExtractedFileName;
+                   sgDirA.Cells[2, j] := MissingHash;
+                 end
+               else
+               begin
+                 MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                 sgDirA.Cells[0, i+1] := IntToStr(i);
+                 sgDirA.Cells[1, i+1] := 'File in DirB but found in Dir A : ' + ExtractedFileName;
+                 sgDirA.Cells[2, i+1] := MissingHash;
+               end;
              end;
          end;
      end;
+    j := 0;
 
     // Check the content of ListA against ListB
 
@@ -1573,6 +1636,7 @@ begin
      begin
        if not HashListB.Find(HashListA.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListA.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListA.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListA.Text, HashPosStart);
@@ -1580,7 +1644,20 @@ begin
            if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
                ExtractedFileName := Copy(FileAndHashListA.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
-               MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+               if OnlyTabulateErrors then
+                   begin
+                     MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                     sgDirB.Cells[0, j] := IntToStr(j);
+                     sgDirB.Cells[1, j] := 'File in DirA but found in Dir B : ' + ExtractedFileName;
+                     sgDirB.Cells[2, j] := MissingHash;
+                   end
+                 else
+                 begin
+                   MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                   sgDirB.Cells[0, i+1] := IntToStr(i);
+                   sgDirB.Cells[1, i+1] := 'File in DirA but found in Dir B : ' + ExtractedFileName;
+                   sgDirB.Cells[2, i+1] := MissingHash;
+                 end;
              end;
          end;
      end;
@@ -1589,7 +1666,6 @@ begin
     if (MisMatchList.Count > 0) then
      begin
        lblStatusB.Caption := 'There is a mis-match between the two directories.';
-       ShowMessage(MisMatchList.Text)
      end
      else
      begin
@@ -1603,17 +1679,22 @@ end;
 // MisMatchHashCompare : When file counts match in both directories but hashes differ, this works out what files are different by hash
 procedure TMainForm.MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
+  OnlyTabulateErrors : boolean;
 
 begin
   i                        := 0;
+  j                        := 0;
   indexA                   := 0;
   indexB                   := 0;
   HashPosStart             := 0;
   FileNameAndPathPosStart  := 0;
   FileNameAndPathPosEnd    := 0;
+  OnlyTabulateErrors       := false;
+
+  if cbShowDetailsOfAllComparisons.Checked then OnlyTabulateErrors := true;
 
   try
     MismatchList := TStringList.Create;
@@ -1622,21 +1703,40 @@ begin
 
     lblStatusB.Caption := 'Checking files in ' + DirB + ' against those in ' + DirA;
     lblStatusB.Refresh;
+
     for i := 0 to HashListB.Count -1 do
      begin
        if not HashListA.Find(HashListB.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListB.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListB.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListB.Text, HashPosStart);
            FileNameAndPathPosStart := RPosEx(':', FileAndHashListB.Text, FileNameAndPathPosEnd -1);
-           if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
+
+           if (Length(MissingHash) > 0) and (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
-               ExtractedFileName := Copy(FileAndHashListB.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
-               MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is a hash mismatch');
+             ExtractedFileName := Copy(FileAndHashListB.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
+             if OnlyTabulateErrors then
+               begin
+                 sgDirA.Cells[0, j] := IntToStr(j);
+                 sgDirA.Cells[1, j] := ExtractedFileName;
+                 sgDirA.Cells[2, j] := MissingHash;
+               end
+             else
+             begin
+               sgDirA.Cells[0, i+1] := IntToStr(i);
+               sgDirA.Cells[1, i+1] := ExtractedFileName;
+               sgDirA.Cells[2, i+1] := 'Differing hash: ' + MissingHash;
+               sgDirA.Row           := i;
+               sgDirA.col           := 1;
+             end;
+             MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is a hash mismatch');
              end;
          end;
      end;
+
+    j := 0;
 
     // Check the content of ListA against ListB
 
@@ -1646,13 +1746,28 @@ begin
      begin
        if not HashListB.Find(HashListA.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListA.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListA.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListA.Text, HashPosStart);
            FileNameAndPathPosStart := RPosEx(':', FileAndHashListA.Text, FileNameAndPathPosEnd -1);
-           if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
+           if (Length(MissingHash) > 0) and (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
                ExtractedFileName := Copy(FileAndHashListA.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
+               if OnlyTabulateErrors then
+                 begin
+                   sgDirB.Cells[0, j] := IntToStr(j);
+                   sgDirB.Cells[1, j] := ExtractedFileName;
+                   sgDirB.Cells[2, j] := MissingHash;
+                 end
+               else
+               begin
+                 sgDirB.Cells[0, i+1] := IntToStr(i);
+                 sgDirB.Cells[1, i+1] := ExtractedFileName;
+                 sgDirB.Cells[2, i+1] := 'Differing hash: ' + MissingHash;
+                 sgDirB.Row           := i;
+                 sgDirB.col           := 1;
+               end;
                MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is a hash mismatch');
              end;
          end;
@@ -1662,7 +1777,6 @@ begin
     if (MisMatchList.Count > 0) then
      begin
        lblStatusB.Caption := 'There is a hash mis-match between the two directories.';
-       ShowMessage(MisMatchList.Text)
      end
      else
      begin
@@ -2215,6 +2329,7 @@ begin
 
   if StopScan1 = FALSE then    // If Stop button clicked, cancel scan
     begin
+
     NameOfFileToHashFull := FileIterator.FileName;
     PathOnly   := FileIterator.Path;
     NameOnly   := ExtractFileName(FileIterator.FileName);
@@ -2264,6 +2379,7 @@ begin
     lblPercentageComplete.Caption := PercentageProgress + '%';
     TotalBytesRead := TotalBytesRead + SizeOfFile;
     lblTotalBytesExamined.Caption := FormatByteSize(TotalBytesRead);
+    pbFileS.Position := ((FileCounter *100) DIV NoOfFilesInDir2);
 
     Application.ProcessMessages;
     FileCounter := FileCounter+1;
@@ -2279,7 +2395,7 @@ procedure TMainForm.lblURLBannerClick(Sender: TObject);
 var
   QuickHashURL: string;
 begin
-  QuickHashURL := 'https://sourceforge.net/projects/quickhash/';
+  QuickHashURL := 'http://quickhash-gui.org';
   OpenURL(QuickHashURL);
 end;
 
@@ -2893,8 +3009,11 @@ begin
               // When or if the stop button is pressed, we need to prevent any
               // division by zero, thus the count check next...
               if FilesFoundToCopy.Count > 0 then
-                lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
-              Application.ProcessMessages;
+                begin
+                  lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
+                  pbCopy.Position := ((NoFilesExamined *100) DIV FilesFoundToCopy.Count);
+                  Application.ProcessMessages;
+                end;
               end; // End of the if m > 0 then statement
 
             // Otherwise file is probably a zero byte file
