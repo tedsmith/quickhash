@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="C:\lazarus-FPC3\fpc\3.0.0\bin\i386-win32\fpc.exe" Date="1231857874"/>
-  <Params Value=" -MObjFPC -Scghi -O1 -gw2 -godwarfsets -gl -WG -l -vewnhibq -FiC:\Programming\QuickHash\v2.6.9.3-Dev\DiskModule\YAFFI\lib\i386-win32 -FuC:\lazarus-FPC3\lcl\units\i386-win32\win32 -FuC:\lazarus-FPC3\lcl\units\i386-win32 -FuC:\lazarus-FPC3\components\lazutils\lib\i386-win32 -FuC:\lazarus-FPC3\packager\units\i386-win32 -FuC:\Programming\QuickHash\v2.6.9.3-Dev\DiskModule\YAFFI\ -FUC:\Programming\QuickHash\v2.6.9.3-Dev\DiskModule\YAFFI\lib\i386-win32\ -odiskhasher.exe -dLCL -dLCLwin32 yaffi.lpr"/>
-</CONFIG>

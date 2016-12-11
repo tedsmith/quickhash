@@ -7,8 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit2, sha1Customised, FindAllFilesEnhanced,
-uDisplayGrid, diskmodule, diskspecification, uProgress;
+  Forms, Unit2, sha1Customised, FindAllFilesEnhanced, diskmodule,
+uDisplayGrid, diskspecification, uProgress;
 
 //{$IFDEF WINDOWS}{$R project1.rc}{$ENDIF}
 
@@ -18,6 +18,7 @@ begin
   Application.Title:='Quick Hash';
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);
   {$IFDEF Windows}
   Application.CreateForm(TfrmDiskHashingModule, frmDiskHashingModule);
   Application.CreateForm(TfrmProgress, frmProgress);
@@ -32,8 +33,6 @@ begin
   Application.CreateForm(TfrmTechSpecs, frmTechSpecs);
   {$ENDIF}
   {$ENDIF}
-
-  Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);
   Application.Run;
 end.
 

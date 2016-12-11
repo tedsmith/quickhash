@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Compiler Value="C:\lazarus\fpc\2.6.4\bin\i386-win32\fpc.exe" Date="1150455029"/>
-  <Params Value=" -MDelphi -Sah -O1 -g -gl -vewnhi -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\Ciphers -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\Hashes -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32 -FuC:\lazarus\packager\units\i386-win32 -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\ -FUC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32\ -l -Xd dcpcrypt.pas"/>
+  <Compiler Value="C:\lazarus-FPC3\fpc\3.0.0\bin\i386-win32\fpc.exe" Date="1231857874"/>
+  <Params Value=" -MDelphi -Sah -O1 -g -gl -l -vewnhibq -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\Ciphers -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\Hashes -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32 -FuC:\lazarus-FPC3\packager\units\i386-win32 -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\ -FUC:\Programming\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32\ -Xd dcpcrypt.pas"/>
 </CONFIG>

@@ -19,6 +19,7 @@ type
     btnClipboardResults2: TButton;
     CopyAndHashGrid: TStringGrid;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure btnClipboardResults2Click(Sender: TObject);
   private
     { private declarations }
   public
@@ -37,6 +38,16 @@ procedure TfrmDisplayGrid1.FormClose(Sender: TObject;
 begin
   CopyAndHashGrid.Clear;
 end;
+
+procedure TfrmDisplayGrid1.btnClipboardResults2Click(Sender: TObject);
+begin
+  try
+    frmDisplayGrid1.CopyAndHashGrid.CopyToClipboard(false);
+  finally
+    ShowMessage('Grid content now in clipboard...Paste (Ctrl+V) into spreadsheet or text editor')
+  end
+end;
+
 
 initialization
   {$I uDisplayGrid.lrs}

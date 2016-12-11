@@ -6,10 +6,10 @@ unit FindAllFilesEnhanced;
 
 interface
 uses
-  Classes;
+  LazUTF8Classes, Classes;
 
 function FindAllFilesEx(const SearchPath: string; SearchMask: string;
-    SearchSubDirs: boolean; IncludeHidderDirs: boolean): TStringList;
+    SearchSubDirs: boolean; IncludeHidderDirs: boolean): TStringListUTF8;
 
 implementation
 uses
@@ -42,11 +42,11 @@ begin
 end;
 
 function FindAllFilesEx(const SearchPath: string; SearchMask: string;
-  SearchSubDirs: boolean; IncludeHidderDirs: boolean): TStringList;
+  SearchSubDirs: boolean; IncludeHidderDirs: boolean): TStringListUTF8;
 var
   Searcher: TListFileSearcher;
 begin
-  Result   := TStringList.Create;
+  Result   := TStringListUTF8.Create;
   Searcher := TListFileSearcher.Create(Result);
   Searcher.DirectoryAttribute := Searcher.DirectoryAttribute or faHidden;
   try

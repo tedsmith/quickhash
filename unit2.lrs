@@ -11,16 +11,16 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#2#24#5'Width'#3#228#3#10'ActivePage'#7#9'TabSheet1'#7'Anchors'#11#5'akTop'#6
   +'akLeft'#7'akRight'#0#14'ParentShowHint'#8#8'TabIndex'#2#0#8'TabOrder'#2#0#8
   +'OnChange'#7#18'PageControl1Change'#0#9'TTabSheet'#9'TabSheet1'#4'Hint'#6#21
-  +'Hash portions of text'#7'Caption'#6#5'Te&xt'#12'ClientHeight'#3'q'#2#11'Cli'
-  +'entWidth'#3#222#3#14'OnContextPopup'#7#21'TabSheet1ContextPopup'#14'ParentS'
+  +'Hash portions of text'#7'Caption'#6#5'Te&xt'#12'ClientHeight'#3'v'#2#11'Cli'
+  +'entWidth'#3#220#3#14'OnContextPopup'#7#21'TabSheet1ContextPopup'#14'ParentS'
   +'howHint'#8#0#9'TGroupBox'#19'TextHashingGroupBox'#4'Left'#3#136#0#6'Height'
-  +#3#182#1#3'Top'#2#10#5'Width'#3','#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRi'
-  +'ght'#0#7'Caption'#6#12'Text Hashing'#12'ClientHeight'#3#164#1#11'ClientWidt'
-  +'h'#3'*'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'#8#10'P'
+  +#3#182#1#3'Top'#2#10#5'Width'#3'*'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRi'
+  +'ght'#0#7'Caption'#6#12'Text Hashing'#12'ClientHeight'#3#160#1#11'ClientWidt'
+  +'h'#3'&'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'#8#10'P'
   +'arentFont'#8#8'TabOrder'#2#0#0#5'TMemo'#12'memoHashText'#4'Left'#2#18#6'Hei'
   +'ght'#3#175#0#4'Hint'#6#139'Type or paste and watch hash value change.'#13#10
   +'For amounts larger than several hundred Kb, save'#13#10'data to a file and '
-  +'use File Hashing instead. '#3'Top'#2#17#5'Width'#3#245#2#7'Anchors'#11#5'ak'
+  +'use File Hashing instead. '#3'Top'#2#17#5'Width'#3#241#2#7'Anchors'#11#5'ak'
   +'Top'#6'akLeft'#7'akRight'#0#13'Lines.Strings'#1#6'6Type or paste text here '
   +'- hash will update as you type'#0#9'MaxLength'#4#0'e'#205#29#8'OnChange'#7#8
   +'HashText'#7'OnEnter'#7#9'ClearText'#14'ParentShowHint'#8#10'ScrollBars'#7#10
@@ -28,24 +28,24 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'eft'#2#18#6'Height'#2'8'#4'Hint'#6#205'This is the hash of ALL THE TEXT in '
   +'the textarea above'#13#10'For line-by-line analysis, use the button'#13#10
   +#13#10'The hash value can be copied from here'#13#10'to clipboard (highlight'
-  +' and press Ctrl + C or right click ''Copy'''#3'Top'#3'`'#1#5'Width'#3#245#2
+  +' and press Ctrl + C or right click ''Copy'''#3'Top'#3'`'#1#5'Width'#3#241#2
   +#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7#8'clSilver'#11'Fon'
   +'t.Height'#2#243#13'Lines.Strings'#1#6#13'...hash value'#0#10'ParentFont'#8
   +#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#1#0#0#12'TLabeledEdit'#20
-  +'lbleExpectedHashText'#4'Left'#2#18#6'Height'#2#27#4'Hint'#6#152'Paste an ex'
+  +'lbleExpectedHashText'#4'Left'#2#18#6'Height'#2#25#4'Hint'#6#152'Paste an ex'
   +'isting hash value here to see if'#13#10'the generated hash matches the comp'
   +'uted.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3'
-  +' dots only)'#3'Top'#3'0'#1#5'Width'#3#245#2#7'Anchors'#11#5'akTop'#6'akLeft'
+  +' dots only)'#3'Top'#3'0'#1#5'Width'#3#241#2#7'Anchors'#11#5'akTop'#6'akLeft'
   +#7'akRight'#0' EditLabel.AnchorSideLeft.Control'#7#20'lbleExpectedHashText!E'
   +'ditLabel.AnchorSideRight.Control'#7#20'lbleExpectedHashText'#30'EditLabel.A'
   +'nchorSideRight.Side'#7#9'asrBottom"EditLabel.AnchorSideBottom.Control'#7#20
   +'lbleExpectedHashText'#14'EditLabel.Left'#2#18#16'EditLabel.Height'#2#17#13
-  +'EditLabel.Top'#3#28#1#15'EditLabel.Width'#3#245#2#17'EditLabel.Caption'#6'.'
+  +'EditLabel.Top'#3#28#1#15'EditLabel.Width'#3#241#2#17'EditLabel.Caption'#6'.'
   +'Expected Hash Value (paste from other utility)'#21'EditLabel.ParentColor'#8
   +#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#2#4'Text'#6#3'...'#0#0#9'T'
   +'GroupBox'#9'GroupBox5'#4'Left'#2#18#6'Height'#2'H'#3'Top'#3#208#0#5'Width'#3
-  +#249#2#7'Caption'#6'!Additional Text Hashing Functions'#12'ClientHeight'#2'6'
-  +#11'ClientWidth'#3#247#2#8'TabOrder'#2#3#0#7'TButton'#7'btnFLBL'#4'Left'#3
+  +#249#2#7'Caption'#6'!Additional Text Hashing Functions'#12'ClientHeight'#2'2'
+  +#11'ClientWidth'#3#245#2#8'TabOrder'#2#3#0#7'TButton'#7'btnFLBL'#4'Left'#3
   +#176#0#6'Height'#2#25#4'Hint'#6'^Load a text file, hash the content '#13#10
   +'of it line-by-line, and save the results '#13#10'to a new file.'#3'Top'#2#8
   +#5'Width'#3#144#0#7'Caption'#6#21'Txt FILE Line-By-Line'#7'OnClick'#7#12'btn'
@@ -57,10 +57,10 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#0#0#7'TButton'#16'btnClearTextArea'#4'Left'#3'h'#2#6'Height'#2#25#3'Top'#2#8
   +#5'Width'#2's'#7'Caption'#6#15'Clear Text Area'#7'OnClick'#7#21'btnClearText'
   +'AreaClick'#8'TabOrder'#2#2#0#0#9'TCheckBox'#29'cbToggleInputDataToOutputFil'
-  +'e'#4'Left'#3'`'#1#6'Height'#2#22#4'Hint'#6#141'If left unticked, the source'
+  +'e'#4'Left'#3'`'#1#6'Height'#2#21#4'Hint'#6#141'If left unticked, the source'
   +' '#13#10'text including corresponding hashes '#13#10'will be output. If tic'
   +'ked, only the'#13#10'hashes will be output on their own.'#3'Top'#2#13#5'Wid'
-  +'th'#3#210#0#7'Caption'#6#30'Source text included in output'#8'OnChange'#7'#'
+  +'th'#3#194#0#7'Caption'#6#30'Source text included in output'#8'OnChange'#7'#'
   +'cbToggleInputDataToOutputFileChange'#14'ParentShowHint'#8#8'ShowHint'#9#8'T'
   +'abOrder'#2#3#0#0#0#0#11'TRadioGroup'#24'AlgorithmChoiceRadioBox1'#4'Left'#2
   +#16#6'Height'#2'i'#4'Hint'#6#145'Having typed some text in the text area, yo'
@@ -72,26 +72,26 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'hildResize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildS'
   +'izing.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclL'
   +'eftToRightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHei'
-  +'ght'#2'Y'#11'ClientWidth'#2'^'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'
+  +'ght'#2'U'#11'ClientWidth'#2'\'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'
   +#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#0#18'OnSelectionChanged'#7#8'HashText'#14
   +'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#1#0#0#9'TGroupBox'#17'SystemR'
   +'AMGroupBox'#4'Left'#2#16#6'Height'#2'Q'#3'Top'#3#137#0#5'Width'#2'`'#7'Capt'
-  +'ion'#6#10'System RAM'#12'ClientHeight'#2'A'#11'ClientWidth'#2'^'#8'TabOrder'
-  +#2#2#0#6'TLabel'#6'lblRAM'#4'Left'#2#8#6'Height'#2#15#3'Top'#2#8#5'Width'#2
-  +#12#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#0#0#9'TTabSheet'#9'TabSheet2'#4
-  +'Hint'#6'6Hash a single file (useful for hashing disks in Linux)'#7'Caption'
-  +#6#5'F&ile'#12'ClientHeight'#3'q'#2#11'ClientWidth'#3#222#3#14'ParentShowHin'
-  +'t'#8#0#9'TGroupBox'#19'FileHashingGroupBox'#4'Left'#3#144#0#6'Height'#3'.'#1
-  +#4'Hint'#12#6#1#0#0'To hash physical disks, run the program as root or sudo'
-  +#13#10'and then navigate to /dev/sdX (where X might be a, b, c etc)'#13#10'f'
-  +'or physical disks or /dev/sdaX (where X might be 1, 2, 3 etc) '#13#10'for l'
-  +'ogical drives. '#13#10#13#10'Some distributions use /dev/h... rather than /'
-  +'dev/s...'#3'Top'#2#10#5'Width'#3'6'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'ak'
-  +'Right'#0#7'Caption'#6#19'Single File Hashing'#12'ClientHeight'#3#28#1#11'Cl'
-  +'ientWidth'#3'4'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'
-  +#8#10'ParentFont'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#0#0#6'T'
-  +'Label'#6'Label1'#4'Left'#3#128#0#6'Height'#2#1#3'Top'#2#16#5'Width'#2#1#11
-  +'ParentColor'#8#0#0#6'TLabel'#6'Label6'#4'Left'#3#9#2#6'Height'#2'"'#3'Top'#2
+  +'ion'#6#10'System RAM'#12'ClientHeight'#2'='#11'ClientWidth'#2'\'#8'TabOrder'
+  +#2#2#0#6'TLabel'#6'lblRAM'#4'Left'#2#8#6'Height'#2#15#3'Top'#2#8#5'Width'#2#9
+  +#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#0#0#9'TTabSheet'#9'TabSheet2'#4'H'
+  +'int'#6'6Hash a single file (useful for hashing disks in Linux)'#7'Caption'#6
+  +#5'F&ile'#12'ClientHeight'#3'q'#2#11'ClientWidth'#3#222#3#14'ParentShowHint'
+  +#8#0#9'TGroupBox'#19'FileHashingGroupBox'#4'Left'#3#144#0#6'Height'#3'.'#1#4
+  +'Hint'#12#6#1#0#0'To hash physical disks, run the program as root or sudo'#13
+  +#10'and then navigate to /dev/sdX (where X might be a, b, c etc)'#13#10'for '
+  +'physical disks or /dev/sdaX (where X might be 1, 2, 3 etc) '#13#10'for logi'
+  +'cal drives. '#13#10#13#10'Some distributions use /dev/h... rather than /dev'
+  +'/s...'#3'Top'#2#10#5'Width'#3'6'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRig'
+  +'ht'#0#7'Caption'#6#19'Single File Hashing'#12'ClientHeight'#3#24#1#11'Clien'
+  +'tWidth'#3'2'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'#8
+  +#10'ParentFont'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#0#0#6'TLa'
+  +'bel'#6'Label1'#4'Left'#3#128#0#6'Height'#2#1#3'Top'#2#16#5'Width'#2#1#11'Pa'
+  +'rentColor'#8#0#0#6'TLabel'#6'Label6'#4'Left'#3#9#2#6'Height'#2'"'#3'Top'#2
   +#31#5'Width'#3#14#1#7'Caption'#6'WAs root, this section can be used to hash '
   +'disks'#10'e.g. /dev/sdX or /dev/sdaX, or /dev/hdX'#11'ParentColor'#8#8'Word'
   +'Wrap'#9#0#0#6'TLabel'#13'lblTimeTaken1'#4'Left'#3#224#0#6'Height'#2#17#3'To'
@@ -129,7 +129,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'esize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing'
   +'.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftTo'
   +'RightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2
-  ,'Y'#11'ClientWidth'#2'^'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'S'
+  ,'U'#11'ClientWidth'#2'\'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'S'
   +'HA-1'#6#6'SHA256'#6#6'SHA512'#0#18'OnSelectionChanged'#7'(AlgorithmChoiceRa'
   +'dioBox2SelectionChanged'#8'TabOrder'#2#1#0#0#0#9'TTabSheet'#9'TabSheet3'#4
   +'Hint'#6'iCompute hashes for multiple files in a directory'#13#10'recursivel'
@@ -138,7 +138,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#0#9'TGroupBox'#24'DirectoryHashingGroupBox'#4'Left'#3#136#0#6'Height'#3'`'#2
   +#3'Top'#2#10#5'Width'#3'H'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#8'a'
   +'kBottom'#0#7'Caption'#6'9Hash all files in chosen directory - recursive by '
-  +'default'#12'ClientHeight'#3'P'#2#11'ClientWidth'#3'F'#3#5'Color'#7#6'clForm'
+  +'default'#12'ClientHeight'#3'L'#2#11'ClientWidth'#3'D'#3#5'Color'#7#6'clForm'
   +#11'ParentColor'#8#10'ParentFont'#8#8'TabOrder'#2#0#0#6'TLabel'#6'Label2'#23
   +'AnchorSideRight.Control'#7#16'lblFilesExamined'#4'Left'#3'('#2#6'Height'#2
   +#15#3'Top'#2#28#5'Width'#2'h'#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7
@@ -236,8 +236,8 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'ChildSizing.EnlargeVertical'#7#24'crsHomogenousChildResize'#28'ChildSizing.'
   +'ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'#7#14
   +'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftToRightThenTopToBottom'
-  +#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2'Y'#11'ClientWidth'#2
-  +'^'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6
+  +#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2'U'#11'ClientWidth'#2
+  +'\'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6
   +'SHA512'#0#8'TabOrder'#2#1#0#0#12'TProgressBar'#7'pbFileS'#4'Left'#3#24#3#6
   +'Height'#2#20#3'Top'#2'h'#5'Width'#3#168#0#8'TabOrder'#2#2#0#0#0#9'TTabSheet'
   +#9'TabSheet4'#4'Hint'#6'\Choose a directory, have its content hashed, files '
@@ -246,7 +246,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'TGroupBox'#24'CopyFilesHashingGroupBox'#4'Left'#2'x'#6'Height'#3'V'#2#3'Top'
   +#2#8#5'Width'#3'X'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'
   +#6'_Hash files in chosen directory, copy them, and re-hash the copied files '
-  +'(recursive by default) '#12'ClientHeight'#3'F'#2#11'ClientWidth'#3'V'#3#5'C'
+  +'(recursive by default) '#12'ClientHeight'#3'B'#2#11'ClientWidth'#3'T'#3#5'C'
   +'olor'#7#6'clForm'#11'ParentColor'#8#10'ParentFont'#8#8'TabOrder'#2#0#0#6'TP'
   +'anel'#24'Panel1CopyAndHashOptions'#4'Left'#2#16#6'Height'#3#184#0#3'Top'#2
   +#16#5'Width'#3'+'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#12'ClientH'
@@ -353,15 +353,15 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'ze'#27'ChildSizing.EnlargeVertical'#7#24'crsHomogenousChildResize'#28'Child'
   +'Sizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'
   +#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftToRightThenTopToBot'
-  +'tom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2'Y'#11'ClientWid'
-  +'th'#2'^'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA25'
+  +'tom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2'U'#11'ClientWid'
+  +'th'#2'\'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA25'
   +'6'#6#6'SHA512'#0#8'TabOrder'#2#1#0#0#0#9'TTabSheet'#9'TabSheet7'#7'Caption'
   +#6#17'Compare Two Files'#12'ClientHeight'#3'q'#2#11'ClientWidth'#3#222#3#0#9
   +'TGroupBox'#9'GroupBox3'#23'AnchorSideRight.Control'#7#9'TabSheet7'#20'Ancho'
   +'rSideRight.Side'#7#9'asrBottom'#4'Left'#2#16#6'Height'#3#240#0#3'Top'#2#16#5
   +'Width'#3#204#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6'2'
-  +'Hash two specific files in two different locations'#12'ClientHeight'#3#224#0
-  +#11'ClientWidth'#3#202#3#8'TabOrder'#2#0#0#11'TRadioGroup'#24'AlgorithmChoic'
+  +'Hash two specific files in two different locations'#12'ClientHeight'#3#220#0
+  +#11'ClientWidth'#3#200#3#8'TabOrder'#2#0#0#11'TRadioGroup'#24'AlgorithmChoic'
   +'eRadioBox5'#4'Left'#2#16#6'Height'#2'i'#3'Top'#2#8#5'Width'#2'`'#8'AutoFill'
   +#9#7'Caption'#6#14'Hash Algorithm'#28'ChildSizing.LeftRightSpacing'#2#6#28'C'
   +'hildSizing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizontal'#7#24'crs'
@@ -369,7 +369,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'ildResize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSi'
   +'zing.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLe'
   +'ftToRightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeig'
-  +'ht'#2'Y'#11'ClientWidth'#2'^'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'
+  +'ht'#2'U'#11'ClientWidth'#2'\'#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'
   +#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#0#18'OnSelectionChanged'#7'(AlgorithmCho'
   +'iceRadioBox5SelectionChanged'#8'TabOrder'#2#0#0#0#10'TStatusBar'#10'StatusB'
   +'ar4'#22'AnchorSideLeft.Control'#7#9'GroupBox4'#23'AnchorSideRight.Control'#7
@@ -378,7 +378,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'roupBox3'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#3#136#0#6'Height'
   +#3#169#0#3'Top'#2#8#5'Width'#3'@'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRig'
   +'ht'#0#7'Caption'#6'*Choose two files and click ''Compare Files'''#12'Client'
-  +'Height'#3#153#0#11'ClientWidth'#3'>'#3#8'TabOrder'#2#2#0#7'TButton'#15'btnF'
+  +'Height'#3#149#0#11'ClientWidth'#3'<'#3#8'TabOrder'#2#2#0#7'TButton'#15'btnF'
   +'ileACompare'#4'Left'#2#8#6'Height'#2#25#3'Top'#2#8#5'Width'#2'X'#7'Caption'
   +#6#13'Select File A'#7'OnClick'#7#20'btnFileACompareClick'#8'TabOrder'#2#0#0
   +#0#7'TButton'#15'btnFileBCompare'#4'Left'#2#8#6'Height'#2#25#3'Top'#2'H'#5'W'
@@ -405,7 +405,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'lientHeight'#3'q'#2#11'ClientWidth'#3#222#3#0#9'TGroupBox'#9'GroupBox1'#4'L'
   +'eft'#2#16#6'Height'#3#228#1#3'Top'#2#24#5'Width'#3#182#3#7'Anchors'#11#5'ak'
   +'Top'#6'akLeft'#7'akRight'#8'akBottom'#0#7'Caption'#6#23'Compare Two Directo'
-  +'ries'#12'ClientHeight'#3#212#1#11'ClientWidth'#3#180#3#8'TabOrder'#2#0#0#11
+  +'ries'#12'ClientHeight'#3#208#1#11'ClientWidth'#3#178#3#8'TabOrder'#2#0#0#11
   +'TRadioGroup'#24'AlgorithmChoiceRadioBox6'#4'Left'#2#12#6'Height'#2'f'#3'Top'
   +#2#10#5'Width'#2'`'#8'AutoFill'#9#7'Caption'#6#14'Hash Algorithm'#28'ChildSi'
   +'zing.LeftRightSpacing'#2#6#28'ChildSizing.TopBottomSpacing'#2#6#29'ChildSiz'
@@ -413,7 +413,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'eVertical'#7#24'crsHomogenousChildResize'#28'ChildSizing.ShrinkHorizontal'#7
   +#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'#7#14'crsScaleChilds'#18'C'
   +'hildSizing.Layout'#7#29'cclLeftToRightThenTopToBottom'#27'ChildSizing.Contr'
-  +'olsPerLine'#2#1#12'ClientHeight'#2'V'#11'ClientWidth'#2'^'#9'ItemIndex'#2#1
+  +'olsPerLine'#2#1#12'ClientHeight'#2'R'#11'ClientWidth'#2'\'#9'ItemIndex'#2#1
   +#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#0#8'TabOrde'
   +'r'#2#0#0#0#11'TStringGrid'#6'sgDirA'#22'AnchorSideLeft.Control'#7#9'GroupBo'
   +'x1'#23'AnchorSideRight.Control'#7#9'GroupBox1'#20'AnchorSideRight.Side'#7#9
@@ -441,7 +441,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'.Control'#7#9'GroupBox1'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#3
   +#136#0#6'Height'#2'y'#3'Top'#2#10#5'Width'#3'*'#3#7'Anchors'#11#5'akTop'#6'a'
   +'kLeft'#7'akRight'#0#7'Caption'#6'!Choose two Directories to Compare'#12'Cli'
-  +'entHeight'#2'i'#11'ClientWidth'#3'('#3#8'TabOrder'#2#3#0#6'TLabel'#11'lblDi'
+  +'entHeight'#2'e'#11'ClientWidth'#3'&'#3#8'TabOrder'#2#3#0#6'TLabel'#11'lblDi'
   +'rAName'#4'Left'#3#184#0#6'Height'#2#15#3'Top'#2#8#5'Width'#2#9#7'Caption'#6
   +#3'...'#11'ParentColor'#8#8'WordWrap'#9#0#0#6'TLabel'#11'lblDirBName'#4'Left'
   +#3#184#0#6'Height'#2#15#3'Top'#2'('#5'Width'#2#9#7'Caption'#6#3'...'#11'Pare'
@@ -459,8 +459,8 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'Box'#9'GroupBox2'#22'AnchorSideLeft.Control'#7#9'GroupBox1'#23'AnchorSideRi'
   +'ght.Control'#7#9'GroupBox1'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'
   +#2#16#6'Height'#3#128#0#3'Top'#3#240#1#5'Width'#3#182#3#7'Anchors'#11#5'akTo'
-  +'p'#6'akLeft'#7'akRight'#0#7'Caption'#6#7'Summary'#12'ClientHeight'#2'p'#11
-  +'ClientWidth'#3#180#3#8'TabOrder'#2#1#0#6'TLabel'#17'lblFileCountDiffA'#4'Le'
+  +'p'#6'akLeft'#7'akRight'#0#7'Caption'#6#7'Summary'#12'ClientHeight'#2'l'#11
+  +'ClientWidth'#3#178#3#8'TabOrder'#2#1#0#6'TLabel'#17'lblFileCountDiffA'#4'Le'
   +'ft'#2#8#6'Height'#2#15#3'Top'#2#8#5'Width'#2'u'#7'Caption'#6#23'File Count '
   +'Difference: '#11'ParentColor'#8#0#0#6'TLabel'#17'lblFileCountDiffB'#22'Anch'
   +'orSideLeft.Control'#7#17'lblFileCountDiffA'#19'AnchorSideLeft.Side'#7#9'asr'
@@ -511,29 +511,29 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#2'P'#5'Width'#2'y'#7'Anchors'#11#5'akTop'#7'akRight'#0#8'TabOrder'#2#4#0#0#0
   +#0#9'TTabSheet'#9'TabSheet5'#4'Hint'#6'vCompute a SHA-1 hash of a physical d'
   +'isk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Win'
-  +'dows Vista or above'#7'Caption'#6#5'Disks'#12'ClientHeight'#3'q'#2#11'Clien'
-  +'tWidth'#3#222#3#0#7'TButton'#23'btnCallDiskHasherModule'#4'Left'#3'x'#1#6'H'
+  +'dows Vista or above'#7'Caption'#6#5'Disks'#12'ClientHeight'#3'v'#2#11'Clien'
+  +'tWidth'#3#220#3#0#7'TButton'#23'btnCallDiskHasherModule'#4'Left'#3'x'#1#6'H'
   ,'eight'#2#25#3'Top'#2#24#5'Width'#3#227#0#7'Caption'#6#27'&Launch Disk Hashi'
   +'ng Module'#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7#28'btnCallDiskHasherM'
   +'oduleClick'#10'ParentFont'#8#8'TabOrder'#2#0#0#0#6'TLabel'#31'lblDiskHashin'
-  +'gRunAsAdminWarning'#4'Left'#3'p'#1#6'Height'#2#15#3'Top'#2'H'#5'Width'#3#19
-  +#1#7'Caption'#6'-Must be run as administrator for disk hashing'#11'ParentCol'
+  +'gRunAsAdminWarning'#4'Left'#3'p'#1#6'Height'#2#15#3'Top'#2'H'#5'Width'#3#239
+  +#0#7'Caption'#6'-Must be run as administrator for disk hashing'#11'ParentCol'
   +'or'#8#0#0#6'TLabel'#6'Label8'#4'Left'#3'X'#1#6'Height'#2#30#3'Top'#2'p'#5'W'
-  +'idth'#3'O'#1#7'Caption'#6'jLINUX USERS - You may prefer to hash disks using'
-  +' '#10'"File" tab and navigate to /dev/sdX or /dev/sdXX as root'#11'ParentCo'
-  +'lor'#8#0#0#0#0#6'TLabel'#12'lblURLBanner'#23'AnchorSideRight.Control'#7#5'O'
-  +'wner'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#3#242#2#6'Height'#2#15
-  +#4'Hint'#6#28'Click to open URL in browser'#3'Top'#2#8#5'Width'#3#254#0#7'An'
+  +'idth'#3''''#1#7'Caption'#6'jLINUX USERS - You may prefer to hash disks usin'
+  +'g '#10'"File" tab and navigate to /dev/sdX or /dev/sdXX as root'#11'ParentC'
+  +'olor'#8#0#0#0#0#6'TLabel'#12'lblURLBanner'#23'AnchorSideRight.Control'#7#5
+  +'Owner'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#3'!'#3#6'Height'#2#15
+  +#4'Hint'#6#28'Click to open URL in browser'#3'Top'#2#8#5'Width'#3#207#0#7'An'
   +'chors'#11#5'akTop'#7'akRight'#0#19'BorderSpacing.Right'#2#10#7'Caption'#6
   +'''Official Site: http://quickhash-gui.org'#10'Font.Color'#7#6'clBlue'#10'Fo'
   +'nt.Style'#11#6'fsBold'#0#11'ParentColor'#8#10'ParentFont'#8#14'ParentShowHi'
   +'nt'#8#8'ShowHint'#9#7'OnClick'#7#17'lblURLBannerClick'#0#0#6'TLabel'#7'Labe'
-  +'l15'#4'Left'#3'h'#1#6'Height'#2#15#3'Top'#2#8#5'Width'#3'L'#1#9'Alignment'#7
-  +#8'taCenter'#7'Anchors'#11#5'akTop'#7'akRight'#0#7'Caption'#6'0Quick Hash, C'
-  +'opyright (c) 2011-2016  Ted Smith. '#10'Font.Style'#11#6'fsBold'#0#11'Paren'
-  +'tColor'#8#10'ParentFont'#8#0#0#11'TOpenDialog'#11'OpenDialog1'#4'left'#3'`'
-  +#1#3'top'#3'('#3#0#0#11'TSaveDialog'#11'SaveDialog1'#4'left'#3#24#1#3'top'#3
-  +'('#3#0#0#11'TSaveDialog'#11'SaveDialog2'#4'left'#3#192#0#3'top'#3'+'#3#0#0
+  +'l15'#4'Left'#3#164#1#6'Height'#2#15#3'Top'#2#8#5'Width'#3#16#1#9'Alignment'
+  +#7#8'taCenter'#7'Anchors'#11#5'akTop'#7'akRight'#0#7'Caption'#6'0Quick Hash,'
+  +' Copyright (c) 2011-2016  Ted Smith. '#10'Font.Style'#11#6'fsBold'#0#11'Par'
+  +'entColor'#8#10'ParentFont'#8#0#0#11'TOpenDialog'#11'OpenDialog1'#4'left'#3
+  +'`'#1#3'top'#3'('#3#0#0#11'TSaveDialog'#11'SaveDialog1'#4'left'#3#24#1#3'top'
+  +#3'('#3#0#0#11'TSaveDialog'#11'SaveDialog2'#4'left'#3#192#0#3'top'#3'+'#3#0#0
   +#22'TSelectDirectoryDialog'#22'SelectDirectoryDialog1'#4'left'#3#160#1#3'top'
   +#3'0'#3#0#0#22'TSelectDirectoryDialog'#22'SelectDirectoryDialog2'#4'left'#3
   +'X'#2#3'top'#3'('#3#0#0#22'TSelectDirectoryDialog'#22'SelectDirectoryDialog3'

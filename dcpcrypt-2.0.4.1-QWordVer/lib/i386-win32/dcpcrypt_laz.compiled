@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="C:\lazarus\fpc\2.6.4\bin\i386-win32\fpc.exe" Date="1150455029"/>
-  <Params Value=" -MDelphi -Scghi -O1 -g -gl -vewnhi -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\Ciphers -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\Hashes -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32 -FuC:\lazarus\packager\units\i386-win32 -FuC:\lazarus\components\lazutils\lib\i386-win32 -FuC:\lazarus\lcl\units\i386-win32 -FuC:\lazarus\lcl\units\i386-win32\win32 -FuC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\ -FUC:\Users\ted\Documents\Programming\QuickHash\QuickHash-2.5.1-Windows-Rel14-09-04\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32\ -l -dLCL -dLCLwin32 dcpcrypt_laz.pas"/>
-</CONFIG>

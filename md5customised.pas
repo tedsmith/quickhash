@@ -43,7 +43,7 @@ interface
 // The default FPC libraries do not contain this.
 {$ifdef windows}
 uses
-   LazUTF8, Windows, SysUtils;
+   LazUTF8, Windows, SysUtils, Dialogs;
 {$endif}
 
 
@@ -625,6 +625,12 @@ begin
     security.bInheritHandle := true;
     security.lpSecurityDescriptor := nil;
     filerec(f).handle:=CreateFileW(@ws[1],GENERIC_READ, file_Share_Read, @security, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    if filerec(f).handle = INVALID_HANDLE_VALUE then
+    begin
+      //RaiseLastOSError;
+      ShowMessage('Could not get handle to file ' + FileName + #13#10 +
+                  '. OS error and code : ' + SysErrorMessageUTF8(GetLastOSError));
+    end;
   end;
   {$endif windows}
 
