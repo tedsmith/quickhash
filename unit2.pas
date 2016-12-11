@@ -18,7 +18,7 @@
     Stackoverflow forums who helped me with the methodology of hashing in buffers
     and Taazz who pointed out where I'd made some daft mistakes. Thanks guys!
 
-    Copyright (C) 2011-2015  Ted Smith https://sourceforge.net/users/tedtechnology
+    Copyright (C) 2011-2016  Ted Smith https://sourceforge.net/users/tedtechnology
 
     NOTE: Date and time values, as computed in recursive directory hashing, are not
     daylight saving time adjusted. Source file date and time values are recorded.
@@ -26,7 +26,7 @@
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version. You are not granted permission to create
+    any later version. You are not granted permission to create
     another disk or file hashing tool based on this code and call it 'QuickHash'.
 
     This program is distributed in the hope that it will be useful,
@@ -54,7 +54,7 @@ uses
 
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, Grids, ExtCtrls, sysconst,
-    LazUTF8Classes, lclintf, ShellCtrls, uDisplayGrid,
+    LazUTF8Classes, lclintf, ShellCtrls, XMLPropStorage, uDisplayGrid, diskmodule,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -73,7 +73,8 @@ uses
   {$IFDEF Windows}
     Windows,
     // For Windows, this is a specific disk hashing tab for QuickHash. Not needed for Linux
-    DiskModuleUnit1;
+     types;
+//DiskModuleUnit1, types;
   {$ENDIF}
   {$IFDEF Darwin}
     MacOSAll;
@@ -87,12 +88,25 @@ type
 
   { TMainForm }
 
+   MEMORYSTATUSEX = record
+     dwLength : DWORD;
+     dwMemoryLoad : DWORD;
+     ullTotalPhys : uint64;
+     ullAvailPhys : uint64;
+     ullTotalPageFile : uint64;
+     ullAvailPageFile : uint64;
+     ullTotalVirtual : uint64;
+     ullAvailVirtual : uint64;
+     ullAvailExtendedVirtual : uint64;
+  end;
+
    TMainForm = class(TForm)
     AlgorithmChoiceRadioBox3: TRadioGroup;
     AlgorithmChoiceRadioBox4: TRadioGroup;
     AlgorithmChoiceRadioBox1: TRadioGroup;
     AlgorithmChoiceRadioBox6: TRadioGroup;
     AlgorithmChoiceRadioBox5: TRadioGroup;
+    btnClearTextArea: TButton;
     btnCompare: TButton;
     btnCompareTwoFiles: TButton;
     btnCompareTwoFilesSaveAs: TButton;
@@ -100,17 +114,20 @@ type
     btnDirB: TButton;
     btnFileACompare: TButton;
     btnFileBCompare: TButton;
+    btnFLBL: TButton;
     btnHashFile: TButton;
+    btnLBL: TButton;
     btnRecursiveDirectoryHashing: TButton;
     btnClipboardResults: TButton;
     btnCallDiskHasherModule: TButton;
-    btnClearTextArea: TButton;
     btnCopyToClipboardA: TButton;
     btnCopyToClipboardB: TButton;
     btnSaveComparisons: TButton;
     btnStopScan1: TButton;
     btnStopScan2: TButton;
     Button8CopyAndHash: TButton;
+    cbToggleInputDataToOutputFile: TCheckBox;
+    cbShowDetailsOfAllComparisons: TCheckBox;
     FileTypeMaskCheckBox2: TCheckBox;
     chkUNCMode: TCheckBox;
     chkHiddenFiles: TCheckBox;
@@ -136,12 +153,20 @@ type
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     gbDirectoryComparisons: TGroupBox;
+    GroupBox5: TGroupBox;
+    Label15: TLabel;
+    pbFileS: TProgressBar;
+    pbCopy: TProgressBar;
+    pbCompareDirA: TProgressBar;
+    pbCompareDirB: TProgressBar;
+    SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
+    SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
     Label1: TLabel;
+    lblRAM: TLabel;
     lbleExpectedHash: TLabeledEdit;
     lbleExpectedHashText: TLabeledEdit;
     lblURLBanner: TLabel;
-    Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
     lblDirAName: TLabel;
@@ -176,7 +201,6 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
-    Label15: TLabel;
     lblTimeTaken6C: TLabel;
     lblTimeTaken5C: TLabel;
     lblTimeTaken6A: TLabel;
@@ -197,8 +221,10 @@ type
     lblTotalFileCountNumberA: TLabel;
     lblTotalFileCountNumberB: TLabel;
     memFileHashField: TMemo;
+    FLBLDialog: TOpenDialog;
     SaveDialog5: TSaveDialog;
     SaveDialog6: TSaveDialog;
+    SaveDialog7: TSaveDialog;
     SelectDirectoryDialog4: TSelectDirectoryDialog;
     SelectDirectoryDialog5: TSelectDirectoryDialog;
     sgDirB: TStringGrid;
@@ -228,6 +254,7 @@ type
     SelectDirectoryDialog3: TSelectDirectoryDialog;
     RecursiveDisplayGrid1: TStringGrid;
     sgDirA: TStringGrid;
+    sysRAMTimer: TTimer;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -236,6 +263,12 @@ type
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
+    QH_MainFormXMLPropStorage: TXMLPropStorage;
+    procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
+    procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
+    procedure PageControl1Change(Sender: TObject);
+    procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
+    procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
     procedure btnClipboardHashValueClick(Sender: TObject);
@@ -250,6 +283,7 @@ type
     //procedure btnHashTextClick(Sender: TObject);
     procedure btnHashFileClick(Sender: TObject);
     procedure btnLaunchDiskModuleClick(Sender: TObject);
+    procedure btnLBLClick(Sender: TObject);
     procedure btnRecursiveDirectoryHashingClick(Sender: TObject);
     procedure btnSaveComparisonsClick(Sender: TObject);
     procedure btnStopScan1Click(Sender: TObject);
@@ -258,6 +292,7 @@ type
     procedure btnCallDiskHasherModuleClick(Sender: TObject);
     procedure btnCompareClick(Sender: TObject);
     procedure btnClearTextAreaClick(Sender: TObject);
+    procedure btnFLBLClick(Sender: TObject);
     procedure Button8CopyAndHashClick(Sender: TObject);
     procedure CheckBoxListOfDirsAndFilesOnlyChange(Sender: TObject);
     procedure CheckBoxListOfDirsOnlyChange(Sender: TObject);
@@ -272,7 +307,7 @@ type
     procedure FormDropFiles(Sender: TObject; const FileNames: array of String);
     procedure HashFile(FileIterator: TFileIterator);
     procedure lblURLBannerClick(Sender: TObject);
-    procedure ProcessDir(const SourceDirName: string);
+    procedure ProcessDir(SourceDirName: string);
     procedure MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
     procedure CompareTwoHashes(FileAHash, FileBHash : string);
     procedure HashText(Sender: TObject);
@@ -284,10 +319,12 @@ type
     function  RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     procedure SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
     procedure EmptyDisplayGrid(Grid : TStringGrid);
-    function FileSizeWithLongPath(strFileName : string) : Int64;
+
+    // function FileSizeWithLongPath(strFileName : string) : Int64;
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
     function FileTimeToDTime(FTime: TFileTime): TDateTime;
+    function GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in GB, with 2 decimals }
     {$ENDIF}
     {$IFDEF LINUX}
     function DateAttributesOfCurrentFileLinux(var SourceDirectoryAndFileName:string):string;
@@ -299,6 +336,8 @@ type
     {$ENDIF}
     function CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTime: Boolean): Boolean;
     procedure SHA1RadioButton3Change(Sender: TObject);
+    procedure TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
     procedure TabSheet3ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
 
@@ -314,30 +353,35 @@ type
     DirA, DirB : string;
    sValue1 : string; // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
 
-  const
-  {$IFDEF WINDOWS}
-    // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
-    // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes
-    LongPathOverride : string = '\\?\';
-    // A and B below are for the Directory Comparison tab only
-    LongPathOverrideA : string = '\\?\';
-    LongPathOverrideB : string = '\\?\';
+   slMultipleDirNames : TStringList;
+   MultipleDirsChosen : boolean;
+
+   {$IFDEF WINDOWS}
+   // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
+   // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes. LongPathOverride
+   // will always either be '\\?\' or '\\?\UNC\'
+   // A and B below are for the Directory Comparison tab only
+
+   LongPathOverride, LongPathOverrideA, LongPathOverrideB : string;
 
    {$else}
     {$IFDEF Darwin}
-    const
-      LongPathOverride : string = '';     // MAX_PATH is 4096 is Linux & Mac, so not needed
-      LongPathOverrideA : string = '';
-      LongPathOverrideB : string = '';
-      {$else}
-        {$IFDEF UNIX and !$ifdef Darwin}
-        const
-          LongPathOverride : string = '';
-          LongPathOverrideA : string = '';
-          LongPathOverrideB : string = '';
-        {$ENDIF}
-   {$ENDIF}
-   {$ENDIF}
+      const
+        LongPathOverride : string = '';     // MAX_PATH is 4096 is Linux & Mac, so not needed
+        LongPathOverrideA : string = '';
+        LongPathOverrideB : string = '';
+        {$else}
+          {$IFDEF UNIX and !$ifdef Darwin}
+          const
+            LongPathOverride : string = '';
+            LongPathOverrideA : string = '';
+            LongPathOverrideB : string = '';
+          {$ENDIF}
+     {$ENDIF}
+  {$ENDIF}
+
+
+
    end;
 
 var
@@ -345,12 +389,18 @@ var
 
 implementation
 
+{$IFDEF WINDOWS}
+// Populate interface with quick view to RAM status
+function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; external 'kernel32' name 'GlobalMemoryStatusEx';
+{$ENDIF}
+
 { TMainForm }
 
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
   x, y, z : integer;
+
 begin
   x := screen.Width;
   y := screen.Height;
@@ -372,13 +422,27 @@ begin
 
   btnCopyToClipboardA.Enabled := false;
   btnCopyToClipboardB.Enabled := false;
-
+  {$ifdef Windows}
+  // These are the default values to be prefixed before a path to invoke the 32K
+  // NTFS filename length over the 260 MAX_PATH. Where the user opts for UNC paths
+  // as well, it becomes '\\?\UNC\'
+  LongPathOverride := '\\?\';
+  // A and B below are for the Directory Comparison tab only
+  LongPathOverrideA := '\\?\';
+  LongPathOverrideB := '\\?\';
+  {$endif}
   // In Lazarus versions  < 1.4.4, the 'FileSortType' property of ShellTreeViews
   // would cause the listing to be doubled if anything other than fstNone was chosen
   // So this will ensure I have sorting until that is fixed.
   // http://bugs.freepascal.org/view.php?id=0028565
   DirListA.AlphaSort;
   DirListB.AlphaSort;
+
+  // Disable the two display grids in the Compare Directories tab as they now only
+  // become visibile if there are mis-matches, or if the user chooses to log everything
+  // (as of v2.7.0)
+  sgDirA.Visible := false;
+  sgDirB.Visible := false;
 
   // Better to have some folder icons for each node of the tree but
   // I can't work out at the moment how to do it for ever folder.
@@ -409,14 +473,35 @@ begin
     chkCopyHidden.Hint:= 'On Windows, QuickHash finds hidden files and folders by default';
     // Remove the advice about using the File tab for hashing files.
     Label6.Caption := '';
+    SystemRAMGroupBox.Visible := true;
+    sysRAMTimer.enabled := true;
+    lblRAM.Caption := GetSystemMem;
+
+  {$ENDIF}
+
+  {$IFDEF Windows}
+    btnCallDiskHasherModule.Enabled := true;
+  {$ENDIF}
+    {$IFDEF Darwin}
+      btnCallDiskHasherModule.Enabled := false; // disabled for OSX currently
+    {$else}
+      {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+        btnCallDiskHasherModule.Enabled := true; // as of v2.7.0 - disabled for Linux previously
+      {$ENDIF}
   {$ENDIF}
 
   {$IFDEF LINUX}
+   Label8.Caption := 'LINUX USERS - You may prefer to hash disks using ' + #13#10 +
+                     'the "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
 
-   // For Linux users, we don't want them trying to use the Windows Disk hashing module
-   // created for Windows users.
-   btnCallDiskHasherModule.Enabled := false;
-   Label8.Caption         := 'LINUX USERS - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
+   // For Linux users, it's helpful for the user to see as a full path the folder
+   // they have chosen, so make source and destination edit fields visible, but
+   // disabled, as we don't want them to be used.
+   Edit2SourcePath.Visible:= true;
+   Edit2SourcePath.Enabled:= false;
+   Edit3DestinationPath.Visible:=true;
+   Edit3DestinationPath.Enabled:=false;
+
    Tabsheet5.Enabled      := true;
    Tabsheet5.Visible      := true;
    chkCopyHidden.Enabled  := true;
@@ -428,7 +513,11 @@ begin
    chkUNCMode.Visible        := false;
    Edit2SourcePath.Text      := 'Source directory selection';
    Edit3DestinationPath.Text := 'Destination directory selection';
-  {$Endif}
+
+   // RAM status stuff needs to be disabled on Linux
+   sysRAMTimer.enabled       := false;
+   SystemRAMGroupBox.Visible := false;
+   {$Endif}
 
  {$ifdef UNIX}
     {$ifdef Darwin}
@@ -451,6 +540,8 @@ begin
  {$ENDIF}
 
 end;
+
+
 // FormDropFiles is the same as btnHashFileClick, except it disables the OpenDialog
 // element and computes the filename from the drag n drop variable and hashes the file.
 procedure TMainForm.FormDropFiles(Sender: TObject;
@@ -472,7 +563,7 @@ begin
 
    begin
     filename := FileNames[0];
-    if DirectoryExists(filename) then
+    if DirectoryExistsUTF8(filename) then
     begin
       ShowMessage('Drag and drop of folders is not supported in this tab.');
     end
@@ -495,13 +586,25 @@ begin
        stop := Now;
        elapsed := stop - start;
        lblTimeTaken2.Caption := 'Time taken : '+ TimeToStr(elapsed);
+
+        // If the user has ane existing hash to check against the drag n drop file
+        // compare it here
+       if lbleExpectedHash.Text <> '...' then
+       begin
+         if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
+           begin
+             Showmessage('Expected hash matches the computed file hash, OK');
+           end
+         else
+         begin
+           Showmessage('Expected hash DOES NOT match the computed file hash!');
+         end;
        Application.ProcessMessages;
+       end
      end
-    else
-      ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
+    else ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
    end;
 end;
-
 
 procedure TMainForm.HashText(Sender: TObject);
 var
@@ -592,27 +695,210 @@ begin
 
 end;
 
-// Procedure SaveOutputAsCSV
-// An object orientated way to save any given display grid to CSV to save me
-// retyping the same code over and over!
-procedure TMainForm.SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
+// Hash each line of text in the input area line-by-line and save to output CSV file
+// Useful for users who need to generate hashes of lists of names or e-mail addresses
+// Google Adsense, for example, requires this as a SHA256. So QuickHash will enable this
+// https://support.google.com/adwords/answer/6276125?hl=en-GB
+procedure TMainForm.btnLBLClick(Sender: TObject);
 var
-  slTmpLoadedFromOutput : TStringLIst;
-  InsTextPos : integer;
+  slLBL : TStringListUTF8;
+  i     : Longword;
 begin
-  // Here we save the grid to CSV, then load into memory, insert
-  // the title line and version number of QuickHash, then save it
-  // back to CSV. A bit round the houses but best I can think of for now
-  InsTextPos := 0;
+  if memoHashText.Lines.Count = 0 then
+    begin
+      ShowMessage('Enter text into the text field first.');
+      exit;
+    end;
+
   try
-    GridName.SaveToCSVFile(FileName);
-    slTmpLoadedFromOutput := TStringLIst.Create;
-    slTmpLoadedFromOutput.LoadFromFile(FileName);
-    slTmpLoadedFromOutput.Insert(InsTextPos, MainForm.Caption + '. Log generated: ' + DateTimeToStr(Now));
+    slLBL := TStringListUTF8.Create;
+    if not cbToggleInputDataToOutputFile.Checked then
+      begin
+      for i := 0 to memoHashText.Lines.Count -1 do
+        begin
+          slLBL.Add(memoHashText.Lines[i] + ',' + Trim(CalcTheHashString(memoHashText.Lines[i])));
+        end;
+      end
+    else
+    begin
+      for i := 0 to memoHashText.Lines.Count -1 do
+        begin
+          slLBL.Add(Trim(CalcTheHashString(memoHashText.Lines[i])));
+        end;
+    end;
   finally
-    // Write back the original data with the newly inserted first line
-    slTmpLoadedFromOutput.SaveToFile(FileName);
-    slTmpLoadedFromOutput.Free;
+    SaveDialog7.Title := 'Save line-by-line results as...';
+    SaveDialog7.InitialDir := GetCurrentDir;
+    SaveDialog7.Filter := 'Comma Sep|*.csv';
+    SaveDialog7.DefaultExt := 'csv';
+
+    if SaveDialog7.Execute then
+      begin
+        slLBL.SaveToFile(SaveDialog7.FileName);
+        memoHashText.Text := 'See output file ' + SaveDialog7.FileName + ' for results.';
+      end
+    else ShowMessage('Unable to save file ' + SaveDialog7.FileName);
+    slLBL.Free;
+  end;
+end;
+
+// Load a text file and hash it line by line, outputting to the memo field
+// Similar to the procedure for hashing the memo line-by-line in "Text" tab
+procedure TMainForm.btnFLBLClick(Sender: TObject);
+var
+  slFLBLInput, slFLBLOutput : TStringListUTF8; // FLBL = File, Line by Line
+  i : Longword;
+begin
+  i := 0;
+  if FLBLDialog.Execute then
+    begin
+      try
+      slFLBLInput := TStringListUTF8.Create;
+      slFLBLOutput:= TStringListUTF8.Create;
+      slFLBLInput.Sorted:= false;
+      slFLBLOutput.Sorted:= false;
+
+      // Load the input file to memory
+      slFLBLInput.LoadFromFile(FLBLDialog.FileName);
+
+      // Write the input to a new stringlist, hash each line
+      if not cbToggleInputDataToOutputFile.Checked then
+        begin
+          for i := 0 to slFLBLInput.Count -1 do
+            begin
+             if Length(slFLBLInput.Strings[i]) > 0 then
+              slFLBLOutput.Add(slFLBLInput.Strings[i] + ',' + Trim(CalcTheHashString(slFLBLInput.Strings[i])));
+            end;
+        end
+      else
+        begin
+         for i := 0 to slFLBLInput.Count -1 do
+          begin
+            if Length(slFLBLInput.Strings[i]) > 0 then
+            begin
+              slFLBLOutput.Add(Trim(CalcTheHashString(slFLBLInput.Strings[i])));
+            end;
+          end;
+      // If the output is smaller than 30Mb, load it to the screen
+      if Length(slFLBLOutput.Text) < 30000000 then
+        begin
+        for i := 0 to slFLBLOutput.Count -1 do
+          begin
+            memoHashText.Lines.Add(slFLBLOutput.Strings[i]);
+          end;
+        {$ifdef Windows}
+          memoHashText.Perform(EM_SCROLLCARET, 0, i);
+        {$endif}
+        end
+      else
+      // Otherwise, just save it and be done with it
+        begin
+          memoHashText.Clear;
+          memoHashText.Lines.Add('Data set too large for display. Save the output file');
+        end;
+      end;
+
+      finally
+        SaveDialog7.Title      := 'Save line-by-line hashing results as...';
+        SaveDialog7.InitialDir := GetCurrentDir;
+        SaveDialog7.Filter     := 'Comma Sep|*.csv';
+        SaveDialog7.DefaultExt := 'csv';
+        SaveDialog7.FileName   := 'Output';
+        if SaveDialog7.Execute then
+          begin
+            slFLBLOutput.SaveToFile(SaveDialog7.FileName);
+            memoHashText.Lines.Add('Results saved to file : ' + SaveDialog7.FileName);
+            // If MS Windows, launch 'Windows Explorer' to show the output file.
+            {$ifdef windows}
+            SysUtils.ExecuteProcess(UTF8ToSys('explorer.exe'), '/select,'+ SaveDialog7.FileName, []);
+            {$endif}
+          end
+        else
+          begin
+            ShowMessage('Unable to save output file ' + SaveDialog7.FileName);
+          end;
+        slFLBLOutput.Free;
+        slFLBLInput.Free;
+      end;
+    end
+  else ShowMessage('Unable to open text file for line-by-line analysis');
+end;
+
+
+procedure TMainForm.sysRAMTimerTimer(Sender: TObject);
+var
+  MemFigures : string;
+begin
+  {$IFDEF WINDOWS}
+  MemFigures := GetSystemMem;
+  lblRAM.Caption := MemFigures;
+  {$ENDIF}
+  // Do nothing with Linux
+end;
+
+procedure TMainForm.cbToggleInputDataToOutputFileChange(Sender: TObject);
+begin
+  if cbToggleInputDataToOutputFile.Checked then
+    cbToggleInputDataToOutputFile.Caption := 'Source text EXcluded in output'
+  else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
+end;
+
+procedure TMainForm.cbShowDetailsOfAllComparisonsChange(Sender: TObject);
+begin
+  if cbShowDetailsOfAllComparisons.Checked then
+    begin
+      cbShowDetailsOfAllComparisons.Caption := 'Tabulate only encountered errors instead of all files (faster)?';
+      sgDirA.Visible := false;
+      sgDirB.Visible := false;
+    end
+  else
+  begin
+    cbShowDetailsOfAllComparisons.Caption:= 'Details of all files will be tabulated (slower). Click again to change.';
+    sgDirA.Visible := true;
+    sgDirB.Visible := true;
+  end;
+end;
+
+procedure TMainForm.PageControl1Change(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.Panel1CopyAndHashOptionsClick(Sender: TObject);
+begin
+
+end;
+
+{$IFDEF WINDOWS}
+// http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
+function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
+VAR
+  MS_Ex : MemoryStatusEx;
+  strTotalPhysMem, strTotalPhysAvail : string;
+begin
+ FillChar (MS_Ex, SizeOf(MemoryStatusEx), #0);
+ MS_Ex.dwLength := SizeOf(MemoryStatusEx);
+ if GlobalMemoryStatusEx(MS_Ex) then
+   begin
+     strTotalPhysMem := FormatByteSize(MS_Ex.ullTotalPhys);
+     strTotalPhysAvail := FormatByteSize(MS_Ex.ullAvailPhys);
+     Result:= strTotalPhysMem + ' total' + #10#13 +
+              strTotalPhysAvail + ' avail' + #10#13;
+   end
+ else Result := 'No Data';
+end;
+{$ENDIF}
+
+// Procedure SaveOutputAsCSV
+// Save any given display grid to CSV with a timestamped header
+procedure TMainForm.SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
+begin
+  // Here we insert the title line and version number of QuickHash, then save it
+  // back to CSV.
+  try
+    Gridname.InsertRowWithValues(0, MainForm.Caption + '. Log generated: ' + DateTimeToStr(Now));
+    GridName.SaveToCSVFile(FileName);
+  finally
   end;
 end;
 
@@ -652,7 +938,7 @@ var
       if (Pos('\\', DirToHash) > 0) then
       begin
         LongPathOverride := '\\?\UNC\';
-        Delete(DirToHash, 1, 2); // Delete the \\ from the DirToHash path (otherwise it becomes '\\?\UNC\\\')
+        Delete(DirToHash, 1, 2); // Delete the \\ from the UNC DirToHash path which always start \\path (otherwise it becomes '\\?\UNC\\\')
       end;
       {$endif}
 
@@ -694,6 +980,7 @@ var
                  TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', true);
                end;
            end;
+
          lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
          NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
          RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
@@ -866,12 +1153,24 @@ end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
 var
-  slHTMLOutput : TStringList;
-  HTMLLogFile3 : string;
-  i, j         : integer;
+  fsHTMLOutput : TFileStream;
+  i, j, k, l   : longword;
+  strHTMLHeader, strTableHeader : string;
+
+{  const
+    strHTMLHeader : string = '<html><title>QuickHash HTML Output</title><body><br />' +
+                             '<p><strong>' + MainForm.Caption + '. Log Created: ' +
+                             DateTimeToStr(Now)+ '</strong></p><p><strong>File and Hash Comparisons of ' +
+                             lblDirAName.Caption + ' and ' + lblDirBName.Caption + '</strong></p><p>Table A</p>'; }
+
 begin
+  i := 0;
+  j := 0;
+  k := 0;
+  l := 0;
+
   SaveDialog6.Title := 'Save Grid A as CSV log file as...';
-  SaveDialog6.InitialDir := GetCurrentDir;
+  SaveDialog6.InitialDir := GetCurrentDir;   // The chosen location will be saved now for the rest of the files
   SaveDialog6.Filter := 'Comma Sep|*.csv|Text file|*.txt';
   SaveDialog6.DefaultExt := 'csv';
   ShowMessage('You will now be prompted to save two seperate CSV files and one combined HTML file...');
@@ -882,6 +1181,7 @@ begin
     end;
 
   SaveDialog6.Title := 'Save Grid B as CSV log file as...';
+  SaveDialog6.Filename := '';
   if SaveDialog6.Execute then
     begin
       SaveOutputAsCSV(SaveDialog6.FileName, sgDirB);
@@ -889,70 +1189,66 @@ begin
 
   // HTML Output
   SaveDialog6.Title := 'Save Grids A and B as HTML log file as...';
-  SaveDialog6.InitialDir := GetCurrentDir;
   SaveDialog6.Filter := 'HTML|*.html';
+  SaveDialog6.Filename := '';
   SaveDialog6.DefaultExt := 'html';
   if SaveDialog6.Execute then
     begin
-      HTMLLogFile3 := SaveDialog6.FileName;
-      slHTMLOutput := TStringList.Create;
+      if not FileExists(SaveDialog6.FileName) then
+        fsHTMLOutput := TFileStreamUTF8.Create(SaveDialog6.FileName, fmCreate)
+      else fsHTMLOutput := TFileStreamUTF8.Create(SaveDialog6.FileName, fmOpenReadWrite);
+
       try
-       slHTMLOutput.Add('<html>');
-       slHTMLOutput.Add('<title>QuickHash HTML Output</title>');
-       slHTMLOutput.Add('<body>');
-       slHTMLOutput.Add('<br />');
-       slHTMLOutput.Add('<p><strong>' + MainForm.Caption + '. ' + 'Log Created: ' + DateTimeToStr(Now)+'</strong></p>');
-       slHTMLOutput.Add('<p><strong>File and Hash Comparisons of ' + lblDirAName.Caption + ' and ' + lblDirBName.Caption + '</strong></p>');
+       strHTMLHeader := '<html><title>QuickHash HTML Output</title><body>' +
+                        '<p><strong>' + MainForm.Caption + '. Log Created: ' +
+                         DateTimeToStr(Now)+ '</strong></p><p><strong>File and Hash Comparisons of "' +
+                         lblDirAName.Caption + '" and "' + lblDirBName.Caption + '"</strong></p><p>Table A</p>';
+
+       fsHTMLOutput.WriteAnsiString(strHTMLHeader);
 
        // Grid A content to HTML
-
-       slHTMLOutput.Add('<p>Table A</p>');
-       slHTMLOutput.Add('<table border=1>');
-       slHTMLOutput.Add('<tr>');
-       slHTMLOutput.Add('<td>' + 'ID');
-       slHTMLOutput.Add('<td>' + 'File Path & Name');
-       slHTMLOutput.Add('<td>' + 'Hash');
+       strTableHeader := '<table border=1><tr><td>ID</td><td>File Path and Name</td><td>Hash</td></tr>';
+       fsHTMLOutput.WriteAnsiString(strTableHeader);
 
        i := 0;
        j := 0;
-       for i := 0 to sgDirA.RowCount-1 do
+       // We use 1 to RowCount instead of 0 to RowCount because a line is added by custom function SaveGridToCSV
+       for i := 1 to sgDirA.RowCount-1 do
          begin
-           slHTMLOutput.Add('<tr>');
            for j := 0 to sgDirA.ColCount-1 do
-             slHTMLOutput.Add('<td>' + sgDirA.Cells[j,i] + '</td>');
-             slHTMLOutput.Add('</tr>');
+             fsHTMLOutput.WriteAnsiString('<td>' + sgDirA.Cells[j,i] + '</td>');
+             fsHTMLOutput.WriteAnsiString('</tr>');
          end;
-       slHTMLOutput.Add('</table>');
-       slHTMLOutput.Add('<p>Total Files : ' + IntToStr(sgDirA.Rowcount -1) + '</p>');
+       fsHTMLOutput.WriteAnsiString('</table>');
+       fsHTMLOutput.WriteAnsiString('<p>Total Files : ' + IntToStr(sgDirA.Rowcount -1) + '</p>');
 
        // Grid B content to HTML
 
-       slHTMLOutput.Add('<p>Table B</p>');
-       slHTMLOutput.Add('<table border=1>');
-       slHTMLOutput.Add('<tr>');
-       slHTMLOutput.Add('<td>' + 'ID');
-       slHTMLOutput.Add('<td>' + 'File Path & Name');
-       slHTMLOutput.Add('<td>' + 'Hash');
-       slHTMLOutput.Add('</tr>');
+       fsHTMLOutput.WriteAnsiString('<p>Table B</p>');
+       fsHTMLOutput.WriteAnsiString('<table border=1>');
+       fsHTMLOutput.WriteAnsiString('<tr>');
+       fsHTMLOutput.WriteAnsiString('<td>' + 'ID' + '</td>');
+       fsHTMLOutput.WriteAnsiString('<td>' + 'File Path & Name' + '</td>');
+       fsHTMLOutput.WriteAnsiString('<td>' + 'Hash' + '</td>');
+       fsHTMLOutput.WriteAnsiString('</tr>');
 
-       i := 0;
-       j := 0;
-       for i := 0 to sgDirB.RowCount-1 do
+       k := 0;
+       l := 0;
+       // We use 1 to RowCount instead of 0 to RowCount because a line is added by custom function SaveGridToCSV
+       for k := 1 to sgDirB.RowCount-1 do
          begin
-           slHTMLOutput.Add('<tr>');
-           for j := 0 to sgDirB.ColCount-1 do
-             slHTMLOutput.Add('<td>' + sgDirB.Cells[j,i] + '</td>');
-             slHTMLOutput.Add('</tr>');
+           for l := 0 to sgDirB.ColCount-1 do
+             fsHTMLOutput.WriteAnsiString('<td>' + sgDirB.Cells[l,k] + '</td>');
+             fsHTMLOutput.WriteAnsiString('</tr>');
          end;
-       slHTMLOutput.Add('</table>');
-       slHTMLOutput.Add('<p>Total Files : ' + IntToStr(sgDirB.Rowcount -1) + '</p>');
-       slHTMLOutput.Add('<p>Result? : ' + lblHashMatchB.Caption + '</p>');
-       slHTMLOutput.Add('</body>');
-       slHTMLOutput.Add('</html>');
-       slHTMLOutput.SaveToFile(HTMLLogFile3);
+       fsHTMLOutput.WriteAnsiString('</table>');
+       fsHTMLOutput.WriteAnsiString('<p>Total Files : ' + IntToStr(sgDirB.Rowcount -1) + '</p>');
+       fsHTMLOutput.WriteAnsiString('<p>Result? : ' + lblHashMatchB.Caption + '</p>');
+       fsHTMLOutput.WriteAnsiString('</body>');
+       fsHTMLOutput.WriteAnsiString('</html>');
+
       finally
-       slHTMLOutput.Free;
-       HTMLLogFile3 := '';
+       fsHTMLOutput.Free;
       end;
     end; // End of Savedialog6.Execute for HTML
 end;
@@ -990,7 +1286,8 @@ end;
 // It also clears all labels from any previous runs of the form.
 procedure TMainForm.btnCallDiskHasherModuleClick(Sender: TObject);
 begin
-
+  // Not needed as of v2.7.0
+  {
 {$ifdef Windows}
   DiskModuleUnit1.frmDiskHashingModule.lbledtStartAtTime.Text := 'HH:MM';
   DiskModuleUnit1.frmDiskHashingModule.ListBox1.Clear;
@@ -1010,6 +1307,8 @@ begin
   DiskModuleUnit1.frmDiskHashingModule.edtComputedHash.Text          := '...';
   DiskModuleUnit1.frmDiskHashingModule.Show;
   {$Endif}
+  }
+  diskmodule.frmDiskHashingModule.Show;
 end;
 
 // RemoveLongPathOverrideChars : The long path override prefix will be either:
@@ -1046,13 +1345,16 @@ var
     FileAndHashListA, FileAndHashListB, // Stringlists for the combined lists of both hashes with filenames
     MisMatchList : TStringList;
 
-  i : integer;
+  i, FilesProcessed : integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
   i                                := 0;
+  FilesProcessed                   := 0;
+  FileHashA                        := '';
+  FileHashB                        := '';
   DirA                             := lblDirAName.Caption;
   DirB                             := lblDirBName.Caption;
 
@@ -1090,8 +1392,9 @@ begin
   try
     // First, list and hash the files in DirA
     lblStatusB.Caption      := 'Counting files in ' + DirA + ' ...please wait';
-    TotalFilesDirA          := TStringList.Create;
+    TotalFilesDirA          := TStringListUTF8.Create;
     TotalFilesDirA.Sorted   := true;
+    Application.ProcessMessages;
     TotalFilesDirA          := FindAllFilesEx(LongPathOverrideA+DirA, '*', True, True);
     TotalFilesDirA.Sort;
     sgDirA.RowCount         := TotalFilesDirA.Count + 1;
@@ -1100,82 +1403,103 @@ begin
     HashListA.Sorted        := true;
     FileAndHashListA.Sorted := true;
 
-    lblStatusB.Caption      := 'Examining files in ' + DirA + ' ...please wait';
+    lblStatusB.Caption      := 'Now, hashing files in ' + DirA + ' ...please wait';
     Application.ProcessMessages;
 
     for i := 0 to TotalFilesDirA.Count -1 do
       begin
+        inc(FilesProcessed, 1);
         FilePath            := ExtractFilePath(TotalFilesDirA.Strings[i]);
         FileName            := ExtractFileName(TotalFilesDirA.Strings[i]);
         FullPathAndName     := FilePath + FileName;
-        FileHashA           := CalcTheHashFile(FullPathAndName);
+        FileHashA           := '';
+        FileHashA           := UpperCase(CalcTheHashFile(FullPathAndName));
         HashListA.Add(FileHashA);
         FileAndHashListA.Add(FullPathAndName + ':' + FileHashA + ':');
-        // Populate display grid for DirA
-        sgDirA.Cells[0, i+1] := IntToStr(i+1);
-        {$IFDEF Windows}
-          sgDirA.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
-        {$ENDIF}
-        {$IFDEF Darwin}
-           sgDirA.Cells[1, i+1] := FullPathAndName;
-        {$else}
-          {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
-            sgDirA.Cells[1, i+1] := FullPathAndName;
+        // Populate display grid for DirA if user has chosen to have all details tabulated
+        if cbShowDetailsOfAllComparisons.Checked = false then
+          begin
+          sgDirA.Cells[0, i+1] := IntToStr(i+1);
+          {$IFDEF Windows}
+            sgDirA.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
           {$ENDIF}
-        {$ENDIF}
-        sgDirA.Cells[2, i+1] := UpperCase(FileHashA);
-        sgDirA.Row           := i;
-        sgDirA.col           := 1;
-        end;
-
-    HashListA.Sort;
+          {$IFDEF Darwin}
+             sgDirA.Cells[1, i+1] := FullPathAndName;
+          {$else}
+            {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+              sgDirA.Cells[1, i+1] := FullPathAndName;
+            {$ENDIF}
+          {$ENDIF}
+          sgDirA.Cells[2, i+1] := UpperCase(FileHashA);
+          sgDirA.Row           := i;
+          sgDirA.col           := 1;
+          end;
+      sgDirA.Visible := true;
+      sgDirB.Visible := true;
+      pbCompareDirA.Position := ((FilesProcessed * 100) DIV TotalFilesDirA.Count);
+      end;
+   FilesProcessed := 0;
+   // HashListA.Sort;
+   // FileAndHashListA.Sort;
 
     lblTotalFileCountNumberA.Caption := IntToStr(TotalFilesDirA.Count);
 
-    Application.ProcessMessages;
-
     // Then, list and hash the files in DirB
-    lblStatusB.Caption       := 'Counting and examining files in ' + DirB + ' ...please wait';
-    TotalFilesDirB           := TStringList.Create;
+    lblStatusB.Caption       := 'Counting files in ' + DirB + ' ...please wait';
+    TotalFilesDirB           := TStringListUTF8.Create;
     TotalFilesDirB.Sorted    := true;
+    Application.ProcessMessages;
     TotalFilesDirB           := FindAllFilesEx(LongPathOverrideB+DirB, '*', True, True);
     TotalFilesDirB.Sort;
-    sgDirB.RowCount          := TotalFilesDirB.Count + 1;
+    if cbShowDetailsOfAllComparisons.Checked = false then
+      sgDirB.RowCount        := TotalFilesDirB.Count + 1;
 
     HashListB                := TStringList.Create;
     FileAndHashListB         := TStringList.Create;
     HashListB.Sorted         := true;
     FileAndHashListB.Sorted  := true;
 
-    lblStatusB.Caption       := 'Counting and examining files in ' + DirB + ' ...please wait';
+    lblStatusB.Caption       := 'Now, hashing files in ' + DirB + ' ...please wait';
     lblStatusB.Refresh;
+    Application.ProcessMessages;
+
     for i := 0 to TotalFilesDirB.Count -1 do
         begin
+          inc(FilesProcessed, 1);
           FilePath             := ExtractFilePath(TotalFilesDirB.Strings[i]);
           FileName             := ExtractFileName(TotalFilesDirB.Strings[i]);
           FullPathAndName      := FilePath + FileName;
-          FileHashB            := CalcTheHashFile(FullPathAndName);
+          FileHashB            := '';
+          FileHashB            := UpperCase(CalcTheHashFile(FullPathAndName));
           HashListB.Add(FileHashB);
           FileAndHashListB.Add(FullPathAndName + ':' + FileHashB + ':');
-          // Populate display grid for DirB
-          sgDirB.Cells[0, i+1] := IntToStr(i+1);
-           {$IFDEF Windows}
-             sgDirB.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
-          {$ENDIF}
-          {$IFDEF Darwin}
-             sgDirB.Cells[1, i+1] := FullPathAndName;
-          {$else}
-            {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
-            sgDirB.Cells[1, i+1] := FullPathAndName;
+          // Populate display grid for DirB if user has chosen to have all details tabulated
+          if cbShowDetailsOfAllComparisons.Checked = false then
+          begin
+            sgDirB.Cells[0, i+1] := IntToStr(i+1);
+             {$IFDEF Windows}
+               sgDirB.Cells[1, i+1] := RemoveLongPathOverrideChars(FullPathAndName, LongPathOverrideB);
             {$ENDIF}
-          {$ENDIF}
+            {$IFDEF Darwin}
+               sgDirB.Cells[1, i+1] := FullPathAndName;
+            {$else}
+              {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+              sgDirB.Cells[1, i+1] := FullPathAndName;
+              {$ENDIF}
+            {$ENDIF}
 
-          sgDirB.Cells[2, i+1] := Uppercase(FileHashB);
-          sgDirB.Row           := i;
-          sgDirB.col           := 1;
+            sgDirB.Cells[2, i+1] := Uppercase(FileHashB);
+            sgDirB.Row           := i;
+            sgDirB.col           := 1;
+          end;
+        sgDirA.Visible := true;
+        sgDirB.Visible := true;
+        pbCompareDirB.Position := ((FilesProcessed * 100) DIV TotalFilesDirB.Count);
         end;
-    HashListB.Sort;
-    FileAndHashListB.Sort;
+
+
+    //HashListB.Sort;
+    //FileAndHashListB.Sort;
 
     lblTotalFileCountNumberB.Caption := IntToStr(TotalFilesDirB.Count);
     lblStatusB.Caption := 'Comparing files in ' + DirA + ' against files in ' + DirB + ' ...please wait';
@@ -1202,7 +1526,7 @@ begin
     }
     if ((TotalFilesDirB.Count - TotalFilesDirA.Count) = 0) or ((TotalFilesDirA.Count - TotalFilesDirB.Count) = 0) then
       begin
-      // We compare the hashlists using the developers choice of hash alg, i.e. SHA1
+      // We compare the hashlists using SHA-1 to see if they match.
       HashOfListA    := SHA1Print(SHA1String(HashListA.Text));
       HashOfListB    := SHA1Print(SHA1String(HashListB.Text));
       if HashOfListA = HashOfListB then
@@ -1210,12 +1534,24 @@ begin
         lblStatusB.Caption := 'Finished examining files. ' + DirA + ' matches ' + DirB;
         lblStatusB.Refresh;
         lblHashMatchB.Caption:= 'MATCH!';
+        sgDirA.Visible := false;
+        sgDirB.Visible := false;
+        // If user only wanted errors to be tabulated, then there is nothing in
+        // grids to save, so disable the save buttons
+        if cbShowDetailsOfAllComparisons.Checked then
+          begin
+            btnCopyToClipboardA.Enabled := false;
+            btnCopyToClipboardB.Enabled := false;
+            btnSaveComparisons.Enabled  := false;
+          end;
         end
       else
         begin
           // So the file counts match but the hash lists differ.
           lblStatusB.Caption    := DirA + ' does not match match ' + DirB;
           lblHashMatchB.Caption := 'MIS-MATCH! File count is the same, but hashes differ.';
+          sgDirA.Visible := true;
+          sgDirB.Visible := true;
           MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB);
         end;
       end;
@@ -1228,6 +1564,8 @@ begin
         lblHashMatchB.Caption:= 'MIS-MATCH! File counts are different.';
         FileAndHashListA.Sort;
         FileAndHashListB.Sort;
+        sgDirA.Visible := true;
+        sgDirB.Visible := true;
         MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB);
       end; // End of mis-match loop
   finally
@@ -1237,26 +1575,24 @@ begin
     if sgDirB.RowCount > 1 then btnCopyToClipboardB.Enabled := true;
     if (sgDirA.RowCount > 1) or (sgDirB.RowCount > 1) then
       btnSaveComparisons.Enabled  := true;
-    Application.ProcessMessages;
-  end;
-
-  try
+    // Free lists
     HashListA.Free;
     TotalFilesDirA.Free;
     FileAndHashListA.Free;
-
     TotalFilesDirB.Free;
     FileAndHashListB.Free;
     HashListB.Free;
-  finally
-    // Compute timings and display them
-    EndTime                  := Now;
-    lblTimeFinishedB.Caption := FormatDateTime('dd/mm/yy hh:mm:ss', EndTime);
-    TimeTaken                := EndTime - StartTime;
-    strTimeTaken             := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeTaken);
-    lblTimeTakenB.Caption    := strTimeTaken;
+
     Application.ProcessMessages;
   end;
+
+  // Compute timings and display them
+  EndTime                  := Now;
+  lblTimeFinishedB.Caption := FormatDateTime('dd/mm/yy hh:mm:ss', EndTime);
+  TimeTaken                := EndTime - StartTime;
+  strTimeTaken             := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeTaken);
+  lblTimeTakenB.Caption    := strTimeTaken;
+  Application.ProcessMessages;
 end;
 
 // btnClearTextAreaClick : Clears the whole text field if the user requests to do so
@@ -1271,22 +1607,26 @@ begin
   if memoHashText.Lines[0] = 'Type or paste text here - hash will update as you type' then memoHashText.Clear;
 end;
 
-// MisMatchCompare takes two hash lists generated from two directories, along with
+// MisMatchFileCountCompare takes two hash lists generated from two directories, along with
 // two other lists that include both the hashes and the filenames, and it compares
 // one pair against the other and highlights the mis matches.
 procedure TMainForm.MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
+  OnlyTabulateErrors : boolean;
 
 begin
   i := 0;
+  j := 0;
   indexA := 0;
   indexB := 0;
   HashPosStart := 0;
   FileNameAndPathPosStart := 0;
   FileNameAndPathPosEnd := 0;
+
+  if cbShowDetailsOfAllComparisons.Checked then OnlyTabulateErrors := true;
 
   try
     MismatchList := TStringList.Create;
@@ -1299,6 +1639,7 @@ begin
      begin
        if not HashListA.Find(HashListB.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListB.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListB.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListB.Text, HashPosStart);
@@ -1306,10 +1647,24 @@ begin
            if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
                ExtractedFileName := Copy(FileAndHashListB.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
-               MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+               if OnlyTabulateErrors then
+                 begin
+                   MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                   sgDirA.Cells[0, j] := IntToStr(j);
+                   sgDirA.Cells[1, j] := 'File in DirB but found in Dir A : ' + ExtractedFileName;
+                   sgDirA.Cells[2, j] := MissingHash;
+                 end
+               else
+               begin
+                 MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                 sgDirA.Cells[0, i+1] := IntToStr(i);
+                 sgDirA.Cells[1, i+1] := 'File in DirB but found in Dir A : ' + ExtractedFileName;
+                 sgDirA.Cells[2, i+1] := MissingHash;
+               end;
              end;
          end;
      end;
+    j := 0;
 
     // Check the content of ListA against ListB
 
@@ -1319,6 +1674,7 @@ begin
      begin
        if not HashListB.Find(HashListA.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListA.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListA.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListA.Text, HashPosStart);
@@ -1326,7 +1682,20 @@ begin
            if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
                ExtractedFileName := Copy(FileAndHashListA.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
-               MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+               if OnlyTabulateErrors then
+                   begin
+                     MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                     sgDirB.Cells[0, j] := IntToStr(j);
+                     sgDirB.Cells[1, j] := 'File in DirA but NOT found in Dir B : ' + ExtractedFileName;
+                     sgDirB.Cells[2, j] := MissingHash;
+                   end
+                 else
+                 begin
+                   MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
+                   sgDirB.Cells[0, i+1] := IntToStr(i);
+                   sgDirB.Cells[1, i+1] := 'File in DirA but NOT found in Dir B : ' + ExtractedFileName;
+                   sgDirB.Cells[2, i+1] := MissingHash;
+                 end;
              end;
          end;
      end;
@@ -1335,7 +1704,19 @@ begin
     if (MisMatchList.Count > 0) then
      begin
        lblStatusB.Caption := 'There is a mis-match between the two directories.';
-       ShowMessage(MisMatchList.Text)
+       SaveErrorsCompareDirsSaveDialog8.Title := 'Save errors as text file';
+       SaveErrorsCompareDirsSaveDialog8.DefaultExt := 'txt';
+       ShowMessage('Errors were encountered.' + #13#10 +
+                   'You will now be prompted to save the error file.' + #13#10 +
+                   'Press OK to do so');
+       if SaveErrorsCompareDirsSaveDialog8.Execute then
+       begin
+         try
+         MisMatchList.SaveToFile(SaveErrorsCompareDirsSaveDialog8.FileName);
+         finally
+           SaveErrorsCompareDirsSaveDialog8.Free;
+         end;
+       end;
      end
      else
      begin
@@ -1349,17 +1730,22 @@ end;
 // MisMatchHashCompare : When file counts match in both directories but hashes differ, this works out what files are different by hash
 procedure TMainForm.MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
+  OnlyTabulateErrors : boolean;
 
 begin
   i                        := 0;
+  j                        := 0;
   indexA                   := 0;
   indexB                   := 0;
   HashPosStart             := 0;
   FileNameAndPathPosStart  := 0;
   FileNameAndPathPosEnd    := 0;
+  OnlyTabulateErrors       := false;
+
+  if cbShowDetailsOfAllComparisons.Checked then OnlyTabulateErrors := true;
 
   try
     MismatchList := TStringList.Create;
@@ -1368,21 +1754,40 @@ begin
 
     lblStatusB.Caption := 'Checking files in ' + DirB + ' against those in ' + DirA;
     lblStatusB.Refresh;
+
     for i := 0 to HashListB.Count -1 do
      begin
        if not HashListA.Find(HashListB.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListB.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListB.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListB.Text, HashPosStart);
            FileNameAndPathPosStart := RPosEx(':', FileAndHashListB.Text, FileNameAndPathPosEnd -1);
-           if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
+
+           if (Length(MissingHash) > 0) and (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
-               ExtractedFileName := Copy(FileAndHashListB.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
-               MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is a hash mismatch');
+             ExtractedFileName := Copy(FileAndHashListB.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
+             if OnlyTabulateErrors then
+               begin
+                 sgDirA.Cells[0, j] := IntToStr(j);
+                 sgDirA.Cells[1, j] := ExtractedFileName;
+                 sgDirA.Cells[2, j] := MissingHash;
+               end
+             else
+             begin
+               sgDirA.Cells[0, i+1] := IntToStr(i);
+               sgDirA.Cells[1, i+1] := ExtractedFileName;
+               sgDirA.Cells[2, i+1] := 'Differing hash: ' + MissingHash;
+               sgDirA.Row           := i;
+               sgDirA.col           := 1;
+             end;
+             MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is a hash mismatch');
              end;
          end;
      end;
+
+    j := 0;
 
     // Check the content of ListA against ListB
 
@@ -1392,13 +1797,28 @@ begin
      begin
        if not HashListB.Find(HashListA.Strings[i], indexA) then
          begin
+           inc(j, 1);
            MissingHash := HashListA.Strings[i];
            HashPosStart := Pos(MissingHash, FileAndHashListA.Text);
            FileNameAndPathPosEnd := RPosEx(':', FileAndHashListA.Text, HashPosStart);
            FileNameAndPathPosStart := RPosEx(':', FileAndHashListA.Text, FileNameAndPathPosEnd -1);
-           if (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
+           if (Length(MissingHash) > 0) and (HashPosStart > 0) and (FileNameAndPathPosStart > 0) and (FileNameAndPathPosEnd > 0) then
              begin
                ExtractedFileName := Copy(FileAndHashListA.Text, FileNameAndPathPosStart -1, (FileNameAndPathPosEnd - FileNameAndPathPosStart) +1);
+               if OnlyTabulateErrors then
+                 begin
+                   sgDirB.Cells[0, j] := IntToStr(j);
+                   sgDirB.Cells[1, j] := ExtractedFileName;
+                   sgDirB.Cells[2, j] := MissingHash;
+                 end
+               else
+               begin
+                 sgDirB.Cells[0, i+1] := IntToStr(i);
+                 sgDirB.Cells[1, i+1] := ExtractedFileName;
+                 sgDirB.Cells[2, i+1] := 'Differing hash: ' + MissingHash;
+                 sgDirB.Row           := i;
+                 sgDirB.col           := 1;
+               end;
                MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is a hash mismatch');
              end;
          end;
@@ -1408,7 +1828,6 @@ begin
     if (MisMatchList.Count > 0) then
      begin
        lblStatusB.Caption := 'There is a hash mis-match between the two directories.';
-       ShowMessage(MisMatchList.Text)
      end
      else
      begin
@@ -1430,6 +1849,8 @@ begin
 end;
 
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
+var
+  i : integer;
 begin
   frmDisplayGrid1.CopyAndHashGrid.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
@@ -1439,7 +1860,8 @@ begin
   lblTimeTaken6A.Caption           := '...';
   lblTimeTaken6B.Caption           := '...';
   lblTimeTaken6C.Caption           := '...';
-  StatusBar3.Caption               := ('Counting files...please wait');
+  i                                := 0;
+  StatusBar3.SimpleText            := ('Counting files first...please wait');
   Application.ProcessMessages;
 
   if chkUNCMode.Checked then
@@ -1447,17 +1869,36 @@ begin
       SourceDir := Edit2SourcePath.Text;
       DestDir   := Edit3DestinationPath.Text;
 
-      {$ifdef Windows}
-      // If chosen path is a UNC path, we need to append the UNC prefix to the
-      // Unicode 32K long API call of \\?\
-      if (Pos('\\', SourceDir) > 0) then
-      begin
-        LongPathOverride := '\\?\UNC\';
-        Delete(SourceDir, 1, 2); // Delete the \\ from the DirToHash path (otherwise it becomes '\\?\UNC\\\')
-      end;
-      {$endif}
-      // Now process the copy and paste in UNC mode
-      ProcessDir(SourceDir);
+      if Pos(':', SourceDir) > 0 then
+        begin
+          ShowMessage('Drive letter detected in source path but UNC mode selected');
+          StatusBar3.SimpleText := 'Aborted due drive letter in source UNC path selection';
+        end
+        else if Pos(':', DestDir) > 0 then
+          begin
+            ShowMessage('Drive letter detected in destination path but UNC mode selected');
+            StatusBar3.SimpleText := 'Aborted due to drive letter in destinatination UNC path selection';
+          end
+          else
+            begin
+              {$ifdef Windows}
+              // If chosen source path is a UNC path, we need to append the UNC prefix to the
+              // Unicode 32K long API call of \\?\
+              if (Pos('\\', SourceDir) > 0) then
+              begin
+                LongPathOverride := '\\?\UNC\';
+                Delete(SourceDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
+              end;
+              // If chosen destination path is a UNC path too, we need to append the UNC prefix
+              if (Pos('\\', DestDir) > 0) then
+              begin
+                LongPathOverride := '\\?\UNC\';
+                Delete(DestDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
+              end;
+              {$endif}
+              // Now process the copy and paste in UNC mode
+              ProcessDir(SourceDir);
+            end;
     end
   else
   begin
@@ -1467,8 +1908,22 @@ begin
     DirListAClick(Sender);
     DirListBClick(Sender);
 
-    // Now process the selected source and destination in non-UNC mode
-    ProcessDir(SourceDir);
+    // Now process the selected source and destination folders in non-UNC mode
+    // If the user has chosen multiple folders...
+    if MultipleDirsChosen then
+      try
+      if slMultipleDirNames.Count > 0 then
+        begin
+          // give ProcessDir function the first folder name in the list for now...
+          // ProcessDir will then do the itterations itself using the same stringlist
+          SourceDir := slMultipleDirNames.Strings[0];
+          ProcessDir(SourceDir);
+        end
+      finally
+        if assigned(slMultipleDirNames) then slMultipleDirNames.free;
+      end
+    // or copy single selected folder as normal if only one folder selected
+    else ProcessDir(SourceDir);
 
     if SourceDirValid AND DestDirValid = FALSE then
       begin
@@ -1808,7 +2263,9 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
                {$endif}
              end
            else
+           begin
             GeneratedHash := MD5Print(MD5File(FileToBeHashed));            //1024 bytes buffer
+           end;
          end;
       1: begin
            if FileSize(FileToBeHashed) > 1048576 then
@@ -1923,6 +2380,7 @@ begin
 
   if StopScan1 = FALSE then    // If Stop button clicked, cancel scan
     begin
+
     NameOfFileToHashFull := FileIterator.FileName;
     PathOnly   := FileIterator.Path;
     NameOnly   := ExtractFileName(FileIterator.FileName);
@@ -1972,6 +2430,7 @@ begin
     lblPercentageComplete.Caption := PercentageProgress + '%';
     TotalBytesRead := TotalBytesRead + SizeOfFile;
     lblTotalBytesExamined.Caption := FormatByteSize(TotalBytesRead);
+    pbFileS.Position := ((FileCounter *100) DIV NoOfFilesInDir2);
 
     Application.ProcessMessages;
     FileCounter := FileCounter+1;
@@ -1987,11 +2446,11 @@ procedure TMainForm.lblURLBannerClick(Sender: TObject);
 var
   QuickHashURL: string;
 begin
-  QuickHashURL := 'https://sourceforge.net/projects/quickhash/';
+  QuickHashURL := 'http://quickhash-gui.org';
   OpenURL(QuickHashURL);
 end;
 
-procedure TMainForm.ProcessDir(const SourceDirName: string);
+procedure TMainForm.ProcessDir(SourceDirName: string);
 
 {$IFDEF WINDOWS}
 type
@@ -2011,7 +2470,7 @@ var
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
-  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
+  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors, slTemp : TStringList;
 
   {$IFDEF WINDOWS}
   DriveLetter : char;  // For MS Windows drive letter irritances only
@@ -2035,7 +2494,7 @@ begin
   k                       := 0;
   m                       := 0;
 
-  SLCopyErrors := TStringList.Create;
+  SLCopyErrors := TStringListUTF8.Create;
 
   // Ensures the selected source directory is set as the directory to be searched
   // and then finds all the files and directories within, storing as a StringList.
@@ -2063,7 +2522,7 @@ begin
   // On Linux, though, we need different behaviour - see IFDEF below
   if chkNoRecursiveCopy.Checked then          // Does not want recursive
     begin
-      if FileTypeMaskCheckBox1.Checked then   // ...and does want a file mask
+      if FileTypeMaskCheckBox1.Checked then     // ...and does want a file mask
         begin
           FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, False, True);
         end
@@ -2073,17 +2532,77 @@ begin
         end;
     end;
 
-  if not chkNoRecursiveCopy.Checked then     // Does want recursive
+  if MultipleDirsChosen = false then              // User has only selected one folder
     begin
-      if FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
+      if not chkNoRecursiveCopy.Checked then        // and does want recursive copy
         begin
-          FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
-        end
-      else                                    // but does not want a file mask
-        begin
-          FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
+          if FileTypeMaskCheckBox1.Checked then       // ...but does want a file mask
+            begin
+              FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
+            end
+          else                                      // ... but does NOT want a file mask
+            begin
+              FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
+            end;
         end;
+    end
+  else                                            // User has selected multiple folders to copy
+  begin
+    if not chkNoRecursiveCopy.Checked then          // and does want recursive
+     begin
+       if FileTypeMaskCheckBox1.Checked then          // ...but does want a file mask for all selected folders
+         begin
+           FilesFoundToCopy := TStringListUTF8.Create;
+           FilesFoundToCopy.Sorted := true;
+           for i := 0 to slMultipleDirNames.Count -1 do
+             begin
+               SourceDirName := slMultipleDirNames.Strings[i];
+               slTemp        := TStringListUTF8.Create;
+               slTemp.Sorted := true;
+               slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
+               for j := 0 to slTemp.Count -1 do
+                 begin
+                   FilesFoundToCopy.Add(slTemp.Strings[j]);
+                 end;
+               slTemp.Free;
+             end;
+         end
+       else                                          // ... but does NOT want a file mask for all selected folders
+         begin
+           FilesFoundToCopy := TStringListUTF8.Create;
+           FilesFoundToCopy.Sorted := true;
+           for i := 0 to slMultipleDirNames.Count -1 do
+             begin
+               SourceDirName    := slMultipleDirNames.Strings[i];
+               slTemp           := TStringListUTF8.Create;
+               slTemp.Sorted    := true;
+               slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
+               for j := 0 to slTemp.Count -1 do
+                 begin
+                   FilesFoundToCopy.Add(slTemp.Strings[j]);
+                 end;
+               slTemp.Free;
+             end;
+         end;
+     end
+    else // User does not want recursive but does want a multiple selection. i.e sub directories of multiple dirs are to be ignored.
+    begin
+      FilesFoundToCopy := TStringListUTF8.Create;
+      FilesFoundToCopy.Sorted := true;
+      for i := 0 to slMultipleDirNames.Count -1 do
+       begin
+         SourceDirName    := slMultipleDirNames.Strings[i];
+         slTemp           := TStringListUTF8.Create;
+         slTemp.Sorted    := true;
+         slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', False, True);
+         for j := 0 to slTemp.Count -1 do
+           begin
+             FilesFoundToCopy.Add(slTemp.Strings[j]);
+           end;
+         slTemp.Free;
+       end;
     end;
+  end;
   {$ENDIF}
 
   {$IFDEF LINUX}
@@ -2268,30 +2787,18 @@ begin
 
       for i := 0 to FilesFoundToCopy.Count -1 do
         begin
-          if StopScan1 = FALSE then
+          // StopScan2 is set to false if the "Stop" button in 'Copy' tab is pressed
+          if StopScan2 = FALSE then
             begin
-            SourceFileHasHash := '';
+            SourceFileHasHash      := '';
             DestinationFileHasHash := '';
 
-            {$IFDEF WINDOWS}
-              // Get the file size using a stream, because the traditional FileSize
-              // function can't injest the Long Path prefix of '\\?\' or '\\?\UNC\'
-              m := FileSizeWithLongPath(FilesFoundToCopy.Strings[i]);
-            {$else}
-              {$IFDEF Darwin}
-                // Not long path stupidity for Apple Mac
-                m := FileSize(FilesFoundToCopy.Strings[i]);
-              {$else}
-                {$IFDEF UNIX and !$ifdef Darwin}
-                  // Not long path stupidity for Linux, either
-                  m := FileSize(FilesFoundToCopy.Strings[i]);
-                {$ENDIF}
-              {$ENDIF}
-            {$ENDIF}
+            // Check the file has a size greater than 0 bytes to avoid default hash values.
+            m := FileSize(FilesFoundToCopy.Strings[i]);
 
             if m >= 0 then
               begin
-              StatusBar3.SimpleText := 'Currently hashing and copying: ' + RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+              StatusBar3.SimpleText := 'Processing: ' + RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
               Application.ProcessMessages;
               { Now we have some output directory jiggery pokery to deal with, that
                 needs to accomodate both OS's. Firstly,
@@ -2354,50 +2861,80 @@ begin
               {$IFDEF Windows}
               { Due to the nonsensories of Windows drive lettering, we have to allow
                 for driver lettering in the finalised destination path.
+
+                We only do this if UNC mode is not selected though, because if
+                it isn't, drive letters should not be needed anyway.
+
                 This loop finds 'C:' in the middle of the concatanated path and
                 return its position. It then deletes 'C:' of 'C:\' if found, or any
                 other A-Z drive letter, leaving the '\' for the path
                 So, C:\SrcDir\SubDirA becomes E:\NewDestDir\SrcDir\SubDirA instead of
                 E:\NewDestDir\C:SrcDir\SubDirA. UNC paths are taken care of by ForceDirectories }
 
-              for DriveLetter in TRange do
-                begin
-                  k := posex(DriveLetter+':', FinalisedDestDir, 4);
-                  Delete(FinalisedDestDir, k, 2);
-                end;
+                if chkUNCMode.Checked = false then
+                  begin
+                    for DriveLetter in TRange do
+                      begin
+                        k := posex(DriveLetter+':', FinalisedDestDir, 4);
+                        Delete(FinalisedDestDir, k, 2);
+                      end;
+                  end;
+
+              // *** SOURCE DIRECTORY ***
+              // SourceDirectoryAndFileName may include '\\' at the start, which
+              // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
+              // So we just reduce it back to one, to follow immediately after the prefix.
+              // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
+
+              SourceDirectoryAndFileName := LongPathOverride+SourceDirectoryAndFileName;
+              if Pos('\\\', SourceDirectoryAndFileName) > 0 then
+              begin
+                SourceDirectoryAndFileName := StringReplace(SourceDirectoryAndFileName, '\\\', '\', [rfReplaceAll]);
+              end;
 
               {Now, again, only if Windows, obtain the Created, Modified and Last Accessed
               dates from the sourcefile by calling custom function 'DateAttributesOfCurrentFile'
               Linux does not have 'Created Dates' so this does not need to run on Linux platforms}
 
               CrDateModDateAccDate := DateAttributesOfCurrentFile(SourceDirectoryAndFileName);
-
               {$ENDIF}
-                {$IFDEF LINUX}
-                // Get the 'Last Modified' date, only, for Linux files
-                CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-                {$ENDIF}
-                  {$IFDEF UNIX}
-                    {$IFDEF Darwin}
-                      // Get the 'Last Modified' date, only, for Apple Mac files
-                      CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-                    {$ENDIF}
+
+              {$IFDEF LINUX}
+              // Get the 'Last Modified' date, only, for Linux files
+              CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
+              {$ENDIF}
+                {$IFDEF UNIX}
+                  {$IFDEF Darwin}
+                    // Get the 'Last Modified' date, only, for Apple Mac files
+                    CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
                   {$ENDIF}
+                {$ENDIF}
               // Determine the filename string of the file to be copied
               FinalisedFileName := ExtractFileName(FilesFoundToCopy.Strings[i]);
 
               // Before copying the file and creating storage areas, lets hash the source file
+
               SourceFileHasHash := Uppercase(CalcTheHashFile(SourceDirectoryAndFileName));
 
               // Now create the destination directory structure, if it is not yet created.
 
               if not DirectoryExistsUTF8(FinalisedDestDir) then
                 begin
-                  if not CustomisedForceDirectoriesUTF8(FinalisedDestDir, true) then
-                    begin
-                      ShowMessage(FinalisedDestDir+' cannot be created. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-                    end;
+                  try
+                    if not CustomisedForceDirectoriesUTF8(LongPathOverride+FinalisedDestDir, true) then
+                      begin
+                        ShowMessage(FinalisedDestDir+' cannot be created. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
+                      end;
+                  finally
+                  end;
                 end;
+
+              // *** DESTINATION DIRECTORY ***
+              // CopiedFilePathAndName may include '\\' at the start, which
+              // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
+              // So we just reduce it back to one, to follow immediately after the prefix.
+              // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
+              // We add a Windows compiler directive because UNC mode isnt in the Linux version
 
               // Now copy the file to the newly formed or already existing destination dir
               // and hash it. Then check that source and destination hashes match.
@@ -2405,25 +2942,34 @@ begin
               // If the user chooses not to reconstruct source dir structure,
               // check for filename conflicts, create an incrementer to ensure uniqueness,
               // and rename to "name.ext_DuplicatedNameX". Otherwise, reconstruct source path
+              {$ifdef Windows}
+              CopiedFilePathAndName := LongPathOverride+CopiedFilePathAndName;
+              if Pos('\\\', CopiedFilePathAndName) > 0 then
+              begin
+                CopiedFilePathAndName := StringReplace(CopiedFilePathAndName, '\\\', '\', [rfReplaceAll]);
+              end;
+              {$endif}
 
               if chkNoPathReconstruction.Checked = false then
                 begin
-                  CopiedFilePathAndName := IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName;
+                  CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
                 end
                 else
                   begin
-                    if FileExists(IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName) then
+                    if FileExists(IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName) then
                     begin
                       DupCount := DupCount + 1;
-                      CopiedFilePathAndName := IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName + '_DuplicatedName' + IntToStr(DupCount);
+                      CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName + '_DuplicatedName' + IntToStr(DupCount);
                     end
                     else
-                    CopiedFilePathAndName := IncludeTrailingPathDelimiter(FinalisedDestDir) + FinalisedFileName;
+                    CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
                   end;
 
               // Now copy the file, either to the reconstructed path or to the root
-
-              if not FileUtil.CopyFile(SourceDirectoryAndFileName, CopiedFilePathAndName) then
+              // Note that FileCopyEx from JawWindows unit is better for monitoring copy progress.
+              // though it seems unable to adjust created date from Vol1 to Vol2 too, same as CopyFile from FileUtil
+              // But one day, look at adding it for user feedback when copying large files if nothing else
+              if not FileUtil.CopyFile(SourceDirectoryAndFileName, CopiedFilePathAndName, true) then
                 begin
                   ShowMessage('Failed to copy file : ' + SourceDirectoryAndFileName + ' Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
                   SLCopyErrors.Add('Failed to copy: ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash);
@@ -2433,15 +2979,46 @@ begin
               DestinationFileHasHash := UpperCase(CalcTheHashFile(CopiedFilePathAndName));
               NoOfFilesCopiedOK := NoOfFilesCopiedOK + 1;
 
-              // Check for hash errors
+              // Check for hash errors. Does source and destination hashes match?
+              // If not, log it to text file and also display in grid.
               if SourceFileHasHash <> DestinationFileHasHash then
                 begin
                   HashMismtachCount := HashMismtachCount + 1;
                   SLCopyErrors.Add('Hash mismatch. Source file ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash + ' Hash of copied file: ' + CopiedFilePathAndName + ' ' + DestinationFileHasHash);
+                  frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
+                    {$IFDEF WINDOWS}
+                      frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+                    {$else}
+                       {$IFDEF Darwin}
+                         frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                       {$else}
+                         {$IFDEF UNIX and !$ifdef Darwin}
+                           frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                         {$ENDIF}
+                       {$ENDIF}
+                    {$ENDIF}
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
+                    {$IFDEF WINDOWS}
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                    {$else}
+                      {$IFDEF Darwin}
+                        frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                      {$else}
+                         {$IFDEF UNIX and !$ifdef Darwin}
+                           frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                         {$endif}
+                      {$endif}
+                    {$endif}
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
+                    frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
+                    frmDisplayGrid1.CopyAndHashGrid.row           := i + 1;
+                    frmDisplayGrid1.CopyAndHashGrid.col           := 1;
                 end
+              // Else, no errors. No need to log to file but still display to user
               else if SourceFileHasHash = DestinationFileHasHash then
                 begin
-                // With the display grid, adding one to each value ensures the first row headings do not conceal the first file
+                  // With the display grid, adding one to each value ensures the first row headings do not conceal the first file
                   frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
                   frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
                   {$IFDEF WINDOWS}
@@ -2456,7 +3033,17 @@ begin
                      {$ENDIF}
                   {$ENDIF}
                   frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                  {$IFDEF WINDOWS}
+                  frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                  {$else}
+                    {$IFDEF Darwin}
+                      frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                    {$else}
+                       {$IFDEF UNIX and !$ifdef Darwin}
+                         frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                       {$endif}
+                    {$endif}
+                  {$endif}
                   frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
                   frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
                   frmDisplayGrid1.CopyAndHashGrid.row           := i + 1; //NoOfFilesCopiedOK +1 ;
@@ -2470,19 +3057,29 @@ begin
               SizeOfFile2 := FileSize(FilesFoundToCopy.Strings[i]);
               TotalBytesRead2 := TotalBytesRead2 + SizeOfFile2;
               lblDataCopiedSoFar.Caption := FormatByteSize(TotalBytesRead2);
-              lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
-              Application.ProcessMessages;
+              // When or if the stop button is pressed, we need to prevent any
+              // division by zero, thus the count check next...
+              if FilesFoundToCopy.Count > 0 then
+                begin
+                  lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
+                  pbCopy.Position := ((NoFilesExamined *100) DIV FilesFoundToCopy.Count);
+                  Application.ProcessMessages;
+                end;
               end; // End of the if m > 0 then statement
 
             // Otherwise file is probably a zero byte file
             if m = 0 then
               begin
-              ZeroByteFilesCounter := ZeroByteFilesCounter + 1; // A file of zero bytes was found in this loop
+                ZeroByteFilesCounter := ZeroByteFilesCounter + 1; // A file of zero bytes was found in this loop
               end;
-          end; // End of the "If Stop button pressed" if
+          end // End of the "If Stop button not pressed" if
+          else
+            begin
+              StatusBar3.SimpleText:= 'Aborted by user';
+            end;
         end;   // End of the 'for Count' of Memo StringList loop
 
-      // Now we can show the grid. Having it displayed for every file as it goes
+      // Now we can show the grid. Having it display for every file as it processes
       // wastes time and isn't especially necessary given the other progress indicators
 
       frmDisplayGrid1.CopyAndHashGrid.Visible := true;
@@ -2492,7 +3089,6 @@ begin
       TimeDifference          := EndTime - StartTime;
       strTimeDifference       := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference);
       lblTimeTaken6C.Caption  := strTimeDifference;
-
 
       // Now lets save the generated values to a CSV file.
 
@@ -2557,11 +3153,18 @@ begin
            end;
         end;
 
-      // If there is one or more errors, display them to the user and save to a log file
+      // If there is one or more errors, save them to a log file of users choosing
       if Length(SLCopyErrors.Text) > 0 then
        begin
-        SLCopyErrors.SaveToFile(IncludeTrailingPathDelimiter(DestDir)+'QHErrorsLog.txt');
-        ShowMessage(SLCopyErrors.Text);
+         ShowMessage('Errors detected! You will now be prompted to save a text log...');
+         if SaveDialog7.Execute then
+           begin
+             SaveDialog7.Title := 'Save error log...';
+             SaveDialog7.InitialDir := GetCurrentDir;
+             SaveDialog7.Filter := 'Text|*.txt';
+             SaveDialog7.DefaultExt := 'txt';
+             SLCopyErrors.SaveToFile(SaveDialog7.FileName);
+           end;
       end;
 
       // All done. End the loops, free resources and notify user
@@ -2571,30 +3174,38 @@ begin
         StatusBar3.SimpleText := 'Finished.';
         frmDisplayGrid1.btnClipboardResults2.Enabled := true;
       end;
-    ShowMessage('Files copied (zero based counter): ' + IntToStr(NoOfFilesCopiedOK) + '. Copy errors : ' + IntToStr(FileCopyErrors) + '. Hash mismatches: ' + IntToStr(HashMismtachCount) + '. Zero byte files: '+ (IntToStr(ZeroByteFilesCounter)));
+    ShowMessage('Files copied : '   + IntToStr(NoOfFilesCopiedOK -1) + #13#10 +
+                'Copy errors : '    + IntToStr(FileCopyErrors)       + #13#10 +
+                'Hash mismatches: ' + IntToStr(HashMismtachCount)    + #13#10 +
+                'Zero byte files: ' + IntToStr(ZeroByteFilesCounter));
     end
   else // End of Proceed Message dialog "Yes, No, Cancel".
-   ShowMessage('Process aborted by user.');
-   Button8CopyAndHash.Enabled := true;
+   begin
+     ShowMessage('Process aborted by user.');
+     Button8CopyAndHash.Enabled := true;
+   end;
 end;
 
-// Since adding the LongPathOverride prefix to deal with any file in any folder
-// up to length of 32K chars, the FileSize function can't deal with the prefix
-// to size obtained by use of a stream instead.
 // Returns the size of the file in bytes on success. -1 otherwise.
+// Needed only if the UNC prefixes cause a problem which they used to but seem not
+// to anymore. So I just use FileSize now for all three operating systems.
+{
 function TMainForm.FileSizeWithLongPath(strFileName : string) : Int64;
 var
   fs : TFileStream;
+  FileSize : Int64;
 begin
   result := -1;
   try
-    fs := TFileStreamUTF8.Create(strFileName, faReadOnly);
-    result := fs.size;
+    fs := TFileStream.Create(strFileName, faReadOnly);
+    FileSize := 0;
+    FileSize := fs.size;
   finally
     fs.free;
   end;
+  if FileSize > 0 then result := FileSize;
 end;
-
+}
 {$IFDEF Windows}
 // FUNCTION FileTimeToDTime - Windows specific,
 // kindly acknowledged from xenblaise @ http://forum.lazarus.freepascal.org/index.php?topic=10869.0
@@ -2715,11 +3326,11 @@ begin
   if chkUNCMode.Checked then
     begin
     Edit2SourcePath.Color      := clWhite;
-    Edit2SourcePath.Text       := 'Enter source UNC path, prefixed with \\';
-
+    Edit2SourcePath.Text       := 'Enter source UNC path (e.g. \\DCSERVER\DATA-1)';
+    Edit2SourcePath.Visible    := true;
     Edit3DestinationPath.Color := clWhite;
-    Edit3DestinationPath.Text  := 'Enter destination UNC path, prefixed with \\';;
-
+    Edit3DestinationPath.Text  := 'Enter destination UNC path (e.g \\FILESERVER\DATA-2';;
+    Edit3DestinationPath.Visible:=true;
     Button8CopyAndHash.Enabled := true;
     DirListA.Enabled           := false;
     DirListA.Visible           := false;
@@ -2728,32 +3339,67 @@ begin
     end
   else
     begin
-    Edit2SourcePath.Color      := clSilver;
-    Edit3DestinationPath.Color := clSilver;
-    Edit2SourcePath.Text       := 'Select source directory ';
-    Edit3DestinationPath.Text  := 'Select source directory ';
-    Button8CopyAndHash.Enabled := false;
-    DirListA.Enabled           := true;
-    DirListA.Visible           := true;
-    DirListB.Enabled           := true;
-    DirListB.Visible           := true;
+      Edit2SourcePath.Color      := clSilver;
+      Edit3DestinationPath.Color := clSilver;
+      Edit2SourcePath.Text       := 'Select source directory ';
+      Edit3DestinationPath.Text  := 'Select destitnation directory ';
+      Button8CopyAndHash.Enabled := false;
+      DirListA.Enabled           := true;
+      DirListA.Visible           := true;
+      DirListB.Enabled           := true;
+      DirListB.Visible           := true;
     end;
 end;
 
 procedure TMainForm.DirListAClick(Sender: TObject);
+var
+  NoOfDirsSelected, i : integer;
 begin
-  SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
-  if DirectoryExists(SourceDir) then
-   begin
-     Edit2SourcePath.Text := SourceDir;
-     SourceDirValid := TRUE;
-     if SourceDirValid AND DestDirValid = TRUE then
+  MultipleDirsChosen := false;
+  NoOfDirsSelected := DirListA.SelectionCount;
+  // If only one folder selected, do as as we always have
+  if NoOfDirsSelected = 1 then
+    begin
+      MultipleDirsChosen := false;
+      SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
+      if DirectoryExists(SourceDir) then
        begin
-         // Now enable the 'Go!' button as both SourceDir and DestDir are valid
-         Button8CopyAndHash.Enabled := true;
+         Edit2SourcePath.Text := SourceDir;
+         SourceDirValid := TRUE;
+         if SourceDirValid AND DestDirValid = TRUE then
+           begin
+             // Now enable the 'Go!' button as both SourceDir and DestDir are valid
+             Button8CopyAndHash.Enabled := true;
+          end;
+       end;
+   end
+  else if NoOfDirsSelected > 1 then
+    // The number of folders selected is greater than 1 so we must itterate
+    try
+      slMultipleDirNames := TStringList.Create;
+      begin
+        MultipleDirsChosen := true;
+        for i := 0 to NoOfDirsSelected -1 do
+          begin
+            {$ifdef Windows}
+            slMultipleDirNames.Add(StringReplace(DirListA.Selections[i].GetTextPath, '/', '\', [rfReplaceAll]));
+            {$else}
+              {$IFDEF Darwin}
+                slMultipleDirNames.Add(DirListA.Selections[i].GetTextPath);
+              {$else}
+                {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+                  slMultipleDirNames.Add(DirListA.Selections[i].GetTextPath);
+                {$ENDIF}
+              {$ENDIF}
+            {$endif}
+          end;
       end;
-   end;
+    finally
+      // nothing to do
+    end
+  else MultipleDirsChosen := false;
 end;
+
 
 procedure TMainForm.DirListBClick(Sender: TObject);
 begin
@@ -2871,6 +3517,12 @@ begin
 end;
 
 procedure TMainForm.SHA1RadioButton3Change(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
 begin
 
 end;

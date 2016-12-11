@@ -1,0 +1,37 @@
+object frmYAFFI: TfrmYAFFI
+  Left = 476
+  Height = 454
+  Top = 284
+  Width = 484
+  Caption = 'frmYAFFI'
+  ClientHeight = 454
+  ClientWidth = 484
+  LCLVersion = '1.4.0.4'
+  object btnListAttachedDisks: TButton
+    Left = 48
+    Height = 25
+    Top = 64
+    Width = 75
+    Caption = 'Scan Disks'
+    OnClick = btnListAttachedDisksClick
+    TabOrder = 0
+  end
+  object TreeView1: TTreeView
+    Left = 48
+    Height = 120
+    Top = 104
+    Width = 400
+    DefaultItemHeight = 16
+    TabOrder = 1
+  end
+  object Memo1: TMemo
+    Left = 48
+    Height = 136
+    Top = 248
+    Width = 400
+    Lines.Strings = (
+      'Memo1'
+    )
+    TabOrder = 2
+  end
+end

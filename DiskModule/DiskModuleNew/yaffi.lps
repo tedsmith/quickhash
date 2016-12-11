@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="35">
+      <Unit0>
+        <Filename Value="yaffi.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="diskhashingmodule"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="14" Y="10"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="diskspecification.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmTechSpecs"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="7"/>
+        <WindowIndex Value="1"/>
+        <UsageCount Value="192"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="uprogress.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmProgress"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uProgress"/>
+        <EditorIndex Value="6"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="14"/>
+        <CursorPos X="13" Y="36"/>
+        <UsageCount Value="157"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="md5customised.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="5"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="604"/>
+        <CursorPos X="15" Y="644"/>
+        <UsageCount Value="98"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="sha1customised.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="sha1Customised"/>
+        <EditorIndex Value="4"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="185"/>
+        <CursorPos X="23" Y="220"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="uGPT.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="3"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="361"/>
+        <CursorPos X="12" Y="370"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="diskmodule.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmDiskHashingModule"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="1452"/>
+        <CursorPos X="21" Y="1485"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="frmDiskHashingModule.lfm"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="UYaffi.pas"/>
+        <ComponentName Value="frmDiskHashingModule"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="24" Y="16"/>
+        <UsageCount Value="200"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="libEWF-FPC\LibEWFUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="786"/>
+        <CursorPos X="45" Y="816"/>
+        <UsageCount Value="200"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="TextSearch\textsearch.lfm"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="103"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="TextSearch\textsearch.pas"/>
+        <ComponentName Value="frmTextSearch"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos Y="3"/>
+        <UsageCount Value="103"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="uSystemConfig_V2_PhyDisk.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="16" Y="21"/>
+        <UsageCount Value="9"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="delphi-wmi-class-generator-master\units\uWmiDelphiClass.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="1554"/>
+        <CursorPos X="26" Y="1571"/>
+        <UsageCount Value="11"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="uSystemConfig_V2_LogDisk.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="7"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="delphi-wmi-class-generator-master\units\uLazarusIDE.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="7"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="uWmiDelphiClass.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="21" Y="22"/>
+        <UsageCount Value="8"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="ewfacquireForFPCAPI\LibEWFUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="403"/>
+        <CursorPos X="37" Y="423"/>
+        <UsageCount Value="20"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\win\wininc\ascfun.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="50"/>
+        <CursorPos X="10" Y="68"/>
+        <UsageCount Value="50"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\win\wininc\ascdef.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="51"/>
+        <CursorPos X="10" Y="69"/>
+        <UsageCount Value="50"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="107"/>
+        <CursorPos X="10" Y="125"/>
+        <UsageCount Value="46"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\inc\objpash.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="227"/>
+        <CursorPos X="8" Y="244"/>
+        <UsageCount Value="6"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="GPTMBR.pas"/>
+        <EditorIndex Value="2"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="68" Y="4"/>
+        <UsageCount Value="80"/>
+        <Loaded Value="True"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\rtl\objpas\sysutils\intfh.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="5"/>
+        <CursorPos X="10" Y="42"/>
+        <UsageCount Value="38"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\include\customform.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="2175"/>
+        <CursorPos Y="2196"/>
+        <UsageCount Value="11"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\include\treeview.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="264"/>
+        <CursorPos Y="297"/>
+        <UsageCount Value="10"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\include\control.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="4747"/>
+        <CursorPos Y="4765"/>
+        <UsageCount Value="7"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\include\wincontrol.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="8118"/>
+        <CursorPos Y="8138"/>
+        <UsageCount Value="6"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\interfaces\gtk2\gtk2wsstdctrls.pp"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="2402"/>
+        <CursorPos Y="2423"/>
+        <UsageCount Value="6"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\include\messagedialogs.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="178"/>
+        <CursorPos Y="199"/>
+        <UsageCount Value="8"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\include\progressbar.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="93"/>
+        <CursorPos Y="113"/>
+        <UsageCount Value="6"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\include\application.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="356"/>
+        <CursorPos Y="381"/>
+        <UsageCount Value="6"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\interfaces\gtk2\gtk2widgetset.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="2285"/>
+        <CursorPos X="25" Y="2299"/>
+        <UsageCount Value="6"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="C:\usr\share\lazarus\1.4.0\lcl\lclmessageglue.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="94"/>
+        <CursorPos Y="114"/>
+        <UsageCount Value="5"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="umbr.pas"/>
+        <UnitName Value="uMBR"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="7"/>
+        <CursorPos X="9" Y="20"/>
+        <UsageCount Value="21"/>
+      </Unit34>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="yaffi.lpr"/>
+        <Caret Line="12" Column="20"/>
+      </Position1>
+      <Position2>
+        <Filename Value="diskmodule.pas"/>
+      </Position2>
+      <Position3>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1473" Column="29" TopLine="1454"/>
+      </Position3>
+      <Position4>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1486" TopLine="1454"/>
+      </Position4>
+      <Position5>
+        <Filename Value="uprogress.pas"/>
+        <Caret Line="37" Column="3" TopLine="2"/>
+      </Position5>
+      <Position6>
+        <Filename Value="uprogress.pas"/>
+        <Caret Line="46" Column="14" TopLine="14"/>
+      </Position6>
+      <Position7>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="11" Column="48"/>
+      </Position7>
+      <Position8>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="12" Column="17"/>
+      </Position8>
+      <Position9>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1003" Column="44" TopLine="985"/>
+      </Position9>
+      <Position10>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1477" Column="17" TopLine="1453"/>
+      </Position10>
+      <Position11>
+        <Filename Value="yaffi.lpr"/>
+        <Caret Line="2" Column="68"/>
+      </Position11>
+      <Position12>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="77" Column="16" TopLine="59"/>
+      </Position12>
+      <Position13>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1485" TopLine="1453"/>
+      </Position13>
+      <Position14>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="77" Column="12" TopLine="67"/>
+      </Position14>
+      <Position15>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="44" Column="10" TopLine="19"/>
+      </Position15>
+      <Position16>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1485" TopLine="1453"/>
+      </Position16>
+      <Position17>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="8" Column="32"/>
+      </Position17>
+      <Position18>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="26" Column="26" TopLine="16"/>
+      </Position18>
+      <Position19>
+        <Filename Value="uprogress.pas"/>
+        <Caret Line="36" Column="35" TopLine="14"/>
+      </Position19>
+      <Position20>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="90" Column="14" TopLine="57"/>
+      </Position20>
+      <Position21>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="672" Column="5" TopLine="654"/>
+      </Position21>
+      <Position22>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="671" Column="14" TopLine="653"/>
+      </Position22>
+      <Position23>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="501" Column="76" TopLine="309"/>
+      </Position23>
+      <Position24>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="76" Column="56" TopLine="58"/>
+      </Position24>
+      <Position25>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="77" Column="67" TopLine="58"/>
+      </Position25>
+      <Position26>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="76" Column="27" TopLine="58"/>
+      </Position26>
+      <Position27>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="351" Column="71" TopLine="321"/>
+      </Position27>
+      <Position28>
+        <Filename Value="uGPT.pas"/>
+        <Caret Line="77" Column="38" TopLine="59"/>
+      </Position28>
+      <Position29>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1479" Column="15" TopLine="1453"/>
+      </Position29>
+      <Position30>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1478" Column="15" TopLine="1452"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+  <Debugging>
+    <Watches Count="2">
+      <Item1>
+        <Expression Value="bytes"/>
+      </Item1>
+      <Item2>
+        <Expression Value="intByteCount"/>
+      </Item2>
+    </Watches>
+  </Debugging>
+</CONFIG>

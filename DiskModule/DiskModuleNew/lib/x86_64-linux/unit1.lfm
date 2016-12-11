@@ -1,0 +1,106 @@
+object frmYaffiLinux: TfrmYaffiLinux
+  Left = 307
+  Height = 240
+  Top = 150
+  Width = 566
+  Caption = 'YAFFI (Yet Another Free Forensic Imager) - Linux Version'
+  ClientHeight = 240
+  ClientWidth = 566
+  OnShow = Button1Click
+  LCLVersion = '1.4.0.4'
+  object cbdisks: TComboBox
+    Left = 64
+    Height = 29
+    Top = 16
+    Width = 288
+    ItemHeight = 0
+    OnChange = cbdisksChange
+    Style = csDropDownList
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    Left = 16
+    Height = 15
+    Top = 30
+    Width = 29
+    Caption = 'Disk:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 15
+    Top = 88
+    Width = 46
+    Caption = 'Vendor:'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 15
+    Top = 128
+    Width = 39
+    Caption = 'Model:'
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 16
+    Height = 15
+    Top = 168
+    Width = 57
+    Caption = 'Serial No:'
+    ParentColor = False
+  end
+  object Button1: TButton
+    Left = 368
+    Height = 32
+    Top = 16
+    Width = 128
+    Caption = 'Refresh Disk List'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object lv: TLabel
+    Left = 95
+    Height = 1
+    Top = 88
+    Width = 1
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object lm: TLabel
+    Left = 95
+    Height = 1
+    Top = 128
+    Width = 1
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object ls: TLabel
+    Left = 95
+    Height = 1
+    Top = 168
+    Width = 1
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label5: TLabel
+    Left = 16
+    Height = 15
+    Top = 208
+    Width = 31
+    Caption = 'Type:'
+    ParentColor = False
+  end
+  object lt: TLabel
+    Left = 95
+    Height = 1
+    Top = 208
+    Width = 1
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+end
