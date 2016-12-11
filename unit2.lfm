@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 346
+  Left = 454
   Height = 696
-  Top = 209
+  Top = 197
   Width = 1018
   AllowDropFiles = True
   Caption = 'Quick Hash v2.7.0 (c) 2011-2016 - The easy and convenient way to hash data in both Linux, Apple Mac and Windows'
@@ -9,36 +9,36 @@ object MainForm: TMainForm
   ClientWidth = 1018
   OnCreate = FormCreate
   OnDropFiles = FormDropFiles
-  Position = poDesktopCenter
-  SessionProperties = 'Width;Top;Position;Left;Height'
-  LCLVersion = '1.4.4.0'
+  Position = poScreenCenter
+  SessionProperties = 'Position'
+  LCLVersion = '1.6.2.0'
   object PageControl1: TPageControl
     Left = 16
     Height = 658
     Top = 24
     Width = 996
-    ActivePage = TabSheet6
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight]
     ParentShowHint = False
-    TabIndex = 5
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
       Caption = 'Te&xt'
-      ClientHeight = 622
-      ClientWidth = 988
+      ClientHeight = 625
+      ClientWidth = 990
       OnContextPopup = TabSheet1ContextPopup
       ParentShowHint = False
       object TextHashingGroupBox: TGroupBox
         Left = 136
         Height = 438
         Top = 10
-        Width = 810
+        Width = 812
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Text Hashing'
-        ClientHeight = 416
-        ClientWidth = 806
+        ClientHeight = 420
+        ClientWidth = 810
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -49,7 +49,7 @@ object MainForm: TMainForm
           Height = 175
           Hint = 'Type or paste and watch hash value change.'#13#10'For amounts larger than several hundred Kb, save'#13#10'data to a file and use File Hashing instead. '
           Top = 17
-          Width = 753
+          Width = 757
           Anchors = [akTop, akLeft, akRight]
           Lines.Strings = (
             'Type or paste text here - hash will update as you type'
@@ -67,7 +67,7 @@ object MainForm: TMainForm
           Height = 56
           Hint = 'This is the hash of ALL THE TEXT in the textarea above'#13#10'For line-by-line analysis, use the button'#13#10#13#10'The hash value can be copied from here'#13#10'to clipboard (highlight and press Ctrl + C or right click ''Copy'''
           Top = 352
-          Width = 753
+          Width = 757
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           Font.Height = -13
@@ -81,10 +81,10 @@ object MainForm: TMainForm
         end
         object lbleExpectedHashText: TLabeledEdit
           Left = 18
-          Height = 25
+          Height = 27
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated hash matches the computed.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3 dots only)'
           Top = 304
-          Width = 753
+          Width = 757
           Anchors = [akTop, akLeft, akRight]
           EditLabel.AnchorSideLeft.Control = lbleExpectedHashText
           EditLabel.AnchorSideRight.Control = lbleExpectedHashText
@@ -93,7 +93,7 @@ object MainForm: TMainForm
           EditLabel.Left = 18
           EditLabel.Height = 17
           EditLabel.Top = 284
-          EditLabel.Width = 753
+          EditLabel.Width = 757
           EditLabel.Caption = 'Expected Hash Value (paste from other utility)'
           EditLabel.ParentColor = False
           ParentShowHint = False
@@ -107,8 +107,8 @@ object MainForm: TMainForm
           Top = 208
           Width = 761
           Caption = 'Additional Text Hashing Functions'
-          ClientHeight = 50
-          ClientWidth = 757
+          ClientHeight = 54
+          ClientWidth = 759
           TabOrder = 3
           object btnFLBL: TButton
             Left = 176
@@ -143,10 +143,10 @@ object MainForm: TMainForm
           end
           object cbToggleInputDataToOutputFile: TCheckBox
             Left = 352
-            Height = 21
+            Height = 22
             Hint = 'If left unticked, the source '#13#10'text including corresponding hashes '#13#10'will be output. If ticked, only the'#13#10'hashes will be output on their own.'
             Top = 13
-            Width = 194
+            Width = 210
             Caption = 'Source text included in output'
             OnChange = cbToggleInputDataToOutputFileChange
             ParentShowHint = False
@@ -171,8 +171,8 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 85
-        ClientWidth = 92
+        ClientHeight = 89
+        ClientWidth = 94
         ItemIndex = 1
         Items.Strings = (
           'MD5'
@@ -191,14 +191,14 @@ object MainForm: TMainForm
         Top = 137
         Width = 96
         Caption = 'System RAM'
-        ClientHeight = 61
-        ClientWidth = 92
+        ClientHeight = 65
+        ClientWidth = 94
         TabOrder = 2
         object lblRAM: TLabel
           Left = 8
           Height = 15
           Top = 8
-          Width = 9
+          Width = 12
           Caption = '...'
           ParentColor = False
         end
@@ -207,8 +207,8 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Hint = 'Hash a single file (useful for hashing disks in Linux)'
       Caption = 'F&ile'
-      ClientHeight = 622
-      ClientWidth = 988
+      ClientHeight = 625
+      ClientWidth = 990
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 144
@@ -218,8 +218,8 @@ object MainForm: TMainForm
         Width = 822
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Single File Hashing'
-        ClientHeight = 280
-        ClientWidth = 818
+        ClientHeight = 284
+        ClientWidth = 820
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -349,8 +349,8 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 85
-        ClientWidth = 92
+        ClientHeight = 89
+        ClientWidth = 94
         ItemIndex = 1
         Items.Strings = (
           'MD5'
@@ -365,8 +365,8 @@ object MainForm: TMainForm
     object TabSheet3: TTabSheet
       Hint = 'Compute hashes for multiple files in a directory'#13#10'recursively, or just those in the root of the directory'
       Caption = 'FileS'
-      ClientHeight = 622
-      ClientWidth = 988
+      ClientHeight = 625
+      ClientWidth = 990
       ParentShowHint = False
       ShowHint = True
       object DirectoryHashingGroupBox: TGroupBox
@@ -376,8 +376,8 @@ object MainForm: TMainForm
         Width = 840
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Hash all files in chosen directory - recursive by default'
-        ClientHeight = 588
-        ClientWidth = 836
+        ClientHeight = 592
+        ClientWidth = 838
         Color = clForm
         ParentColor = False
         ParentFont = False
@@ -677,8 +677,8 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 85
-        ClientWidth = 92
+        ClientHeight = 89
+        ClientWidth = 94
         ItemIndex = 1
         Items.Strings = (
           'MD5'
@@ -699,8 +699,8 @@ object MainForm: TMainForm
     object TabSheet4: TTabSheet
       Hint = 'Choose a directory, have its content hashed, files are copied to destination, and re-hashed.'
       Caption = '&Copy'
-      ClientHeight = 622
-      ClientWidth = 988
+      ClientHeight = 625
+      ClientWidth = 990
       ParentShowHint = False
       ShowHint = True
       object CopyFilesHashingGroupBox: TGroupBox
@@ -710,8 +710,8 @@ object MainForm: TMainForm
         Width = 856
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Hash files in chosen directory, copy them, and re-hash the copied files (recursive by default) '
-        ClientHeight = 578
-        ClientWidth = 852
+        ClientHeight = 582
+        ClientWidth = 854
         Color = clForm
         ParentColor = False
         ParentFont = False
@@ -1046,8 +1046,8 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 85
-        ClientWidth = 92
+        ClientHeight = 89
+        ClientWidth = 94
         ItemIndex = 1
         Items.Strings = (
           'MD5'
@@ -1060,8 +1060,8 @@ object MainForm: TMainForm
     end
     object TabSheet7: TTabSheet
       Caption = 'Compare Two Files'
-      ClientHeight = 630
-      ClientWidth = 988
+      ClientHeight = 625
+      ClientWidth = 990
       object GroupBox3: TGroupBox
         AnchorSideRight.Control = TabSheet7
         AnchorSideRight.Side = asrBottom
@@ -1071,8 +1071,8 @@ object MainForm: TMainForm
         Width = 972
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Hash two specific files in two different locations'
-        ClientHeight = 220
-        ClientWidth = 968
+        ClientHeight = 224
+        ClientWidth = 970
         TabOrder = 0
         object AlgorithmChoiceRadioBox5: TRadioGroup
           Left = 16
@@ -1089,8 +1089,8 @@ object MainForm: TMainForm
           ChildSizing.ShrinkVertical = crsScaleChilds
           ChildSizing.Layout = cclLeftToRightThenTopToBottom
           ChildSizing.ControlsPerLine = 1
-          ClientHeight = 85
-          ClientWidth = 92
+          ClientHeight = 89
+          ClientWidth = 94
           ItemIndex = 1
           Items.Strings = (
             'MD5'
@@ -1119,8 +1119,8 @@ object MainForm: TMainForm
           Width = 832
           Anchors = [akTop, akLeft, akRight]
           Caption = 'Choose two files and click ''Compare Files'''
-          ClientHeight = 149
-          ClientWidth = 828
+          ClientHeight = 153
+          ClientWidth = 830
           TabOrder = 2
           object btnFileACompare: TButton
             Left = 8
@@ -1219,8 +1219,8 @@ object MainForm: TMainForm
     object TabSheet6: TTabSheet
       Hint = 'Choose Directory A and compare it against Directory B to see if their contents are both the same'
       Caption = 'Compare Directories'
-      ClientHeight = 630
-      ClientWidth = 988
+      ClientHeight = 625
+      ClientWidth = 990
       object GroupBox1: TGroupBox
         Left = 16
         Height = 484
@@ -1228,8 +1228,8 @@ object MainForm: TMainForm
         Width = 950
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Compare Two Directories'
-        ClientHeight = 464
-        ClientWidth = 946
+        ClientHeight = 468
+        ClientWidth = 948
         TabOrder = 0
         object AlgorithmChoiceRadioBox6: TRadioGroup
           Left = 12
@@ -1246,8 +1246,8 @@ object MainForm: TMainForm
           ChildSizing.ShrinkVertical = crsScaleChilds
           ChildSizing.Layout = cclLeftToRightThenTopToBottom
           ChildSizing.ControlsPerLine = 1
-          ClientHeight = 82
-          ClientWidth = 92
+          ClientHeight = 86
+          ClientWidth = 94
           ItemIndex = 1
           Items.Strings = (
             'MD5'
@@ -1333,8 +1333,8 @@ object MainForm: TMainForm
           Width = 810
           Anchors = [akTop, akLeft, akRight]
           Caption = 'Choose two Directories to Compare'
-          ClientHeight = 101
-          ClientWidth = 806
+          ClientHeight = 105
+          ClientWidth = 808
           TabOrder = 3
           object lblDirAName: TLabel
             Left = 184
@@ -1404,8 +1404,8 @@ object MainForm: TMainForm
         Width = 950
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Summary'
-        ClientHeight = 108
-        ClientWidth = 946
+        ClientHeight = 112
+        ClientWidth = 948
         TabOrder = 1
         object lblFileCountDiffA: TLabel
           Left = 8
@@ -1591,7 +1591,7 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 617
+      ClientHeight = 625
       ClientWidth = 990
       object btnCallDiskHasherModule: TButton
         Left = 376
@@ -1606,26 +1606,18 @@ object MainForm: TMainForm
       end
       object lblDiskHashingRunAsAdminWarning: TLabel
         Left = 368
-        Height = 13
+        Height = 15
         Top = 72
-        Width = 215
+        Width = 275
         Caption = 'Must be run as administrator for disk hashing'
         ParentColor = False
       end
-      object Label7: TLabel
-        Left = 304
-        Height = 13
-        Top = 101
-        Width = 358
-        Caption = 'Tested on Windows XP and 7. Maybe read errors reported on Windows 8+'
-        ParentColor = False
-      end
       object Label8: TLabel
-        Left = 248
-        Height = 13
-        Top = 160
-        Width = 425
-        Caption = 'LINUX USERS - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root'
+        Left = 344
+        Height = 30
+        Top = 112
+        Width = 335
+        Caption = 'LINUX USERS - You may prefer to hash disks using '#10'"File" tab and navigate to /dev/sdX or /dev/sdXX as root'
         ParentColor = False
       end
     end
@@ -1633,11 +1625,11 @@ object MainForm: TMainForm
   object lblURLBanner: TLabel
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 801
+    Left = 754
     Height = 15
     Hint = 'Click to open URL in browser'
     Top = 8
-    Width = 207
+    Width = 254
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 10
     Caption = 'Official Site: http://quickhash-gui.org'
@@ -1650,10 +1642,10 @@ object MainForm: TMainForm
     OnClick = lblURLBannerClick
   end
   object Label15: TLabel
-    Left = 513
+    Left = 360
     Height = 15
     Top = 8
-    Width = 272
+    Width = 332
     Alignment = taCenter
     Anchors = [akTop, akRight]
     Caption = 'Quick Hash, Copyright (c) 2011-2016  Ted Smith. '
@@ -1770,5 +1762,9 @@ object MainForm: TMainForm
     FileName = 'QHSettings.xml'
     left = 530
     top = 12
+  end
+  object SaveErrorsCompareDirsSaveDialog8: TSaveDialog
+    left = 288
+    top = 616
   end
 end

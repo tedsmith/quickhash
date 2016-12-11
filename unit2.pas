@@ -54,7 +54,7 @@ uses
 
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, Grids, ExtCtrls, sysconst,
-    LazUTF8Classes, lclintf, ShellCtrls, XMLPropStorage, uDisplayGrid,
+    LazUTF8Classes, lclintf, ShellCtrls, XMLPropStorage, uDisplayGrid, diskmodule,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -73,7 +73,8 @@ uses
   {$IFDEF Windows}
     Windows,
     // For Windows, this is a specific disk hashing tab for QuickHash. Not needed for Linux
-    DiskModuleUnit1, types;
+     types;
+//DiskModuleUnit1, types;
   {$ENDIF}
   {$IFDEF Darwin}
     MacOSAll;
@@ -158,6 +159,7 @@ type
     pbCopy: TProgressBar;
     pbCompareDirA: TProgressBar;
     pbCompareDirB: TProgressBar;
+    SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
     Label1: TLabel;
@@ -165,7 +167,6 @@ type
     lbleExpectedHash: TLabeledEdit;
     lbleExpectedHashText: TLabeledEdit;
     lblURLBanner: TLabel;
-    Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
     lblDirAName: TLabel;
@@ -437,6 +438,12 @@ begin
   DirListA.AlphaSort;
   DirListB.AlphaSort;
 
+  // Disable the two display grids in the Compare Directories tab as they now only
+  // become visibile if there are mis-matches, or if the user chooses to log everything
+  // (as of v2.7.0)
+  sgDirA.Visible := false;
+  sgDirB.Visible := false;
+
   // Better to have some folder icons for each node of the tree but
   // I can't work out at the moment how to do it for ever folder.
   // The following only does the root nodes.
@@ -472,12 +479,20 @@ begin
 
   {$ENDIF}
 
-  {$IFDEF LINUX}
+  {$IFDEF Windows}
+    btnCallDiskHasherModule.Enabled := true;
+  {$ENDIF}
+    {$IFDEF Darwin}
+      btnCallDiskHasherModule.Enabled := false; // disabled for OSX currently
+    {$else}
+      {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+        btnCallDiskHasherModule.Enabled := true; // as of v2.7.0 - disabled for Linux previously
+      {$ENDIF}
+  {$ENDIF}
 
-   // For Linux users, we don't want them trying to use the Windows Disk hashing module
-   // created for Windows users.
-   btnCallDiskHasherModule.Enabled := false;
-   Label8.Caption         := 'LINUX USERS - Hash disks using "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
+  {$IFDEF LINUX}
+   Label8.Caption := 'LINUX USERS - You may prefer to hash disks using ' + #13#10 +
+                     'the "File" tab and navigate to /dev/sdX or /dev/sdXX as root';
 
    // For Linux users, it's helpful for the user to see as a full path the folder
    // they have chosen, so make source and destination edit fields visible, but
@@ -830,8 +845,18 @@ end;
 
 procedure TMainForm.cbShowDetailsOfAllComparisonsChange(Sender: TObject);
 begin
-  if cbShowDetailsOfAllComparisons.Checked then cbShowDetailsOfAllComparisons.Caption := 'Tabulate only encountered errors instead of all files (faster)?'
-  else cbShowDetailsOfAllComparisons.Caption:= 'Details of all files will be tabulated (slower). Click again to change.';
+  if cbShowDetailsOfAllComparisons.Checked then
+    begin
+      cbShowDetailsOfAllComparisons.Caption := 'Tabulate only encountered errors instead of all files (faster)?';
+      sgDirA.Visible := false;
+      sgDirB.Visible := false;
+    end
+  else
+  begin
+    cbShowDetailsOfAllComparisons.Caption:= 'Details of all files will be tabulated (slower). Click again to change.';
+    sgDirA.Visible := true;
+    sgDirB.Visible := true;
+  end;
 end;
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
@@ -1261,7 +1286,8 @@ end;
 // It also clears all labels from any previous runs of the form.
 procedure TMainForm.btnCallDiskHasherModuleClick(Sender: TObject);
 begin
-
+  // Not needed as of v2.7.0
+  {
 {$ifdef Windows}
   DiskModuleUnit1.frmDiskHashingModule.lbledtStartAtTime.Text := 'HH:MM';
   DiskModuleUnit1.frmDiskHashingModule.ListBox1.Clear;
@@ -1281,6 +1307,8 @@ begin
   DiskModuleUnit1.frmDiskHashingModule.edtComputedHash.Text          := '...';
   DiskModuleUnit1.frmDiskHashingModule.Show;
   {$Endif}
+  }
+  diskmodule.frmDiskHashingModule.Show;
 end;
 
 // RemoveLongPathOverrideChars : The long path override prefix will be either:
@@ -1406,6 +1434,8 @@ begin
           sgDirA.Row           := i;
           sgDirA.col           := 1;
           end;
+      sgDirA.Visible := true;
+      sgDirB.Visible := true;
       pbCompareDirA.Position := ((FilesProcessed * 100) DIV TotalFilesDirA.Count);
       end;
    FilesProcessed := 0;
@@ -1462,6 +1492,8 @@ begin
             sgDirB.Row           := i;
             sgDirB.col           := 1;
           end;
+        sgDirA.Visible := true;
+        sgDirB.Visible := true;
         pbCompareDirB.Position := ((FilesProcessed * 100) DIV TotalFilesDirB.Count);
         end;
 
@@ -1502,6 +1534,8 @@ begin
         lblStatusB.Caption := 'Finished examining files. ' + DirA + ' matches ' + DirB;
         lblStatusB.Refresh;
         lblHashMatchB.Caption:= 'MATCH!';
+        sgDirA.Visible := false;
+        sgDirB.Visible := false;
         // If user only wanted errors to be tabulated, then there is nothing in
         // grids to save, so disable the save buttons
         if cbShowDetailsOfAllComparisons.Checked then
@@ -1516,6 +1550,8 @@ begin
           // So the file counts match but the hash lists differ.
           lblStatusB.Caption    := DirA + ' does not match match ' + DirB;
           lblHashMatchB.Caption := 'MIS-MATCH! File count is the same, but hashes differ.';
+          sgDirA.Visible := true;
+          sgDirB.Visible := true;
           MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB);
         end;
       end;
@@ -1528,6 +1564,8 @@ begin
         lblHashMatchB.Caption:= 'MIS-MATCH! File counts are different.';
         FileAndHashListA.Sort;
         FileAndHashListB.Sort;
+        sgDirA.Visible := true;
+        sgDirB.Visible := true;
         MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB);
       end; // End of mis-match loop
   finally
@@ -1648,14 +1686,14 @@ begin
                    begin
                      MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
                      sgDirB.Cells[0, j] := IntToStr(j);
-                     sgDirB.Cells[1, j] := 'File in DirA but found in Dir B : ' + ExtractedFileName;
+                     sgDirB.Cells[1, j] := 'File in DirA but NOT found in Dir B : ' + ExtractedFileName;
                      sgDirB.Cells[2, j] := MissingHash;
                    end
                  else
                  begin
                    MisMatchList.Add(ExtractedFileName + ' ' + MissingHash + ' is NOT in both directories');
                    sgDirB.Cells[0, i+1] := IntToStr(i);
-                   sgDirB.Cells[1, i+1] := 'File in DirA but found in Dir B : ' + ExtractedFileName;
+                   sgDirB.Cells[1, i+1] := 'File in DirA but NOT found in Dir B : ' + ExtractedFileName;
                    sgDirB.Cells[2, i+1] := MissingHash;
                  end;
              end;
@@ -1666,6 +1704,19 @@ begin
     if (MisMatchList.Count > 0) then
      begin
        lblStatusB.Caption := 'There is a mis-match between the two directories.';
+       SaveErrorsCompareDirsSaveDialog8.Title := 'Save errors as text file';
+       SaveErrorsCompareDirsSaveDialog8.DefaultExt := 'txt';
+       ShowMessage('Errors were encountered.' + #13#10 +
+                   'You will now be prompted to save the error file.' + #13#10 +
+                   'Press OK to do so');
+       if SaveErrorsCompareDirsSaveDialog8.Execute then
+       begin
+         try
+         MisMatchList.SaveToFile(SaveErrorsCompareDirsSaveDialog8.FileName);
+         finally
+           SaveErrorsCompareDirsSaveDialog8.Free;
+         end;
+       end;
      end
      else
      begin
