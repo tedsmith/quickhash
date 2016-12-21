@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="C:\lazarus-FPC3\fpc\3.0.0\bin\i386-win32\fpc.exe" Date="1231857874"/>
-  <Params Value=" -MDelphi -Sah -O1 -g -gl -l -vewnhibq -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\Ciphers -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\Hashes -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32 -FuC:\lazarus-FPC3\packager\units\i386-win32 -FuC:\Programming\dcpcrypt-2.0.4.1-QWordVer\ -FUC:\Programming\dcpcrypt-2.0.4.1-QWordVer\lib\i386-win32\ -Xd dcpcrypt.pas"/>
-</CONFIG>
