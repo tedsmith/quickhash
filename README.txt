@@ -12,7 +12,7 @@ The next thing to do is to install the DCPCrypt package into your Lazarus IDE, o
 
 Debian Dependancies : fpc, lazarus, lcl, lcl-utils, debhelper (>= 8)
 
-After Lazarus has rebuilt itself, then you can compile QuickHash yourself using Lazarus. I am hopeful this guide might help various Linux distributors include QuickHash into their package management platforms. 
+After Lazarus has rebuilt itself, then you can compile QuickHash yourself using Lazarus. I am hopeful this guide might help various Linux distributors include QuickHash into their package management platforms. In fact, the project LazPackager (https://github.com/prof7bit/LazPackager) seems to be able to help with the creation of deb packages with Lazarus. 
 
 Ted Smith 11/12/16
 
