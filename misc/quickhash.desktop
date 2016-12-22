@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Quick Hash
+Comment=Hash files, text or disks
+GenericName=Graphical data hash tool
+Exec=quickhash
+Terminal=false
+Type=Application
+Icon=quickhash
+Categories=GNOME;GTK;Utility;
+StartupNotify=true
