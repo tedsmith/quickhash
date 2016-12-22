@@ -1,30 +1,45 @@
 # Makefile for Linux
 
+PREFIX ?= /usr
+BIN = quickhash
 PROJECT = project1
 LAZBUILD := lazbuild
 OPTIONS ?=
-ifeq ($(V),1)
-OPTIONS += --verbose
-endif
+# use a local temporary config directory to not register
+# dcpcrypt_laz.lpk permanently and globally
+OPTIONS += --pcp=lazarus_cfg dcpcrypt-2.0.4.1-QWordVer/dcpcrypt_laz.lpk
 
 
-all: $(PROJECT)
+all: $(BIN)
 
 clean:
-	rm -rf lib/
+	rm -rf lib/ lazarus_cfg/
 	rm -f $(BIN) $(PROJECT)
 
 distclean: clean
 	rm -f $(PROJECT).lpi $(PROJECT).ico $(PROJECT).res
 
-$(PROJECT): $(PROJECT).lpi $(PROJECT).ico
+$(BIN): $(PROJECT).lpi $(PROJECT).ico
 	$(LAZBUILD) $(OPTIONS) $<
 
 $(PROJECT).lpi: $(PROJECT)_linux.lpi
 	cp $< $@
 
-$(PROJECT).ico: QuickHash.ico
+$(PROJECT).ico: misc/QuickHash.ico
 	cp $< $@
 
+define \n
+
+
+endef
+
 install:
+	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
+	install -m 755 $(BIN) $(DESTDIR)$(PREFIX)/bin
+	install -d -m 755 $(DESTDIR)$(PREFIX)/share/applications
+	install -m 644 misc/quickhash.desktop $(DESTDIR)$(PREFIX)/share/applications
+	$(foreach SIZE,16 24 32 48 64 96 128,\
+	  install -d -m 755 $(DESTDIR)$(PREFIX)/share/icons/hicolor/$(SIZE)x$(SIZE)/apps ; ${\n}\
+	  install -m 644 misc/quickhash_$(SIZE).png $(DESTDIR)$(PREFIX)/share/icons/hicolor/$(SIZE)x$(SIZE)/apps/quickhash.png ; ${\n})
+
 
