@@ -13,7 +13,7 @@ OPTIONS += --pcp=lazarus_cfg dcpcrypt-2.0.4.1-QWordVer/dcpcrypt_laz.lpk
 all: $(BIN)
 
 clean:
-	rm -rf lib/ lazarus_cfg/
+	rm -rf lib/ dcpcrypt-2.0.4.1-QWordVer/lib/ lazarus_cfg/
 	rm -f $(BIN) $(PROJECT)
 
 distclean: clean
