@@ -1757,7 +1757,6 @@ object MainForm: TMainForm
   end
   object QH_MainFormXMLPropStorage: TXMLPropStorage
     StoredValues = <>
-    FileName = 'QHSettings.xml'
     left = 56
     top = 584
   end

@@ -585,7 +585,6 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#0#11'TOpenDialog'#10'FLBLDialog'#4'left'#2'8'#3'top'#3'h'#1#0#0#6'TTimer'#11
   +'sysRAMTimer'#8'Interval'#3#136#19#7'OnTimer'#7#16'sysRAMTimerTimer'#4'left'
   +#2'8'#3'top'#3'0'#1#0#0#15'TXMLPropStorage'#25'QH_MainFormXMLPropStorage'#12
-  +'StoredValues'#14#0#8'FileName'#6#14'QHSettings.xml'#4'left'#2'8'#3'top'#3'H'
-  +#2#0#0#11'TSaveDialog SaveErrorsCompareDirsSaveDialog8'#4'left'#2'8'#3'top'#3
-  +#128#2#0#0#0
+  +'StoredValues'#14#0#4'left'#2'8'#3'top'#3'H'#2#0#0#11'TSaveDialog SaveErrors'
+  +'CompareDirsSaveDialog8'#4'left'#2'8'#3'top'#3#128#2#0#0#0
 ]);
