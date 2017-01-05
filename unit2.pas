@@ -150,9 +150,7 @@ type
     FileTypeMaskCheckBox1: TCheckBox;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
-    GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
-    gbDirectoryComparisons: TGroupBox;
     GroupBox5: TGroupBox;
     Label15: TLabel;
     pbFileS: TProgressBar;
