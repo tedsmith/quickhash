@@ -921,7 +921,7 @@ var
   lblFilesExamined.Caption      := '...';
   lblPercentageComplete.Caption := '...';
   lblTotalBytesExamined.Caption := '...';
-
+  pbFileS.Position              := 0;
   slDuplicates := TStringList.Create;
   slDuplicates.Sorted := true;
 
@@ -1347,6 +1347,8 @@ var
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
+  MisMatchStatus : boolean;
+
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
   i                                := 0;
@@ -1355,6 +1357,8 @@ begin
   FileHashB                        := '';
   DirA                             := lblDirAName.Caption;
   DirB                             := lblDirBName.Caption;
+  pbCompareDirA.Position := 0;
+  pbCompareDirB.Position := 0;
 
   {$ifdef Windows}
   // Check if a UNC server path is given for either DirA or DirB.
@@ -1374,6 +1378,7 @@ begin
   end;
   {$endif}
 
+  MisMatchStatus                   := false; // Switches to true if a mismatch is identified
   StartTime                        := Now;
   sgDirA.Clean;
   sgDirB.Clean;
@@ -1495,7 +1500,6 @@ begin
         pbCompareDirB.Position := ((FilesProcessed * 100) DIV TotalFilesDirB.Count);
         end;
 
-
     //HashListB.Sort;
     //FileAndHashListB.Sort;
 
@@ -1536,7 +1540,7 @@ begin
         sgDirB.Visible := false;
         // If user only wanted errors to be tabulated, then there is nothing in
         // grids to save, so disable the save buttons
-        if cbShowDetailsOfAllComparisons.Checked then
+        if not cbShowDetailsOfAllComparisons.Checked then
           begin
             btnCopyToClipboardA.Enabled := false;
             btnCopyToClipboardB.Enabled := false;
@@ -1546,6 +1550,7 @@ begin
       else
         begin
           // So the file counts match but the hash lists differ.
+          MisMatchStatus := true;
           lblStatusB.Caption    := DirA + ' does not match match ' + DirB;
           lblHashMatchB.Caption := 'MIS-MATCH! File count is the same, but hashes differ.';
           sgDirA.Visible := true;
@@ -1559,6 +1564,7 @@ begin
     // Start of Mis-Match Loop:
     if (TotalFilesDirB.Count < TotalFilesDirA.Count) or (TotalFilesDirB.Count > TotalFilesDirA.Count) then
       begin
+        MisMatchStatus := true;
         lblHashMatchB.Caption:= 'MIS-MATCH! File counts are different.';
         FileAndHashListA.Sort;
         FileAndHashListB.Sort;
@@ -1568,11 +1574,19 @@ begin
       end; // End of mis-match loop
   finally
     // Only enable the copy to clipboard and save button if the grids have more
-    // rows of data in them besides the header row.
-    if sgDirA.RowCount > 1 then btnCopyToClipboardA.Enabled := true;
-    if sgDirB.RowCount > 1 then btnCopyToClipboardB.Enabled := true;
-    if (sgDirA.RowCount > 1) or (sgDirB.RowCount > 1) then
-      btnSaveComparisons.Enabled  := true;
+    // rows of data in them besides the header row and only if there is some data
+    // to report. If there are no errors, and if the user left checked the option
+    // "Tabulate only encountered errors instead of all files (faster)?" then
+    // then there will be no data to save, or to copy to clipboard.
+    if not cbShowDetailsOfAllComparisons.Checked then
+      begin
+        if sgDirA.RowCount > 1 then btnCopyToClipboardA.Enabled := true;
+        if sgDirB.RowCount > 1 then btnCopyToClipboardB.Enabled := true;
+        sgDirA.Visible:= true;
+        sgDirB.Visible:= true;
+        btnSaveComparisons.Enabled  := true;
+      end;
+
     // Free lists
     HashListA.Free;
     TotalFilesDirA.Free;
@@ -1859,6 +1873,7 @@ begin
   lblTimeTaken6B.Caption           := '...';
   lblTimeTaken6C.Caption           := '...';
   i                                := 0;
+  pbCopy.Position                  := 0;
   StatusBar3.SimpleText            := ('Counting files first...please wait');
   Application.ProcessMessages;
 
