@@ -26,7 +26,7 @@
     </RunParams>
     <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="dcpcrypt_laz"/>
+        <PackageName Value="HashLib4PascalPackage"/>
       </Item1>
       <Item2>
         <PackageName Value="LCL"/>
@@ -46,7 +46,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="dcpcrypt-2.0.4.1-QWordVer/Ciphers;dcpcrypt-2.0.4.1-QWordVer/Hashes;dcpcrypt-2.0.4.1-QWordVer/$(PkgOutDir)"/>
+      <OtherUnitFiles Value="$(PkgOutDir)"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

@@ -7,13 +7,14 @@ LAZBUILD := lazbuild
 OPTIONS ?=
 # use a local temporary config directory to not register
 # dcpcrypt_laz.lpk permanently and globally
-OPTIONS += --pcp=lazarus_cfg dcpcrypt-2.0.4.1-QWordVer/dcpcrypt_laz.lpk
+OPTIONS += --pcp=lazarus_cfg  HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk
 
 
 all: $(BIN)
 
 clean:
-	rm -rf lib/ dcpcrypt-2.0.4.1-QWordVer/lib/ lazarus_cfg/
+	rm -rf lib/ lazarus_cfg/
+	rm -rf HashLib4Pascal/HashLib/src/Packages/FPC/lib/
 	rm -f $(BIN) $(PROJECT)
 
 distclean: clean
