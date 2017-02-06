@@ -18,8 +18,15 @@ uses
   {$endif}
     diskspecification, uProgress, Classes, SysUtils, FileUtil,
     Forms, Controls, Graphics, LazUTF8, strutils,
-    Dialogs, StdCtrls, ComCtrls, ExtCtrls, Menus, sha1Customised,
-    md5Customised;
+    Dialogs, StdCtrls, ComCtrls, ExtCtrls, Menus,
+
+    // DEPRECATED as of v2.8.0
+    // sha1Customised, md5Customised,
+
+    // New as of v2.8.0 - HashLib4Pascal Unit, superseeds DCPCrypt.
+    HlpHashFactory,
+    HlpIHash,
+    HlpIHashResult;
 
 type
 
@@ -29,7 +36,10 @@ type
     btnRefreshDiskList: TButton;
     btnStartHashing: TButton;
     cbdisks: TComboBox;
+    cbLogFile: TCheckBox;
     comboHashChoice: TComboBox;
+    ledtComputedHashD: TLabeledEdit;
+    ledtComputedHashC: TLabeledEdit;
     ledtComputedHashA: TLabeledEdit;
     ledtComputedHashB: TLabeledEdit;
     GroupBox1: TGroupBox;
@@ -48,12 +58,14 @@ type
     menShowDiskTechData: TMenuItem;
     menHashDisk: TMenuItem;
     PopupMenu1: TPopupMenu;
+    sdLogFile: TSaveDialog;
     TreeView1: TTreeView;
 
     // http://forum.lazarus.freepascal.org/index.php/topic,28560.0.html
     procedure btnAbortClick(Sender: TObject);
     procedure btnRefreshDiskListClick(Sender: TObject);
     procedure btnStartHashingClick(Sender: TObject);
+    procedure cbLogFileChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure menHashDiskClick(Sender: TObject);
@@ -128,6 +140,8 @@ begin
 
   ledtComputedHashA.Enabled := false;
   ledtComputedHashB.Enabled := false;
+  ledtComputedHashC.Enabled := false;
+  ledtComputedHashD.Enabled := false;
 
   {$ifdef Windows}
   // These are the Linux centric elements, so disable them on Windows
@@ -175,6 +189,12 @@ end;
 procedure TfrmDiskHashingModule.btnStartHashingClick(Sender: TObject);
 begin
   menHashDiskClick(Sender);
+end;
+
+procedure TfrmDiskHashingModule.cbLogFileChange(Sender: TObject);
+begin
+  if cbLogFile.Checked then cbLogFile.Caption:= 'Create and save a log file';
+  if not cbLogFile.Checked then cbLogFile.Caption:= 'No log file required.';
 end;
 
 
@@ -394,7 +414,7 @@ begin
   slDisklist.Free;
   DisksProcess.Free;
  end;
-{$endif}
+
 
 // Returns a string holding the disk block COUNT (not size) as extracted from the string from
 // /proc/partitions. e.g. : 8  0  312571224 sda
@@ -482,6 +502,7 @@ begin
   end;
   slDevDisk.free;
 end;
+{$endif}
 
 // For extracting the disk size value from the output of UDIsks on Linux
 function ExtractNumbers(s: string): string;
@@ -674,18 +695,33 @@ begin
 // Assigns numeric value to hash algorithm choice to make if else statements used later, faster
 function TfrmDiskHashingModule.InitialiseHashChoice(Sender : TObject) : Integer;
 begin
+  result := -1;
+
   if comboHashChoice.Text = 'MD5' then
     begin
       result := 1;
     end
-  else if comboHashChoice.Text = 'SHA-1' then
-    begin
-      result := 2;
-    end
-  else if comboHashChoice.Text = 'MD5 & SHA-1' then
-    begin
-      result := 3;
-    end;
+      else if comboHashChoice.Text = 'SHA-1' then
+        begin
+          result := 2;
+        end
+          else if comboHashChoice.Text = 'MD5 & SHA-1' then
+            begin
+              result := 3;
+            end
+              else if comboHashChoice.Text = 'SHA256' then
+                begin
+                  result := 4;
+                end
+                  else if comboHashChoice.Text = 'SHA512' then
+                    begin
+                      result := 5;
+                    end
+                      else if comboHashChoice.Text = 'SHA-1 & SHA256' then
+                        begin
+                           result := 6;
+                        end
+                    else result := 7;
 end;
 
 
@@ -925,7 +961,9 @@ const
     SourceDevice    := ledtSelectedItem.Text;
     comboHashChoice.Enabled  := false;
 
-    // Determine what hash algorithm to use. MD5 = 1, SHA-1 = 2, MD5 & SHA-1 = 3, Use Non = 4. -1 is false
+    // Determine what hash algorithm to use.
+    // MD5 = 1, SHA-1 = 2, MD5 & SHA-1 = 3, SHA256 = 4,
+    // SHA512 = 5, SHA-1 & SHA256 = 6, Use Non = 7. -1 is false
     HashChoice := frmDiskHashingModule.InitialiseHashChoice(nil);
     if HashChoice = -1 then abort;
 
@@ -941,7 +979,8 @@ const
     // Check if handle is valid before doing anything else
     if hSelectedDisk = INVALID_HANDLE_VALUE then
     begin
-      RaiseLastOSError;
+     ShowMessage('Could not get exclusive disk access ' +
+     'OS error and code : ' + SysErrorMessageUTF8(GetLastOSError));
     end
     {$else ifdef UNIX}
     hSelectedDisk := FileOpen(SourceDevice, fmOpenRead);
@@ -965,7 +1004,7 @@ const
                    raise Exception.Create('Unable to initiate FSCTL_ALLOW_EXTENDED_DASD_IO.');
           end;
          {$endif}
-        // Source disk handle is OK. So attempt imaging of it
+        // Source disk handle is OK. So attempt reading it
 
         // First, compute the exact disk size of the disk or volume
         {$ifdef Windows}
@@ -1003,13 +1042,13 @@ const
           EndedAt := Now;
           TimeTakenToHash := EndedAt - StartedAt;
           end
-        else ShowMessage('Disk hashing failed\aborted. Only ' + IntToStr(HashResult) + ' bytes read of the reported ' + IntToStr(ExactDiskSize));
+        else ShowMessage('Disk hashing failed\aborted. Try restarting QuickHash.' + #13#10 +
+                         'Only ' + IntToStr(HashResult) + ' bytes read of the reported ' + IntToStr(ExactDiskSize));
 
         // Release existing handle to disk
         try
           if (hSelectedDisk > 0) then
             FileClose(hSelectedDisk);
-
         finally
           comboHashChoice.Enabled  := true;
         end;
@@ -1030,14 +1069,31 @@ const
           slHashLog.Add('Hashing Started At: '        + FormatDateTime('dd/mm/yy HH:MM:SS', StartedAt));
           slHashLog.Add('Hashing Ended At:   '        + FormatDateTime('dd/mm/yy HH:MM:SS', EndedAt));
           slHashLog.Add('Time Taken to hash: '       + FormatDateTime('HHH:MM:SS', TimeTakenToHash));
-          slHashLog.Add('Hash(es) of disk : ' + 'MD5: ' + ledtComputedHashA.Text + ' SHA-1: ' + ledtComputedHashB.Text);
+          slHashLog.Add('Hash(es) of disk : '                + #13#10 +
+                        ' MD5:    ' + ledtComputedHashA.Text + #13#10 +
+                        ' SHA-1:  ' + ledtComputedHashB.Text + #13#10 +
+                        ' SHA256: ' + ledtComputedHashC.Text + #13#10 +
+                        ' SHA512: ' + ledtComputedHashD.Text + #13#10);
           slHashLog.Add('=======================');
         finally
-          // Save the logfile using the image name as its foundation
-          slHashLog.SaveToFile('HashLog.txt');
-          slHashLog.free;
-        end;
-    end;
+        // Save the logfile
+        if cbLogFile.Checked then
+          begin
+           sdLogFile.DefaultExt := 'txt';
+           sdLogFile.Filter := 'Text file|*.txt';
+           sdLogFile.InitialDir := GetCurrentDir;
+           sdLogFile.Title := 'Save your log file as...';
+           if sdLogFile.Execute then
+             begin
+               try
+                 slHashLog.SaveToFile(sdLogFile.FileName);
+               finally
+                 slHashLog.free;
+               end;
+             end else slHashLog.free;
+           end;
+        end; // End of finally
+      end; // end of the 'else' statement relating to the disk handle being initiated OK
     Application.ProcessMessages;
   end;
 
@@ -1045,21 +1101,26 @@ const
 function HashDisk(hDiskHandle : THandle; DiskSize : Int64; HashChoice : Integer) : Int64;
 var
   // Buffer size has to be divisible by the disk size.
-  Buffer                   : array [0..65535] of Byte;   // 8191 (8Kb) 32767 (32Kb) or 1048576 (1Mb) or 262144 (240Kb) or 131072 (120Kb buffer) or 65536 (64Kb buffer)
-  // Hash digests for disk reading
-  MD5ctxDisk               : TMD5Context;
-  SHA1ctxDisk              : TSHA1Context;
-  MD5Digest                : TMD5Digest;
-  SHA1Digest               : TSHA1Digest;
-  BytesRead                : integer;
+  // 64Kb buffer works well. Other options are 8191 (8Kb) 32767 (32Kb) or
+  // 1048576 (1Mb) or 262144 (240Kb) or 131072 (120Kb buffer)
+  Buffer                   : array [0..65535] of Byte;
+  BytesRead, LoopItterator : integer;
   TotalBytesRead           : Int64;
+  // New HashLib4Pascal hash digests for disk reading in v2.8.0 upwards.
+  // DCPCrypt digests deprecated.
+  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512: IHash;
+  HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256, HashInstanceResultSHA512 : IHashResult;
 
 begin
   BytesRead           := 0;
   TotalBytesRead      := 0;
+  LoopItterator       := 0;
   frmProgress.ProgressBar1.Position := 0;
   frmProgress.lblTotalBytesSource.Caption := ' bytes read of ' + IntToStr(DiskSize);
   frmProgress.lblStatus.Caption := ' Hashing disk...please wait';
+
+  // Initialise buffer
+  FillChar(Buffer, SizeOf(Buffer), 0);
 
   frmProgress.Show;
 
@@ -1067,21 +1128,42 @@ begin
     // Initialise the hash digests in accordance with the users chosen algorithm
     if HashChoice = 1 then
       begin
-      MD5Init(MD5ctxDisk);
+        HashInstanceMD5 := THashFactory.TCrypto.CreateMD5();
+        HashInstanceMD5.Initialize();
       end
-      else if HashChoice = 2 then
-        begin
-        SHA1Init(SHA1ctxDisk);
-        end
-          else if HashChoice = 3 then
-            begin
-              MD5Init(MD5ctxDisk);
-              SHA1Init(SHA1ctxDisk);
-            end
-            else if HashChoice = 4 then
+        else if HashChoice = 2 then
+          begin
+            HashInstanceSHA1 := THashFactory.TCrypto.CreateSHA1();
+            HashInstanceSHA1.Initialize();
+          end
+            else if HashChoice = 3 then
               begin
-               // No hashing initiliased
-              end;
+               HashInstanceMD5 := THashFactory.TCrypto.CreateMD5();
+               HashInstanceMD5.Initialize();
+               HashInstanceSHA1 := THashFactory.TCrypto.CreateSHA1();
+               HashInstanceSHA1.Initialize();
+              end
+                else if HashChoice = 4 then
+                  begin
+                    HashInstanceSHA256 := THashFactory.TCrypto.CreateSHA2_256();
+                    HashInstanceSHA256.Initialize();
+                  end
+                    else if HashChoice = 5 then
+                    begin
+                      HashInstanceSHA512 := THashFactory.TCrypto.CreateSHA2_512();
+                      HashInstanceSHA512.Initialize();
+                    end
+                      else if HashChoice = 6 then // SHA-1 & SHA256
+                      begin
+                        HashInstanceSHA1 := THashFactory.TCrypto.CreateSHA1();
+                        HashInstanceSHA1.Initialize();
+                        HashInstanceSHA256 := THashFactory.TCrypto.CreateSHA2_256();
+                        HashInstanceSHA256.Initialize();
+                      end
+                      else if HashChoice = 6 then
+                        begin
+                         // No hashing initiliased
+                        end;
     // Now to seek to start of device
     FileSeek(hDiskHandle, 0, 0);
       repeat
@@ -1092,66 +1174,88 @@ begin
             BytesRead    := FileRead(hDiskHandle, Buffer, (DiskSize - TotalBytesRead));
             if BytesRead = -1 then
             begin
-              RaiseLastOSError;
+              ShowMessage('Disk read error near byte ' + IntToStr(TotalBytesRead) + '. ' + SysErrorMessageUTF8(GetLastOSError));
               exit;
             end
               else inc(TotalBytesRead, BytesRead);
           end
           else
             begin
-              // But if buffer is full, just read fully
+              // But if amount left to read is equal to buffer capacity, just read the full amount
               BytesRead    := FileRead(hDiskHandle, Buffer, SizeOf(Buffer));
+              if BytesRead = -1 then
+                begin
+                  ShowMessage('Disk read error near byte ' + IntToStr(TotalBytesRead) + '. ' + SysErrorMessageUTF8(GetLastOSError));
+                  exit;
+                end
+                  else inc(TotalBytesRead, BytesRead);
             end;
-            if BytesRead = -1 then
-              begin
-                RaiseLastOSError;
-                exit;
-              end
-                else inc(TotalBytesRead, BytesRead);
-
         frmProgress.lblTotalBytesRead.Caption:= IntToStr(TotalBytesRead);
         frmProgress.ProgressBar1.Position := Trunc((TotalBytesRead/DiskSize)*100);
         frmProgress.lblPercent.Caption := ' (' + IntToStr(frmProgress.ProgressBar1.Position) + '%)';
 
         // Hash the bytes read and\or written using the algorithm required
         // If the user selected no hashing, break the loop immediately; faster
-        if HashChoice = 4 then
+        if HashChoice = 7 then
           begin
            // No hashing initiliased
           end
           else if HashChoice = 1 then
             begin
-              MD5Update(MD5ctxDisk, Buffer, BytesRead);
+              HashInstanceMD5.TransformUntyped(Buffer, BytesRead);
             end
               else if HashChoice = 2 then
                 begin
-                  SHA1Update(SHA1ctxDisk, Buffer, BytesRead);
+                 HashInstanceSHA1.TransformUntyped(Buffer, BytesRead);
                 end
                   else if HashChoice = 3 then
                     begin
-                      MD5Update(MD5ctxDisk, Buffer, BytesRead);
-                      SHA1Update(SHA1ctxDisk, Buffer, BytesRead);
-                    end;
-      Application.ProcessMessages;
+                      HashInstanceMD5.TransformUntyped(Buffer, BytesRead);
+                      HashInstanceSHA1.TransformUntyped(Buffer, BytesRead);
+                    end
+                      else if HashChoice = 4 then
+                        begin
+                         HashInstanceSHA256.TransformUntyped(Buffer, BytesRead);
+                        end
+                          else if HashChoice = 5 then
+                            begin
+                             HashInstanceSHA512.TransformUntyped(Buffer, BytesRead);
+                            end
+                              else if HashChoice = 6 then
+                                begin
+                                 HashInstanceSHA1.TransformUntyped(Buffer, BytesRead);
+                                 HashInstanceSHA256.TransformUntyped(Buffer, BytesRead);
+                                end;
+      // Only refresh the interface when a few loops have gone by
+      inc(LoopItterator, 1);
+      if LoopItterator = 150 then
+        begin
+          LoopItterator := 0;
+          Application.ProcessMessages;
+        end;
       until (TotalBytesRead = DiskSize) or (frmDiskHashingModule.Stop = true);
   finally
     // Compute the final hashes of disk and image
     if HashChoice = 1 then
       begin
-      MD5Final(MD5ctxDisk, MD5Digest);
+       HashInstanceResultMD5 := HashInstanceMD5.TransformFinal();
         begin
           // MD5 Disk hash
           frmDiskHashingModule.ledtComputedHashA.Clear;
           frmDiskHashingModule.ledtComputedHashA.Visible := true;
           frmDiskHashingModule.ledtComputedHashA.Enabled := true;
-          frmDiskHashingModule.ledtComputedHashA.Text    := Uppercase(MD5Print(MD5Digest));
+          frmDiskHashingModule.ledtComputedHashA.Text    := Uppercase(HashInstanceResultMD5.ToString());
           frmDiskHashingModule.ledtComputedHashB.Visible := false;
+          frmDiskHashingModule.ledtComputedHashC.Enabled := false;
+          frmDiskHashingModule.ledtComputedHashC.Visible := false;
+          frmDiskHashingModule.ledtComputedHashD.Enabled := false;
+          frmDiskHashingModule.ledtComputedHashD.Visible := false;
         end;
       end
         else if HashChoice = 2 then
           begin
             // SHA-1 hash only
-            SHA1Final(SHA1ctxDisk, SHA1Digest);
+            HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
             begin
               // SHA1 Disk Hash
               frmDiskHashingModule.ledtComputedHashA.Visible := false;
@@ -1159,33 +1263,108 @@ begin
               frmDiskHashingModule.ledtComputedHashB.Clear;
               frmDiskHashingModule.ledtComputedHashB.Enabled := true;
               frmDiskHashingModule.ledtComputedHashB.Visible := true;
-              frmDiskHashingModule.ledtComputedHashB.Text    := Uppercase(SHA1Print(SHA1Digest));
+              frmDiskHashingModule.ledtComputedHashB.Text    := Uppercase(HashInstanceResultSHA1.ToString());
+              frmDiskHashingModule.ledtComputedHashC.Enabled := false;
+              frmDiskHashingModule.ledtComputedHashC.Visible := false;
+              frmDiskHashingModule.ledtComputedHashD.Enabled := false;
+              frmDiskHashingModule.ledtComputedHashD.Visible := false;
             end;
           end
             else if HashChoice = 3 then
               begin
                 // MD5 and SHA-1 together
-                MD5Final(MD5ctxDisk, MD5Digest);
-                SHA1Final(SHA1ctxDisk, SHA1Digest);
+                HashInstanceResultMD5  := HashInstanceMD5.TransformFinal();
+                HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
                 // Disk hash
                 frmDiskHashingModule.ledtComputedHashA.Clear;
                 frmDiskHashingModule.ledtComputedHashA.Visible := true;
                 frmDiskHashingModule.ledtComputedHashA.Enabled := true;
-                frmDiskHashingModule.ledtComputedHashA.Text    := Uppercase(MD5Print(MD5Digest));
+                frmDiskHashingModule.ledtComputedHashA.Text    := Uppercase(HashInstanceResultMD5.ToString());
 
                 frmDiskHashingModule.ledtComputedHashB.Clear;
                 frmDiskHashingModule.ledtComputedHashB.Visible := true;
                 frmDiskHashingModule.ledtComputedHashB.Enabled := true;
-                frmDiskHashingModule.ledtComputedHashB.Text    := Uppercase(SHA1Print(SHA1Digest));
+                frmDiskHashingModule.ledtComputedHashB.Text    := Uppercase(HashInstanceResultSHA1.ToString());
               end
-              else if HashChoice = 4 then
+            else if HashChoice = 4 then
+              begin
+                // SHA-256 hash only
+                HashInstanceResultSHA256 := HashInstanceSHA256.TransformFinal();
+                begin
+                  // SHA256 Disk Hash
+                  frmDiskHashingModule.ledtComputedHashA.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashA.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashA.Clear;
+                  frmDiskHashingModule.ledtComputedHashB.Clear;
+                  frmDiskHashingModule.ledtComputedHashB.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashB.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashC.Clear;
+                  frmDiskHashingModule.ledtComputedHashC.Enabled := true;
+                  frmDiskHashingModule.ledtComputedHashC.Visible := true;
+                  frmDiskHashingModule.ledtComputedHashC.Text    := Uppercase(HashInstanceResultSHA256.ToString());
+                  frmDiskHashingModule.ledtComputedHashD.Clear;
+                  frmDiskHashingModule.ledtComputedHashD.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashD.Visible := false;
+                end;
+              end
+            else if HashChoice = 5 then
+              begin
+                // SHA-512 hash only
+                HashInstanceResultSHA512 := HashInstanceSHA512.TransformFinal();
+                begin
+                  // SHA512 Disk Hash
+                  frmDiskHashingModule.ledtComputedHashA.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashA.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashA.Clear;
+                  frmDiskHashingModule.ledtComputedHashB.Clear;
+                  frmDiskHashingModule.ledtComputedHashB.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashB.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashC.Clear;
+                  frmDiskHashingModule.ledtComputedHashC.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashC.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashD.Clear;
+                  frmDiskHashingModule.ledtComputedHashD.Enabled := true;
+                  frmDiskHashingModule.ledtComputedHashD.Visible := true;
+                  frmDiskHashingModule.ledtComputedHashD.Text    := Uppercase(HashInstanceResultSHA512.ToString());
+                end;
+              end
+            else if HashChoice = 6 then
+              begin
+                // SHA-1 & SHA-256 hash only
+               HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
+               HashInstanceResultSHA256 := HashInstanceSHA256.TransformFinal();
+                begin
+                  // SHA-1 & SHA256 Disk Hash
+                  frmDiskHashingModule.ledtComputedHashA.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashA.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashA.Clear;
+                  frmDiskHashingModule.ledtComputedHashB.Clear;
+                  frmDiskHashingModule.ledtComputedHashB.Enabled := true;
+                  frmDiskHashingModule.ledtComputedHashB.Visible := true;
+                  frmDiskHashingModule.ledtComputedHashB.Text    := Uppercase(HashInstanceResultSHA1.ToString());
+                  frmDiskHashingModule.ledtComputedHashC.Clear;
+                  frmDiskHashingModule.ledtComputedHashC.Enabled := true;
+                  frmDiskHashingModule.ledtComputedHashC.Visible := true;
+                  frmDiskHashingModule.ledtComputedHashC.Text    := Uppercase(HashInstanceResultSHA256.ToString());
+                  frmDiskHashingModule.ledtComputedHashD.Clear;
+                  frmDiskHashingModule.ledtComputedHashD.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashD.Visible := false;
+                end;
+              end
+            else if HashChoice = 7 then
                 begin
                  frmDiskHashingModule.ledtComputedHashA.Text    := Uppercase('No hash computed');
                  frmDiskHashingModule.ledtComputedHashB.Text    := Uppercase('No hash computed');
+                 frmDiskHashingModule.ledtComputedHashC.Text    := Uppercase('No hash computed');
+                 frmDiskHashingModule.ledtComputedHashD.Text    := Uppercase('No hash computed');
                  frmDiskHashingModule.ledtComputedHashA.Enabled := true;
                  frmDiskHashingModule.ledtComputedHashA.Visible := true;
                  frmDiskHashingModule.ledtComputedHashB.Enabled := true;
                  frmDiskHashingModule.ledtComputedHashB.Visible := true;
+                 frmDiskHashingModule.ledtComputedHashC.Enabled := true;
+                 frmDiskHashingModule.ledtComputedHashC.Visible := true;
+                 frmDiskHashingModule.ledtComputedHashC.Enabled := true;
+                 frmDiskHashingModule.ledtComputedHashC.Visible := true;
                  frmProgress.lblStatus.Caption      := 'No verification conducted';
                 end;
       end;

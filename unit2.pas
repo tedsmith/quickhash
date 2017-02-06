@@ -12,13 +12,9 @@
     Benchmark tests are welcomed to test on across various platforms and architectures.
 
     Contributions from members at the Lazarus forums, Stackoverflow and other
-    StackExchnage groups are welcomed and acknowledged. In particular, user Engkin
-    (http://forum.lazarus.freepascal.org/index.php?action=profile;u=52702) who
-    helped with the speeds of the SHA1 and MD5 implementations ENORMOUSLY, David Heferman of the
-    Stackoverflow forums who helped me with the methodology of hashing in buffers
-    and Taazz who pointed out where I'd made some daft mistakes. Thanks guys!
+    StackExchnage groups are welcomed and acknowledged.
 
-    Copyright (C) 2011-2016  Ted Smith https://sourceforge.net/users/tedtechnology
+    Copyright (C) 2011-2017  Ted Smith www.quickhash-gui.org
 
     NOTE: Date and time values, as computed in recursive directory hashing, are not
     daylight saving time adjusted. Source file date and time values are recorded.
@@ -39,14 +35,31 @@
 
 }
 
-unit Unit2; // Unit 1 was superseeded and related to pre v2.0.0
+unit Unit2; // Unit 1 was superseeded with v2.0.0
 
 {$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
 
 interface
 
 uses
-  {$IFDEF UNIX}
+{ Deprecated uses clauses, discarded as a result of migrating to HashLib4Pascal
+   with QuickHash v2.8.0 in Feb 2017.
+
+// previously we had to use a customised MD5 & SHA-1 library to process Unicode on Windows and
+// to run a customised MD5Transform and SHA1Transform function that was converted to assembly.
+// No longer needed but the source code remains in the project because the
+// Assembly transforms that forum user Engkin helped me with rocked!
+
+md5customised,
+sha1customised,
+
+// The DCPCrypt library was used for SHA256 and SHA512 which are not part of FPC
+// but as of v2.80, DCPCrypt was discarded in favour of HashLib4Pascal
+
+DCPsha512, DCPsha256, DCPsha1, DCPmd5,
+}
+
+{$IFDEF UNIX}
     {$IFDEF UseCThreads}
       cthreads,
     {$ENDIF}
@@ -58,23 +71,16 @@ uses
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
-  // we have to use a customised MD5 library to process Unicode on Windows and
-  // to run a customised MD5Transform function
-  md5customised,
-  // we use a customised SHA1 library to process Unicode on Windows and to run
-  // a customised SHA1Transform function
-  sha1customised,
-
-  // The DCPCrypt library, for some of the hashing algorithms used in certain
-  // circumstances. SHA256 and SHA512 are not part of FPC:
-    DCPsha512, DCPsha256, DCPsha1, DCPmd5,
+  // New as of v2.8.0 - HashLib4Pascal Unit, superseeds DCPCrypt.
+  HlpHashFactory,
+  HlpIHash,
+  HlpIHashResult,
 
   // Remaining Uses clauses for specific OS's
   {$IFDEF Windows}
     Windows,
     // For Windows, this is a specific disk hashing tab for QuickHash. Not needed for Linux
      types;
-//DiskModuleUnit1, types;
   {$ENDIF}
   {$IFDEF Darwin}
     MacOSAll;
@@ -311,6 +317,7 @@ type
     procedure HashText(Sender: TObject);
     procedure ClearText(Sender: TObject);
     procedure MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
+    function  ValidateTextWithHash(strToBeHashed:ansistring): string;
     function  CalcTheHashString(strToBeHashed:ansistring):string;
     function  CalcTheHashFile(FileToBeHashed:string):string;
     function  FormatByteSize(const bytes: QWord): string;
@@ -608,27 +615,31 @@ procedure TMainForm.HashText(Sender: TObject);
 var
   strHashValueText : string;
 begin
-  if Length(memoHashText.Text) = 0 then
-    begin
-      StrHashValue.Caption := 'Awaiting input in text field...';
-    end
-    else
+  if memoHashText.Lines[0] = 'Type or paste text here - hash will update as you type' then
+  begin
+    StrHashValue.Caption := 'Awaiting valid input in text field...';
+  end
+  else
+    if Length(memoHashText.Text) = 0 then
       begin
-       strHashValueText := Trim(Uppercase(CalcTheHashString(memoHashText.Text)));
-       StrHashValue.Caption := strHashValueText;
-
-       if lbleExpectedHashText.Text <> '...' then
-       begin
-       if strHashValueText = Trim(Uppercase(lbleExpectedHashText.Text)) then
-         begin
-           Showmessage('Expected hash matches the generated text hash, OK');
-         end
-       else
-         begin
-           Showmessage('Expected hash DOES NOT match the generated text hash!');
-         end;
-      end;
-    end;
+        StrHashValue.Caption := 'Awaiting input in text field...';
+      end
+      else
+        begin
+         strHashValueText := Trim(Uppercase(CalcTheHashString(memoHashText.Text)));
+         StrHashValue.Caption := strHashValueText;
+         if lbleExpectedHashText.Text <> '...' then
+           begin
+           if strHashValueText = Trim(Uppercase(lbleExpectedHashText.Text)) then
+             begin
+               Showmessage('Expected hash matches the generated text hash, OK');
+             end
+           else
+             begin
+               Showmessage('Expected hash DOES NOT match the generated text hash!');
+             end;
+           end;
+        end;
 end;
 
 procedure TMainForm.btnHashFileClick(Sender: TObject);
@@ -1400,6 +1411,7 @@ begin
     Application.ProcessMessages;
     TotalFilesDirA          := FindAllFilesEx(LongPathOverrideA+DirA, '*', True, True);
     TotalFilesDirA.Sort;
+    lblTotalFileCountNumberA.Caption := IntToStr(TotalFilesDirA.Count);
     sgDirA.RowCount         := TotalFilesDirA.Count + 1;
     HashListA               := TStringList.Create;
     FileAndHashListA        := TStringList.Create;
@@ -1454,6 +1466,7 @@ begin
     Application.ProcessMessages;
     TotalFilesDirB           := FindAllFilesEx(LongPathOverrideB+DirB, '*', True, True);
     TotalFilesDirB.Sort;
+    lblTotalFileCountNumberB.Caption := IntToStr(TotalFilesDirB.Count);
     if cbShowDetailsOfAllComparisons.Checked = false then
       sgDirB.RowCount        := TotalFilesDirB.Count + 1;
 
@@ -1528,9 +1541,10 @@ begin
     }
     if ((TotalFilesDirB.Count - TotalFilesDirA.Count) = 0) or ((TotalFilesDirA.Count - TotalFilesDirB.Count) = 0) then
       begin
-      // We compare the hashlists using SHA-1 to see if they match.
-      HashOfListA    := SHA1Print(SHA1String(HashListA.Text));
-      HashOfListB    := SHA1Print(SHA1String(HashListB.Text));
+      // We compare the hashlists using a hash to see if they match.
+      // Whatever hash the user has chosen will be used - it's only text.
+      HashOfListA    := ValidateTextWithHash(HashListA.Text);
+      HashOfListB    := ValidateTextWithHash(HashListB.Text);
       if HashOfListA = HashOfListB then
         begin
         lblStatusB.Caption := 'Finished examining files. ' + DirA + ' matches ' + DirB;
@@ -2147,10 +2161,52 @@ begin
       Application.ProcessMessages;
     end;
 end;
-// As strings are so quick to compute, I have used the DCPCrypt library for all
-// of the 4 hashing algorithms for consistancy and simplicity. This differs though
-// for file and disk hashing, where speed is more important - see CalcTheHashFile
 
+// New as of v2.8.0 : ValidateTextWithHash : Used as a generic text hashing function for use elsewhere
+// besides the 'Text' tab, for example, when comparing lists of data in the compare tab
+// The result is a SHA256 string on success, empty on failure.
+function TMainForm.ValidateTextWithHash(strToBeHashed:ansistring) : string;
+begin
+  result := '';
+  result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+end;
+
+// For use in the 'Text' tab only, for hashing text elements. Not to be used
+// for general text hashing. To do that, use ValidateTextWithHash and examine
+// the resulting SHA256 value
+function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
+var
+  TabRadioGroup1: TRadioGroup;
+begin
+  result := '';
+  if Length(strToBeHashed) > 0 then
+    begin
+      case PageControl1.TabIndex of
+        0: TabRadioGroup1 := AlgorithmChoiceRadioBox1;  //RadioGroup on the 1st tab.
+        1: TabRadioGroup1 := AlgorithmChoiceRadioBox2;  //RadioGroup on the 2nd tab.
+        2: TabRadioGroup1 := AlgorithmChoiceRadioBox3;  //RadioGroup on the 3rd tab.
+        3: TabRadioGroup1 := AlgorithmChoiceRadioBox4;  //RadioGroup on the 4th tab.
+        4: TabRadioGroup1 := AlgorithmChoiceRadioBox6;  //RadioGroup on the 5th tab.
+      end;
+
+      case TabRadioGroup1.ItemIndex of
+        0: begin
+             result := THashFactory.TCrypto.CreateMD5().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
+        1: begin
+             result := THashFactory.TCrypto.CreateSHA1().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
+        2: begin
+             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
+        3: begin
+             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
+      end;
+    end; // End of string length check
+end;
+
+{ DEPRECATED AS OF V2.8.0 in favour of HashLib4Pascal library instead of DCPCrypt
 function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 
   var
@@ -2224,7 +2280,111 @@ function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
     end;
     result := GeneratedHash;  // return the resultant hash digest, if successfully computed
   end;
+}
 
+function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
+const
+  BufSize = 16 * 1024;  // 64kb buffer
+var
+  TabRadioGroup2: TRadioGroup;
+  fsFileToBeHashed: TFileStream;
+  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512: IHash;
+  HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256, HashInstanceResultSHA512 : IHashResult;
+  Buffer: array [0 .. BufSize - 1] of Byte;
+  i : Integer;
+begin
+  case PageControl1.TabIndex of
+        0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
+        1: TabRadioGroup2 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
+        2: TabRadioGroup2 := AlgorithmChoiceRadioBox3;  //RadioGroup for FileS.
+        3: TabRadioGroup2 := AlgorithmChoiceRadioBox4;  //RadioGroup for Copy.
+        4: TabRadioGroup2 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
+        5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Direcories.
+  end;
+
+  { For each hash instance, it has to be created, then initialised, populated,
+    and finally converted to a string result.
+  }
+  try
+    fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyWrite);
+    if fsFileToBeHashed.Handle > -1 then
+    begin
+      case TabRadioGroup2.ItemIndex of
+        0: begin
+          // MD5
+          HashInstanceMD5 := THashFactory.TCrypto.CreateMD5();
+          HashInstanceMD5.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceMD5.TransformUntyped(Buffer, i);
+              end;
+            until false;
+          HashInstanceResultMD5 := HashInstanceMD5.TransformFinal();
+          result := HashInstanceResultMD5.ToString()
+          end; // End of MD5
+
+        1: begin
+          // SHA-1
+          HashInstanceSHA1 := THashFactory.TCrypto.CreateSHA1();
+          HashInstanceSHA1.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceSHA1.TransformUntyped(Buffer, i);
+              end;
+            until false;
+          HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
+          result := HashInstanceResultSHA1.ToString()
+          end; // End of SHA-1
+
+        2: begin
+          // SHA256
+          HashInstanceSHA256 := THashFactory.TCrypto.CreateSHA2_256();
+          HashInstanceSHA256.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceSHA256.TransformUntyped(Buffer, i);
+              end;
+            until false;
+          HashInstanceResultSHA256 := HashInstanceSHA256.TransformFinal();
+          result := HashInstanceResultSHA256.ToString()
+          end;  // End of SHA256
+
+        3: begin
+          // SHA512
+          HashInstanceSHA512 := THashFactory.TCrypto.CreateSHA2_512();
+          HashInstanceSHA512.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceSHA512.TransformUntyped(Buffer, i);
+              end;
+            until false;
+          HashInstanceResultSHA512 := HashInstanceSHA512.TransformFinal();
+          result := HashInstanceResultSHA512.ToString()
+          end;  // End of SHA512
+      end; // end of case statement
+    end // End of FS handle check
+    else ShowMessage('File handle could not be initiated. Check file is not open.');
+  finally
+    fsFileToBeHashed.free;
+  end;
+end;
+{DEPRECATED AS OF V2.8.0 in favour of HashLib4Pascal library instead of DCPCrypt
 function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
   var
     {MD5 and SHA1 utilise the LCL functions, whereas SHA256 and SHA512 utilise
@@ -2378,7 +2538,7 @@ function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
     end;
   result := GeneratedHash;  // return the resultant hash digest, if successfully computed
   end;
-
+}
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
 var
   SizeOfFile : int64;
