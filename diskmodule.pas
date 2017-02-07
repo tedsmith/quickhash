@@ -62,12 +62,13 @@ type
     TreeView1: TTreeView;
 
     // http://forum.lazarus.freepascal.org/index.php/topic,28560.0.html
-    procedure btnAbortClick(Sender: TObject);
+    procedure btnAbortHashingClick(Sender: TObject);
     procedure btnRefreshDiskListClick(Sender: TObject);
     procedure btnStartHashingClick(Sender: TObject);
     procedure cbLogFileChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure ledtSelectedItemChange(Sender: TObject);
     procedure menHashDiskClick(Sender: TObject);
     procedure menShowDiskManagerClick(Sender: TObject);
     procedure TreeView1SelectionChanged(Sender: TObject);
@@ -79,7 +80,6 @@ type
   private
     { private declarations }
   public
-    Stop : boolean;
     BytesPerSector : integer;
     { public declarations }
   end;
@@ -87,8 +87,9 @@ type
 var
   frmDiskHashingModule: TfrmDiskHashingModule;
   PhyDiskNode, PartitionNoNode, DriveLetterNode           : TTreeNode;
-  HashChoice : integer;
+  HashChoice, ExecutionCount : integer;
   slOffsetsOfHits          : TStringList;
+  Stop : boolean;
 
   {$ifdef Windows}
   // These four functions are needed for traversing the attached disks in Windows.
@@ -137,7 +138,7 @@ var
 begin
   Stop := false;
   MissingFileCount := 0;
-
+  ExecutionCount := 0;
   ledtComputedHashA.Enabled := false;
   ledtComputedHashB.Enabled := false;
   ledtComputedHashC.Enabled := false;
@@ -168,6 +169,11 @@ begin
  {$endif}
 end;
 
+procedure TfrmDiskHashingModule.ledtSelectedItemChange(Sender: TObject);
+begin
+
+end;
+
 procedure TfrmDiskHashingModule.btnRefreshDiskListClick(Sender: TObject);
 begin
   {$ifdef Windows}
@@ -188,6 +194,7 @@ end;
 
 procedure TfrmDiskHashingModule.btnStartHashingClick(Sender: TObject);
 begin
+  diskmodule.Stop := false; // if a hash was previously run and aborted, the flag needs to be reset for run 2
   menHashDiskClick(Sender);
 end;
 
@@ -197,14 +204,16 @@ begin
   if not cbLogFile.Checked then cbLogFile.Caption:= 'No log file required.';
 end;
 
-
-procedure TfrmDiskHashingModule.btnAbortClick(Sender: TObject);
+procedure TfrmDiskHashingModule.btnAbortHashingClick(Sender: TObject);
 begin
-  Stop := TRUE;
+  Stop := true;
+
   if Stop = TRUE then
   begin
     ledtComputedHashA.Text := 'Process aborted.';
     ledtComputedHashB.Text := 'Process aborted.';
+    ledtComputedHashC.Text := 'Process aborted.';
+    ledtComputedHashD.Text := 'Process aborted.';
     Abort;
   end;
 end;
@@ -1031,19 +1040,29 @@ const
         // Now hash the chosen device, passing the exact size and
         // hash selection and Image name.
         StartedAt := Now;
-
+        frmProgress.lblResult.Caption := 'Hashing ' + ledtSelectedItem.Text;
+        frmProgress.lblProgressStartTime.Caption := 'Started At: ' + FormatDateTime('dd/mm/yy HH:MM:SS', StartedAt);
         // Start the disk hashing...
         HashResult := HashDisk(hSelectedDisk, ExactDiskSize, HashChoice);
-
+        // Disk hashing completed
         If HashResult = ExactDiskSize then
           begin
           frmProgress.lblStatus.Caption := 'Disk hashed OK. ' + IntToStr(ExactDiskSize)+' bytes read.';
-          frmProgress.lblResult.Caption := 'Finished';
+          frmProgress.lblResult.Caption := 'Finished hashing ' + ledtSelectedItem.Text;
           EndedAt := Now;
           TimeTakenToHash := EndedAt - StartedAt;
+          frmProgress.lblProgressEndedAt.Caption := 'Ended At: '     + FormatDateTime('dd/mm/yy HH:MM:SS', EndedAt);
+          frmProgress.lblProgressTimeTaken.Caption := 'Time Taken: ' + FormatDateTime('HHH:MM:SS', TimeTakenToHash);
           end
-        else ShowMessage('Disk hashing failed\aborted. Try restarting QuickHash.' + #13#10 +
+        else
+          begin
+            ShowMessage('Disk hashing failed or was aborted.' + #13#10 +
                          'Only ' + IntToStr(HashResult) + ' bytes read of the reported ' + IntToStr(ExactDiskSize));
+            frmDiskHashingModule.ledtComputedHashA.Text := 'Aborted or failed to compute';
+            frmDiskHashingModule.ledtComputedHashB.Text := 'Aborted or failed to compute';
+            frmDiskHashingModule.ledtComputedHashC.Text := 'Aborted or failed to compute';
+            frmDiskHashingModule.ledtComputedHashD.Text := 'Aborted or failed to compute';
+          end;
 
         // Release existing handle to disk
         try
@@ -1086,11 +1105,12 @@ const
            if sdLogFile.Execute then
              begin
                try
+                 frmProgress.Close;
                  slHashLog.SaveToFile(sdLogFile.FileName);
                finally
                  slHashLog.free;
                end;
-             end else slHashLog.free;
+             end else slHashLog.free; // free it anyway if user doesnt want log file
            end;
         end; // End of finally
       end; // end of the 'else' statement relating to the disk handle being initiated OK
@@ -1233,7 +1253,7 @@ begin
           LoopItterator := 0;
           Application.ProcessMessages;
         end;
-      until (TotalBytesRead = DiskSize) or (frmDiskHashingModule.Stop = true);
+      until (TotalBytesRead = DiskSize) or (Stop = true);
   finally
     // Compute the final hashes of disk and image
     if HashChoice = 1 then

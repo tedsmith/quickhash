@@ -126,6 +126,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.ParentColor = False
       TabOrder = 5
       Text = '...'
+      OnChange = ledtSelectedItemChange
     end
     object comboHashChoice: TComboBox
       Left = 144
@@ -169,6 +170,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.Width = 464
       EditLabel.Caption = 'Device Hash MD5'
       EditLabel.ParentColor = False
+      ReadOnly = True
       TabOrder = 3
       Text = '...'
     end
@@ -187,6 +189,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.Width = 464
       EditLabel.Caption = 'Device Hash SHA-1'
       EditLabel.ParentColor = False
+      ReadOnly = True
       TabOrder = 4
       Text = '...'
     end
@@ -234,6 +237,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.Width = 735
       EditLabel.Caption = 'Device Hash SHA256'
       EditLabel.ParentColor = False
+      ReadOnly = True
       TabOrder = 8
       Text = '...'
     end
@@ -252,6 +256,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.Width = 735
       EditLabel.Caption = 'Device Hash SHA512'
       EditLabel.ParentColor = False
+      ReadOnly = True
       TabOrder = 9
       Text = '...'
     end
