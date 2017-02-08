@@ -26,6 +26,7 @@ type
     ProgressBar1: TProgressBar;
     procedure btnAbortHashingClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
+    procedure FormCreate(Sender: TObject);
   private
     { private declarations }
   public
@@ -44,10 +45,12 @@ uses
 
 { TfrmProgress }
 
-
-procedure TfrmProgress.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+procedure TfrmProgress.FormCreate(Sender: TObject);
 begin
-  lblStatus.Caption:= 'Aborting...';
+  // Reset labels if run again before exiting QuickHash
+  lblProgressStartTime.Caption := 'Started at : ';
+  lblProgressEndedAt.Caption   := 'Ended at: ';
+  lblProgressTimeTaken.Caption := 'Time taken: ';
 end;
 
 procedure TfrmProgress.btnAbortHashingClick(Sender: TObject);
@@ -58,6 +61,15 @@ begin
   frmDiskHashingModule.ledtComputedHashC.Text := 'Aborted';
   frmDiskHashingModule.ledtComputedHashD.Text := 'Aborted';
   frmProgress.Close;
+end;
+
+procedure TfrmProgress.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  lblStatus.Caption:= 'Aborting...';
+  // Reset labels if run again before exiting QuickHash
+  lblProgressStartTime.Caption := 'Started at : ';
+  lblProgressEndedAt.Caption   := 'Ended at: ';
+  lblProgressTimeTaken.Caption := 'Time taken: ';
 end;
 
 end.

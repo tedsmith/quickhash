@@ -14,25 +14,25 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   LCLVersion = '1.6.2.0'
   object Label2: TLabel
     Left = 16
-    Height = 15
+    Height = 13
     Top = 88
-    Width = 46
+    Width = 38
     Caption = 'Vendor:'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 16
-    Height = 15
+    Height = 13
     Top = 128
-    Width = 39
+    Width = 32
     Caption = 'Model:'
     ParentColor = False
   end
   object Label4: TLabel
     Left = 16
-    Height = 15
+    Height = 13
     Top = 168
-    Width = 57
+    Width = 46
     Caption = 'Serial No:'
     ParentColor = False
   end
@@ -65,9 +65,9 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object Label5: TLabel
     Left = 16
-    Height = 15
+    Height = 13
     Top = 208
-    Width = 31
+    Width = 28
     Caption = 'Type:'
     ParentColor = False
   end
@@ -86,17 +86,17 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     Top = 14
     Width = 759
     Anchors = [akTop, akLeft, akRight]
-    ClientHeight = 584
-    ClientWidth = 757
+    ClientHeight = 568
+    ClientWidth = 755
     TabOrder = 0
     object TreeView1: TTreeView
       Left = 8
       Height = 136
       Hint = 'Left click a physical disk or logical volume to select it'#10'Right click a selection for other options'
       Top = 48
-      Width = 737
+      Width = 735
       Anchors = [akTop, akLeft, akRight]
-      DefaultItemHeight = 18
+      DefaultItemHeight = 16
       HotTrack = True
       ParentShowHint = False
       PopupMenu = PopupMenu1
@@ -109,9 +109,9 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object ledtSelectedItem: TLabeledEdit
       Left = 144
-      Height = 25
+      Height = 21
       Top = 208
-      Width = 593
+      Width = 591
       Anchors = [akTop, akLeft, akRight]
       Color = clGradientInactiveCaption
       EditLabel.AnchorSideLeft.Control = ledtSelectedItem
@@ -119,9 +119,9 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = ledtSelectedItem
       EditLabel.Left = 144
-      EditLabel.Height = 15
-      EditLabel.Top = 190
-      EditLabel.Width = 593
+      EditLabel.Height = 13
+      EditLabel.Top = 192
+      EditLabel.Width = 591
       EditLabel.Caption = 'Selected Item:'
       EditLabel.ParentColor = False
       TabOrder = 5
@@ -130,10 +130,10 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object comboHashChoice: TComboBox
       Left = 144
-      Height = 27
+      Height = 21
       Top = 248
       Width = 112
-      ItemHeight = 0
+      ItemHeight = 13
       ItemIndex = 1
       Items.Strings = (
         'MD5'
@@ -142,7 +142,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
         'SHA256'
         'SHA512'
         'SHA-1 & SHA256'
-        'xxHash (fast)'
+        'xxHash64 (fast)'
       )
       TabOrder = 1
       Text = 'SHA-1'
@@ -158,7 +158,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object ledtComputedHashA: TLabeledEdit
       Left = 8
-      Height = 25
+      Height = 21
       Top = 328
       Width = 464
       EditLabel.AnchorSideLeft.Control = ledtComputedHashA
@@ -166,8 +166,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = ledtComputedHashA
       EditLabel.Left = 8
-      EditLabel.Height = 15
-      EditLabel.Top = 310
+      EditLabel.Height = 13
+      EditLabel.Top = 312
       EditLabel.Width = 464
       EditLabel.Caption = 'Device Hash MD5'
       EditLabel.ParentColor = False
@@ -177,7 +177,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object ledtComputedHashB: TLabeledEdit
       Left = 8
-      Height = 25
+      Height = 21
       Top = 384
       Width = 464
       EditLabel.AnchorSideLeft.Control = ledtComputedHashB
@@ -185,8 +185,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = ledtComputedHashB
       EditLabel.Left = 8
-      EditLabel.Height = 15
-      EditLabel.Top = 366
+      EditLabel.Height = 13
+      EditLabel.Top = 368
       EditLabel.Width = 464
       EditLabel.Caption = 'Device Hash SHA-1'
       EditLabel.ParentColor = False
@@ -205,10 +205,10 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object cbdisks: TComboBox
       Left = 64
-      Height = 29
+      Height = 21
       Top = 8
       Width = 288
-      ItemHeight = 0
+      ItemHeight = 13
       OnChange = cbdisksChange
       Style = csDropDownList
       TabOrder = 7
@@ -216,16 +216,16 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object Label1: TLabel
       Left = 16
-      Height = 15
+      Height = 13
       Top = 16
-      Width = 29
+      Width = 23
       Caption = 'Disk:'
       ParentColor = False
       Visible = False
     end
     object ledtComputedHashC: TLabeledEdit
       Left = 8
-      Height = 25
+      Height = 21
       Top = 440
       Width = 735
       EditLabel.AnchorSideLeft.Control = ledtComputedHashC
@@ -233,8 +233,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = ledtComputedHashC
       EditLabel.Left = 8
-      EditLabel.Height = 15
-      EditLabel.Top = 422
+      EditLabel.Height = 13
+      EditLabel.Top = 424
       EditLabel.Width = 735
       EditLabel.Caption = 'Device Hash SHA256'
       EditLabel.ParentColor = False
@@ -244,7 +244,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object ledtComputedHashD: TLabeledEdit
       Left = 8
-      Height = 25
+      Height = 21
       Top = 489
       Width = 735
       EditLabel.AnchorSideLeft.Control = ledtComputedHashD
@@ -252,8 +252,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = ledtComputedHashD
       EditLabel.Left = 8
-      EditLabel.Height = 15
-      EditLabel.Top = 471
+      EditLabel.Height = 13
+      EditLabel.Top = 473
       EditLabel.Width = 735
       EditLabel.Caption = 'Device Hash SHA512'
       EditLabel.ParentColor = False
@@ -263,10 +263,10 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object cbLogFile: TCheckBox
       Left = 288
-      Height = 22
+      Height = 17
       Hint = 'Software title, Hashes, start times, '#13#10'end times, time taken, dates etc will '#13#10'be logged at the end of the process'
       Top = 248
-      Width = 182
+      Width = 148
       Caption = 'Create and save a log file?'
       Checked = True
       OnChange = cbLogFileChange
@@ -277,7 +277,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
     object ledtComputedHashE: TLabeledEdit
       Left = 8
-      Height = 25
+      Height = 21
       Top = 532
       Width = 735
       EditLabel.AnchorSideLeft.Control = ledtComputedHashE
@@ -285,8 +285,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = ledtComputedHashE
       EditLabel.Left = 8
-      EditLabel.Height = 15
-      EditLabel.Top = 514
+      EditLabel.Height = 13
+      EditLabel.Top = 516
       EditLabel.Width = 735
       EditLabel.Caption = 'Device Hash xxHash'
       EditLabel.ParentColor = False

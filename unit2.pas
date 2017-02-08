@@ -33,6 +33,12 @@
     You can read a copy of the GNU General Public License at
     http://www.gnu.org/licenses/>. Also, http://www.gnu.org/copyleft/gpl.html
 
+    HashLib4Pascal and xxHash64 libraries are both licensed under the MIT License
+    https://opensource.org/licenses/MIT
+
+    HashLib4Pascal : https://github.com/Xor-el/HashLib4Pascal
+    xxHash64       : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/
+
 }
 
 unit Unit2; // Unit 1 was superseeded with v2.0.0
@@ -268,6 +274,7 @@ type
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
     QH_MainFormXMLPropStorage: TXMLPropStorage;
+    procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
@@ -866,6 +873,11 @@ begin
     sgDirA.Visible := true;
     sgDirB.Visible := true;
   end;
+end;
+
+procedure TMainForm.AlgorithmChoiceRadioBox1Click(Sender: TObject);
+begin
+
 end;
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
@@ -2202,6 +2214,9 @@ begin
         3: begin
              result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
+        4: begin
+           result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
       end;
     end; // End of string length check
 end;
@@ -2288,8 +2303,10 @@ const
 var
   TabRadioGroup2: TRadioGroup;
   fsFileToBeHashed: TFileStream;
-  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512: IHash;
-  HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256, HashInstanceResultSHA512 : IHashResult;
+  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512,
+    HashInstancexxHash64: IHash;
+  HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256,
+    HashInstanceResultSHA512, HashInstanceResultxxHash64 : IHashResult;
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
 begin
@@ -2377,6 +2394,24 @@ begin
           HashInstanceResultSHA512 := HashInstanceSHA512.TransformFinal();
           result := HashInstanceResultSHA512.ToString()
           end;  // End of SHA512
+
+        4: begin
+          // xxHash64
+          HashInstancexxHash64 := THashFactory.THash64.CreateXXHash64();
+          HashInstancexxHash64.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstancexxHash64.TransformUntyped(Buffer, i);
+              end;
+            until false;
+          HashInstanceResultxxHash64 := HashInstancexxHash64.TransformFinal();
+          result := HashInstanceResultxxHash64.ToString()
+          end;  // End of xxHash64
+
       end; // end of case statement
     end // End of FS handle check
     else ShowMessage('File handle could not be initiated. Check file is not open.');

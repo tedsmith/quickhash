@@ -734,7 +734,7 @@ begin
                         begin
                           result := 6;
                         end
-                          else if comboHashChoice.Text = 'xxHash (fast)' then
+                          else if comboHashChoice.Text = 'xxHash64 (fast)' then
                           begin
                             result := 7;
                           end
@@ -1100,7 +1100,7 @@ const
                         ' SHA-1:  ' + ledtComputedHashB.Text + #13#10 +
                         ' SHA256: ' + ledtComputedHashC.Text + #13#10 +
                         ' SHA512: ' + ledtComputedHashD.Text + #13#10 +
-                        ' xxHash: ' + ledtComputedHashE.Text + #13#10);
+                        ' xxHash64: ' + ledtComputedHashE.Text + #13#10);
           slHashLog.Add('=======================');
         finally
         // Save the logfile

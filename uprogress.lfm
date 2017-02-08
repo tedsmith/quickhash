@@ -8,6 +8,7 @@ object frmProgress: TfrmProgress
   ClientHeight = 322
   ClientWidth = 421
   OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
   Position = poDesktopCenter
   ShowHint = True
   LCLVersion = '1.6.2.0'
