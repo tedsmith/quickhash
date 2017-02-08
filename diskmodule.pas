@@ -145,6 +145,7 @@ begin
   ledtComputedHashB.Enabled := false;
   ledtComputedHashC.Enabled := false;
   ledtComputedHashD.Enabled := false;
+  ledtComputedHashE.Enabled := false;
 
   {$ifdef Windows}
   // These are the Linux centric elements, so disable them on Windows
@@ -216,6 +217,7 @@ begin
     ledtComputedHashB.Text := 'Process aborted.';
     ledtComputedHashC.Text := 'Process aborted.';
     ledtComputedHashD.Text := 'Process aborted.';
+    ledtComputedHashE.Text := 'Process aborted.';
     Abort;
   end;
 end;
