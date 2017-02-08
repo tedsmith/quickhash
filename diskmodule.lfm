@@ -1,7 +1,7 @@
 object frmDiskHashingModule: TfrmDiskHashingModule
-  Left = 412
+  Left = 464
   Height = 623
-  Top = 189
+  Top = 158
   Width = 787
   Caption = 'QuickHash v2.8.0 - Disk Hashing Module'
   ClientHeight = 623
@@ -82,11 +82,11 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object GroupBox1: TGroupBox
     Left = 14
-    Height = 552
+    Height = 586
     Top = 14
     Width = 759
     Anchors = [akTop, akLeft, akRight]
-    ClientHeight = 534
+    ClientHeight = 568
     ClientWidth = 755
     TabOrder = 0
     object TreeView1: TTreeView
@@ -142,6 +142,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
         'SHA256'
         'SHA512'
         'SHA-1 & SHA256'
+        'xxHash (fast)'
       )
       TabOrder = 1
       Text = 'SHA-1'
@@ -273,6 +274,24 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       ShowHint = True
       State = cbChecked
       TabOrder = 10
+    end
+    object ledtComputedHashE: TLabeledEdit
+      Left = 8
+      Height = 21
+      Top = 532
+      Width = 735
+      EditLabel.AnchorSideLeft.Control = ledtComputedHashE
+      EditLabel.AnchorSideRight.Control = ledtComputedHashE
+      EditLabel.AnchorSideRight.Side = asrBottom
+      EditLabel.AnchorSideBottom.Control = ledtComputedHashE
+      EditLabel.Left = 8
+      EditLabel.Height = 13
+      EditLabel.Top = 516
+      EditLabel.Width = 735
+      EditLabel.Caption = 'Device Hash xxHash'
+      EditLabel.ParentColor = False
+      TabOrder = 11
+      Text = '...'
     end
   end
   object ImageList1: TImageList

@@ -2284,7 +2284,7 @@ function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 
 function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
 const
-  BufSize = 16 * 1024;  // 64kb buffer
+  BufSize = 64 * 1024;  // 64kb buffer
 var
   TabRadioGroup2: TRadioGroup;
   fsFileToBeHashed: TFileStream;
