@@ -142,7 +142,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
         'SHA256'
         'SHA512'
         'SHA-1 & SHA256'
-        'xxHash64 (fast)'
+        'xxHash (fast)'
       )
       TabOrder = 1
       Text = 'SHA-1'

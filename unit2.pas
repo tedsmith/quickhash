@@ -82,6 +82,7 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
   HlpIHash,
   HlpIHashResult,
 
+
   // Remaining Uses clauses for specific OS's
   {$IFDEF Windows}
     Windows,
@@ -391,9 +392,6 @@ type
           {$ENDIF}
      {$ENDIF}
   {$ENDIF}
-
-
-
    end;
 
 var
@@ -455,6 +453,22 @@ begin
   // (as of v2.7.0)
   sgDirA.Visible := false;
   sgDirB.Visible := false;
+
+  {$ifdef CPU64}
+  AlgorithmChoiceRadioBox1.Items.Strings[4] := 'xxHash64';
+  AlgorithmChoiceRadioBox2.Items.Strings[4] := 'xxHash64';
+  AlgorithmChoiceRadioBox3.Items.Strings[4] := 'xxHash64';
+  AlgorithmChoiceRadioBox4.Items.Strings[4] := 'xxHash64';
+  AlgorithmChoiceRadioBox5.Items.Strings[4] := 'xxHash64';
+  AlgorithmChoiceRadioBox6.Items.Strings[4] := 'xxHash64';
+  {$else if CPU32}
+  AlgorithmChoiceRadioBox1.Items.Strings[4] := 'xxHash32';
+  AlgorithmChoiceRadioBox2.Items.Strings[4] := 'xxHash32';
+  AlgorithmChoiceRadioBox3.Items.Strings[4] := 'xxHash32';
+  AlgorithmChoiceRadioBox4.Items.Strings[4] := 'xxHash32';
+  AlgorithmChoiceRadioBox5.Items.Strings[4] := 'xxHash32';
+  AlgorithmChoiceRadioBox6.Items.Strings[4] := 'xxHash32';
+  {$endif}
 
   // Better to have some folder icons for each node of the tree but
   // I can't work out at the moment how to do it for ever folder.
@@ -2215,7 +2229,11 @@ begin
              result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
         4: begin
-           result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           {$ifdef CPU64}
+            result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           {$else if CPU32}
+            result := THashFactory.THash32.CreateXXHash32().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           {$endif}
            end;
       end;
     end; // End of string length check
@@ -2303,10 +2321,21 @@ const
 var
   TabRadioGroup2: TRadioGroup;
   fsFileToBeHashed: TFileStream;
-  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512,
-    HashInstancexxHash64: IHash;
+  // HashLib4Pascal types for MD5, SHA-1, SHA256 and SHA-512
+  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512 : IHash;
   HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256,
-    HashInstanceResultSHA512, HashInstanceResultxxHash64 : IHashResult;
+    HashInstanceResultSHA512 : IHashResult;
+  // HashLib4Pascal types for xxHash. xxHash64 is crazy fast on 64, but if run on a 32-bit
+  // system, performance is hindered considerably. So for this algorithm, CPU dependant
+  // instances are created
+{$ifdef CPU64}
+    HashInstancexxHash64       : IHash;
+    HashInstanceResultxxHash64 : IHashResult;
+{$else if CPU32}
+  HashInstancexxHash32         : IHash;
+  HashInstanceResultxxHash32   : IHashResult;
+{$endif}
+
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
 begin
@@ -2396,7 +2425,8 @@ begin
           end;  // End of SHA512
 
         4: begin
-          // xxHash64
+          // xxHash
+          {$ifdef CPU64}
           HashInstancexxHash64 := THashFactory.THash64.CreateXXHash64();
           HashInstancexxHash64.Initialize();
             repeat
@@ -2410,7 +2440,22 @@ begin
             until false;
           HashInstanceResultxxHash64 := HashInstancexxHash64.TransformFinal();
           result := HashInstanceResultxxHash64.ToString()
-          end;  // End of xxHash64
+          {$else if CPU32}
+          HashInstancexxHash32 := THashFactory.THash32.CreateXXHash32();
+          HashInstancexxHash32.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstancexxHash32.TransformUntyped(Buffer, i);
+              end;
+            until false;
+          HashInstanceResultxxHash32 := HashInstancexxHash32.TransformFinal();
+          result := HashInstanceResultxxHash32.ToString()
+          {$endif}
+          end;  // End of xxHash
 
       end; // end of case statement
     end // End of FS handle check

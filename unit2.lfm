@@ -158,7 +158,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
         Left = 16
-        Height = 118
+        Height = 129
         Hint = 'Having typed some text in the text area, you can'#13#10'easily recompute different hashes for the text inputted'#13#10'by choosing a different hash algorithm'
         Top = 10
         Width = 96
@@ -172,7 +172,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 97
+        ClientHeight = 108
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -181,7 +181,7 @@ object MainForm: TMainForm
           'SHA-1'
           'SHA256'
           'SHA512'
-          'xxHash64'
+          'xxHash'
         )
         OnClick = AlgorithmChoiceRadioBox1Click
         OnSelectionChanged = HashText
@@ -193,7 +193,7 @@ object MainForm: TMainForm
       object SystemRAMGroupBox: TGroupBox
         Left = 16
         Height = 81
-        Top = 137
+        Top = 152
         Width = 96
         Caption = 'System RAM'
         ClientHeight = 60
@@ -343,7 +343,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup
         Left = 16
-        Height = 121
+        Height = 129
         Top = 10
         Width = 96
         AutoFill = True
@@ -356,7 +356,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 100
+        ClientHeight = 108
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -365,7 +365,7 @@ object MainForm: TMainForm
           'SHA-1'
           'SHA256'
           'SHA512'
-          'xxHash64'
+          'xxHash'
         )
         OnSelectionChanged = AlgorithmChoiceRadioBox2SelectionChanged
         ParentFont = False
@@ -677,7 +677,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox3: TRadioGroup
         Left = 16
-        Height = 114
+        Height = 129
         Top = 10
         Width = 96
         AutoFill = True
@@ -690,7 +690,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 93
+        ClientHeight = 108
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -699,7 +699,7 @@ object MainForm: TMainForm
           'SHA-1'
           'SHA256'
           'SHA512'
-          'xxHash64'
+          'xxHash'
         )
         ParentFont = False
         TabOrder = 1
@@ -1051,7 +1051,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox4: TRadioGroup
         Left = 16
-        Height = 118
+        Height = 129
         Top = 10
         Width = 96
         AutoFill = True
@@ -1064,7 +1064,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 97
+        ClientHeight = 108
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1073,7 +1073,7 @@ object MainForm: TMainForm
           'SHA-1'
           'SHA256'
           'SHA512'
-          'xxHash64'
+          'xxHash'
         )
         ParentFont = False
         TabOrder = 1
@@ -1085,7 +1085,7 @@ object MainForm: TMainForm
       ClientWidth = 978
       object AlgorithmChoiceRadioBox5: TRadioGroup
         Left = 16
-        Height = 118
+        Height = 129
         Top = 10
         Width = 96
         AutoFill = True
@@ -1098,7 +1098,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 97
+        ClientHeight = 108
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1107,7 +1107,7 @@ object MainForm: TMainForm
           'SHA-1'
           'SHA256'
           'SHA512'
-          'xxHash64'
+          'xxHash'
         )
         OnSelectionChanged = AlgorithmChoiceRadioBox5SelectionChanged
         ParentFont = False
@@ -1567,7 +1567,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox6: TRadioGroup
         Left = 16
-        Height = 118
+        Height = 129
         Top = 10
         Width = 96
         AutoFill = True
@@ -1580,7 +1580,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 97
+        ClientHeight = 108
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1589,7 +1589,7 @@ object MainForm: TMainForm
           'SHA-1'
           'SHA256'
           'SHA512'
-          'xxHash64'
+          'xxHash'
         )
         ParentFont = False
         TabOrder = 2

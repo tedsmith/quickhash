@@ -26,8 +26,7 @@ uses
     // New as of v2.8.0 - HashLib4Pascal Unit, superseeds DCPCrypt.
     HlpHashFactory,
     HlpIHash,
-    HlpIHashResult,
-    HlpXXHash64;
+    HlpIHashResult;
 
 type
 
@@ -146,6 +145,13 @@ begin
   ledtComputedHashC.Enabled := false;
   ledtComputedHashD.Enabled := false;
   ledtComputedHashE.Enabled := false;
+  {$ifdef CPU64}
+  ledtComputedHashE.Caption:= 'Device Hash xxHash64';
+  comboHashChoice.Items.Strings[6] := 'xxHash64';
+  {$else if CPU32}
+  ledtComputedHashE.Caption:= 'Device Hash xxHash32';
+  comboHashChoice.Items.Strings[6] := 'xxHash32';
+  {$endif}
 
   {$ifdef Windows}
   // These are the Linux centric elements, so disable them on Windows
@@ -734,7 +740,7 @@ begin
                         begin
                           result := 6;
                         end
-                          else if comboHashChoice.Text = 'xxHash64 (fast)' then
+                          else if (comboHashChoice.Text = 'xxHash32') or (comboHashChoice.Text = 'xxHash64') then
                           begin
                             result := 7;
                           end
@@ -1100,7 +1106,7 @@ const
                         ' SHA-1:  ' + ledtComputedHashB.Text + #13#10 +
                         ' SHA256: ' + ledtComputedHashC.Text + #13#10 +
                         ' SHA512: ' + ledtComputedHashD.Text + #13#10 +
-                        ' xxHash64: ' + ledtComputedHashE.Text + #13#10);
+                        ' xxHash: ' + ledtComputedHashE.Text + #13#10);
           slHashLog.Add('=======================');
         finally
         // Save the logfile
@@ -1138,9 +1144,16 @@ var
   // DCPCrypt digests deprecated.
   HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512: IHash;
   HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256, HashInstanceResultSHA512 : IHashResult;
-  HashInstancexxHash64   : IHash;
-  HashInstancexxHash64Result : IHashResult;
-  //HashInstanceResultxxHash64 : TXXHash64;
+
+  {$ifdef CPU64}
+    HashInstancexxHash64       : IHash;
+    HashInstancexxHash64Result : IHashResult;
+  {$else ifdef CPU32}
+    HashInstancexxHash32       : IHash;
+    HashInstancexxHash32Result : IHashResult;
+  {$endif}
+
+
 begin
   BytesRead           := 0;
   TotalBytesRead      := 0;
@@ -1192,8 +1205,13 @@ begin
                       end
                         else if HashChoice = 7 then // Uber fast xxHash
                         begin
+                         {$ifdef CPU64}
                           HashInstancexxHash64 := THashFactory.THash64.CreateXXHash64();
                           HashInstancexxHash64.Initialize();
+                         {$else ifdef CPU32}
+                          HashInstancexxHash32 := THashFactory.THash32.CreateXXHash32();
+                          HashInstancexxHash32.Initialize();
+                         {$endif}
                         end
                           else if HashChoice = 8 then
                             begin
@@ -1263,7 +1281,11 @@ begin
                                 end
                                   else if HashChoice = 7 then
                                   begin
+                                    {$ifdef CPU64}
                                      HashInstancexxHash64.TransformUntyped(Buffer, BytesRead);
+                                    {$else if CPU32}
+                                     HashInstancexxHash32.TransformUntyped(Buffer, BytesRead);
+                                    {$endif}
                                   end;
       // Only refresh the interface when a few loops have gone by
       inc(LoopItterator, 1);
@@ -1412,7 +1434,11 @@ begin
             else if HashChoice = 7 then
               begin
                 // xxHash only
-                HashInstancexxHash64Result :=  HashInstancexxHash64.TransformFinal();
+                {$ifdef CPU64}
+                  HashInstancexxHash64Result :=  HashInstancexxHash64.TransformFinal();
+                {$else if CPU32}
+                  HashInstancexxHash32Result :=  HashInstancexxHash32.TransformFinal();
+                {$endif}
                 begin
                   // xxHash Disk Hash
                   frmDiskHashingModule.ledtComputedHashA.Enabled := false;
@@ -1432,7 +1458,11 @@ begin
                   frmDiskHashingModule.ledtComputedHashE.Clear;
                   frmDiskHashingModule.ledtComputedHashE.Enabled := true;
                   frmDiskHashingModule.ledtComputedHashE.Visible := true;
-                  frmDiskHashingModule.ledtComputedHashE.Text    := Uppercase(HashInstancexxHash64Result.ToString());
+                  {$ifdef CPU64}
+                    frmDiskHashingModule.ledtComputedHashE.Text    := Uppercase(HashInstancexxHash64Result.ToString());
+                  {$else if CPU32}
+                    frmDiskHashingModule.ledtComputedHashE.Text    := Uppercase(HashInstancexxHash32Result.ToString());
+                  {$endif}
                 end;
               end
             else if HashChoice = 8 then
