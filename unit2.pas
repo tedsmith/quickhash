@@ -666,7 +666,7 @@ end;
 
 procedure TMainForm.btnHashFileClick(Sender: TObject);
 var
-  filename : string;
+  filename : widestring;
   fileHashValue : ansistring;
   start, stop, elapsed : TDateTime;
 
@@ -683,7 +683,7 @@ begin
   Label1.Caption           := '';
   memFileHashField.Clear;
 
-  if FileExistsUTF8(filename) then
+  if FileExists(filename) then
   begin
     start := Now;
     lblStartedFileAt.Caption := 'Started at  : '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
@@ -2368,7 +2368,7 @@ begin
   }
   try
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyWrite);
-    if fsFileToBeHashed.Handle > -1 then
+    if fsFileToBeHashed.Handle <> INVALID_HANDLE_VALUE then
     begin
       case TabRadioGroup2.ItemIndex of
         0: begin
