@@ -146,10 +146,8 @@ begin
   ledtComputedHashD.Enabled := false;
   ledtComputedHashE.Enabled := false;
   {$ifdef CPU64}
-  ledtComputedHashE.Caption:= 'Device Hash xxHash64';
   comboHashChoice.Items.Strings[6] := 'xxHash64';
   {$else if CPU32}
-  ledtComputedHashE.Caption:= 'Device Hash xxHash32';
   comboHashChoice.Items.Strings[6] := 'xxHash32';
   {$endif}
 

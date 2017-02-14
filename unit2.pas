@@ -166,6 +166,7 @@ type
     GroupBox4: TGroupBox;
     GroupBox5: TGroupBox;
     Label15: TLabel;
+    lbEndedFileAt: TLabel;
     pbFileS: TProgressBar;
     pbCopy: TProgressBar;
     pbCompareDirA: TProgressBar;
@@ -224,8 +225,8 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    lblTimeTaken1: TLabel;
-    lblTimeTaken2: TLabel;
+    lblStartedFileAt: TLabel;
+    lblFileTimeTaken: TLabel;
     AlgorithmChoiceRadioBox2: TRadioGroup;
     lblTotalFileCountA: TLabel;
     lblTotalFileCountB: TLabel;
@@ -582,8 +583,8 @@ begin
   StatusBar1.SimpleText := '';
 
   // First, clear the captions from any earlier file hashing actions
-  lblTimeTaken1.Caption := '';
-  lblTimeTaken2.Caption := '';
+  lblStartedFileAt.Caption := '';
+  lblFileTimeTaken.Caption := '';
   Label1.Caption := '';
   memFileHashField.Clear;
 
@@ -597,7 +598,7 @@ begin
     if FileExistsUTF8(filename) then
      begin
        start := Now;
-       lblTimeTaken1.Caption := 'Started at  : '+ TimeToStr(Start);
+       lblStartedFileAt.Caption := 'Started at  : '+ TimeToStr(Start);
        Tabsheet2.Show;
        edtFileNameToBeHashed.Caption := (filename);
        label1.Caption := 'Hashing file... ';
@@ -611,7 +612,7 @@ begin
 
        stop := Now;
        elapsed := stop - start;
-       lblTimeTaken2.Caption := 'Time taken : '+ TimeToStr(elapsed);
+       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
 
         // If the user has ane existing hash to check against the drag n drop file
         // compare it here
@@ -676,15 +677,16 @@ begin
       filename := OpenDialog1.Filename;
     end;
   // First, clear the captions from any earlier file hashing actions
-  lblTimeTaken1.Caption := '';
-  lblTimeTaken2.Caption := '';
-  Label1.Caption := '';
+  lblStartedFileAt.Caption := '';
+  lbEndedFileAt.Caption    := '';
+  lblFileTimeTaken.Caption := '';
+  Label1.Caption           := '';
   memFileHashField.Clear;
 
   if FileExistsUTF8(filename) then
   begin
     start := Now;
-    lblTimeTaken1.Caption := 'Started at  : '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
+    lblStartedFileAt.Caption := 'Started at  : '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
 
     edtFileNameToBeHashed.Caption := (filename);
     label1.Caption := 'Hashing file... ';
@@ -712,8 +714,8 @@ begin
         Showmessage('Expected hash DOES NOT match the computed file hash!');
       end;
     end;
-
-    lblTimeTaken2.Caption := 'Time taken : '+ TimeToStr(elapsed);
+    lbEndedFileAt.Caption    := 'Ended at : '+ TimeToStr(stop);
+    lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
     Application.ProcessMessages;
   end
   else
@@ -2156,15 +2158,28 @@ end;
 procedure TMainForm.AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
 var
   HashValue : ansistring;
+  start, stop, elapsed : TDateTime;
 begin
   if edtFileNameToBeHashed.Text <> 'File being hashed...' then
     begin
+      // First, clear the captions from any earlier file hashing actions
+      lblStartedFileAt.Caption := '';
+      lbEndedFileAt.Caption    := 'awaiting new end time...';
+      lblFileTimeTaken.Caption := 'awaiting recomputation...';
+      Label1.Caption := '';
       memFileHashField.Clear;
       StatusBar1.SimpleText := 'RECOMPUTING NEW HASH VALUE...Please wait.';
+      start := Now;
+      lblStartedFileAt.Caption := 'Started at : '+ TimeToStr(start);
       Application.ProcessMessages;
       HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text);
       memFileHashField.Lines.Add(Uppercase(HashValue));
+      stop := Now;
+      elapsed := stop - start;
       StatusBar1.SimpleText := 'RECOMPUTED NEW HASH VALUE.';
+      lbEndedFileAt.Caption:= 'Ended at : '+ TimeToStr(stop);
+      lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
+      Application.ProcessMessages;
     end;
 end;
 

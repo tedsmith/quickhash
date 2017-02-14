@@ -82,11 +82,11 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   end
   object GroupBox1: TGroupBox
     Left = 14
-    Height = 586
+    Height = 594
     Top = 14
     Width = 759
     Anchors = [akTop, akLeft, akRight]
-    ClientHeight = 568
+    ClientHeight = 576
     ClientWidth = 755
     TabOrder = 0
     object TreeView1: TTreeView
@@ -278,7 +278,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     object ledtComputedHashE: TLabeledEdit
       Left = 8
       Height = 21
-      Top = 532
+      Top = 544
       Width = 735
       EditLabel.AnchorSideLeft.Control = ledtComputedHashE
       EditLabel.AnchorSideRight.Control = ledtComputedHashE
@@ -286,7 +286,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       EditLabel.AnchorSideBottom.Control = ledtComputedHashE
       EditLabel.Left = 8
       EditLabel.Height = 13
-      EditLabel.Top = 516
+      EditLabel.Top = 528
       EditLabel.Width = 735
       EditLabel.Caption = 'Device Hash xxHash'
       EditLabel.ParentColor = False

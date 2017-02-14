@@ -250,7 +250,7 @@ object MainForm: TMainForm
           ParentColor = False
           WordWrap = True
         end
-        object lblTimeTaken1: TLabel
+        object lblStartedFileAt: TLabel
           Left = 224
           Height = 16
           Top = 16
@@ -258,10 +258,10 @@ object MainForm: TMainForm
           Caption = '...'
           ParentColor = False
         end
-        object lblTimeTaken2: TLabel
+        object lblFileTimeTaken: TLabel
           Left = 224
           Height = 16
-          Top = 40
+          Top = 64
           Width = 12
           Caption = '...'
           ParentColor = False
@@ -339,6 +339,14 @@ object MainForm: TMainForm
           EditLabel.ParentColor = False
           TabOrder = 4
           Text = '...'
+        end
+        object lbEndedFileAt: TLabel
+          Left = 224
+          Height = 16
+          Top = 40
+          Width = 12
+          Caption = '...'
+          ParentColor = False
         end
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup
