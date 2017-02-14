@@ -2368,7 +2368,11 @@ begin
   }
   try
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyWrite);
+    {$ifdef Windows}
     if fsFileToBeHashed.Handle <> INVALID_HANDLE_VALUE then
+    {$else ifdef UNIX}
+    if fsFileToBeHashed.Handle > -1 then
+    {$endif}
     begin
       case TabRadioGroup2.ItemIndex of
         0: begin
