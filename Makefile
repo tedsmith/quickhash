@@ -6,7 +6,7 @@ PROJECT = project1
 LAZBUILD := lazbuild
 OPTIONS ?=
 # use a local temporary config directory to not register
-# dcpcrypt_laz.lpk permanently and globally
+# the used package(s) permanently and globally
 OPTIONS += --pcp=lazarus_cfg  HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk
 
 
