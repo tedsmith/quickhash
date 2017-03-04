@@ -1,0 +1,17 @@
+quickhash (2.8.0-1) unstable; urgency=low
+
+  * New release version
+
+ -- Ted Smith <tedsmith28@yahoo.co.uk>  Wed, 15 Feb 2017 14:36:02 +0100
+
+quickhash (2.7.0-1) unstable; urgency=low
+
+  * New release version
+
+ -- Ted Smith <tedsmith28@yahoo.co.uk>  Wed, 21 Dec 2016 12:20:18 +0000
+
+quickhash (2.7.0) UNRELEASED; urgency=low
+
+  * Create Debian package
+
+ -- Ted Smith <tedsmith28@yahoo.co.uk>  Wed, 21 Dec 2016 12:00:00 +0000

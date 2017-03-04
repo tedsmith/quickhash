@@ -1,0 +1,23 @@
+Source: quickhash
+Maintainer: Ted Smith <tedsmith28@yahoo.co.uk>
+Section: misc
+Priority: optional
+Build-Depends: debhelper (>= 9), fpc, lazarus, lcl, lcl-utils
+Standards-Version: 3.9.5
+Homepage: http://quickhash-gui.org/
+Vcs-Git: https://github.com/tedsmith/quickhash.git
+Vcs-Browser: https://github.com/tedsmith/quickhash
+
+Package: quickhash
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Graphical data hashing tool
+ Quickhash is a graphical means for users to easily
+ hash data such as text, files, or even disks using Linux
+ without knowing command line syntax. 
+ .
+ It can also be used for copying files from one folder to another
+ where hashes are computed prior to copying and afterwards.
+ .
+ Users can compare to files, or compare two folders, using hash
+ anaysis to be sure one matches the other
