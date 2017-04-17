@@ -17,10 +17,10 @@ object MainForm: TMainForm
     Height = 658
     Top = 24
     Width = 986
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -161,7 +161,7 @@ object MainForm: TMainForm
         Height = 129
         Hint = 'Having typed some text in the text area, you can'#13#10'easily recompute different hashes for the text inputted'#13#10'by choosing a different hash algorithm'
         Top = 10
-        Width = 96
+        Width = 104
         AutoFill = True
         Caption = 'Algorithm'
         ChildSizing.LeftRightSpacing = 6
@@ -173,7 +173,7 @@ object MainForm: TMainForm
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
         ClientHeight = 108
-        ClientWidth = 92
+        ClientWidth = 100
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
@@ -430,10 +430,10 @@ object MainForm: TMainForm
           TabOrder = 5
         end
         object DirSelectedField: TEdit
-          Left = 6
+          Left = 8
           Height = 24
           Hint = 'The chosen parent directory'
-          Top = 104
+          Top = 112
           Width = 828
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
@@ -454,7 +454,7 @@ object MainForm: TMainForm
           Left = 552
           Height = 16
           Top = 56
-          Width = 68
+          Width = 88
           Anchors = [akTop, akLeft, akRight]
           Caption = '% Complete:'
           ParentColor = False
@@ -537,9 +537,9 @@ object MainForm: TMainForm
         end
         object RecursiveDisplayGrid1: TStringGrid
           Left = 6
-          Height = 420
+          Height = 412
           Hint = 'Select single or multiple cells then ''Ctrl + C''  to copy content to clipboard. Click headers to sort by column header,auto-expand and re-arrange by dragging'
-          Top = 144
+          Top = 152
           Width = 828
           Anchors = [akTop, akLeft, akRight, akBottom]
           Color = clDefault
@@ -713,7 +713,7 @@ object MainForm: TMainForm
         TabOrder = 1
       end
       object pbFileS: TProgressBar
-        Left = 792
+        Left = 776
         Height = 20
         Top = 104
         Width = 168
@@ -731,11 +731,11 @@ object MainForm: TMainForm
         Left = 120
         Height = 596
         Top = 10
-        Width = 842
+        Width = 840
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Hash files in chosen directory, copy them, and re-hash the copied files (recursive by default) '
         ClientHeight = 575
-        ClientWidth = 838
+        ClientWidth = 836
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -745,10 +745,10 @@ object MainForm: TMainForm
           Left = 8
           Height = 184
           Top = 8
-          Width = 823
+          Width = 819
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 184
-          ClientWidth = 823
+          ClientWidth = 819
           TabOrder = 3
           OnClick = Panel1CopyAndHashOptionsClick
           object CheckBoxListOfDirsOnly: TCheckBox
@@ -924,10 +924,11 @@ object MainForm: TMainForm
             AnchorSideTop.Control = pbCopy
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = pbCopy
-            Left = 370
+            Left = 376
             Height = 16
-            Top = 156
+            Top = 136
             Width = 12
+            Anchors = []
             Caption = '...'
             ParentColor = False
           end
@@ -951,7 +952,7 @@ object MainForm: TMainForm
           end
           object pbCopy: TProgressBar
             AnchorSideRight.Control = lblFilesCopiedPercentage
-            Left = 154
+            Left = 136
             Height = 20
             Top = 136
             Width = 216
@@ -977,6 +978,7 @@ object MainForm: TMainForm
         object Edit2SourcePath: TEdit
           Left = 8
           Height = 24
+          Hint = 'Show currently selected source directory'#13#10'Switch to UNC path by ticking "UNC Mode?"'
           Top = 216
           Width = 365
           Color = clSilver
@@ -988,6 +990,7 @@ object MainForm: TMainForm
         object Edit3DestinationPath: TEdit
           Left = 480
           Height = 24
+          Hint = 'Show currently selected destination directory'#13#10'Switch to UNC path by ticking "UNC Mode?"'
           Top = 216
           Width = 357
           Color = clSilver
@@ -1000,7 +1003,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 20
           Top = 555
-          Width = 838
+          Width = 836
           Panels = <>
           ParentShowHint = False
         end
@@ -1008,7 +1011,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 272
           Hint = 'Single click where to copy files FROM'
-          Top = 259
+          Top = 256
           Width = 365
           Anchors = [akLeft, akBottom]
           AutoExpand = True
@@ -1026,7 +1029,7 @@ object MainForm: TMainForm
           Left = 480
           Height = 272
           Hint = 'Single click where to copy files TO'
-          Top = 259
+          Top = 256
           Width = 357
           Anchors = [akLeft, akBottom]
           AutoExpand = True
@@ -1048,8 +1051,9 @@ object MainForm: TMainForm
           TabOrder = 7
         end
         object chkUNCMode: TCheckBox
-          Left = 376
+          Left = 384
           Height = 20
+          Hint = 'Tick to enter UNC network path '#13#10'instead of using treeview selection'
           Top = 216
           Width = 85
           Caption = 'UNC Mode?'
@@ -1126,11 +1130,11 @@ object MainForm: TMainForm
         Left = 120
         Height = 200
         Top = 10
-        Width = 842
+        Width = 840
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Choose two files and click ''Compare Files'''
         ClientHeight = 179
-        ClientWidth = 838
+        ClientWidth = 836
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
@@ -1232,7 +1236,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 20
           Top = 159
-          Width = 838
+          Width = 836
           Panels = <>
         end
       end
@@ -1244,13 +1248,13 @@ object MainForm: TMainForm
       ClientWidth = 978
       object GroupBox1: TGroupBox
         Left = 120
-        Height = 483
+        Height = 490
         Top = 10
-        Width = 844
+        Width = 842
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Compare two directories'
-        ClientHeight = 462
-        ClientWidth = 840
+        ClientHeight = 469
+        ClientWidth = 838
         DragMode = dmAutomatic
         Font.Height = -13
         ParentFont = False
@@ -1263,7 +1267,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 128
           Top = 160
-          Width = 840
+          Width = 838
           Anchors = [akTop, akLeft, akRight, akBottom]
           ColCount = 3
           ColumnClickSorts = True
@@ -1285,9 +1289,9 @@ object MainForm: TMainForm
           AnchorSideRight.Control = GroupBox1
           AnchorSideRight.Side = asrBottom
           Left = 0
-          Height = 123
+          Height = 127
           Top = 288
-          Width = 840
+          Width = 838
           Anchors = [akTop, akLeft, akRight, akBottom]
           ColCount = 3
           ColumnClickSorts = True
@@ -1389,12 +1393,12 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 120
         Height = 168
-        Top = 448
-        Width = 844
+        Top = 455
+        Width = 842
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Summary'
         ClientHeight = 147
-        ClientWidth = 840
+        ClientWidth = 838
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
@@ -1606,8 +1610,8 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 632
-      ClientWidth = 978
+      ClientHeight = 625
+      ClientWidth = 980
       object btnCallDiskHasherModule: TButton
         Left = 376
         Height = 25

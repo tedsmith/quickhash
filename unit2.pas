@@ -503,6 +503,11 @@ begin
     SystemRAMGroupBox.Visible := true;
     sysRAMTimer.enabled := true;
     lblRAM.Caption := GetSystemMem;
+    Edit2SourcePath.Enabled:=true;
+    Edit2SourcePath.Visible:=true;
+    Edit3DestinationPath.Enabled:=true;
+    Edit3DestinationPath.Visible:=true;
+
 
   {$ENDIF}
 
@@ -686,7 +691,7 @@ begin
   if FileExists(filename) then
   begin
     start := Now;
-    lblStartedFileAt.Caption := 'Started at  : '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
+    lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
 
     edtFileNameToBeHashed.Caption := (filename);
     label1.Caption := 'Hashing file... ';
@@ -714,7 +719,7 @@ begin
         Showmessage('Expected hash DOES NOT match the computed file hash!');
       end;
     end;
-    lbEndedFileAt.Caption    := 'Ended at : '+ TimeToStr(stop);
+    lbEndedFileAt.Caption    := 'Ended at   : '+ DateTimeToStr(stop);
     lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
     Application.ProcessMessages;
   end
@@ -2367,118 +2372,109 @@ begin
     and finally converted to a string result.
   }
   try
-    fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyWrite);
-    {$ifdef Windows}
-    if fsFileToBeHashed.Handle <> INVALID_HANDLE_VALUE then
-    {$else ifdef UNIX}
-    if fsFileToBeHashed.Handle > -1 then
-    {$endif}
-    begin
-      case TabRadioGroup2.ItemIndex of
-        0: begin
-          // MD5
-          HashInstanceMD5 := THashFactory.TCrypto.CreateMD5();
-          HashInstanceMD5.Initialize();
-            repeat
-            i := fsFileToBeHashed.Read(Buffer, BufSize);
-            if i <= 0 then
-              break
-            else
-              begin
-                HashInstanceMD5.TransformUntyped(Buffer, i);
-              end;
-            until false;
-          HashInstanceResultMD5 := HashInstanceMD5.TransformFinal();
-          result := HashInstanceResultMD5.ToString()
-          end; // End of MD5
+    fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
+    case TabRadioGroup2.ItemIndex of
+      0: begin
+        // MD5
+        HashInstanceMD5 := THashFactory.TCrypto.CreateMD5();
+        HashInstanceMD5.Initialize();
+          repeat
+          i := fsFileToBeHashed.Read(Buffer, BufSize);
+          if i <= 0 then
+            break
+          else
+            begin
+              HashInstanceMD5.TransformUntyped(Buffer, i);
+            end;
+          until false;
+        HashInstanceResultMD5 := HashInstanceMD5.TransformFinal();
+        result := HashInstanceResultMD5.ToString()
+        end; // End of MD5
 
-        1: begin
-          // SHA-1
-          HashInstanceSHA1 := THashFactory.TCrypto.CreateSHA1();
-          HashInstanceSHA1.Initialize();
-            repeat
-            i := fsFileToBeHashed.Read(Buffer, BufSize);
-            if i <= 0 then
-              break
-            else
-              begin
-                HashInstanceSHA1.TransformUntyped(Buffer, i);
-              end;
-            until false;
-          HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
-          result := HashInstanceResultSHA1.ToString()
-          end; // End of SHA-1
+      1: begin
+        // SHA-1
+        HashInstanceSHA1 := THashFactory.TCrypto.CreateSHA1();
+        HashInstanceSHA1.Initialize();
+          repeat
+          i := fsFileToBeHashed.Read(Buffer, BufSize);
+          if i <= 0 then
+            break
+          else
+            begin
+              HashInstanceSHA1.TransformUntyped(Buffer, i);
+            end;
+          until false;
+        HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
+        result := HashInstanceResultSHA1.ToString()
+        end; // End of SHA-1
 
-        2: begin
-          // SHA256
-          HashInstanceSHA256 := THashFactory.TCrypto.CreateSHA2_256();
-          HashInstanceSHA256.Initialize();
-            repeat
-            i := fsFileToBeHashed.Read(Buffer, BufSize);
-            if i <= 0 then
-              break
-            else
-              begin
-                HashInstanceSHA256.TransformUntyped(Buffer, i);
-              end;
-            until false;
-          HashInstanceResultSHA256 := HashInstanceSHA256.TransformFinal();
-          result := HashInstanceResultSHA256.ToString()
-          end;  // End of SHA256
+      2: begin
+        // SHA256
+        HashInstanceSHA256 := THashFactory.TCrypto.CreateSHA2_256();
+        HashInstanceSHA256.Initialize();
+          repeat
+          i := fsFileToBeHashed.Read(Buffer, BufSize);
+          if i <= 0 then
+            break
+          else
+            begin
+              HashInstanceSHA256.TransformUntyped(Buffer, i);
+            end;
+          until false;
+        HashInstanceResultSHA256 := HashInstanceSHA256.TransformFinal();
+        result := HashInstanceResultSHA256.ToString()
+        end;  // End of SHA256
 
-        3: begin
-          // SHA512
-          HashInstanceSHA512 := THashFactory.TCrypto.CreateSHA2_512();
-          HashInstanceSHA512.Initialize();
-            repeat
-            i := fsFileToBeHashed.Read(Buffer, BufSize);
-            if i <= 0 then
-              break
-            else
-              begin
-                HashInstanceSHA512.TransformUntyped(Buffer, i);
-              end;
-            until false;
-          HashInstanceResultSHA512 := HashInstanceSHA512.TransformFinal();
-          result := HashInstanceResultSHA512.ToString()
-          end;  // End of SHA512
+      3: begin
+        // SHA512
+        HashInstanceSHA512 := THashFactory.TCrypto.CreateSHA2_512();
+        HashInstanceSHA512.Initialize();
+          repeat
+          i := fsFileToBeHashed.Read(Buffer, BufSize);
+          if i <= 0 then
+            break
+          else
+            begin
+              HashInstanceSHA512.TransformUntyped(Buffer, i);
+            end;
+          until false;
+        HashInstanceResultSHA512 := HashInstanceSHA512.TransformFinal();
+        result := HashInstanceResultSHA512.ToString()
+        end;  // End of SHA512
 
-        4: begin
-          // xxHash
-          {$ifdef CPU64}
-          HashInstancexxHash64 := THashFactory.THash64.CreateXXHash64();
-          HashInstancexxHash64.Initialize();
-            repeat
-            i := fsFileToBeHashed.Read(Buffer, BufSize);
-            if i <= 0 then
-              break
-            else
-              begin
-                HashInstancexxHash64.TransformUntyped(Buffer, i);
-              end;
-            until false;
-          HashInstanceResultxxHash64 := HashInstancexxHash64.TransformFinal();
-          result := HashInstanceResultxxHash64.ToString()
-          {$else if CPU32}
-          HashInstancexxHash32 := THashFactory.THash32.CreateXXHash32();
-          HashInstancexxHash32.Initialize();
-            repeat
-            i := fsFileToBeHashed.Read(Buffer, BufSize);
-            if i <= 0 then
-              break
-            else
-              begin
-                HashInstancexxHash32.TransformUntyped(Buffer, i);
-              end;
-            until false;
-          HashInstanceResultxxHash32 := HashInstancexxHash32.TransformFinal();
-          result := HashInstanceResultxxHash32.ToString()
-          {$endif}
-          end;  // End of xxHash
-
-      end; // end of case statement
-    end // End of FS handle check
-    else ShowMessage('File handle could not be initiated. Check file is not open.');
+      4: begin
+        // xxHash
+        {$ifdef CPU64}
+        HashInstancexxHash64 := THashFactory.THash64.CreateXXHash64();
+        HashInstancexxHash64.Initialize();
+          repeat
+          i := fsFileToBeHashed.Read(Buffer, BufSize);
+          if i <= 0 then
+            break
+          else
+            begin
+              HashInstancexxHash64.TransformUntyped(Buffer, i);
+            end;
+          until false;
+        HashInstanceResultxxHash64 := HashInstancexxHash64.TransformFinal();
+        result := HashInstanceResultxxHash64.ToString()
+        {$else if CPU32}
+        HashInstancexxHash32 := THashFactory.THash32.CreateXXHash32();
+        HashInstancexxHash32.Initialize();
+          repeat
+          i := fsFileToBeHashed.Read(Buffer, BufSize);
+          if i <= 0 then
+            break
+          else
+            begin
+              HashInstancexxHash32.TransformUntyped(Buffer, i);
+            end;
+          until false;
+        HashInstanceResultxxHash32 := HashInstancexxHash32.TransformFinal();
+        result := HashInstanceResultxxHash32.ToString()
+        {$endif}
+        end;  // End of xxHash
+    end; // end of case statement
   finally
     fsFileToBeHashed.free;
   end;
@@ -3446,7 +3442,7 @@ begin
         StatusBar3.SimpleText := 'Finished.';
         frmDisplayGrid1.btnClipboardResults2.Enabled := true;
       end;
-    ShowMessage('Files copied : '   + IntToStr(NoOfFilesCopiedOK -1) + #13#10 +
+    ShowMessage('Files copied : '   + IntToStr(NoOfFilesCopiedOK) + #13#10 +
                 'Copy errors : '    + IntToStr(FileCopyErrors)       + #13#10 +
                 'Hash mismatches: ' + IntToStr(HashMismtachCount)    + #13#10 +
                 'Zero byte files: ' + IntToStr(ZeroByteFilesCounter));
@@ -3613,8 +3609,8 @@ begin
     begin
       Edit2SourcePath.Color      := clSilver;
       Edit3DestinationPath.Color := clSilver;
-      Edit2SourcePath.Text       := 'Select source directory ';
-      Edit3DestinationPath.Text  := 'Select destitnation directory ';
+      Edit2SourcePath.Text       := 'Select source directory below ';
+      Edit3DestinationPath.Text  := 'Select destitnation directory below ';
       Button8CopyAndHash.Enabled := false;
       DirListA.Enabled           := true;
       DirListA.Visible           := true;
