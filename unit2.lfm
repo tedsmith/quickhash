@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 130
   Width = 1018
   AllowDropFiles = True
-  Caption = 'QuickHash v2.8.0 - The easy and convenient way to hash data in Linux, OSX and Windows'
+  Caption = 'QuickHash v2.8.1 - The easy and convenient way to hash data in Linux, OSX and Windows'
   ClientHeight = 696
   ClientWidth = 1018
   OnCreate = FormCreate
@@ -17,10 +17,10 @@ object MainForm: TMainForm
     Height = 658
     Top = 24
     Width = 986
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -219,13 +219,13 @@ object MainForm: TMainForm
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 120
-        Height = 302
+        Height = 310
         Hint = 'To hash physical disks, run the program as root or sudo'#13#10'and then navigate to /dev/sdX (where X might be a, b, c etc)'#13#10'for physical disks or /dev/sdaX (where X might be 1, 2, 3 etc) '#13#10'for logical drives. '#13#10#13#10'Some distributions use /dev/h... rather than /dev/s...'
         Top = 10
         Width = 846
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Single File Hashing'
-        ClientHeight = 281
+        ClientHeight = 289
         ClientWidth = 842
         Color = clForm
         Font.Height = -13
@@ -296,7 +296,7 @@ object MainForm: TMainForm
         object StatusBar1: TStatusBar
           Left = 0
           Height = 20
-          Top = 261
+          Top = 269
           Width = 842
           Panels = <>
         end
@@ -1610,8 +1610,8 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 625
-      ClientWidth = 980
+      ClientHeight = 632
+      ClientWidth = 978
       object btnCallDiskHasherModule: TButton
         Left = 376
         Height = 25

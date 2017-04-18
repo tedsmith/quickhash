@@ -72,8 +72,9 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
   {$ENDIF}
 
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
-    Graphics, Dialogs, StdCtrls, Menus, ComCtrls, Grids, ExtCtrls, sysconst,
-    LazUTF8Classes, lclintf, ShellCtrls, XMLPropStorage, uDisplayGrid, diskmodule,
+    Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
+    LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls, XMLPropStorage,
+    uDisplayGrid, diskmodule,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -410,7 +411,7 @@ function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; extern
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
-  x, y, z : integer;
+  x, y : integer;
 
 begin
   x := screen.Width;
@@ -595,47 +596,49 @@ begin
 
    begin
     filename := FileNames[0];
-    if DirectoryExistsUTF8(filename) then
+    if LazFileUtils.DirectoryExistsUTF8(filename) then
     begin
       ShowMessage('Drag and drop of folders is not supported in this tab.');
     end
     else
-    if FileExistsUTF8(filename) then
+     if LazFileUtils.FileExistsUTF8(filename) then
      begin
-       start := Now;
-       lblStartedFileAt.Caption := 'Started at  : '+ TimeToStr(Start);
-       Tabsheet2.Show;
-       edtFileNameToBeHashed.Caption := (filename);
-       label1.Caption := 'Hashing file... ';
-       StatusBar1.SimpleText := ' HASHING FILE...PLEASE WAIT';
-       Application.ProcessMessages;
-       fileHashValue := CalcTheHashFile(Filename); // Custom function
-       memFileHashField.Lines.Add(UpperCase(fileHashValue));
-       label1.Caption := 'Complete.';
-       StatusBar1.SimpleText := ' HASHING COMPLETE!';
-       OpenDialog1.Close;
+      start := Now;
+      lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
 
-       stop := Now;
-       elapsed := stop - start;
-       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
+      edtFileNameToBeHashed.Caption := (filename);
+      label1.Caption := 'Hashing file... ';
+      StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
+      Application.ProcessMessages;
+      fileHashValue := CalcTheHashFile(Filename); // Custom function
+      memFileHashField.Lines.Add(UpperCase(fileHashValue));
+      label1.Caption := 'Complete.';
+      StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
-        // If the user has ane existing hash to check against the drag n drop file
-        // compare it here
-       if lbleExpectedHash.Text <> '...' then
-       begin
-         if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
-           begin
-             Showmessage('Expected hash matches the computed file hash, OK');
-           end
-         else
-         begin
-           Showmessage('Expected hash DOES NOT match the computed file hash!');
-         end;
-       Application.ProcessMessages;
-       end
+      OpenDialog1.Close;
+
+      stop := Now;
+      elapsed := stop - start;
+
+      // If the user has ane existing hash to check, compare it here
+      if lbleExpectedHash.Text <> '...' then
+        begin
+          if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
+            begin
+              Showmessage('Expected hash matches the computed file hash, OK');
+            end
+          else
+            begin
+              Showmessage('Expected hash DOES NOT match the computed file hash!');
+            end;
+        end;
+        lbEndedFileAt.Caption    := 'Ended at   : '+ DateTimeToStr(stop);
+        lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
+        Application.ProcessMessages;
      end
-    else ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-   end;
+  else
+    ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
+  end;
 end;
 
 procedure TMainForm.HashText(Sender: TObject);
@@ -688,7 +691,7 @@ begin
   Label1.Caption           := '';
   memFileHashField.Clear;
 
-  if FileExists(filename) then
+  if LazFileUtils.FileExistsUTF8(filename) then
   begin
     start := Now;
     lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
@@ -847,7 +850,7 @@ begin
             memoHashText.Lines.Add('Results saved to file : ' + SaveDialog7.FileName);
             // If MS Windows, launch 'Windows Explorer' to show the output file.
             {$ifdef windows}
-            SysUtils.ExecuteProcess(UTF8ToSys('explorer.exe'), '/select,'+ SaveDialog7.FileName, []);
+            SysUtils.ExecuteProcess(LazUTF8.UTF8ToSys('explorer.exe'), '/select,'+ SaveDialog7.FileName, []);
             {$endif}
           end
         else
@@ -949,12 +952,11 @@ end;
 procedure TMainForm.btnRecursiveDirectoryHashingClick(Sender: TObject);
 
 var
-  DirToHash, CSVLogFile, HTMLLogFile1, SearchMask : string;
+  DirToHash, HTMLLogFile1, SearchMask : string;
   FS                                              : TFileSearcher;
   TotalFilesToExamine, slDuplicates               : TStringList;
   start, stop, elapsed                            : TDateTime;
   j, i, DuplicatesDeleted                         : integer;
-  DeleteResult                                    : Boolean;
 
   begin
   FileCounter                   := 1;
@@ -1236,7 +1238,7 @@ begin
   SaveDialog6.DefaultExt := 'html';
   if SaveDialog6.Execute then
     begin
-      if not FileExists(SaveDialog6.FileName) then
+      if not LazFileUtils.FileExistsUTF8(SaveDialog6.FileName) then
         fsHTMLOutput := TFileStreamUTF8.Create(SaveDialog6.FileName, fmCreate)
       else fsHTMLOutput := TFileStreamUTF8.Create(SaveDialog6.FileName, fmOpenReadWrite);
 
@@ -1328,28 +1330,6 @@ end;
 // It also clears all labels from any previous runs of the form.
 procedure TMainForm.btnCallDiskHasherModuleClick(Sender: TObject);
 begin
-  // Not needed as of v2.7.0
-  {
-{$ifdef Windows}
-  DiskModuleUnit1.frmDiskHashingModule.lbledtStartAtTime.Text := 'HH:MM';
-  DiskModuleUnit1.frmDiskHashingModule.ListBox1.Clear;
-  DiskModuleUnit1.frmDiskHashingModule.lblSpeedB.Caption             := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblDiskNameB.Caption          := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblByteCapacityB.Caption      := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblBytesLeftToHashB.Caption   := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblStartTimeB.Caption         := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblEndTimeB.Caption           := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblSpeedB.Caption             := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblModelB.Caption             := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblMediaTypeB.Caption         := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblInterfaceB.Caption         := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblSectorsB.Caption           := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblTimeTakenB.Caption         := '...';
-  DiskModuleUnit1.frmDiskHashingModule.lblManufacturerB.Caption      := '...';
-  DiskModuleUnit1.frmDiskHashingModule.edtComputedHash.Text          := '...';
-  DiskModuleUnit1.frmDiskHashingModule.Show;
-  {$Endif}
-  }
   diskmodule.frmDiskHashingModule.Show;
 end;
 
@@ -1380,7 +1360,7 @@ procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
   FilePath, FileName, FullPathAndName, FileHashA, FileHashB,
-    HashOfListA, HashOfListB, Mismatch, s, strTimeTaken, strTimeDifference : string;
+    HashOfListA, HashOfListB, Mismatch, strTimeTaken, strTimeDifference : string;
 
   TotalFilesDirA, TotalFilesDirB,       // Stringlists just for the file names
     HashListA, HashListB,               // Stringlists just for the hashes of each file in each directory
@@ -1908,8 +1888,6 @@ begin
 end;
 
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
-var
-  i : integer;
 begin
   frmDisplayGrid1.CopyAndHashGrid.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
@@ -1919,7 +1897,6 @@ begin
   lblTimeTaken6A.Caption           := '...';
   lblTimeTaken6B.Caption           := '...';
   lblTimeTaken6C.Caption           := '...';
-  i                                := 0;
   pbCopy.Position                  := 0;
   StatusBar3.SimpleText            := ('Counting files first...please wait');
   Application.ProcessMessages;
@@ -2039,7 +2016,7 @@ begin
   FileA := Trim(lblFileAName.Caption);
   FileB := Trim(lblFileBName.Caption);
 
-  if (FileExistsUTF8(FileA) = false) or (FileExistsUTF8(FileB) = false) then
+  if (LazFileUtils.FileExistsUTF8(FileA) = false) or (LazFileUtils.FileExistsUTF8(FileB) = false) then
   begin
     StatusBar4.SimpleText := 'BOTH FILES MUST BE SELECTED!';
     Application.ProcessMessages;
@@ -2050,7 +2027,7 @@ begin
       // FileA
       StatusBar4.SimpleText := 'Computing hash of ' + FileA + '...';
 
-      if FileExistsUTF8(FileA) then
+      if LazFileUtils.FileExistsUTF8(FileA) then
       begin
         Application.ProcessMessages;
         FileAHash := Uppercase(CalcTheHashFile(FileA));
@@ -2060,7 +2037,7 @@ begin
 
       //FileB
       StatusBar4.SimpleText := 'Computing hash of ' + FileB + '...';
-      if FileExistsUTF8(FileB) then
+      if LazFileUtils.FileExistsUTF8(FileB) then
       begin
         Application.ProcessMessages;
         FileBHash := Uppercase(CalcTheHashFile(FileB));
@@ -2194,7 +2171,7 @@ var
 begin
   HashValueA := '';
   HashValueB := '';
-  if FileExists(lblFileAName.Caption) and FileExists(lblFileBName.Caption) then
+  if LazFileUtils.FileExistsUTF8(lblFileAName.Caption) and LazFileUtils.FileExistsUTF8(lblFileBName.Caption) then
     begin
       StatusBar4.SimpleText := 'RECOMPUTING NEW HASH VALUES...Please wait.';
       Application.ProcessMessages;
@@ -2355,10 +2332,15 @@ var
   HashInstancexxHash32         : IHash;
   HashInstanceResultxxHash32   : IHashResult;
 {$endif}
-
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
+  TotalBytesRead_B, LoopCounter : QWord;
+  strFileSize : string;
+
 begin
+  TotalBytesRead_B := 0;
+  LoopCounter := 0;
+  strFileSize := '';
   case PageControl1.TabIndex of
         0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
         1: TabRadioGroup2 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
@@ -2373,6 +2355,7 @@ begin
   }
   try
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
+    strFileSize := FormatByteSize(fsFileToBeHashed.Size);
     case TabRadioGroup2.ItemIndex of
       0: begin
         // MD5
@@ -2385,6 +2368,20 @@ begin
           else
             begin
               HashInstanceMD5.TransformUntyped(Buffer, i);
+              // All the tabs have a per file progress bar, except the File tab.
+              // So provide the user with feedback, if the active tab is File tab
+              // To reduce lag due to application refresh, a loop counter is used
+              if PageControl1.ActivePage = TabSheet2 then
+                begin
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then
+                  begin
+                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
+                    StatusBar1.Refresh;
+                    LoopCounter := 0;
+                  end;
+                end;
             end;
           until false;
         HashInstanceResultMD5 := HashInstanceMD5.TransformFinal();
@@ -2402,6 +2399,17 @@ begin
           else
             begin
               HashInstanceSHA1.TransformUntyped(Buffer, i);
+              if PageControl1.ActivePage = TabSheet2 then
+                begin
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then
+                  begin
+                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
+                    StatusBar1.Refresh;
+                    LoopCounter := 0;
+                  end;
+                end;
             end;
           until false;
         HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
@@ -2419,6 +2427,17 @@ begin
           else
             begin
               HashInstanceSHA256.TransformUntyped(Buffer, i);
+              if PageControl1.ActivePage = TabSheet2 then
+                begin
+                  inc(TotalBytesRead_B, i);
+                  inc(LoopCounter, 1);
+                  if LoopCounter = 40 then
+                    begin
+                      StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
+                      StatusBar1.Refresh;
+                      LoopCounter := 0;
+                    end;
+                end;
             end;
           until false;
         HashInstanceResultSHA256 := HashInstanceSHA256.TransformFinal();
@@ -2436,6 +2455,17 @@ begin
           else
             begin
               HashInstanceSHA512.TransformUntyped(Buffer, i);
+              if PageControl1.ActivePage = TabSheet2 then
+                begin
+                  inc(TotalBytesRead_B, i);
+                  inc(LoopCounter, 1);
+                  if LoopCounter = 40 then
+                    begin
+                      StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
+                      StatusBar1.Refresh;
+                      LoopCounter := 0;
+                    end;
+                end;
             end;
           until false;
         HashInstanceResultSHA512 := HashInstanceSHA512.TransformFinal();
@@ -2468,6 +2498,13 @@ begin
           else
             begin
               HashInstancexxHash32.TransformUntyped(Buffer, i);
+              // All the tabs have a per file progress bar, except the File tab.
+              // So provide the user with feedback, if the active tab is File tab
+              if PageControl1.ActivePage = TabSheet2 then
+                begin
+                  inc(TotalBytesRead, i);
+                  StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read.';
+                end;
             end;
           until false;
         HashInstanceResultxxHash32 := HashInstancexxHash32.TransformFinal();
@@ -3186,7 +3223,7 @@ begin
 
               // Now create the destination directory structure, if it is not yet created.
 
-              if not DirectoryExistsUTF8(FinalisedDestDir) then
+              if not LazFileUtils.DirectoryExistsUTF8(FinalisedDestDir) then
                 begin
                   try
                     if not CustomisedForceDirectoriesUTF8(LongPathOverride+FinalisedDestDir, true) then
@@ -3224,7 +3261,7 @@ begin
                 end
                 else
                   begin
-                    if FileExists(IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName) then
+                    if LazFileUtils.FileExistsUTF8(IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName) then
                     begin
                       DupCount := DupCount + 1;
                       CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName + '_DuplicatedName' + IntToStr(DupCount);
@@ -3630,7 +3667,7 @@ begin
     begin
       MultipleDirsChosen := false;
       SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
-      if DirectoryExists(SourceDir) then
+      if LazFileUtils.DirectoryExistsUTF8(SourceDir) then
        begin
          Edit2SourcePath.Text := SourceDir;
          SourceDirValid := TRUE;
@@ -3672,7 +3709,7 @@ end;
 procedure TMainForm.DirListBClick(Sender: TObject);
 begin
   DestDir := UTF8ToSys(DirListB.GetSelectedNodePath);
-  if DirectoryExists(DestDir) then
+  if LazFileUtils.DirectoryExistsUTF8(DestDir) then
    begin
      Edit3DestinationPath.Text := DestDir;
      DestDirValid := TRUE;
@@ -3749,7 +3786,7 @@ function TMainForm.CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTim
     ADir:=ExcludeTrailingPathDelimiter(Dir);
 
     if (ADir='') then Exit;
-    if Not DirectoryExistsUTF8(ADir) then
+    if Not LazFileUtils.DirectoryExistsUTF8(ADir) then
       begin
         APath := ExtractFilePath(ADir);
         //this can happen on Windows if user specifies Dir like \user\name/test/
@@ -3773,7 +3810,7 @@ function TMainForm.CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTim
 begin
   Result := False;
   ADrv := ExtractFileDrive(Dir);
-  if (ADrv<>'') and (not DirectoryExistsUTF8(ADrv))
+  if (ADrv<>'') and (not LazFileUtils.DirectoryExistsUTF8(ADrv))
   {$IFNDEF FORCEDIR_NO_UNC_SUPPORT} and (not IsUncDrive(ADrv)){$ENDIF} then Exit;
   if Dir='' then
     begin

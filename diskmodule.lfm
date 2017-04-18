@@ -3,7 +3,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   Height = 623
   Top = 158
   Width = 787
-  Caption = 'QuickHash v2.8.0 - Disk Hashing Module'
+  Caption = 'QuickHash v2.8.1 - Disk Hashing Module'
   ClientHeight = 623
   ClientWidth = 787
   DefaultMonitor = dmDesktop
