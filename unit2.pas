@@ -74,7 +74,7 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
     LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls, XMLPropStorage,
-    uDisplayGrid, diskmodule,
+    uDisplayGrid, diskmodule, clipbrd,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -142,6 +142,8 @@ type
     Button8CopyAndHash: TButton;
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
+    edtFileBName: TEdit;
+    edtFileAName: TEdit;
     FileTypeMaskCheckBox2: TCheckBox;
     chkUNCMode: TCheckBox;
     chkHiddenFiles: TCheckBox;
@@ -185,9 +187,7 @@ type
     lblDirAName: TLabel;
     lblDirBName: TLabel;
     lblFileAHash: TLabel;
-    lblFileAName: TLabel;
     lblFileBHash: TLabel;
-    lblFileBName: TLabel;
     lblFilesCopiedPercentage: TLabel;
     lblDataCopiedSoFar: TLabel;
     lblHashMatchResult: TLabel;
@@ -280,6 +280,8 @@ type
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
+    procedure lblFileAHashClick(Sender: TObject);
+    procedure lblFileBHashClick(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure sysRAMTimerTimer(Sender: TObject);
@@ -881,6 +883,66 @@ begin
   if cbToggleInputDataToOutputFile.Checked then
     cbToggleInputDataToOutputFile.Caption := 'Source text EXcluded in output'
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
+end;
+
+procedure TMainForm.lblFileAHashClick(Sender: TObject);
+var
+  ChosenHashAlg : string;
+begin
+  case AlgorithmChoiceRadioBox5.ItemIndex of
+      0: begin
+      ChosenHashAlg := 'MD5';
+      end;
+      1: begin
+      ChosenHashAlg := 'SHA-1';
+      end;
+      2: begin
+      ChosenHashAlg := 'SHA256';
+      end;
+      3: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      4: begin
+      ChosenHashAlg := 'xxHash';
+      end;
+  end;
+  if lblFileAHash.Caption = '...' then
+    exit
+  else
+    begin
+      Clipboard.AsText := ChosenHashAlg + ' ' + lblFileAHash.Caption;
+      ShowMessage(ChosenHashAlg + ' Hash value now in clipboard');
+    end;
+end;
+
+procedure TMainForm.lblFileBHashClick(Sender: TObject);
+var
+  ChosenHashAlg : string;
+begin
+  case AlgorithmChoiceRadioBox5.ItemIndex of
+      0: begin
+      ChosenHashAlg := 'MD5';
+      end;
+      1: begin
+      ChosenHashAlg := 'SHA-1';
+      end;
+      2: begin
+      ChosenHashAlg := 'SHA256';
+      end;
+      3: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      4: begin
+      ChosenHashAlg := 'xxHash';
+      end;
+  end;
+  if lblFileBHash.Caption = '...' then
+    exit
+  else
+    begin
+      Clipboard.AsText := ChosenHashAlg + ' ' + lblFileBHash.Caption;
+      ShowMessage(ChosenHashAlg + ' Hash value now in clipboard');
+    end;
 end;
 
 procedure TMainForm.cbShowDetailsOfAllComparisonsChange(Sender: TObject);
@@ -2013,8 +2075,8 @@ begin
   lblFileAHash.Caption       := '';
   lblFileBHash.Caption       := '';
 
-  FileA := Trim(lblFileAName.Caption);
-  FileB := Trim(lblFileBName.Caption);
+  FileA := Trim(edtFileAName.Caption);
+  FileB := Trim(edtFileBName.Caption);
 
   if (LazFileUtils.FileExistsUTF8(FileA) = false) or (LazFileUtils.FileExistsUTF8(FileB) = false) then
   begin
@@ -2056,10 +2118,28 @@ end;
 procedure TMainForm.btnCompareTwoFilesSaveAsClick(Sender: TObject);
 var
   slCompareTwoFiles : TStringList;
+  ChosenHashAlg : string;
 begin
+  case AlgorithmChoiceRadioBox5.ItemIndex of
+      0: begin
+      ChosenHashAlg := 'MD5';
+      end;
+      1: begin
+      ChosenHashAlg := 'SHA-1';
+      end;
+      2: begin
+      ChosenHashAlg := 'SHA256';
+      end;
+      3: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      4: begin
+      ChosenHashAlg := 'xxHash';
+      end;
+  end;
   slCompareTwoFiles := TStringList.Create;
-  slCompareTwoFiles.Add('File A: ' + lblFileAName.Caption + ', ' + 'Hash: ' + lblFileAHash.Caption);
-  slCompareTwoFiles.Add('File B: ' + lblFileBName.Caption + ', ' + 'Hash: ' + lblFileBHash.Caption);
+  slCompareTwoFiles.Add('File A: ' + edtFileAName.Caption + ', ' + ChosenHashAlg + ' Hash: ' + lblFileAHash.Caption);
+  slCompareTwoFiles.Add('File B: ' + edtFileBName.Caption + ', ' + ChosenHashAlg + ' Hash: ' + lblFileBHash.Caption);
   slCompareTwoFiles.Add('Result: ' + lblHashMatchResult.Caption);
 
   if SaveDialog5.Execute then
@@ -2076,10 +2156,14 @@ begin
   lblHashMatchResult.Caption := '';
   if FileAHash = FileBHash then
   begin
-  lblHashMatchResult.Caption:= 'MATCH!';
+    lblHashMatchResult.Font.Color := clBlack;
+    lblHashMatchResult.Caption:= 'MATCH!';
   end
   else
-  lblHashMatchResult.Caption:= 'MIS-MATCH!';
+    begin
+      lblHashMatchResult.Font.Color := clRed;
+      lblHashMatchResult.Caption:= 'MIS-MATCH!';
+    end;
 end;
 
 procedure TMainForm.btnDirAClick(Sender: TObject);
@@ -2113,7 +2197,7 @@ begin
   btnCompareTwoFilesSaveAs.Enabled := false;
   if OpenDialog1.Execute then
   begin
-    lblFileAName.Caption := OpenDialog1.FileName;
+    edtFileAName.Caption := OpenDialog1.FileName;
   end;
 end;
 // Used in "Compare Two Files" tab, to select FileB
@@ -2122,7 +2206,7 @@ begin
   btnCompareTwoFilesSaveAs.Enabled := false;
   if OpenDialog1.Execute then
   begin
-    lblFileBName.Caption := OpenDialog1.FileName;
+    edtFileBName.Caption := OpenDialog1.FileName;
   end;
 end;
 
@@ -2171,14 +2255,14 @@ var
 begin
   HashValueA := '';
   HashValueB := '';
-  if LazFileUtils.FileExistsUTF8(lblFileAName.Caption) and LazFileUtils.FileExistsUTF8(lblFileBName.Caption) then
+  if LazFileUtils.FileExistsUTF8(edtFileAName.Caption) and LazFileUtils.FileExistsUTF8(edtFileBName.Caption) then
     begin
       StatusBar4.SimpleText := 'RECOMPUTING NEW HASH VALUES...Please wait.';
       Application.ProcessMessages;
-      HashValueA := Uppercase(CalcTheHashFile(lblFileAName.Caption));
+      HashValueA := Uppercase(CalcTheHashFile(edtFileAName.Caption));
       lblFileAHash.Caption := HashValueA;
       Application.ProcessMessages;
-      HashValueB := Uppercase(CalcTheHashFile(lblFileBName.Caption));
+      HashValueB := Uppercase(CalcTheHashFile(edtFileBName.Caption));
       lblFileBHash.Caption := HashValueB;
       StatusBar4.SimpleText := 'RECOMPUTED NEW HASH VALUES.';
       Application.ProcessMessages;

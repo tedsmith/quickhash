@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 268
+  Left = 297
   Height = 696
-  Top = 130
+  Top = 110
   Width = 1018
   AllowDropFiles = True
   Caption = 'QuickHash v2.8.1 - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -126,11 +126,13 @@ object MainForm: TMainForm
           object btnLBL: TButton
             Left = 8
             Height = 25
-            Hint = 'Generate hash values line by line'#13#10'of the text pasted or written'#13#10'into the text field above. '#13#10'Results are saved to text file.'
+            Hint = 'Generate hash values line-by-line'#13#10'of the text pasted or written'#13#10'into the text field above. '#13#10'Results are saved to text file.'
             Top = 8
             Width = 128
             Caption = 'TEXT Line-By-Line'
             OnClick = btnLBLClick
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 1
           end
           object btnClearTextArea: TButton
@@ -1128,12 +1130,12 @@ object MainForm: TMainForm
       object GroupBox4: TGroupBox
         AnchorSideRight.Side = asrBottom
         Left = 120
-        Height = 200
+        Height = 240
         Top = 10
         Width = 840
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Choose two files and click ''Compare Files'''
-        ClientHeight = 179
+        ClientHeight = 219
         ClientWidth = 836
         Font.Height = -13
         ParentFont = False
@@ -1177,38 +1179,28 @@ object MainForm: TMainForm
         object lblFileBHash: TLabel
           Left = 130
           Height = 16
+          Hint = 'Single left mouse click to copy value to clipboard'
           Top = 100
           Width = 12
           Caption = '...'
           ParentColor = False
+          ParentShowHint = False
+          ShowHint = True
           WordWrap = True
-        end
-        object lblFileBName: TLabel
-          Left = 130
-          Height = 16
-          Top = 72
-          Width = 12
-          Caption = '...'
-          ParentColor = False
-          WordWrap = True
+          OnClick = lblFileBHashClick
         end
         object lblFileAHash: TLabel
           Left = 130
           Height = 16
+          Hint = 'Single left mouse click to copy value to clipboard'
           Top = 40
           Width = 12
           Caption = '...'
           ParentColor = False
+          ParentShowHint = False
+          ShowHint = True
           WordWrap = True
-        end
-        object lblFileAName: TLabel
-          Left = 130
-          Height = 16
-          Top = 8
-          Width = 12
-          Caption = '...'
-          ParentColor = False
-          WordWrap = True
+          OnClick = lblFileAHashClick
         end
         object lblHashMatchResult: TLabel
           Left = 180
@@ -1221,11 +1213,11 @@ object MainForm: TMainForm
           ParentFont = False
         end
         object btnCompareTwoFilesSaveAs: TButton
-          Left = 688
+          Left = 128
           Height = 25
-          Top = 118
-          Width = 88
-          Caption = 'Save As ...'
+          Top = 160
+          Width = 112
+          Caption = 'Save Result...'
           Enabled = False
           OnClick = btnCompareTwoFilesSaveAsClick
           TabOrder = 3
@@ -1235,9 +1227,33 @@ object MainForm: TMainForm
           AnchorSideRight.Control = GroupBox4
           Left = 0
           Height = 20
-          Top = 159
+          Top = 199
           Width = 836
           Panels = <>
+        end
+        object edtFileAName: TEdit
+          Left = 128
+          Height = 24
+          Hint = 'Path to the file you wish to analyse. '#13#10'Type or paste path here directly, '#13#10'or use the button to the left to select it'
+          Top = 9
+          Width = 648
+          Anchors = [akTop, akLeft, akRight]
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 5
+          Text = 'Select File A or paste path to file'
+        end
+        object edtFileBName: TEdit
+          Left = 128
+          Height = 24
+          Hint = 'Path to the second file you wish to analyse. '#13#10'Type or paste path here directly, '#13#10'or use the button to the left to select it'
+          Top = 72
+          Width = 648
+          Anchors = [akTop, akLeft, akRight]
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 6
+          Text = 'Select File B or paste path to file'
         end
       end
     end
