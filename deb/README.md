@@ -1,4 +1,5 @@
-#How To
+How To
+======
 
 Install the required build-dependencies:
 `sudo apt-get install --no-install-recommends fakeroot lintian debhelper fpc lazarus lcl lcl-utils`
