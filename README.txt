@@ -22,7 +22,7 @@ Ted Smith Feb 2017
 
 * Version History
 
-v2.8.1
+v2.8.x
 
 All version of QuickHash prior (1.0 to v2.8.0) had problems accessing files that were opened by certain programs (not all programs) due to the way some programs share open files, and the way many refuse access to open files by other programs. For data hashing, ideally, open files should be closed. But in some cases this may not be possible and the inability to use QuickHash on such files was frustrating some users. So with this release, the file handle initiation has been altered to allow access to open files, on the understanding that the hash that the user gets may not be the same once that open file is closed later. 
 
@@ -38,9 +38,9 @@ Some clearer hints added to the “Copy” tab and the percentage complete indicator
 
 The mouseover hint in the 'Text' tab for the button 'TEXT Line-by-Line' was not showing. Now it does. 
 
-In the “Compare Files” tab, the user can now use either the buttons to select their files, or they can paste the path directly into a path field. These fields are anchored to the right so maximising QuickHash makes them wider. Hint added to explain this. 
+In the “Compare Two Files” tab, the user can now use either the buttons to select their files, or they can paste the path directly into a path field. These fields are anchored to the right so maximising QuickHash makes them wider. Hint added to explain this. 
 
-In the “Compare Files” tab, the user can single-click the resulting hash value and it will be copied to the clipboard, allowing the user to paste into whatever tool they wish (Notepad etc). The chosen hash algorithm will be prefixed to the value. Hint added to explain this. 
+In the “Compare Two Files” tab, the user can single-click the resulting hash value and it will be copied to the clipboard, allowing the user to paste into whatever tool they wish (Notepad etc). The chosen hash algorithm will be prefixed to the value. Hint added to explain this. 
 
 In the “Compare Files” tab, if the result is a match, it will say so in black (as it always has done) or it will be displayed in red if it is a mis-match, to ensure the user notices it more easily.  
 
