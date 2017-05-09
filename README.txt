@@ -46,6 +46,8 @@ In the “Compare Files” tab, if the result is a match, it will say so in black (a
 
 Many redundant variables removed that have been left in over time that were no longer needed. 
 
+Added a “Donate Now” label to the main interface, to try and encourage users to make small donations that can, in turn, help with the hosting costs of the website at AWS. 
+
 v2.8.0 Feb 2017
 
 Major change the the hash library. All version of QuickHash prior to and including v2.7.0 used DCPCrypt, which is a fairly old library and had to be adjusted to hash large files over 4Gb due to a 32-bit limitation. In addition, for SHA-256 and SHA-512, it was not enormously fast, though it was fast enough. With v2.8.0, HashLib4Pascal (http://wiki.freepascal.org/HashLib4Pascal and https://github.com/Xor-el/HashLib4Pascal) has been incorporated instead. There is not only a huge code readability improvement but a slight speed increase as well for all four of the major algorithms used by QuickHash. In addition, it will now make the addition of other other hash algorithms easier for the devlopers, because the library has a large choice to choose from. Enormous credit, appreciation and thanks to Ugochukwu Mmaduekwe Stanley, aka Xor-el, for the library (https://github.com/Xor-el) which is licensed under MIT. 

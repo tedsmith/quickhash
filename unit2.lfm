@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 297
+  Left = 318
   Height = 696
-  Top = 110
+  Top = 62
   Width = 1018
   AllowDropFiles = True
   Caption = 'QuickHash v2.8.1 - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -1688,6 +1688,22 @@ object MainForm: TMainForm
     ParentColor = False
     ParentFont = False
     OptimalFill = True
+  end
+  object lblDonate: TLabel
+    Cursor = crHandPoint
+    Left = 512
+    Height = 13
+    Hint = 'Launches https://paypal.me/quickhash for'#13#10'quick PayPal donations'
+    Top = 4
+    Width = 142
+    Caption = 'Click here to donate now!'
+    Font.Color = clRed
+    Font.Style = [fsBold, fsUnderline]
+    ParentColor = False
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+    OnClick = lblDonateClick
   end
   object OpenDialog1: TOpenDialog
     left = 352

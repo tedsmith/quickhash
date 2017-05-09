@@ -169,6 +169,7 @@ type
     GroupBox4: TGroupBox;
     GroupBox5: TGroupBox;
     Label15: TLabel;
+    lblDonate: TLabel;
     lbEndedFileAt: TLabel;
     pbFileS: TProgressBar;
     pbCopy: TProgressBar;
@@ -280,6 +281,7 @@ type
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
+    procedure lblDonateClick(Sender: TObject);
     procedure lblFileAHashClick(Sender: TObject);
     procedure lblFileBHashClick(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
@@ -883,6 +885,14 @@ begin
   if cbToggleInputDataToOutputFile.Checked then
     cbToggleInputDataToOutputFile.Caption := 'Source text EXcluded in output'
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
+end;
+
+procedure TMainForm.lblDonateClick(Sender: TObject);
+var
+  QuickHashDonateURL : string;
+begin
+  QuickHashDonateURL := 'https://paypal.me/quickhash';
+  OpenURL(QuickHashDonateURL);
 end;
 
 procedure TMainForm.lblFileAHashClick(Sender: TObject);
