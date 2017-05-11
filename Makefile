@@ -4,6 +4,8 @@ PREFIX ?= /usr
 BIN = quickhash
 PROJECT = project1
 LAZBUILD := lazbuild
+LAZRES := lazres
+RESFILES = udisplaygrid.lrs unit2.lrs
 OPTIONS ?=
 # use a local temporary config directory to not register
 # the used package(s) permanently and globally
@@ -21,6 +23,8 @@ distclean: clean
 	rm -f $(PROJECT).lpi $(PROJECT).ico $(PROJECT).res
 
 $(BIN): $(PROJECT).lpi $(PROJECT).ico
+	$(LAZRES) udisplaygrid.lrs udisplaygrid.lfm
+	$(LAZRES) unit2.lrs unit2.lfm
 	$(LAZBUILD) $(OPTIONS) $<
 
 $(PROJECT).lpi: $(PROJECT)_linux.lpi
