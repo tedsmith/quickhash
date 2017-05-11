@@ -11,6 +11,11 @@ OPTIONS ?=
 # the used package(s) permanently and globally
 OPTIONS += --pcp=lazarus_cfg  HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk
 
+define \n
+
+
+endef
+
 
 all: $(BIN)
 
@@ -18,13 +23,16 @@ clean:
 	rm -rf lib/ lazarus_cfg/
 	rm -rf HashLib4Pascal/HashLib/src/Packages/FPC/lib/
 	rm -f $(BIN) $(PROJECT)
+	$(foreach FILE,$(RESFILES),\
+	  test ! -f $(FILE).backup || mv -f $(FILE).backup $(FILE) ; ${\n})
 
 distclean: clean
 	rm -f $(PROJECT).lpi $(PROJECT).ico $(PROJECT).res
 
 $(BIN): $(PROJECT).lpi $(PROJECT).ico
-	$(LAZRES) udisplaygrid.lrs udisplaygrid.lfm
-	$(LAZRES) unit2.lrs unit2.lfm
+	$(foreach FILE,$(RESFILES),\
+	  test -f $(FILE).backup || cp $(FILE) $(FILE).backup ; ${\n}\
+	  $(LAZRES) $(FILE) $(FILE:.lrs=.lfm) ; ${\n})
 	$(LAZBUILD) $(OPTIONS) $<
 
 $(PROJECT).lpi: $(PROJECT)_linux.lpi
@@ -32,11 +40,6 @@ $(PROJECT).lpi: $(PROJECT)_linux.lpi
 
 $(PROJECT).ico: misc/QuickHash.ico
 	cp $< $@
-
-define \n
-
-
-endef
 
 install:
 	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
