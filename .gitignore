@@ -37,6 +37,7 @@ ppas.sh
 /project1.ico
 /project1.lpi
 /lazarus_cfg
+*.lrs.backup
 
 # QuickHash settings
 QHSettings.xml
