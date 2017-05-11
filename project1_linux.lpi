@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- This project file is used by make. Optimization and
+ hardening flags are enabled, debugging is disabled. -->
 <CONFIG>
   <ProjectOptions>
     <Version Value="9"/>
@@ -42,7 +44,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="project1"/>
+      <Filename Value="quickhash"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
@@ -69,7 +71,12 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-oquickhash"/>
+      <Verbosity>
+        <ShowHints Value="False"/>
+      </Verbosity>
+      <CompilerMessages>
+        <IgnoredMessages idx2005="True"/><!-- Warning: Comment level n found -->
+      </CompilerMessages>
     </Other>
   </CompilerOptions>
   <Debugging>
