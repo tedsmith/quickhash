@@ -16,6 +16,7 @@
 *.rst
 *.rsj
 *.lrt
+/HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
 
 # Lazarus local files (user-specific info)
 *.lps
