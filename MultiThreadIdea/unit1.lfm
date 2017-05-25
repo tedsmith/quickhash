@@ -1,0 +1,46 @@
+object Form1: TForm1
+  Left = 334
+  Height = 582
+  Top = 110
+  Width = 1176
+  Caption = 'Form1'
+  ClientHeight = 582
+  ClientWidth = 1176
+  OnCreate = FormCreate
+  LCLVersion = '1.6.2.0'
+  object Memo1: TMemo
+    Left = 43
+    Height = 280
+    Top = 88
+    Width = 1102
+    Lines.Strings = (
+      'Memo1'
+    )
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+  object Memo2: TMemo
+    Left = 88
+    Height = 130
+    Top = 400
+    Width = 1008
+    Lines.Strings = (
+      'Memo2'
+    )
+    ScrollBars = ssAutoBoth
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 43
+    Height = 25
+    Top = 32
+    Width = 96
+    Caption = 'Folder of Files'
+    OnClick = Button2Click
+    TabOrder = 2
+  end
+  object SelectDirectoryDialog1: TSelectDirectoryDialog
+    left = 192
+    top = 32
+  end
+end
