@@ -5,7 +5,7 @@ BIN = quickhash
 PROJECT = project1
 LAZBUILD := lazbuild
 LAZRES := lazres
-RESFILES = udisplaygrid.lrs unit2.lrs
+RESFILES = frmaboutunit.lrs udisplaygrid.lrs unit2.lrs
 OPTIONS ?=
 # use a local temporary config directory to not register
 # the used package(s) permanently and globally

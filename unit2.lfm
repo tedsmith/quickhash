@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 652
+  Left = 488
   Height = 704
-  Top = 310
+  Top = 188
   Width = 1018
   AllowDropFiles = True
   Caption = 'QuickHash v2.8.2 - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -12,7 +12,7 @@ object MainForm: TMainForm
   OnDropFiles = FormDropFiles
   Position = poScreenCenter
   SessionProperties = 'Position'
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.6.4.0'
   object PageControl1: TPageControl
     Left = 16
     Height = 646
@@ -164,7 +164,7 @@ object MainForm: TMainForm
         Height = 129
         Hint = 'Having typed some text in the text area, you can'#13#10'easily recompute different hashes for the text inputted'#13#10'by choosing a different hash algorithm'
         Top = 10
-        Width = 104
+        Width = 96
         AutoFill = True
         Caption = 'Algorithm'
         ChildSizing.LeftRightSpacing = 6
@@ -176,7 +176,7 @@ object MainForm: TMainForm
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
         ClientHeight = 107
-        ClientWidth = 100
+        ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
@@ -887,7 +887,7 @@ object MainForm: TMainForm
             Left = 464
             Height = 17
             Top = 145
-            Width = 69
+            Width = 68
             Caption = 'Time Taken:'
             ParentColor = False
           end
@@ -1481,7 +1481,7 @@ object MainForm: TMainForm
           Left = 518
           Height = 17
           Top = 64
-          Width = 69
+          Width = 68
           Caption = 'Time Taken:'
           ParentColor = False
         end

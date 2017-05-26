@@ -1,12 +1,10 @@
-{ This is an automatically generated lazarus resource file }
-
 LazarusResources.Add('TMainForm','FORMDATA',[
-  'TPF0'#9'TMainForm'#8'MainForm'#4'Left'#3#140#2#6'Height'#3#192#2#3'Top'#3'6'
-  +#1#5'Width'#3#250#3#14'AllowDropFiles'#9#7'Caption'#6'UQuickHash v2.8.2 - Th'
+  'TPF0'#9'TMainForm'#8'MainForm'#4'Left'#3#232#1#6'Height'#3#192#2#3'Top'#3#188
+  +#0#5'Width'#3#250#3#14'AllowDropFiles'#9#7'Caption'#6'UQuickHash v2.8.2 - Th'
   +'e easy and convenient way to hash data in Linux, OSX and Windows'#12'Client'
   +'Height'#3#172#2#11'ClientWidth'#3#250#3#4'Menu'#7#9'MainMenu1'#8'OnCreate'#7
   +#10'FormCreate'#11'OnDropFiles'#7#13'FormDropFiles'#8'Position'#7#14'poScree'
-  +'nCenter'#17'SessionProperties'#6#8'Position'#10'LCLVersion'#6#7'1.6.2.0'#0
+  +'nCenter'#17'SessionProperties'#6#8'Position'#10'LCLVersion'#6#7'1.6.4.0'#0
   +#12'TPageControl'#12'PageControl1'#4'Left'#2#16#6'Height'#3#134#2#3'Top'#2#24
   +#5'Width'#3#218#3#10'ActivePage'#7#9'TabSheet1'#7'Anchors'#11#5'akTop'#6'akL'
   +'eft'#7'akRight'#8'akBottom'#0#14'ParentShowHint'#8#8'TabIndex'#2#0#8'TabOrd'
@@ -67,13 +65,13 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#4'Left'#2#16#6'Height'#3#129#0#4'Hint'#6#145'Having typed some text in the '
   ,'text area, you can'#13#10'easily recompute different hashes for the text in'
   +'putted'#13#10'by choosing a different hash algorithm'#3'Top'#2#10#5'Width'#2
-  +'h'#8'AutoFill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpacing'
+  +'`'#8'AutoFill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpacing'
   +#2#6#28'ChildSizing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizontal'#7
   +#24'crsHomogenousChildResize'#27'ChildSizing.EnlargeVertical'#7#24'crsHomoge'
   +'nousChildResize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'C'
   +'hildSizing.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29
   +'cclLeftToRightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'Clien'
-  +'tHeight'#2'k'#11'ClientWidth'#2'd'#11'Font.Height'#2#243#9'ItemIndex'#2#1#13
+  +'tHeight'#2'k'#11'ClientWidth'#2'\'#11'Font.Height'#2#243#9'ItemIndex'#2#1#13
   +'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7
   +'OnClick'#7#29'AlgorithmChoiceRadioBox1Click'#18'OnSelectionChanged'#7#8'Has'
   +'hText'#10'ParentFont'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#1#0
@@ -297,7 +295,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'Width'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTa'
   +'ken6B'#4'Left'#3'0'#2#6'Height'#2#17#3'Top'#2'y'#5'Width'#2#9#7'Caption'#6#3
   +'...'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken5C'#4'Left'#3#208#1#6'H'
-  +'eight'#2#17#3'Top'#3#145#0#5'Width'#2'E'#7'Caption'#6#11'Time Taken:'#11'Pa'
+  +'eight'#2#17#3'Top'#3#145#0#5'Width'#2'D'#7'Caption'#6#11'Time Taken:'#11'Pa'
   +'rentColor'#8#0#0#6'TLabel'#14'lblTimeTaken6C'#4'Left'#3'0'#2#6'Height'#2#17
   +#3'Top'#3#145#0#5'Width'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLa'
   +'bel'#21'lblNoOfFilesToExamine'#4'Left'#3#136#0#6'Height'#2#17#3'Top'#2'H'#5
@@ -486,7 +484,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'entColor'#8#0#0#6'TLabel'#16'lblTimeFinishedA'#4'Left'#3#6#2#6'Height'#2#17
   +#3'Top'#2'$'#5'Width'#2'R'#7'Caption'#6#14'Time Finished:'#11'ParentColor'#8
   +#0#0#6'TLabel'#13'lblTimeTakenA'#4'Left'#3#6#2#6'Height'#2#17#3'Top'#2'@'#5
-  +'Width'#2'E'#7'Caption'#6#11'Time Taken:'#11'ParentColor'#8#0#0#6'TLabel'#13
+  +'Width'#2'D'#7'Caption'#6#11'Time Taken:'#11'ParentColor'#8#0#0#6'TLabel'#13
   +'lblTimeStartB'#4'Left'#3'i'#2#6'Height'#2#17#3'Top'#2#8#5'Width'#2#9#7'Capt'
   +'ion'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#16'lblTimeFinishedB'#4'Left'#3
   +'i'#2#6'Height'#2#17#3'Top'#2'$'#5'Width'#2#9#7'Caption'#6#3'...'#11'ParentC'

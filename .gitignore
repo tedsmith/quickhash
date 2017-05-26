@@ -3,7 +3,7 @@
 *.dll
 *.so
 *.dylib
-*.lrs
+#*.lrs
 *.res
 *.compiled
 *.dbg
@@ -41,7 +41,7 @@ ppas.sh
 *.lrs.backup
 
 # QuickHash settings
-QHSettings.xml
+project1.xml
 
 # Application bundle for Mac OS
 *.app/
