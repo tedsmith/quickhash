@@ -27,8 +27,9 @@ backup/
 *.bak
 lib/
 
-# auto-generated linker script on Linux
+# auto-generated linker scripts
 ppas.sh
+ppas.bat
 
 # Linux binary
 /quickhash
