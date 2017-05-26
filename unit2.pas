@@ -693,7 +693,7 @@ end;
 
 procedure TMainForm.btnHashFileClick(Sender: TObject);
 var
-  filename : widestring;
+  filename : string;
   fileHashValue : ansistring;
   start, stop, elapsed : TDateTime;
 
@@ -1079,7 +1079,7 @@ VAR
   MS_Ex : MemoryStatusEx;
   strTotalPhysMem, strTotalPhysAvail : string;
 begin
- FillChar (MS_Ex, SizeOf(MemoryStatusEx), #0);
+ FillChar(MS_Ex{%H-}, SizeOf(MemoryStatusEx), #0);
  MS_Ex.dwLength := SizeOf(MemoryStatusEx);
  if GlobalMemoryStatusEx(MS_Ex) then
    begin
@@ -1519,18 +1519,19 @@ procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
   FilePath, FileName, FullPathAndName, FileHashA, FileHashB,
-    HashOfListA, HashOfListB, Mismatch, strTimeTaken, strTimeDifference : string;
+    HashOfListA, HashOfListB, strTimeTaken{, strTimeDifference} : string;
 
+  //MisMatchList : TStringList;
   TotalFilesDirA, TotalFilesDirB,       // Stringlists just for the file names
     HashListA, HashListB,               // Stringlists just for the hashes of each file in each directory
-    FileAndHashListA, FileAndHashListB, // Stringlists for the combined lists of both hashes with filenames
-    MisMatchList : TStringList;
+    FileAndHashListA, FileAndHashListB  // Stringlists for the combined lists of both hashes with filenames
+    : TStringList;
 
   i, FilesProcessed : integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
-  MisMatchStatus : boolean;
+  //MisMatchStatus : boolean;
 
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
@@ -1561,7 +1562,7 @@ begin
   end;
   {$endif}
 
-  MisMatchStatus                   := false; // Switches to true if a mismatch is identified
+  //MisMatchStatus                   := false; // Switches to true if a mismatch is identified
   StartTime                        := Now;
   sgDirA.Clean;
   sgDirB.Clean;
@@ -1736,7 +1737,7 @@ begin
       else
         begin
           // So the file counts match but the hash lists differ.
-          MisMatchStatus := true;
+          //MisMatchStatus := true;
           lblStatusB.Caption    := DirA + ' does not match match ' + DirB;
           lblHashMatchB.Caption := 'MIS-MATCH! File count is the same, but hashes differ.';
           sgDirA.Visible := true;
@@ -1750,7 +1751,7 @@ begin
     // Start of Mis-Match Loop:
     if (TotalFilesDirB.Count < TotalFilesDirA.Count) or (TotalFilesDirB.Count > TotalFilesDirA.Count) then
       begin
-        MisMatchStatus := true;
+        //MisMatchStatus := true;
         lblHashMatchB.Caption:= 'MIS-MATCH! File counts are different.';
         FileAndHashListA.Sort;
         FileAndHashListB.Sort;
@@ -1810,7 +1811,7 @@ end;
 // one pair against the other and highlights the mis matches.
 procedure TMainForm.MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
   OnlyTabulateErrors : boolean;
@@ -1819,7 +1820,6 @@ begin
   i := 0;
   j := 0;
   indexA := 0;
-  indexB := 0;
   HashPosStart := 0;
   FileNameAndPathPosStart := 0;
   FileNameAndPathPosEnd := 0;
@@ -1928,7 +1928,7 @@ end;
 // MisMatchHashCompare : When file counts match in both directories but hashes differ, this works out what files are different by hash
 procedure TMainForm.MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
   OnlyTabulateErrors : boolean;
@@ -1937,7 +1937,6 @@ begin
   i                        := 0;
   j                        := 0;
   indexA                   := 0;
-  indexB                   := 0;
   HashPosStart             := 0;
   FileNameAndPathPosStart  := 0;
   FileNameAndPathPosEnd    := 0;
@@ -2373,7 +2372,7 @@ end;
 function TMainForm.ValidateTextWithHash(strToBeHashed:ansistring) : string;
 begin
   result := '';
-  result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+  result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(PWideChar(strToBeHashed), TEncoding.UTF8).ToString();
 end;
 
 // For use in the 'Text' tab only, for hashing text elements. Not to be used
@@ -2382,9 +2381,12 @@ end;
 function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 var
   TabRadioGroup1: TRadioGroup;
+  _strToBeHashed: UnicodeString;
 begin
+  TabRadioGroup1 := AlgorithmChoiceRadioBox1;
   result := '';
   if Length(strToBeHashed) > 0 then
+    _strToBeHashed := PWideChar(strToBeHashed);
     begin
       case PageControl1.TabIndex of
         0: TabRadioGroup1 := AlgorithmChoiceRadioBox1;  //RadioGroup on the 1st tab.
@@ -2396,22 +2398,22 @@ begin
 
       case TabRadioGroup1.ItemIndex of
         0: begin
-             result := THashFactory.TCrypto.CreateMD5().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateMD5().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         1: begin
-             result := THashFactory.TCrypto.CreateSHA1().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA1().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         2: begin
-             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         3: begin
-             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         4: begin
            {$ifdef CPU64}
-            result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+            result := THashFactory.THash64.CreateXXHash64().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            {$else if CPU32}
-            result := THashFactory.THash32.CreateXXHash32().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+            result := THashFactory.THash32.CreateXXHash32().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            {$endif}
            end;
       end;
@@ -3723,6 +3725,8 @@ var
   STime       : TSystemTime;
 
 begin
+  FillChar(LocalFTime{%H-}, SizeOf(LocalFTime), 0);
+  FillChar(STime{%H-}, SizeOf(STime), 0);
   FileTimeToLocalFileTime(FTime, LocalFTime);
   FileTimeToSystemTime(LocalFTime, STime);
   Result := SystemTimeToDateTime(STime);
@@ -3869,7 +3873,7 @@ begin
   if NoOfDirsSelected = 1 then
     begin
       MultipleDirsChosen := false;
-      SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
+      SourceDir := UTF8ToSys(DirListA.Path);
       if LazFileUtils.DirectoryExistsUTF8(SourceDir) then
        begin
          Edit2SourcePath.Text := SourceDir;
@@ -3911,7 +3915,7 @@ end;
 
 procedure TMainForm.DirListBClick(Sender: TObject);
 begin
-  DestDir := UTF8ToSys(DirListB.GetSelectedNodePath);
+  DestDir := UTF8ToSys(DirListB.Path);
   if LazFileUtils.DirectoryExistsUTF8(DestDir) then
    begin
      Edit3DestinationPath.Text := DestDir;
