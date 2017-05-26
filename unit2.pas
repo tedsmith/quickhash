@@ -74,7 +74,7 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
     LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls, XMLPropStorage,
-    uDisplayGrid, diskmodule, clipbrd,
+    uDisplayGrid, diskmodule, clipbrd, frmAboutUnit,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -169,8 +169,14 @@ type
     GroupBox4: TGroupBox;
     GroupBox5: TGroupBox;
     Label15: TLabel;
-    lblDonate: TLabel;
     lbEndedFileAt: TLabel;
+    MainMenu1: TMainMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem2A: TMenuItem;
+    MenuItem1C: TMenuItem;
+    MenuItem1A: TMenuItem;
+    MenuItem1B: TMenuItem;
     pbFileS: TProgressBar;
     pbCopy: TProgressBar;
     pbCompareDirA: TProgressBar;
@@ -279,11 +285,20 @@ type
     TextHashingGroupBox: TGroupBox;
     QH_MainFormXMLPropStorage: TXMLPropStorage;
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
+    procedure AlgorithmChoiceRadioBox2Click(Sender: TObject);
+    procedure AlgorithmChoiceRadioBox3Click(Sender: TObject);
+    procedure AlgorithmChoiceRadioBox4Click(Sender: TObject);
+    procedure AlgorithmChoiceRadioBox5Click(Sender: TObject);
+    procedure AlgorithmChoiceRadioBox6Click(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure lblDonateClick(Sender: TObject);
     procedure lblFileAHashClick(Sender: TObject);
     procedure lblFileBHashClick(Sender: TObject);
+    procedure MenuItem1AClick(Sender: TObject);
+    procedure MenuItem1Click(Sender: TObject);
+    procedure MenuItem2AClick(Sender: TObject);
+    procedure MenuItem1CClick(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure sysRAMTimerTimer(Sender: TObject);
@@ -955,6 +970,26 @@ begin
     end;
 end;
 
+procedure TMainForm.MenuItem1AClick(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.MenuItem1Click(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.MenuItem2AClick(Sender: TObject);
+begin
+  frmAbout.Show
+end;
+
+procedure TMainForm.MenuItem1CClick(Sender: TObject);
+begin
+  MainForm.Close;
+end;
+
 procedure TMainForm.cbShowDetailsOfAllComparisonsChange(Sender: TObject);
 begin
   if cbShowDetailsOfAllComparisons.Checked then
@@ -971,9 +1006,60 @@ begin
   end;
 end;
 
+// These radio clcik events are to ensure the same hash algorithm is chosen
+// for all the tabs, if the user changes it from the defualt. New to v.2.8.2
 procedure TMainForm.AlgorithmChoiceRadioBox1Click(Sender: TObject);
 begin
+  AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
+  AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
+  AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
+  AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
+  AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
+end;
 
+procedure TMainForm.AlgorithmChoiceRadioBox2Click(Sender: TObject);
+begin
+  AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
+  AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
+  AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
+  AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
+  AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
+end;
+
+procedure TMainForm.AlgorithmChoiceRadioBox3Click(Sender: TObject);
+begin
+  AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
+  AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
+  AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
+  AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
+  AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
+end;
+
+procedure TMainForm.AlgorithmChoiceRadioBox4Click(Sender: TObject);
+begin
+  AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
+  AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
+  AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
+  AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
+  AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
+end;
+
+procedure TMainForm.AlgorithmChoiceRadioBox5Click(Sender: TObject);
+begin
+  AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
+  AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
+  AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
+  AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
+  AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
+end;
+
+procedure TMainForm.AlgorithmChoiceRadioBox6Click(Sender: TObject);
+begin
+  AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
+  AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
+  AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
+  AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
+  AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
 end;
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
@@ -1040,8 +1126,6 @@ var
   lblPercentageComplete.Caption := '...';
   lblTotalBytesExamined.Caption := '...';
   pbFileS.Position              := 0;
-  slDuplicates := TStringList.Create;
-  slDuplicates.Sorted := true;
 
   if SelectDirectoryDialog1.Execute then
     begin
@@ -1155,19 +1239,22 @@ var
          // Now traverse the grid for duplicate hash entries, if the user wishes to
 
          if chkFlagDuplicates.Checked then
-           begin
+         try
+           slDuplicates := TStringList.Create;
+           slDuplicates.Sorted := true;
            RecursiveDisplayGrid1.SortOrder := soAscending;
            RecursiveDisplayGrid1.SortColRow(true, 3, RecursiveDisplayGrid1.FixedRows, RecursiveDisplayGrid1.RowCount - 1);
-            for i := 1 to RecursiveDisplayGrid1.RowCount -1 do
-            begin
-              if RecursiveDisplayGrid1.Cells[3, i] = RecursiveDisplayGrid1.Cells[3, i-1] then
-                begin
-                 RecursiveDisplayGrid1.Cells[5, i] := 'Yes, of file ' + RecursiveDisplayGrid1.Cells[1,i-1];
-                 slDuplicates.Add(RecursiveDisplayGrid1.Cells[2,i-1] + RecursiveDisplayGrid1.Cells[1, i-1]);
-                end;
-            end;
-            slDuplicates.Sort;
-           end;
+           for i := 1 to RecursiveDisplayGrid1.RowCount -1 do
+             begin
+               if RecursiveDisplayGrid1.Cells[3, i] = RecursiveDisplayGrid1.Cells[3, i-1] then
+                 begin
+                  RecursiveDisplayGrid1.Cells[5, i] := 'Yes, of file ' + RecursiveDisplayGrid1.Cells[1,i-1];
+                  slDuplicates.Add(RecursiveDisplayGrid1.Cells[2,i-1] + RecursiveDisplayGrid1.Cells[1, i-1]);
+                 end;
+             end;
+         finally
+           slDuplicates.Sort;
+         end;
 
          // and conclude timings and update display
          stop := Now;
@@ -1263,8 +1350,8 @@ var
               StatusBar2.Refresh;
               ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
             end;
-      slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
     end; // end of duplicate deletion phase
+  if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
 end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
@@ -2021,8 +2108,9 @@ begin
     // If the user has chosen multiple folders...
     if MultipleDirsChosen then
       try
-      if slMultipleDirNames.Count > 0 then
+        if slMultipleDirNames.Count > 0 then
         begin
+          ShowMessage('The following multiple directories will be hashed and copied:' + #13#10 + slMultipleDirNames.Text);
           // give ProcessDir function the first folder name in the list for now...
           // ProcessDir will then do the itterations itself using the same stringlist
           SourceDir := slMultipleDirNames.Strings[0];
@@ -2951,55 +3039,76 @@ begin
      begin
        if FileTypeMaskCheckBox1.Checked then          // ...but does want a file mask for all selected folders
          begin
+           try
            FilesFoundToCopy := TStringListUTF8.Create;
            FilesFoundToCopy.Sorted := true;
            for i := 0 to slMultipleDirNames.Count -1 do
              begin
                SourceDirName := slMultipleDirNames.Strings[i];
-               slTemp        := TStringListUTF8.Create;
-               slTemp.Sorted := true;
-               slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
-               for j := 0 to slTemp.Count -1 do
-                 begin
-                   FilesFoundToCopy.Add(slTemp.Strings[j]);
-                 end;
-               slTemp.Free;
+               try
+                 slTemp        := TStringListUTF8.Create;
+                 slTemp.Sorted := true;
+                 slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
+                 for j := 0 to slTemp.Count -1 do
+                   begin
+                     FilesFoundToCopy.Add(slTemp.Strings[j]);
+                   end;
+               finally
+                 slTemp.Free;
+               end;
              end;
+           finally
+             //
+           end;
          end
        else                                          // ... but does NOT want a file mask for all selected folders
          begin
-           FilesFoundToCopy := TStringListUTF8.Create;
-           FilesFoundToCopy.Sorted := true;
-           for i := 0 to slMultipleDirNames.Count -1 do
-             begin
-               SourceDirName    := slMultipleDirNames.Strings[i];
-               slTemp           := TStringListUTF8.Create;
-               slTemp.Sorted    := true;
-               slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
-               for j := 0 to slTemp.Count -1 do
-                 begin
-                   FilesFoundToCopy.Add(slTemp.Strings[j]);
+           try
+             FilesFoundToCopy := TStringListUTF8.Create;
+             FilesFoundToCopy.Sorted := true;
+             for i := 0 to slMultipleDirNames.Count -1 do
+               begin
+                 SourceDirName    := slMultipleDirNames.Strings[i];
+                 try
+                   slTemp           := TStringListUTF8.Create;
+                   slTemp.Sorted    := true;
+                   slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
+                   for j := 0 to slTemp.Count -1 do
+                     begin
+                       FilesFoundToCopy.Add(slTemp.Strings[j]);
+                     end;
+                 finally
+                   slTemp.Free;
                  end;
-               slTemp.Free;
-             end;
+               end;
+           finally
+             //
+           end;
          end;
      end
     else // User does not want recursive but does want a multiple selection. i.e sub directories of multiple dirs are to be ignored.
     begin
+      try
       FilesFoundToCopy := TStringListUTF8.Create;
       FilesFoundToCopy.Sorted := true;
       for i := 0 to slMultipleDirNames.Count -1 do
        begin
          SourceDirName    := slMultipleDirNames.Strings[i];
-         slTemp           := TStringListUTF8.Create;
-         slTemp.Sorted    := true;
-         slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', False, True);
-         for j := 0 to slTemp.Count -1 do
-           begin
-             FilesFoundToCopy.Add(slTemp.Strings[j]);
-           end;
-         slTemp.Free;
+         try
+           slTemp           := TStringListUTF8.Create;
+           slTemp.Sorted    := true;
+           slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', False, True);
+           for j := 0 to slTemp.Count -1 do
+             begin
+               FilesFoundToCopy.Add(slTemp.Strings[j]);
+             end;
+         finally
+           slTemp.Free;
+         end;
        end;
+      finally
+        //
+      end;
     end;
   end;
   {$ENDIF}

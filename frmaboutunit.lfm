@@ -1,0 +1,57 @@
+object frmAbout: TfrmAbout
+  Left = 900
+  Height = 435
+  Top = 462
+  Width = 734
+  Caption = 'About QuickHash-GUI'
+  ClientHeight = 435
+  ClientWidth = 734
+  Position = poMainFormCenter
+  LCLVersion = '1.6.2.0'
+  object memAbout: TMemo
+    Left = 16
+    Height = 370
+    Top = 24
+    Width = 704
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Lines.Strings = (
+      'Developed by Ted Smith (c) 2011-2017 '
+      ''
+      'Home Page : http://www.quickhash-gui.org (First registered in 2011 and hosted until 2016 at  '
+      'http://sourceforge.net/projects/quickhash)'
+      ''
+      'Donations are welcomed! The website is hosted using AWS which is not free after the first year. If you have found QuickHash '
+      'useful to you or your business, please consider donating using PayPal at https://paypal.me/quickhash'
+      ''
+      'Development Github Page : https://github.com/tedsmith/quickhash'
+      ''
+      'Contributions made by Dareal Shinji (http://www.github.com/darealshinji), especially regarding repository maintenance and '
+      'Debian packaging are both welcomed and acknowledged, in addition to the Lazarus forum members, who are always so helpful. '
+      ''
+      'Bug Tracker available at http://www.quickhash-gui.org/bug-tracker/ where bugs and feature requests can be submitted and '
+      'reviewed. '
+      ''
+      'For a private communication or technical help which the website does not answer, you can e-mail me at '
+      'tedsmith28@yahoo.co.uk, however, this should not be used as the means to ask about bugs or problems. Please use the bug '
+      'tracker for that!! '
+      ''
+      'Created using the Lazarus IDE and the Freepascal Compiler. QuickHash is open-source and released under the '
+      'GPL2 license. The HashLib4Pascal library is licensed under MIT and developed by the talented Ugochukwu Mmaduekwe Stanley '
+      '(aka Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'
+    )
+    ReadOnly = True
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+  object Button1: TButton
+    AnchorSideTop.Control = memAbout
+    AnchorSideTop.Side = asrBottom
+    Left = 304
+    Height = 25
+    Top = 394
+    Width = 147
+    Caption = 'Close'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+end

@@ -7,8 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit2, sha1Customised, FindAllFilesEnhanced, diskmodule,
-uDisplayGrid, diskspecification, uProgress;
+  Forms, Unit2, FindAllFilesEnhanced, diskmodule, uDisplayGrid,
+  diskspecification, uProgress, frmAboutUnit;
 
 //{$IFDEF WINDOWS}{$R project1.rc}{$ENDIF}
 
@@ -33,6 +33,7 @@ begin
   Application.CreateForm(TfrmTechSpecs, frmTechSpecs);
   {$ENDIF}
   {$ENDIF}
+  Application.CreateForm(TfrmAbout, frmAbout);
   Application.Run;
 end.
 
