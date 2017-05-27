@@ -698,6 +698,7 @@ var
   start, stop, elapsed : TDateTime;
 
 begin
+  filename := '';
   StatusBar1.SimpleText := '';
   if OpenDialog1.Execute then
     begin
@@ -885,8 +886,10 @@ end;
 
 
 procedure TMainForm.sysRAMTimerTimer(Sender: TObject);
+{$ifdef windows}
 var
   MemFigures : string;
+{$endif}
 begin
   {$IFDEF WINDOWS}
   MemFigures := GetSystemMem;
@@ -914,6 +917,7 @@ procedure TMainForm.lblFileAHashClick(Sender: TObject);
 var
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -944,6 +948,7 @@ procedure TMainForm.lblFileBHashClick(Sender: TObject);
 var
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -2217,6 +2222,7 @@ var
   slCompareTwoFiles : TStringList;
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -2384,9 +2390,9 @@ var
   _strToBeHashed: UnicodeString;
 begin
   TabRadioGroup1 := AlgorithmChoiceRadioBox1;
+  _strToBeHashed := PWideChar(strToBeHashed);
   result := '';
   if Length(strToBeHashed) > 0 then
-    _strToBeHashed := PWideChar(strToBeHashed);
     begin
       case PageControl1.TabIndex of
         0: TabRadioGroup1 := AlgorithmChoiceRadioBox1;  //RadioGroup on the 1st tab.
@@ -2946,22 +2952,24 @@ type
   TRange = 'A'..'Z';   // For the drive lettering of Windows systems
 {$ENDIF}
 var
-  i, NoOfFilesCopiedOK, j, k, HashMismtachCount,
+  i, NoOfFilesCopiedOK, j, HashMismtachCount,
     FileCopyErrors, ZeroByteFilesCounter, DupCount : integer;
 
   SizeOfFile2, TotalBytesRead2, NoFilesExamined, m: Int64;
 
   SubDirStructure, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
-    FormattedSystemDate, OutputDirDateFormatted,
-    CrDateModDateAccDate, CurrentFile, CSVLogFile2, HTMLLogFile2,
-    strNoOfFilesToExamine, SubDirStructureParent, strTimeDifference : string;
+    FormattedSystemDate, OutputDirDateFormatted, CrDateModDateAccDate,
+    CSVLogFile2, HTMLLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
+    strTimeDifference : string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
-  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors, slTemp : TStringList;
+  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
 
   {$IFDEF WINDOWS}
+  CurrentFile : string;
+  slTemp : TStringList;
   DriveLetter : char;  // For MS Windows drive letter irritances only
   {$ENDIF}
 
@@ -2980,7 +2988,6 @@ begin
   DupCount                := 0;
   i                       := 0;
   j                       := 0;
-  k                       := 0;
   m                       := 0;
 
   SLCopyErrors := TStringListUTF8.Create;
@@ -3252,8 +3259,8 @@ begin
         i := 0;
           for i := 0 to FilesFoundToCopy.Count -1 do
             begin
-              CurrentFile := FilesFoundToCopy.Strings[i];
               {$IFDEF Windows}
+              CurrentFile := FilesFoundToCopy.Strings[i];
               CrDateModDateAccDate := DateAttributesOfCurrentFile(CurrentFile);
               {$ENDIF}
               frmDisplayGrid1.CopyAndHashGrid.rowcount    := i + 1;

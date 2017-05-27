@@ -246,6 +246,10 @@ var
   stmp, strModel, strVendor, strType, strSerial : String;
 
 begin
+  strModel := '';
+  strVendor := '';
+  strType := '';
+  strSerial := '';
 
   // Probe all attached disks and populate the interface
   DiskInfoProcess:=TProcess.Create(nil);
@@ -381,13 +385,14 @@ var
   DisksProcess: TProcess;
   i: Integer;
   slDisklist: TSTringList;
-  PhyDiskNode, PartitionNoNode, DriveLetterNode           : TTreeNode;
+  PhyDiskNode, DriveLetterNode           : TTreeNode;
   strPhysDiskSize, strLogDiskSize, DiskDevName, DiskLabels, dmCryptDiscovered   : string;
 begin
   DisksProcess:=TProcess.Create(nil);
   DisksProcess.Options:=[poWaitOnExit, poUsePipes];
-  DisksProcess.CommandLine:='cat /proc/partitions';   //get all disks/partitions list
-  DisksProcess.Execute;
+  DisksProcess.Executable := '/bin/sh';
+  DisksProcess.Parameters.Add('-c');
+  DisksProcess.Parameters.Add('cat /proc/partitions');   //get all disks/partitions list
   slDisklist:=TStringList.Create;
   slDisklist.LoadFromStream(DisksProcess.Output);
   slDisklist.Delete(0);  //delete columns name line
@@ -457,18 +462,16 @@ end;
 function GetBlockSizeLinux(DiskDevName : string) : Integer;
 var
   DiskProcess: TProcess;
-  BlockSize, StartOffset, i : Integer;
+  i : Integer;
   slDevDisk: TSTringList;
   strBlockSize : string;
-  RelLine : boolean;
 
 begin
-  RelLine := false;
-  BlockSize := 0;
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
-  DiskProcess.Execute;
+  DiskProcess.Executable := '/bin/sh';
+  DiskProcess.Parameters.Add('-c');
+  DiskProcess.Parameters.Add('udisks --show-info ' + DiskDevName);   //get all disks/partitions list
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
 
@@ -487,7 +490,7 @@ end;
 function GetByteCountLinux(DiskDevName : string) : QWord;
 var
   DiskProcess: TProcess;
-  StartOffset, i : Integer;
+  i : Integer;
   slDevDisk: TSTringList;
   strByteCount : string;
   ScanDiskData : boolean;
@@ -500,8 +503,9 @@ begin
   strByteCount := '';
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
-  DiskProcess.Execute;
+  DiskProcess.Executable := '/bin/sh';
+  DiskProcess.Parameters.Add('-c');
+  DiskProcess.Parameters.Add('udisks --show-info ' + DiskDevName);   //get all disks/partitions list
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
 
@@ -540,6 +544,7 @@ end;
 // Returns the exact disk size for BOTH physical disks and logical drives as
 // reported by the Windows API and is used during the imaging stage
 function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
+{$ifdef Windows}
 const
   // These are defined at the MSDN.Microsoft.com website for DeviceIOControl
   // and https://forum.tuts4you.com/topic/22361-deviceiocontrol-ioctl-codes/
@@ -606,11 +611,12 @@ var
   ByteSize: int64;
   BytesReturned: DWORD;
   DLength: TDiskLength;
+{$endif}
 
 begin
+  {$ifdef Windows}
   ByteSize      := 0;
   BytesReturned := 0;
-  {$ifdef Windows}
   // https://msdn.microsoft.com/en-us/library/aa365178%28v=vs.85%29.aspx
   if not DeviceIOControl(hSelectedDisk,
                          IOCTL_DISK_GET_LENGTH_INFO,
@@ -971,11 +977,15 @@ const
   //SectorCount                             : Int64;
   //ExactSectorSize                         : integer;
     slHashLog                               : TStringList;
+    {$ifdef Windows}
     BytesReturned                           : DWORD;
+    {$endif}
     StartedAt, EndedAt, TimeTakenToHash     : TDateTime;
 
   begin
+    {$ifdef Windows}
     BytesReturned   := 0;
+    {$endif}
     ExactDiskSize   := 0;
   //ExactSectorSize := 0;
   //SectorCount     := 0;
@@ -1037,7 +1047,7 @@ const
         ExactDiskSize   := GetDiskLengthInBytes(hSelectedDisk);
         {$endif}
         {$ifdef UNIX}
-        ExactDiskSize   := GetByteCountLinux(SourceDevice);
+        ExactDiskSize   := GetByteCountLinux(string(SourceDevice));
         {$endif}
 
         // Now query the sector size.
@@ -1495,8 +1505,10 @@ end;
 
 
 procedure TfrmDiskHashingModule.menShowDiskManagerClick(Sender: TObject);
+{$ifdef Windows}
 var
 ProcDiskManager : TProcess;
+{$endif}
 begin
   {$ifdef Windows}
   try
