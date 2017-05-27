@@ -2968,6 +2968,7 @@ var
   FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
 
   {$IFDEF WINDOWS}
+  k : integer;
   CurrentFile : string;
   slTemp : TStringList;
   DriveLetter : char;  // For MS Windows drive letter irritances only
@@ -2988,6 +2989,9 @@ begin
   DupCount                := 0;
   i                       := 0;
   j                       := 0;
+  {$IFDEF Windows}
+  k                       := 0;
+  {$ENDIF}
   m                       := 0;
 
   SLCopyErrors := TStringListUTF8.Create;
