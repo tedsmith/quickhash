@@ -1252,10 +1252,26 @@ var
                   slDuplicates.Add(RecursiveDisplayGrid1.Cells[2,i-1] + RecursiveDisplayGrid1.Cells[1, i-1]);
                  end;
              end;
-         finally
-           slDuplicates.Sort;
-         end;
 
+          if slDuplicates.Count > 0 then
+            if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
+              [mbCancel, mbNo, mbYes],0) = mrYes then
+              begin
+                for i := 0 to (slDuplicates.Count -1) do
+                  begin
+                    StatusBar2.SimpleText:= 'Deleting duplicate file ' + slDuplicates.Strings[i];
+                    StatusBar2.Refresh;
+                    if SysUtils.DeleteFile(slDuplicates.Strings[i]) then
+                      inc(DuplicatesDeleted);
+                  end;
+                StatusBar2.SimpleText:= 'Finished deleting ' + IntToStr(DuplicatesDeleted) + ' duplicate files';
+                StatusBar2.Refresh;
+                ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
+              end;
+         finally
+           //slDuplicates.Sort;
+           if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
+         end;
          // and conclude timings and update display
          stop := Now;
          elapsed := stop - start;
@@ -1331,27 +1347,6 @@ var
           ShowMessage('Invalid directory selected' + sLineBreak + 'You must select a directory. Error code : ' + SysErrorMessageUTF8(GetLastOSError));
         end;
     end;
-
-  // Now see if the user wishes to delete any found duplicates
-  if chkFlagDuplicates.Checked then
-    begin
-      if slDuplicates.Count > 0 then
-        if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
-          [mbCancel, mbNo, mbYes],0) = mrYes then
-            begin
-              for i := 0 to (slDuplicates.Count -1) do
-                begin
-                  StatusBar2.SimpleText:= 'Deleting duplicate file ' + slDuplicates.Strings[i];
-                  StatusBar2.Refresh;
-                  if SysUtils.DeleteFile(slDuplicates.Strings[i]) then
-                    inc(DuplicatesDeleted);
-                end;
-              StatusBar2.SimpleText:= 'Finished deleting ' + IntToStr(DuplicatesDeleted) + ' duplicate files';
-              StatusBar2.Refresh;
-              ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
-            end;
-    end; // end of duplicate deletion phase
-  if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
 end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
