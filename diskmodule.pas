@@ -134,8 +134,11 @@ implementation
 
 // Enable or disable elements depending on the OS hosting the application
 procedure TfrmDiskHashingModule.FormCreate(Sender: TObject);
+var
+  MissingFileCount : integer;
 begin
   Stop := false;
+  MissingFileCount := 0;
   ExecutionCount := 0;
   ledtComputedHashA.Enabled := false;
   ledtComputedHashB.Enabled := false;
@@ -240,25 +243,19 @@ const
   svendor = 'ID_VENDOR=';
 var
 
-  DiskInfoProcess : TProcess;
-  diskinfo        : TStringList;
-  i               : Integer;
+  DiskInfoProcess          : TProcess;
+  DiskInfoProcessUDISKS    : TProcess;
+  diskinfo, diskinfoUDISKS : TStringList;
+  i                        : Integer;
   stmp, strModel, strVendor, strType, strSerial : String;
 
 begin
-  strModel := '';
-  strVendor := '';
-  strType := '';
-  strSerial := '';
 
   // Probe all attached disks and populate the interface
   DiskInfoProcess:=TProcess.Create(nil);
   DiskInfoProcess.Options:=[poWaitOnExit, poUsePipes];
-  // get info about selected disk
-  DiskInfoProcess.Executable:='/sbin/udevadm';
-  DiskInfoProcess.Parameters.Add('info');
-  DiskInfoProcess.Parameters.Add('--query=property');
-  DiskInfoProcess.Parameters.Add('--name=' + DiskDevName);
+  DiskInfoProcess.CommandLine:='/sbin/udevadm info --query=property --name='+DiskDevName;  //get info about selected disk
+  DiskInfoProcess.Execute;
 
   diskinfo:=TStringList.Create;
   diskinfo.LoadFromStream(DiskInfoProcess.Output);
@@ -325,11 +322,8 @@ begin
   // Probe all attached disks and populate the interface
   DiskInfoProcess:=TProcess.Create(nil);
   DiskInfoProcess.Options:=[poWaitOnExit, poUsePipes];
-  // get info about selected disk
-  DiskInfoProcess.Executable:='/sbin/udevadm';
-  DiskInfoProcess.Parameters.Add('info');
-  DiskInfoProcess.Parameters.Add('--query=property');
-  DiskInfoProcess.Parameters.Add('--name=' + cbdisks.Text);
+  DiskInfoProcess.CommandLine:='/sbin/udevadm info --query=property --name='+cbdisks.Text;  //get info about selected disk
+  DiskInfoProcess.Execute;
 
   diskinfo:=TStringList.Create;
   diskinfo.LoadFromStream(DiskInfoProcess.Output);
@@ -364,9 +358,8 @@ begin
   // Get all technical specifications about a user selected disk and save it
   DiskInfoProcessUDISKS := TProcess.Create(nil);
   DiskInfoProcessUDISKS.Options := [poWaitOnExit, poUsePipes];
-  DiskInfoProcessUDISKS.Executable := '/bin/sh';
-  DiskInfoProcessUDISKS.Parameters.Add('-c');
-  DiskInfoProcessUDISKS.Parameters.Add('udisks --show-info /dev/' + cbdisks.Text);
+  DiskInfoProcessUDISKS.CommandLine := 'udisks --show-info /dev/' + cbdisks.Text;
+  DiskInfoProcessUDISKS.Execute;
   diskinfoUDISKS := TStringList.Create;
   diskinfoUDISKS.LoadFromStream(diskinfoProcessUDISKS.Output);
   diskinfoUDISKS.SaveToFile('TechnicalDiskDetails.txt');
@@ -385,14 +378,13 @@ var
   DisksProcess: TProcess;
   i: Integer;
   slDisklist: TSTringList;
-  PhyDiskNode, DriveLetterNode           : TTreeNode;
+  PhyDiskNode, PartitionNoNode, DriveLetterNode           : TTreeNode;
   strPhysDiskSize, strLogDiskSize, DiskDevName, DiskLabels, dmCryptDiscovered   : string;
 begin
   DisksProcess:=TProcess.Create(nil);
   DisksProcess.Options:=[poWaitOnExit, poUsePipes];
-  DisksProcess.Executable := '/bin/sh';
-  DisksProcess.Parameters.Add('-c');
-  DisksProcess.Parameters.Add('cat /proc/partitions');   //get all disks/partitions list
+  DisksProcess.CommandLine:='cat /proc/partitions';   //get all disks/partitions list
+  DisksProcess.Execute;
   slDisklist:=TStringList.Create;
   slDisklist.LoadFromStream(DisksProcess.Output);
   slDisklist.Delete(0);  //delete columns name line
@@ -462,16 +454,18 @@ end;
 function GetBlockSizeLinux(DiskDevName : string) : Integer;
 var
   DiskProcess: TProcess;
-  i : Integer;
+  BlockSize, StartOffset, i : Integer;
   slDevDisk: TSTringList;
   strBlockSize : string;
+  RelLine : boolean;
 
 begin
+  RelLine := false;
+  BlockSize := 0;
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.Executable := '/bin/sh';
-  DiskProcess.Parameters.Add('-c');
-  DiskProcess.Parameters.Add('udisks --show-info ' + DiskDevName);   //get all disks/partitions list
+  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
+  DiskProcess.Execute;
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
 
@@ -490,7 +484,7 @@ end;
 function GetByteCountLinux(DiskDevName : string) : QWord;
 var
   DiskProcess: TProcess;
-  i : Integer;
+  StartOffset, i : Integer;
   slDevDisk: TSTringList;
   strByteCount : string;
   ScanDiskData : boolean;
@@ -503,9 +497,8 @@ begin
   strByteCount := '';
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.Executable := '/bin/sh';
-  DiskProcess.Parameters.Add('-c');
-  DiskProcess.Parameters.Add('udisks --show-info ' + DiskDevName);   //get all disks/partitions list
+  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
+  DiskProcess.Execute;
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
 
@@ -544,7 +537,6 @@ end;
 // Returns the exact disk size for BOTH physical disks and logical drives as
 // reported by the Windows API and is used during the imaging stage
 function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
-{$ifdef Windows}
 const
   // These are defined at the MSDN.Microsoft.com website for DeviceIOControl
   // and https://forum.tuts4you.com/topic/22361-deviceiocontrol-ioctl-codes/
@@ -611,12 +603,11 @@ var
   ByteSize: int64;
   BytesReturned: DWORD;
   DLength: TDiskLength;
-{$endif}
 
 begin
-  {$ifdef Windows}
   ByteSize      := 0;
   BytesReturned := 0;
+  {$ifdef Windows}
   // https://msdn.microsoft.com/en-us/library/aa365178%28v=vs.85%29.aspx
   if not DeviceIOControl(hSelectedDisk,
                          IOCTL_DISK_GET_LENGTH_INFO,
@@ -828,15 +819,13 @@ begin
   SelectedDisk     := '';
   Partitions       := 0;
   GPTData          := '';
-  SectorsPerTrack  := 0;
-  ReportedSectors  := 0;
   frmTechSpecs.Memo1.Clear;
 
   if Pos('\\.\PHYSICALDRIVE', TreeView1.Selected.Text) > 0 then
     begin
       // "\\.\PHYSICALDRIVE" = 17 chars, and up to '25' disks allocated so a further
       // 2 chars for that, so 19 chars ibn total.
-      SelectedDisk := PWideChar(Trim(Copy(TreeView1.Selected.Text, 0, 19)));
+      SelectedDisk := Trim(Copy(TreeView1.Selected.Text, 0, 19));
 
       // Determine if it a MBR or GPT partitioned disk. Call GPTMBR  and uGPT units...
       MBRorGPT := MBR_or_GPT(SelectedDisk);
@@ -846,7 +835,7 @@ begin
         end;
 
       // Now ensure the disk string is suitable for WMI and and so on
-      SelectedDisk := PWideChar(Trim(StringReplace(PWideChar(SelectedDisk), '\', '\\', [rfReplaceAll])));
+      SelectedDisk := ANSIToUTF8(Trim(StringReplace(SelectedDisk,'\','\\',[rfReplaceAll])));
       // Years from now, when this makes no sense, just remember that WMI wants a widestring!!!!
       // Dont spend hours of your life again trying to work that undocumented aspect out.
 
@@ -941,9 +930,8 @@ begin
   // Get all technical specifications about a user selected disk and save it
   DiskInfoProcessUDISKS := TProcess.Create(nil);
   DiskInfoProcessUDISKS.Options := [poWaitOnExit, poUsePipes];
-  DiskInfoProcessUDISKS.Executable := '/bin/sh';
-  DiskInfoProcessUDISKS.Parameters.Add('-c');
-  DiskInfoProcessUDISKS.Parameters.Add('udisks --show-info ' + Treeview1.Selected.Text);
+  DiskInfoProcessUDISKS.CommandLine := 'udisks --show-info ' + Treeview1.Selected.Text;
+  DiskInfoProcessUDISKS.Execute;
 
   diskinfoUDISKS := TStringList.Create;
   diskinfoUDISKS.LoadFromStream(diskinfoProcessUDISKS.Output);
@@ -973,28 +961,23 @@ const
   var
     SourceDevice                            : widestring;
     hSelectedDisk                           : THandle;
-    ExactDiskSize, HashResult               : Int64;
-  //SectorCount                             : Int64;
-  //ExactSectorSize                         : integer;
+    ExactDiskSize, SectorCount, HashResult  : Int64;
+    ExactSectorSize                         : integer;
     slHashLog                               : TStringList;
-    {$ifdef Windows}
     BytesReturned                           : DWORD;
-    {$endif}
     StartedAt, EndedAt, TimeTakenToHash     : TDateTime;
 
   begin
-    {$ifdef Windows}
     BytesReturned   := 0;
-    {$endif}
     ExactDiskSize   := 0;
-  //ExactSectorSize := 0;
-  //SectorCount     := 0;
+    ExactSectorSize := 0;
+    SectorCount     := 0;
     HashResult      := 0;
     HashChoice      := -1;
     StartedAt       := 0;
     EndedAt         := 0;
     TimeTakenToHash := 0;
-    SourceDevice    := PWideChar(ledtSelectedItem.Text);
+    SourceDevice    := ledtSelectedItem.Text;
     comboHashChoice.Enabled  := false;
 
     // Determine what hash algorithm to use.
@@ -1047,20 +1030,20 @@ const
         ExactDiskSize   := GetDiskLengthInBytes(hSelectedDisk);
         {$endif}
         {$ifdef UNIX}
-        ExactDiskSize   := GetByteCountLinux(string(SourceDevice));
+        ExactDiskSize   := GetByteCountLinux(SourceDevice);
         {$endif}
 
         // Now query the sector size.
         // 512 bytes is common with MBR but with GPT disks, 1024 or 4096 is likely
         {$ifdef Windows}
-        //ExactSectorSize := GetSectorSizeInBytes(hSelectedDisk);
+        ExactSectorSize := GetSectorSizeInBytes(hSelectedDisk);
         {$endif}
         {$ifdef Unix}
-        //ExactSectorSize := GetBlockSizeLinux(SourceDevice);
+        ExactSectorSize := GetBlockSizeLinux(SourceDevice);
         {$endif}
 
         // Now we can assign a sector count based on sector size and disk size
-        //SectorCount   := ExactDiskSize DIV ExactSectorSize;
+        SectorCount   := ExactDiskSize DIV ExactSectorSize;
 
         frmProgress.lblTotalBytesSource.Caption := ' bytes hashed of ' + IntToStr(ExactDiskSize);
 
@@ -1110,7 +1093,7 @@ const
           {$ifdef Unix}
           slHashLog.Add('Using operating system: '    + GetOSNameLinux);
           {$endif}
-          slHashLog.Add('Device ID: '                 + String(SourceDevice));
+          slHashLog.Add('Device ID: '                 + SourceDevice);
           slHashLog.Add('Chosen Hash Algorithm: '     + comboHashChoice.Text);
           slHashLog.Add('=======================');
           slHashLog.Add('Hashing Started At: '        + FormatDateTime('dd/mm/yy HH:MM:SS', StartedAt));
@@ -1505,10 +1488,8 @@ end;
 
 
 procedure TfrmDiskHashingModule.menShowDiskManagerClick(Sender: TObject);
-{$ifdef Windows}
 var
 ProcDiskManager : TProcess;
-{$endif}
 begin
   {$ifdef Windows}
   try
@@ -1543,7 +1524,7 @@ function VarArrayToStr(const vArray: variant): string;
           varDouble,
           varCurrency : Result := FloatToStr(Double(V));
           varDate     : Result := VarToStr(V);
-          varOleStr   : Result := String(V);
+          varOleStr   : Result := WideString(V);
           varBoolean  : Result := VarToStr(V);
           varVariant  : Result := VarToStr(Variant(V));
           varByte     : Result := char(byte(V));
@@ -1611,7 +1592,7 @@ var
   oEnumPartition : IEnumvariant;
   oEnumLogical   : IEnumvariant;
   Val1, Val2, Val3, Val4,
-    DeviceID, s : string;
+    DeviceID, s : widestring;
   DriveLetter, strDiskSize, strFreeSpace, strVolumeName    : string;
   DriveLetterID  : Byte;
   intDriveSize, intFreeSpace : Int64;
@@ -1676,7 +1657,7 @@ begin;
             Val3 := Format('Drive %s',[string(objLogicalDisk.DeviceID)]);
              if Length(Val3) > 0 then
               begin
-                DriveLetter    := GetJustDriveLetter(PWideChar(Val3));
+                DriveLetter    := GetJustDriveLetter(Val3);
                 DriveLetterID  := GetDriveIDFromLetter(DriveLetter);
                 intDriveSize   := DiskSize(DriveLetterID);
                 strDiskSize    := FormatByteSize(intDriveSize);
@@ -1705,7 +1686,7 @@ begin
   Delete(str, 1, 6);
   // Now strip out the ':'
   Delete(str, 2, 1);
-  result := String(str);
+  result := str;
 end;
 
 // Returns the numerical ID stored by Windows of the queried drive letter
@@ -1757,7 +1738,7 @@ const
   IOCTL_DISK_GET_DRIVE_GEOMETRY      = $0070000;
 var
   DG : TDiskGeometry;
-  BytesReturned : Integer;
+  SectorSizeInBytes, BytesReturned : Integer;
 
 begin
   if not DeviceIOControl(hSelectedDisk,
