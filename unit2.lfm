@@ -160,7 +160,7 @@ object MainForm: TMainForm
         end
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
-        Left = 8
+        Left = 16
         Height = 129
         Hint = 'Having typed some text in the text area, you can'#13#10'easily recompute different hashes for the text inputted'#13#10'by choosing a different hash algorithm'
         Top = 10
@@ -194,10 +194,10 @@ object MainForm: TMainForm
         TabOrder = 1
       end
       object SystemRAMGroupBox: TGroupBox
-        Left = 8
+        Left = 16
         Height = 81
         Top = 152
-        Width = 104
+        Width = 96
         Caption = 'System RAM'
         ClientHeight = 60
         ClientWidth = 92
@@ -353,10 +353,10 @@ object MainForm: TMainForm
         end
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup
-        Left = 8
+        Left = 16
         Height = 129
         Top = 10
-        Width = 104
+        Width = 96
         AutoFill = True
         Caption = 'Algorithm'
         ChildSizing.LeftRightSpacing = 6
@@ -688,10 +688,10 @@ object MainForm: TMainForm
         end
       end
       object AlgorithmChoiceRadioBox3: TRadioGroup
-        Left = 8
+        Left = 16
         Height = 129
         Top = 10
-        Width = 104
+        Width = 96
         AutoFill = True
         Caption = 'Algorithm'
         ChildSizing.LeftRightSpacing = 6
@@ -1067,10 +1067,10 @@ object MainForm: TMainForm
         end
       end
       object AlgorithmChoiceRadioBox4: TRadioGroup
-        Left = 8
+        Left = 16
         Height = 129
         Top = 10
-        Width = 104
+        Width = 96
         AutoFill = True
         Caption = 'Algorithm'
         ChildSizing.LeftRightSpacing = 6
@@ -1102,10 +1102,10 @@ object MainForm: TMainForm
       ClientHeight = 612
       ClientWidth = 980
       object AlgorithmChoiceRadioBox5: TRadioGroup
-        Left = 8
+        Left = 16
         Height = 129
         Top = 10
-        Width = 104
+        Width = 96
         AutoFill = True
         Caption = 'Algorithm'
         ChildSizing.LeftRightSpacing = 6
@@ -1599,10 +1599,10 @@ object MainForm: TMainForm
         end
       end
       object AlgorithmChoiceRadioBox6: TRadioGroup
-        Left = 8
+        Left = 16
         Height = 129
         Top = 10
-        Width = 104
+        Width = 96
         AutoFill = True
         Caption = 'Algorithm'
         ChildSizing.LeftRightSpacing = 6

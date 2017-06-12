@@ -72,14 +72,18 @@ implementation
 function MBR_or_GPT(SelectedDisk : widestring) : string; 
 
 const
+  PARTITION_STYLE_MBR = 0;
+  PARTITION_STYLE_GPT = 1;
+  PARTITION_STYLE_RAW = 2;
+
   IOCTL_DISK_GET_DRIVE_LAYOUT_EX = $00070050;
 var
+  i: Integer;
   Drive: widestring;
   hDevice: THandle;
   DriveLayoutInfo: TDriveLayoutInformationEx;
   BytesReturned: DWORD;
 begin
-    BytesReturned := 0;
     result := '';
     Drive := SelectedDisk;
     // This particular handle assignment does not require admin rights as it allows
