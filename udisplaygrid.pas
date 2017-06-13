@@ -50,7 +50,7 @@ end;
 
 
 initialization
-  {$I uDisplayGrid.lrs}
+  {$I udisplaygrid.lrs}
 
 end.
 

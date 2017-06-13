@@ -9,7 +9,7 @@ uses
   LazUTF8Classes, Classes;
 
 function FindAllFilesEx(const SearchPath: string; SearchMask: string;
-    SearchSubDirs: boolean; IncludeHidderDirs: boolean): TStringListUTF8;
+    SearchSubDirs: boolean; IncludeHiddenDirs: boolean): TStringListUTF8;
 
 implementation
 uses
@@ -42,7 +42,7 @@ begin
 end;
 
 function FindAllFilesEx(const SearchPath: string; SearchMask: string;
-  SearchSubDirs: boolean; IncludeHidderDirs: boolean): TStringListUTF8;
+  SearchSubDirs: boolean; IncludeHiddenDirs: boolean): TStringListUTF8;
 var
   Searcher: TListFileSearcher;
 begin
