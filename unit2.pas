@@ -698,6 +698,7 @@ var
   start, stop, elapsed : TDateTime;
 
 begin
+  filename := '';
   StatusBar1.SimpleText := '';
   if OpenDialog1.Execute then
     begin
@@ -885,8 +886,10 @@ end;
 
 
 procedure TMainForm.sysRAMTimerTimer(Sender: TObject);
+{$ifdef windows}
 var
   MemFigures : string;
+{$endif}
 begin
   {$IFDEF WINDOWS}
   MemFigures := GetSystemMem;
@@ -914,6 +917,7 @@ procedure TMainForm.lblFileAHashClick(Sender: TObject);
 var
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -944,6 +948,7 @@ procedure TMainForm.lblFileBHashClick(Sender: TObject);
 var
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -1514,18 +1519,16 @@ procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
   FilePath, FileName, FullPathAndName, FileHashA, FileHashB,
-    HashOfListA, HashOfListB, Mismatch, strTimeTaken, strTimeDifference : string;
+    HashOfListA, HashOfListB, strTimeTaken : string;
 
   TotalFilesDirA, TotalFilesDirB,       // Stringlists just for the file names
     HashListA, HashListB,               // Stringlists just for the hashes of each file in each directory
-    FileAndHashListA, FileAndHashListB, // Stringlists for the combined lists of both hashes with filenames
-    MisMatchList : TStringList;
+    FileAndHashListA, FileAndHashListB  // Stringlists for the combined lists of both hashes with filenames
+    : TStringList;
 
   i, FilesProcessed : integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
-
-  MisMatchStatus : boolean;
 
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
@@ -1556,7 +1559,6 @@ begin
   end;
   {$endif}
 
-  MisMatchStatus                   := false; // Switches to true if a mismatch is identified
   StartTime                        := Now;
   sgDirA.Clean;
   sgDirB.Clean;
@@ -1731,7 +1733,6 @@ begin
       else
         begin
           // So the file counts match but the hash lists differ.
-          MisMatchStatus := true;
           lblStatusB.Caption    := DirA + ' does not match match ' + DirB;
           lblHashMatchB.Caption := 'MIS-MATCH! File count is the same, but hashes differ.';
           sgDirA.Visible := true;
@@ -1745,7 +1746,6 @@ begin
     // Start of Mis-Match Loop:
     if (TotalFilesDirB.Count < TotalFilesDirA.Count) or (TotalFilesDirB.Count > TotalFilesDirA.Count) then
       begin
-        MisMatchStatus := true;
         lblHashMatchB.Caption:= 'MIS-MATCH! File counts are different.';
         FileAndHashListA.Sort;
         FileAndHashListB.Sort;
@@ -1805,7 +1805,7 @@ end;
 // one pair against the other and highlights the mis matches.
 procedure TMainForm.MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
   OnlyTabulateErrors : boolean;
@@ -1814,7 +1814,6 @@ begin
   i := 0;
   j := 0;
   indexA := 0;
-  indexB := 0;
   HashPosStart := 0;
   FileNameAndPathPosStart := 0;
   FileNameAndPathPosEnd := 0;
@@ -1923,7 +1922,7 @@ end;
 // MisMatchHashCompare : When file counts match in both directories but hashes differ, this works out what files are different by hash
 procedure TMainForm.MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, HashPosStart, FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
   OnlyTabulateErrors : boolean;
@@ -1932,7 +1931,6 @@ begin
   i                        := 0;
   j                        := 0;
   indexA                   := 0;
-  indexB                   := 0;
   HashPosStart             := 0;
   FileNameAndPathPosStart  := 0;
   FileNameAndPathPosEnd    := 0;
@@ -2213,6 +2211,7 @@ var
   slCompareTwoFiles : TStringList;
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -2378,6 +2377,7 @@ function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 var
   TabRadioGroup1: TRadioGroup;
 begin
+  TabRadioGroup1 := AlgorithmChoiceRadioBox1;
   result := '';
   if Length(strToBeHashed) > 0 then
     begin
@@ -2939,22 +2939,25 @@ type
   TRange = 'A'..'Z';   // For the drive lettering of Windows systems
 {$ENDIF}
 var
-  i, NoOfFilesCopiedOK, j, k, HashMismtachCount,
+  i, NoOfFilesCopiedOK, j, HashMismtachCount,
     FileCopyErrors, ZeroByteFilesCounter, DupCount : integer;
 
   SizeOfFile2, TotalBytesRead2, NoFilesExamined, m: Int64;
 
   SubDirStructure, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
-    FormattedSystemDate, OutputDirDateFormatted,
-    CrDateModDateAccDate, CurrentFile, CSVLogFile2, HTMLLogFile2,
-    strNoOfFilesToExamine, SubDirStructureParent, strTimeDifference : string;
+    FormattedSystemDate, OutputDirDateFormatted, CrDateModDateAccDate,
+    CSVLogFile2, HTMLLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
+    strTimeDifference : string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
-  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors, slTemp : TStringList;
+  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
 
   {$IFDEF WINDOWS}
+  k : integer;
+  CurrentFile : string;
+  slTemp : TStringList;
   DriveLetter : char;  // For MS Windows drive letter irritances only
   {$ENDIF}
 
@@ -2973,7 +2976,9 @@ begin
   DupCount                := 0;
   i                       := 0;
   j                       := 0;
+  {$ifdef Windows}
   k                       := 0;
+  {$endif}
   m                       := 0;
 
   SLCopyErrors := TStringListUTF8.Create;
@@ -3245,8 +3250,8 @@ begin
         i := 0;
           for i := 0 to FilesFoundToCopy.Count -1 do
             begin
-              CurrentFile := FilesFoundToCopy.Strings[i];
               {$IFDEF Windows}
+              CurrentFile := FilesFoundToCopy.Strings[i];
               CrDateModDateAccDate := DateAttributesOfCurrentFile(CurrentFile);
               {$ENDIF}
               frmDisplayGrid1.CopyAndHashGrid.rowcount    := i + 1;
