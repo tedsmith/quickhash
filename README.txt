@@ -10,7 +10,7 @@ After installtion of Lazarus and Freepascal, choose "Open Project" and navigate 
 
 The next thing to do is to apply the HashLib4Pascal package into your Lazarus project, otherwise QuickHash project will not find the library it needs when you try to compile. The library is included in the GitHub QuickHash project. So simply choose 'Package' --> Open Package File (lpk)' from the top menu of Lazarus. Choose and navigate to
 
- /CloneOfQuickHashProject/HashLib4Pascal/HashLib/src/Packages/FPCdcpcrypt_laz.lpk, 
+ /CloneOfQuickHashProject/HashLib4Pascal/HashLib/src/Packages/FPC/FPCdcpcrypt_laz.lpk, 
 
 then click the 'Compile' button. Then use the next button to the right called 'Use >>' and then click 'Add to Project' from the drop down menu. HashLib4Pascal is now added to your QuickHash project. 
 
