@@ -74,7 +74,7 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
     LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls, XMLPropStorage,
-    uDisplayGrid, diskmodule, clipbrd, frmAboutUnit,
+    uDisplayGrid, diskmodule, clipbrd, ZVDateTimePicker, frmAboutUnit,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -142,6 +142,11 @@ type
     Button8CopyAndHash: TButton;
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
+    lblNoOfFilesToExamine2: TLabel;
+    lblschedulertickboxCompareTab: TCheckBox;
+    lblschedulertickboxFileSTab: TCheckBox;
+    lblschedulertickboxCopyTab: TCheckBox;
+    lblschedulertickboxFileTab: TCheckBox;
     edtFileBName: TEdit;
     edtFileAName: TEdit;
     FileTypeMaskCheckBox2: TCheckBox;
@@ -184,7 +189,6 @@ type
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
-    Label1: TLabel;
     lblRAM: TLabel;
     lbleExpectedHash: TLabeledEdit;
     lbleExpectedHashText: TLabeledEdit;
@@ -198,7 +202,6 @@ type
     lblFilesCopiedPercentage: TLabel;
     lblDataCopiedSoFar: TLabel;
     lblHashMatchResult: TLabel;
-    lblNoOfFilesToExamine2: TLabel;
     lblNoOfFilesToExamine: TLabel;
     lblPercentageComplete: TLabel;
     lblTotalBytesExamined: TLabel;
@@ -284,6 +287,10 @@ type
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
     QH_MainFormXMLPropStorage: TXMLPropStorage;
+    ZVDateTimePickerCopyTab: TZVDateTimePicker;
+    ZVDateTimePickerCompareTab: TZVDateTimePicker;
+    ZVDateTimePickerFileTab: TZVDateTimePicker;
+    ZVDateTimePickerFileSTab: TZVDateTimePicker;
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox3Click(Sender: TObject);
@@ -295,6 +302,10 @@ type
     procedure lblDonateClick(Sender: TObject);
     procedure lblFileAHashClick(Sender: TObject);
     procedure lblFileBHashClick(Sender: TObject);
+    procedure lblschedulertickboxFileSTabChange(Sender: TObject);
+    procedure lblschedulertickboxFileTabChange(Sender: TObject);
+    procedure lblschedulertickboxCopyTabChange(Sender: TObject);
+    procedure lblschedulertickboxCompareTabChange(Sender: TObject);
     procedure MenuItem1AClick(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2AClick(Sender: TObject);
@@ -600,18 +611,16 @@ procedure TMainForm.FormDropFiles(Sender: TObject;
   const FileNames: array of String);
 
 var
-  filename : ansistring;
-  fileHashValue : ansistring;
-  start, stop, elapsed : TDateTime;
-
+  filename, fileHashValue : ansistring;
+  start, stop, elapsed, scheduleStartTime : TDateTime;
+  LoopCounter : integer;
 begin
-  StatusBar1.SimpleText := '';
-
   // First, clear the captions from any earlier file hashing actions
-  lblStartedFileAt.Caption := '';
-  lblFileTimeTaken.Caption := '';
-  Label1.Caption := '';
+  StatusBar1.SimpleText    := '';
+  lblStartedFileAt.Caption := '...';
+  lblFileTimeTaken.Caption := '...';
   memFileHashField.Clear;
+  LoopCounter              := 0;
 
    begin
     filename := FileNames[0];
@@ -620,18 +629,44 @@ begin
       ShowMessage('Drag and drop of folders is not supported in this tab.');
     end
     else
-     if LazFileUtils.FileExistsUTF8(filename) then
-     begin
+    // User has selected a file, so check its valid
+      if LazFileUtils.FileExistsUTF8(filename) then
+      begin
+        // Now start a scheduled time, if selected
+        if lblschedulertickboxFileTab.Checked then
+          begin
+            // Check user has not chosen a time in the past
+            if ZVDateTimePickerFileTab.DateTime < Now then
+            begin
+              ShowMessage('Scheduled start time is in the past. Correct it.');
+              exit;
+            end
+          else
+            scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
+            StatusBar1.SimpleText := 'Waiting....scheduled ' + filename + ' for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+            repeat
+              // This sleep loop avoids straining the CPU too much but also ensures the
+              // interface stays responsive to button clicks etc.
+              // So every 1K itteration, refresh the interface until the scheduled start
+              // arrives or the user clicks Abort.
+              inc(LoopCounter,1);
+              if LoopCounter = 1000 then
+                begin
+                  Application.ProcessMessages;
+                  LoopCounter := 0;
+                end;
+              sleep(0);
+            until scheduleStartTime = Now;
+          end;
+
       start := Now;
       lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
 
       edtFileNameToBeHashed.Caption := (filename);
-      label1.Caption := 'Hashing file... ';
       StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
       Application.ProcessMessages;
       fileHashValue := CalcTheHashFile(Filename); // Custom function
       memFileHashField.Lines.Add(UpperCase(fileHashValue));
-      label1.Caption := 'Complete.';
       StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
       OpenDialog1.Close;
@@ -693,12 +728,15 @@ end;
 
 procedure TMainForm.btnHashFileClick(Sender: TObject);
 var
-  filename : widestring;
+  filename : string;
   fileHashValue : ansistring;
-  start, stop, elapsed : TDateTime;
-
+  start, stop, elapsed, scheduleStartTime : TDateTime;
+  LoopCounter : integer;
 begin
+  filename := '';
   StatusBar1.SimpleText := '';
+  LoopCounter := 0;
+
   if OpenDialog1.Execute then
     begin
       filename := OpenDialog1.Filename;
@@ -707,21 +745,43 @@ begin
   lblStartedFileAt.Caption := '';
   lbEndedFileAt.Caption    := '';
   lblFileTimeTaken.Caption := '';
-  Label1.Caption           := '';
   memFileHashField.Clear;
 
   if LazFileUtils.FileExistsUTF8(filename) then
   begin
+    if lblschedulertickboxFileTab.Checked then
+    begin
+      if ZVDateTimePickerFileTab.DateTime < Now then
+      begin
+        ShowMessage('Scheduled start time is in the past. Correct it.');
+        exit;
+      end
+      else
+      scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
+      StatusBar1.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+        repeat
+          // This sleep loop avoids straining the CPU too much but also ensures the
+          // interface stays responsive to button clicks etc.
+          // So every 1K itteration, refresh the interface until the scheduled start
+          // arrives or the user clicks Abort.
+          inc(LoopCounter,1);
+          if LoopCounter = 1000 then
+            begin
+              Application.ProcessMessages;
+              LoopCounter := 0;
+            end;
+          sleep(0);
+        until scheduleStartTime = Now;
+    end;
+
     start := Now;
     lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
 
     edtFileNameToBeHashed.Caption := (filename);
-    label1.Caption := 'Hashing file... ';
     StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
     Application.ProcessMessages;
     fileHashValue := CalcTheHashFile(Filename); // Custom function
     memFileHashField.Lines.Add(UpperCase(fileHashValue));
-    label1.Caption := 'Complete.';
     StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
     OpenDialog1.Close;
@@ -885,8 +945,10 @@ end;
 
 
 procedure TMainForm.sysRAMTimerTimer(Sender: TObject);
+{$ifdef windows}
 var
   MemFigures : string;
+{$endif}
 begin
   {$IFDEF WINDOWS}
   MemFigures := GetSystemMem;
@@ -914,6 +976,7 @@ procedure TMainForm.lblFileAHashClick(Sender: TObject);
 var
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -944,6 +1007,7 @@ procedure TMainForm.lblFileBHashClick(Sender: TObject);
 var
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -968,6 +1032,66 @@ begin
       Clipboard.AsText := ChosenHashAlg + ' ' + lblFileBHash.Caption;
       ShowMessage(ChosenHashAlg + ' Hash value now in clipboard');
     end;
+end;
+
+// Enables or disables time scheduler of FileS tab
+procedure TMainForm.lblschedulertickboxFileSTabChange(Sender: TObject);
+begin
+  if lblschedulertickboxFileSTab.Checked then
+  begin
+    ZVDateTimePickerFileSTab.Visible := true;
+    ZVDateTimePickerFileSTab.Enabled := true;
+  end
+  else
+  begin
+    ZVDateTimePickerFileSTab.Visible := false;
+    ZVDateTimePickerFileSTab.Enabled := false;
+  end;
+end;
+
+// Enables or disables time scheduler of File tab
+procedure TMainForm.lblschedulertickboxFileTabChange(Sender: TObject);
+begin
+  if lblschedulertickboxFileTab.Checked then
+  begin
+    ZVDateTimePickerFileTab.Visible := true;
+    ZVDateTimePickerFileTab.Enabled := true;
+  end
+  else
+  begin
+    ZVDateTimePickerFileTab.Visible := false;
+    ZVDateTimePickerFileTab.Enabled := false;
+  end;
+end;
+
+// Enables or disables time scheduler of Copy tab
+procedure TMainForm.lblschedulertickboxCopyTabChange(Sender: TObject);
+begin
+  if lblschedulertickboxCopyTab.Checked then
+  begin
+    ZVDateTimePickerCopyTab.Visible := true;
+    ZVDateTimePickerCopyTab.Enabled := true;
+  end
+  else
+  begin
+    ZVDateTimePickerCopyTab.Visible := false;
+    ZVDateTimePickerCopyTab.Enabled := false;
+  end;
+end;
+
+// Enables or disables time scheduler of Compare tab
+procedure TMainForm.lblschedulertickboxCompareTabChange(Sender: TObject);
+begin
+  if lblschedulertickboxCompareTab.Checked then
+  begin
+    ZVDateTimePickerCompareTab.Visible := true;
+    ZVDateTimePickerCompareTab.Enabled := true;
+  end
+  else
+  begin
+    ZVDateTimePickerCompareTab.Visible := false;
+    ZVDateTimePickerCompareTab.Enabled := false;
+  end;
 end;
 
 procedure TMainForm.MenuItem1AClick(Sender: TObject);
@@ -1079,7 +1203,7 @@ VAR
   MS_Ex : MemoryStatusEx;
   strTotalPhysMem, strTotalPhysAvail : string;
 begin
- FillChar (MS_Ex, SizeOf(MemoryStatusEx), #0);
+ FillChar(MS_Ex{%H-}, SizeOf(MemoryStatusEx), #0);
  MS_Ex.dwLength := SizeOf(MemoryStatusEx);
  if GlobalMemoryStatusEx(MS_Ex) then
    begin
@@ -1113,8 +1237,8 @@ var
   DirToHash, HTMLLogFile1, SearchMask : string;
   FS                                              : TFileSearcher;
   TotalFilesToExamine, slDuplicates               : TStringList;
-  start, stop, elapsed                            : TDateTime;
-  j, i, DuplicatesDeleted                         : integer;
+  start, stop, elapsed, scheduleStartTime         : TDateTime;
+  j, i, LoopCounter, DuplicatesDeleted            : integer;
 
   begin
   FileCounter                   := 1;
@@ -1126,6 +1250,7 @@ var
   lblPercentageComplete.Caption := '...';
   lblTotalBytesExamined.Caption := '...';
   pbFileS.Position              := 0;
+  LoopCounter                   := 0;
 
   if SelectDirectoryDialog1.Execute then
     begin
@@ -1147,7 +1272,33 @@ var
       // Check selected dir exists. If it does, start the process.
       if DirPathExists(LongPathOverride+DirToHash) then
         begin
-        // Now lets recursively count each file,
+        // If a scheduler has been set, wait for that future time to arrive
+        if lblschedulertickboxFileSTab.Checked then
+          begin
+            if ZVDateTimePickerFileSTab.DateTime < Now then
+            begin
+              ShowMessage('Scheduled start time is in the past. Correct it.');
+              exit;
+            end
+            else
+            scheduleStartTime     := ZVDateTimePickerFileSTab.DateTime;
+            StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+              repeat
+                // This sleep loop avoids straining the CPU too much but also ensures the
+                // interface stays responsive to button clicks etc.
+                // So every 1K itteration, refresh the interface until the scheduled start
+                // arrives or the user clicks Abort.
+                inc(LoopCounter,1);
+                if LoopCounter = 1000 then
+                  begin
+                    Application.ProcessMessages;
+                    LoopCounter := 0;
+                  end;
+                sleep(0);
+              until (scheduleStartTime = Now) or (StopScan1 = true);
+            end;
+
+         // Now lets recursively count each file,
          start := Now;
          lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
          StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
@@ -1252,26 +1403,10 @@ var
                   slDuplicates.Add(RecursiveDisplayGrid1.Cells[2,i-1] + RecursiveDisplayGrid1.Cells[1, i-1]);
                  end;
              end;
-
-          if slDuplicates.Count > 0 then
-            if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
-              [mbCancel, mbNo, mbYes],0) = mrYes then
-              begin
-                for i := 0 to (slDuplicates.Count -1) do
-                  begin
-                    StatusBar2.SimpleText:= 'Deleting duplicate file ' + slDuplicates.Strings[i];
-                    StatusBar2.Refresh;
-                    if SysUtils.DeleteFile(slDuplicates.Strings[i]) then
-                      inc(DuplicatesDeleted);
-                  end;
-                StatusBar2.SimpleText:= 'Finished deleting ' + IntToStr(DuplicatesDeleted) + ' duplicate files';
-                StatusBar2.Refresh;
-                ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
-              end;
          finally
-           //slDuplicates.Sort;
-           if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
+           slDuplicates.Sort;
          end;
+
          // and conclude timings and update display
          stop := Now;
          elapsed := stop - start;
@@ -1347,6 +1482,27 @@ var
           ShowMessage('Invalid directory selected' + sLineBreak + 'You must select a directory. Error code : ' + SysErrorMessageUTF8(GetLastOSError));
         end;
     end;
+
+  // Now see if the user wishes to delete any found duplicates
+  if chkFlagDuplicates.Checked then
+    begin
+      if slDuplicates.Count > 0 then
+        if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
+          [mbCancel, mbNo, mbYes],0) = mrYes then
+            begin
+              for i := 0 to (slDuplicates.Count -1) do
+                begin
+                  StatusBar2.SimpleText:= 'Deleting duplicate file ' + slDuplicates.Strings[i];
+                  StatusBar2.Refresh;
+                  if SysUtils.DeleteFile(slDuplicates.Strings[i]) then
+                    inc(DuplicatesDeleted);
+                end;
+              StatusBar2.SimpleText:= 'Finished deleting ' + IntToStr(DuplicatesDeleted) + ' duplicate files';
+              StatusBar2.Refresh;
+              ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
+            end;
+    end; // end of duplicate deletion phase
+  if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
 end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
@@ -1514,18 +1670,19 @@ procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
   FilePath, FileName, FullPathAndName, FileHashA, FileHashB,
-    HashOfListA, HashOfListB, Mismatch, strTimeTaken, strTimeDifference : string;
+    HashOfListA, HashOfListB, strTimeTaken{, strTimeDifference} : string;
 
+  //MisMatchList : TStringList;
   TotalFilesDirA, TotalFilesDirB,       // Stringlists just for the file names
     HashListA, HashListB,               // Stringlists just for the hashes of each file in each directory
-    FileAndHashListA, FileAndHashListB, // Stringlists for the combined lists of both hashes with filenames
-    MisMatchList : TStringList;
+    FileAndHashListA, FileAndHashListB  // Stringlists for the combined lists of both hashes with filenames
+    : TStringList;
 
   i, FilesProcessed : integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
-  MisMatchStatus : boolean;
+  //MisMatchStatus : boolean;
 
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
@@ -1556,7 +1713,7 @@ begin
   end;
   {$endif}
 
-  MisMatchStatus                   := false; // Switches to true if a mismatch is identified
+  //MisMatchStatus                   := false; // Switches to true if a mismatch is identified
   StartTime                        := Now;
   sgDirA.Clean;
   sgDirB.Clean;
@@ -1731,7 +1888,7 @@ begin
       else
         begin
           // So the file counts match but the hash lists differ.
-          MisMatchStatus := true;
+          //MisMatchStatus := true;
           lblStatusB.Caption    := DirA + ' does not match match ' + DirB;
           lblHashMatchB.Caption := 'MIS-MATCH! File count is the same, but hashes differ.';
           sgDirA.Visible := true;
@@ -1745,7 +1902,7 @@ begin
     // Start of Mis-Match Loop:
     if (TotalFilesDirB.Count < TotalFilesDirA.Count) or (TotalFilesDirB.Count > TotalFilesDirA.Count) then
       begin
-        MisMatchStatus := true;
+        //MisMatchStatus := true;
         lblHashMatchB.Caption:= 'MIS-MATCH! File counts are different.';
         FileAndHashListA.Sort;
         FileAndHashListB.Sort;
@@ -1805,7 +1962,7 @@ end;
 // one pair against the other and highlights the mis matches.
 procedure TMainForm.MisMatchFileCountCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
   OnlyTabulateErrors : boolean;
@@ -1814,7 +1971,6 @@ begin
   i := 0;
   j := 0;
   indexA := 0;
-  indexB := 0;
   HashPosStart := 0;
   FileNameAndPathPosStart := 0;
   FileNameAndPathPosEnd := 0;
@@ -1923,7 +2079,7 @@ end;
 // MisMatchHashCompare : When file counts match in both directories but hashes differ, this works out what files are different by hash
 procedure TMainForm.MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, j, indexA, indexB,  HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
   OnlyTabulateErrors : boolean;
@@ -1932,7 +2088,6 @@ begin
   i                        := 0;
   j                        := 0;
   indexA                   := 0;
-  indexB                   := 0;
   HashPosStart             := 0;
   FileNameAndPathPosStart  := 0;
   FileNameAndPathPosEnd    := 0;
@@ -2042,6 +2197,9 @@ begin
 end;
 
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
+var
+  scheduleStartTime : TDateTime;
+  LoopCounter       : Integer;
 begin
   frmDisplayGrid1.CopyAndHashGrid.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
@@ -2052,8 +2210,34 @@ begin
   lblTimeTaken6B.Caption           := '...';
   lblTimeTaken6C.Caption           := '...';
   pbCopy.Position                  := 0;
-  StatusBar3.SimpleText            := ('Counting files first...please wait');
+  LoopCounter                      := 0;
   Application.ProcessMessages;
+
+  // First, wait for the scheduler time to arrive, if set by the user
+  if lblschedulertickboxCopyTab.Checked then
+    begin
+      if ZVDateTimePickerCopyTab.DateTime < Now then
+      begin
+        ShowMessage('Scheduled start time is in the past. Correct it.');
+        exit;
+      end
+      else
+      scheduleStartTime     := ZVDateTimePickerCopyTab.DateTime;
+      StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+      repeat
+        // This sleep loop avoids straining the CPU too much but also ensures the
+        // interface stays responsive to button clicks etc.
+        // So every 1K itteration, refresh the interface until the scheduled start
+        // arrives or the user clicks Abort.
+        inc(LoopCounter,1);
+        if LoopCounter = 1000 then
+          begin
+            Application.ProcessMessages;
+            LoopCounter := 0;
+          end;
+        sleep(0);
+      until (scheduleStartTime = Now) or (StopScan2 = true);
+    end;
 
   if chkUNCMode.Checked then
     begin
@@ -2105,10 +2289,15 @@ begin
       try
         if slMultipleDirNames.Count > 0 then
         begin
-          ShowMessage('The following multiple directories will be hashed and copied:' + #13#10 + slMultipleDirNames.Text);
+          // Only show the user a prompt if scheduler was NOT selected
+          If lblschedulertickboxCopyTab.Checked = false then
+          begin
+            ShowMessage('The following multiple directories will be hashed and copied:' + #13#10 + slMultipleDirNames.Text);
+          end;
           // give ProcessDir function the first folder name in the list for now...
           // ProcessDir will then do the itterations itself using the same stringlist
           SourceDir := slMultipleDirNames.Strings[0];
+          // Now process the chosen folders
           ProcessDir(SourceDir);
         end
       finally
@@ -2159,6 +2348,8 @@ end;
 procedure TMainForm.btnCompareTwoFilesClick(Sender: TObject);
 var
   FileA, FileB, FileAHash, FileBHash : string;
+  schedulestarttime : TDateTime;
+  LoopCounter : integer;
 begin
   FileA                      := '';
   FileB                      := '';
@@ -2167,6 +2358,7 @@ begin
   lblHashMatchResult.Caption := '';
   lblFileAHash.Caption       := '';
   lblFileBHash.Caption       := '';
+  LoopCounter                := 0;
 
   FileA := Trim(edtFileAName.Caption);
   FileB := Trim(edtFileBName.Caption);
@@ -2179,6 +2371,30 @@ begin
   end
   else
     begin
+      if lblschedulertickboxCompareTab.Checked then
+      begin
+        if ZVDateTimePickerCompareTab.DateTime < Now then
+        begin
+         ShowMessage('Scheduled start time is in the past. Correct it.');
+         exit;
+        end
+        else
+        scheduleStartTime     := ZVDateTimePickerCompareTab.DateTime;
+        StatusBar4.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+         repeat
+           // This sleep loop avoids straining the CPU too much but also ensures the
+           // interface stays responsive to button clicks etc.
+           // So every 1K itteration, refresh the interface until the scheduled start
+           // arrives or the user clicks Abort.
+           inc(LoopCounter,1);
+           if LoopCounter = 1000 then
+             begin
+               Application.ProcessMessages;
+               LoopCounter := 0;
+             end;
+           sleep(0);
+         until scheduleStartTime = Now;
+      end;
       // FileA
       StatusBar4.SimpleText := 'Computing hash of ' + FileA + '...';
 
@@ -2213,6 +2429,7 @@ var
   slCompareTwoFiles : TStringList;
   ChosenHashAlg : string;
 begin
+  ChosenHashAlg := 'MD5';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -2325,7 +2542,6 @@ begin
       lblStartedFileAt.Caption := '';
       lbEndedFileAt.Caption    := 'awaiting new end time...';
       lblFileTimeTaken.Caption := 'awaiting recomputation...';
-      Label1.Caption := '';
       memFileHashField.Clear;
       StatusBar1.SimpleText := 'RECOMPUTING NEW HASH VALUE...Please wait.';
       start := Now;
@@ -2368,7 +2584,7 @@ end;
 function TMainForm.ValidateTextWithHash(strToBeHashed:ansistring) : string;
 begin
   result := '';
-  result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+  result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(PWideChar(strToBeHashed), TEncoding.UTF8).ToString();
 end;
 
 // For use in the 'Text' tab only, for hashing text elements. Not to be used
@@ -2377,7 +2593,10 @@ end;
 function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 var
   TabRadioGroup1: TRadioGroup;
+  _strToBeHashed: UnicodeString;
 begin
+  TabRadioGroup1 := AlgorithmChoiceRadioBox1;
+  _strToBeHashed := PWideChar(strToBeHashed);
   result := '';
   if Length(strToBeHashed) > 0 then
     begin
@@ -2391,22 +2610,22 @@ begin
 
       case TabRadioGroup1.ItemIndex of
         0: begin
-             result := THashFactory.TCrypto.CreateMD5().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateMD5().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         1: begin
-             result := THashFactory.TCrypto.CreateSHA1().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA1().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         2: begin
-             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         3: begin
-             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            end;
         4: begin
            {$ifdef CPU64}
-            result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+            result := THashFactory.THash64.CreateXXHash64().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            {$else if CPU32}
-            result := THashFactory.THash32.CreateXXHash32().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+            result := THashFactory.THash32.CreateXXHash32().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
            {$endif}
            end;
       end;
@@ -2939,22 +3158,25 @@ type
   TRange = 'A'..'Z';   // For the drive lettering of Windows systems
 {$ENDIF}
 var
-  i, NoOfFilesCopiedOK, j, k, HashMismtachCount,
+  i, NoOfFilesCopiedOK, j, HashMismtachCount,
     FileCopyErrors, ZeroByteFilesCounter, DupCount : integer;
 
   SizeOfFile2, TotalBytesRead2, NoFilesExamined, m: Int64;
 
   SubDirStructure, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
-    FormattedSystemDate, OutputDirDateFormatted,
-    CrDateModDateAccDate, CurrentFile, CSVLogFile2, HTMLLogFile2,
-    strNoOfFilesToExamine, SubDirStructureParent, strTimeDifference : string;
+    FormattedSystemDate, OutputDirDateFormatted, CrDateModDateAccDate,
+    CSVLogFile2, HTMLLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
+    strTimeDifference : string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
-  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors, slTemp : TStringList;
+  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
 
   {$IFDEF WINDOWS}
+  k : integer;
+  CurrentFile : string;
+  slTemp : TStringList;
   DriveLetter : char;  // For MS Windows drive letter irritances only
   {$ENDIF}
 
@@ -2973,16 +3195,16 @@ begin
   DupCount                := 0;
   i                       := 0;
   j                       := 0;
+  {$IFDEF Windows}
   k                       := 0;
+  {$ENDIF}
   m                       := 0;
 
   SLCopyErrors := TStringListUTF8.Create;
 
   // Ensures the selected source directory is set as the directory to be searched
   // and then finds all the files and directories within, storing as a StringList.
-  // Check with the user that he wants to proceed before starting the copy, compute
-  // the systems date and time settings, display that, and also generate part of
-  // the output directory based on time of execution
+  // Generate part of the output directory based on time of execution
 
   // This is for the GUI output
   StartTime  := Now;
@@ -3227,10 +3449,18 @@ begin
        end;
     {$ENDIF}
   {$ENDIF}
-  if MessageDlg('Proceed?', 'Source directory contains ' + IntToStr(FilesFoundToCopy.Count) + ' mask-matched files, inc sub-dirs. FYI, the host system date settings are : ' + FormattedSystemDate + '. Do you want to proceed?', mtConfirmation,
-   [mbCancel, mbNo, mbYes],0) = mrYes then
 
-    begin
+  // This prompt was used for ages, to ensure the user is happy to proceed
+  // after discovering how many files there are in source.
+  // But adding the scheduler makes it more complictaed and prevent automation.
+  // Several users also complained that they came back to it after thinking
+  // it had finished, to find it waiting for the user to press Yes.
+  // So discarded in v2.8.3 upwards.
+
+  {if MessageDlg('Proceed?', 'Source directory contains ' + IntToStr(FilesFoundToCopy.Count) + ' mask-matched files, inc sub-dirs. FYI, the host system date settings are : ' + FormattedSystemDate + '. Do you want to proceed?', mtConfirmation,
+   [mbCancel, mbNo, mbYes],0) = mrYes then}
+
+
     strNoOfFilesToExamine := IntToStr(FilesFoundToCopy.Count);
     lblTimeTaken6A.Caption := FormatDateTime('dd/mm/yy hh:mm:ss', SystemDate);
     Application.ProcessMessages;
@@ -3245,8 +3475,8 @@ begin
         i := 0;
           for i := 0 to FilesFoundToCopy.Count -1 do
             begin
-              CurrentFile := FilesFoundToCopy.Strings[i];
               {$IFDEF Windows}
+              CurrentFile := FilesFoundToCopy.Strings[i];
               CrDateModDateAccDate := DateAttributesOfCurrentFile(CurrentFile);
               {$ENDIF}
               frmDisplayGrid1.CopyAndHashGrid.rowcount    := i + 1;
@@ -3559,7 +3789,7 @@ begin
               lblNoOfFilesToExamine2.Caption := IntToStr(NoFilesExamined);
               SizeOfFile2 := FileSize(FilesFoundToCopy.Strings[i]);
               TotalBytesRead2 := TotalBytesRead2 + SizeOfFile2;
-              lblDataCopiedSoFar.Caption := FormatByteSize(TotalBytesRead2);
+              lblDataCopiedSoFar.Caption := '(' + FormatByteSize(TotalBytesRead2) + ')';
               // When or if the stop button is pressed, we need to prevent any
               // division by zero, thus the count check next...
               if FilesFoundToCopy.Count > 0 then
@@ -3677,16 +3907,13 @@ begin
         StatusBar3.SimpleText := 'Finished.';
         frmDisplayGrid1.btnClipboardResults2.Enabled := true;
       end;
+
     ShowMessage('Files copied : '   + IntToStr(NoOfFilesCopiedOK) + #13#10 +
                 'Copy errors : '    + IntToStr(FileCopyErrors)       + #13#10 +
                 'Hash mismatches: ' + IntToStr(HashMismtachCount)    + #13#10 +
                 'Zero byte files: ' + IntToStr(ZeroByteFilesCounter));
-    end
-  else // End of Proceed Message dialog "Yes, No, Cancel".
-   begin
-     ShowMessage('Process aborted by user.');
+
      Button8CopyAndHash.Enabled := true;
-   end;
 end;
 
 // Returns the size of the file in bytes on success. -1 otherwise.
@@ -3718,6 +3945,8 @@ var
   STime       : TSystemTime;
 
 begin
+  FillChar(LocalFTime{%H-}, SizeOf(LocalFTime), 0);
+  FillChar(STime{%H-}, SizeOf(STime), 0);
   FileTimeToLocalFileTime(FTime, LocalFTime);
   FileTimeToSystemTime(LocalFTime, STime);
   Result := SystemTimeToDateTime(STime);
@@ -3864,7 +4093,7 @@ begin
   if NoOfDirsSelected = 1 then
     begin
       MultipleDirsChosen := false;
-      SourceDir := UTF8ToSys(DirListA.GetSelectedNodePath);
+      SourceDir := UTF8ToSys(DirListA.Path);
       if LazFileUtils.DirectoryExistsUTF8(SourceDir) then
        begin
          Edit2SourcePath.Text := SourceDir;
@@ -3906,7 +4135,7 @@ end;
 
 procedure TMainForm.DirListBClick(Sender: TObject);
 begin
-  DestDir := UTF8ToSys(DirListB.GetSelectedNodePath);
+  DestDir := UTF8ToSys(DirListB.Path);
   if LazFileUtils.DirectoryExistsUTF8(DestDir) then
    begin
      Edit3DestinationPath.Text := DestDir;
