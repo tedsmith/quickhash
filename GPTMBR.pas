@@ -75,14 +75,15 @@ const
   PARTITION_STYLE_MBR = 0;
   PARTITION_STYLE_GPT = 1;
   PARTITION_STYLE_RAW = 2;
+
   IOCTL_DISK_GET_DRIVE_LAYOUT_EX = $00070050;
 var
+  i: Integer;
   Drive: widestring;
   hDevice: THandle;
   DriveLayoutInfo: TDriveLayoutInformationEx;
   BytesReturned: DWORD;
 begin
-    BytesReturned := 0;
     result := '';
     Drive := SelectedDisk;
     // This particular handle assignment does not require admin rights as it allows
@@ -100,9 +101,9 @@ begin
       if DeviceIoControl(hDevice, IOCTL_DISK_GET_DRIVE_LAYOUT_EX, nil, 0,
         @DriveLayoutInfo, SizeOf(DriveLayoutInfo), BytesReturned, nil) then
       begin
-        if DriveLayoutInfo.PartitionStyle = PARTITION_STYLE_MBR then result := 'MBR (sig: ' + IntToHex(SwapEndian(DriveLayoutInfo.DriveLayoutInformation.Mbr.Signature), 8) + ')';
-        if DriveLayoutInfo.PartitionStyle = PARTITION_STYLE_GPT then result := 'GPT (sig: ' + GUIDToString(DriveLayoutInfo.DriveLayoutInformation.Gpt.DiskId) + ')';
-        if DriveLayoutInfo.PartitionStyle = PARTITION_STYLE_RAW then result := 'RAW (no signature)';
+        if DriveLayoutInfo.PartitionStyle = 0 then result := 'MBR (sig: ' + IntToHex(SwapEndian(DriveLayoutInfo.DriveLayoutInformation.Mbr.Signature), 8) + ')';
+        if DriveLayoutInfo.PartitionStyle = 1 then result := 'GPT (sig: ' + GUIDToString(DriveLayoutInfo.DriveLayoutInformation.Gpt.DiskId) + ')';
+        if DriveLayoutInfo.PartitionStyle = 2 then result := 'RAW (no signature)';
       end;
     end;
     CloseHandle(hDevice);

@@ -1,34 +1,36 @@
+{ This is an automatically generated lazarus resource file }
+
 LazarusResources.Add('TMainForm','FORMDATA',[
-  'TPF0'#9'TMainForm'#8'MainForm'#4'Left'#3'Z'#1#6'Height'#3#192#2#3'Top'#3#149
-  +#0#5'Width'#3#250#3#14'AllowDropFiles'#9#7'Caption'#6'UQuickHash v2.8.2 - Th'
-  +'e easy and convenient way to hash data in Linux, OSX and Windows'#12'Client'
-  +'Height'#3#173#2#11'ClientWidth'#3#250#3#4'Menu'#7#9'MainMenu1'#8'OnCreate'#7
-  +#10'FormCreate'#11'OnDropFiles'#7#13'FormDropFiles'#8'Position'#7#14'poScree'
-  +'nCenter'#17'SessionProperties'#6#8'Position'#10'LCLVersion'#6#7'1.6.4.0'#0
-  +#12'TPageControl'#12'PageControl1'#4'Left'#2#16#6'Height'#3#135#2#3'Top'#2#24
-  +#5'Width'#3#218#3#10'ActivePage'#7#9'TabSheet1'#7'Anchors'#11#5'akTop'#6'akL'
-  +'eft'#7'akRight'#8'akBottom'#0#14'ParentShowHint'#8#8'TabIndex'#2#0#8'TabOrd'
-  +'er'#2#0#8'OnChange'#7#18'PageControl1Change'#0#9'TTabSheet'#9'TabSheet1'#4
-  +'Hint'#6#21'Hash portions of text'#7'Caption'#6#5'Te&xt'#12'ClientHeight'#3
-  +'m'#2#11'ClientWidth'#3#210#3#14'OnContextPopup'#7#21'TabSheet1ContextPopup'
-  +#14'ParentShowHint'#8#0#9'TGroupBox'#19'TextHashingGroupBox'#4'Left'#2'x'#6
-  +'Height'#3#182#1#3'Top'#2#10#5'Width'#3'L'#3#7'Anchors'#11#5'akTop'#6'akLeft'
-  +#7'akRight'#0#7'Caption'#6#12'Text Hashing'#12'ClientHeight'#3#161#1#11'Clie'
-  +'ntWidth'#3'H'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'#8
-  +#10'ParentFont'#8#8'TabOrder'#2#0#0#5'TMemo'#12'memoHashText'#4'Left'#2#8#6
-  +'Height'#3#183#0#4'Hint'#6#139'Type or paste and watch hash value change.'#13
-  +#10'For amounts larger than several hundred Kb, save'#13#10'data to a file a'
-  +'nd use File Hashing instead. '#3'Top'#2#9#5'Width'#3'4'#3#7'Anchors'#11#5'a'
-  +'kTop'#6'akLeft'#7'akRight'#0#13'Lines.Strings'#1#6'6Type or paste text here'
-  +' - hash will update as you type'#0#9'MaxLength'#4#0'e'#205#29#8'OnChange'#7
-  +#8'HashText'#7'OnEnter'#7#9'ClearText'#14'ParentShowHint'#8#10'ScrollBars'#7
-  +#10'ssAutoBoth'#8'ShowHint'#9#8'TabOrder'#2#0#0#0#5'TMemo'#12'StrHashValue'#4
-  +'Left'#2#8#6'Height'#2'8'#4'Hint'#6#205'This is the hash of ALL THE TEXT in '
-  +'the textarea above'#13#10'For line-by-line analysis, use the button'#13#10
-  +#13#10'The hash value can be copied from here'#13#10'to clipboard (highlight'
-  +' and press Ctrl + C or right click ''Copy'''#3'Top'#3'`'#1#5'Width'#3'4'#3#7
-  +'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7#8'clSilver'#11'Font.'
-  +'Height'#2#243#13'Lines.Strings'#1#6#13'...hash value'#0#10'ParentFont'#8#14
+  'TPF0'#9'TMainForm'#8'MainForm'#4'Left'#3#10#1#6'Height'#3#192#2#3'Top'#2'J'#5
+  +'Width'#3#250#3#14'AllowDropFiles'#9#7'Caption'#6'UQuickHash v2.8.3 - The ea'
+  +'sy and convenient way to hash data in Linux, OSX and Windows'#12'ClientHeig'
+  +'ht'#3#173#2#11'ClientWidth'#3#250#3#4'Menu'#7#9'MainMenu1'#8'OnCreate'#7#10
+  +'FormCreate'#11'OnDropFiles'#7#13'FormDropFiles'#8'Position'#7#14'poScreenCe'
+  +'nter'#17'SessionProperties'#6#8'Position'#10'LCLVersion'#6#7'1.6.4.0'#0#12
+  +'TPageControl'#12'PageControl1'#4'Left'#2#16#6'Height'#3#135#2#3'Top'#2#24#5
+  +'Width'#3#218#3#10'ActivePage'#7#9'TabSheet2'#7'Anchors'#11#5'akTop'#6'akLef'
+  +'t'#7'akRight'#8'akBottom'#0#14'ParentShowHint'#8#8'TabIndex'#2#1#8'TabOrder'
+  +#2#0#8'OnChange'#7#18'PageControl1Change'#0#9'TTabSheet'#9'TabSheet1'#4'Hint'
+  +#6#21'Hash portions of text'#7'Caption'#6#5'Te&xt'#12'ClientHeight'#3'm'#2#11
+  +'ClientWidth'#3#210#3#14'OnContextPopup'#7#21'TabSheet1ContextPopup'#14'Pare'
+  +'ntShowHint'#8#0#9'TGroupBox'#19'TextHashingGroupBox'#4'Left'#2'x'#6'Height'
+  +#3#182#1#3'Top'#2#10#5'Width'#3'L'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRi'
+  +'ght'#0#7'Caption'#6#12'Text Hashing'#12'ClientHeight'#3#161#1#11'ClientWidt'
+  +'h'#3'H'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'#8#10'P'
+  +'arentFont'#8#8'TabOrder'#2#0#0#5'TMemo'#12'memoHashText'#4'Left'#2#8#6'Heig'
+  +'ht'#3#183#0#4'Hint'#6#139'Type or paste and watch hash value change.'#13#10
+  +'For amounts larger than several hundred Kb, save'#13#10'data to a file and '
+  +'use File Hashing instead. '#3'Top'#2#9#5'Width'#3'4'#3#7'Anchors'#11#5'akTo'
+  +'p'#6'akLeft'#7'akRight'#0#13'Lines.Strings'#1#6'6Type or paste text here - '
+  +'hash will update as you type'#0#9'MaxLength'#4#0'e'#205#29#8'OnChange'#7#8
+  +'HashText'#7'OnEnter'#7#9'ClearText'#14'ParentShowHint'#8#10'ScrollBars'#7#10
+  +'ssAutoBoth'#8'ShowHint'#9#8'TabOrder'#2#0#0#0#5'TMemo'#12'StrHashValue'#4'L'
+  +'eft'#2#8#6'Height'#2'8'#4'Hint'#6#205'This is the hash of ALL THE TEXT in t'
+  +'he textarea above'#13#10'For line-by-line analysis, use the button'#13#10#13
+  +#10'The hash value can be copied from here'#13#10'to clipboard (highlight an'
+  +'d press Ctrl + C or right click ''Copy'''#3'Top'#3'`'#1#5'Width'#3'4'#3#7'A'
+  +'nchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7#8'clSilver'#11'Font.H'
+  +'eight'#2#243#13'Lines.Strings'#1#6#13'...hash value'#0#10'ParentFont'#8#14
   +'ParentShowHint'#8#10'ScrollBars'#7#16'ssAutoHorizontal'#8'ShowHint'#9#8'Tab'
   +'Order'#2#1#0#0#12'TLabeledEdit'#20'lbleExpectedHashText'#4'Left'#2#8#6'Heig'
   +'ht'#2#24#4'Hint'#6#152'Paste an existing hash value here to see if'#13#10't'
@@ -62,9 +64,9 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#2#13#5'Width'#3#190#0#7'Caption'#6#30'Source text included in output'#8'OnC'
   +'hange'#7'#cbToggleInputDataToOutputFileChange'#14'ParentShowHint'#8#8'ShowH'
   +'int'#9#8'TabOrder'#2#3#0#0#0#0#11'TRadioGroup'#24'AlgorithmChoiceRadioBox1'
-  +#4'Left'#2#8#6'Height'#3#129#0#4'Hint'#6#145'Having typed some text in the t'
-  ,'ext area, you can'#13#10'easily recompute different hashes for the text inp'
-  +'utted'#13#10'by choosing a different hash algorithm'#3'Top'#2#10#5'Width'#2
+  +#4'Left'#2#16#6'Height'#3#129#0#4'Hint'#6#145'Having typed some text in the '
+  ,'text area, you can'#13#10'easily recompute different hashes for the text in'
+  +'putted'#13#10'by choosing a different hash algorithm'#3'Top'#2#10#5'Width'#2
   +'h'#8'AutoFill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpacing'
   +#2#6#28'ChildSizing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizontal'#7
   +#24'crsHomogenousChildResize'#27'ChildSizing.EnlargeVertical'#7#24'crsHomoge'
@@ -75,354 +77,399 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7
   +'OnClick'#7#29'AlgorithmChoiceRadioBox1Click'#18'OnSelectionChanged'#7#8'Has'
   +'hText'#10'ParentFont'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#1#0
-  +#0#9'TGroupBox'#17'SystemRAMGroupBox'#4'Left'#2#8#6'Height'#2'Q'#3'Top'#3#152
-  +#0#5'Width'#2'h'#7'Caption'#6#10'System RAM'#12'ClientHeight'#2'<'#11'Client'
-  +'Width'#2'\'#11'Font.Height'#2#243#10'ParentFont'#8#8'TabOrder'#2#2#0#6'TLab'
-  +'el'#6'lblRAM'#4'Left'#2#8#6'Height'#2#16#3'Top'#2#8#5'Width'#2#12#7'Caption'
-  +#6#3'...'#11'ParentColor'#8#0#0#0#0#9'TTabSheet'#9'TabSheet2'#4'Hint'#6'6Has'
-  +'h a single file (useful for hashing disks in Linux)'#7'Caption'#6#5'F&ile'
-  +#12'ClientHeight'#3'd'#2#11'ClientWidth'#3#212#3#14'ParentShowHint'#8#0#9'TG'
-  +'roupBox'#19'FileHashingGroupBox'#4'Left'#2'x'#6'Height'#3'6'#1#4'Hint'#12#6
-  +#1#0#0'To hash physical disks, run the program as root or sudo'#13#10'and th'
-  +'en navigate to /dev/sdX (where X might be a, b, c etc)'#13#10'for physical '
-  +'disks or /dev/sdaX (where X might be 1, 2, 3 etc) '#13#10'for logical drive'
-  +'s. '#13#10#13#10'Some distributions use /dev/h... rather than /dev/s...'#3
-  +'Top'#2#10#5'Width'#3'N'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'C'
-  +'aption'#6#19'Single File Hashing'#12'ClientHeight'#3'!'#1#11'ClientWidth'#3
-  +'J'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'#8#10'Parent'
-  +'Font'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#0#0#6'TLabel'#6'La'
-  +'bel1'#4'Left'#3#128#0#6'Height'#2#1#3'Top'#2#16#5'Width'#2#1#11'ParentColor'
-  +#8#0#0#6'TLabel'#6'Label6'#4'Left'#3#9#2#6'Height'#2'"'#3'Top'#2#31#5'Width'
-  +#3#14#1#7'Caption'#6'WAs root, this section can be used to hash disks'#10'e.'
-  +'g. /dev/sdX or /dev/sdaX, or /dev/hdX'#11'ParentColor'#8#8'WordWrap'#9#0#0#6
-  +'TLabel'#16'lblStartedFileAt'#4'Left'#3#224#0#6'Height'#2#17#3'Top'#2#16#5'W'
-  +'idth'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#16'lblFileTim'
-  +'eTaken'#4'Left'#3#224#0#6'Height'#2#17#3'Top'#2'@'#5'Width'#2#9#7'Caption'#6
-  +#3'...'#11'ParentColor'#8#0#0#5'TEdit'#21'edtFileNameToBeHashed'#4'Left'#2#6
-  +#6'Height'#2#25#3'Top'#2'`'#5'Width'#3'>'#3#7'Anchors'#11#5'akTop'#6'akLeft'
-  +#7'akRight'#0#5'Color'#7#8'clSilver'#8'ReadOnly'#9#8'TabOrder'#2#0#4'Text'#6
-  +#20'File being hashed...'#0#0#7'TButton'#11'btnHashFile'#4'Left'#2#6#6'Heigh'
-  +'t'#2#25#4'Hint'#6'EChoose a single file to hash (or Linux physical device e'
-  +'.g. /dev/sda)'#3'Top'#2#16#5'Width'#2'S'#8'AutoSize'#9#7'Caption'#6#12'Sele'
-  +'ct &File'#5'Color'#4#128#255#128#0#10'Font.Style'#11#6'fsBold'#0#7'OnClick'
-  +#7#16'btnHashFileClick'#10'ParentFont'#8#14'ParentShowHint'#8#8'ShowHint'#9#8
-  +'TabOrder'#2#1#0#0#10'TStatusBar'#10'StatusBar1'#4'Left'#2#0#6'Height'#2#23#3
-  +'Top'#3#9#1#5'Width'#3'J'#3#6'Panels'#14#0#0#0#6'TLabel'#19'lblDragAndDropNu'
-  +'dge'#4'Left'#2#6#6'Height'#2#17#3'Top'#2'0'#5'Width'#3#184#0#7'Caption'#6' '
-  +'(or "drag and drop" a file here)'#11'ParentColor'#8#0#0#5'TMemo'#16'memFile'
-  +'HashField'#4'Left'#2#6#6'Height'#2':'#3'Top'#3#136#0#5'Width'#3'<'#3#7'Anch'
-  +'ors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7#8'clSilver'#13'Lines.Str'
-  +'ings'#1#6'!Computed hash will appear here...'#0#8'TabOrder'#2#3#0#0#12'TLab'
-  +'eledEdit'#16'lbleExpectedHash'#4'Left'#2#6#6'Height'#2#25#4'Hint'#6'YPaste '
-  +'an existing hash value here to see if'#13#10'the generated file hash matche'
-  +'s it, or not. '#3'Top'#3#224#0#5'Width'#3'>'#3#7'Anchors'#11#5'akTop'#6'akL'
-  +'eft'#7'akRight'#0' EditLabel.AnchorSideLeft.Control'#7#16'lbleExpectedHash!'
-  +'EditLabel.AnchorSideRight.Control'#7#16'lbleExpectedHash'#30'EditLabel.Anch'
-  +'orSideRight.Side'#7#9'asrBottom"EditLabel.AnchorSideBottom.Control'#7#16'lb'
-  +'leExpectedHash'#14'EditLabel.Left'#2#6#16'EditLabel.Height'#2#17#13'EditLab'
-  +'el.Top'#3#204#0#15'EditLabel.Width'#3'>'#3#17'EditLabel.Caption'#6'.Expecte'
-  +'d Hash Value (paste from other utility)'#21'EditLabel.ParentColor'#8#8'TabO'
-  +'rder'#2#4#4'Text'#6#3'...'#0#0#6'TLabel'#13'lbEndedFileAt'#4'Left'#3#224#0#6
-  +'Height'#2#17#3'Top'#2'('#5'Width'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8
-  +#0#0#0#11'TRadioGroup'#24'AlgorithmChoiceRadioBox2'#4'Left'#2#8#6'Height'#3
-  +#129#0#3'Top'#2#10#5'Width'#2'h'#8'AutoFill'#9#7'Caption'#6#9'Algorithm'#28
-  +'ChildSizing.LeftRightSpacing'#2#6#28'ChildSizing.TopBottomSpacing'#2#6#29'C'
-  ,'hildSizing.EnlargeHorizontal'#7#24'crsHomogenousChildResize'#27'ChildSizing'
-  +'.EnlargeVertical'#7#24'crsHomogenousChildResize'#28'ChildSizing.ShrinkHoriz'
-  +'ontal'#7#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'#7#14'crsScaleChi'
-  +'lds'#18'ChildSizing.Layout'#7#29'cclLeftToRightThenTopToBottom'#27'ChildSiz'
-  +'ing.ControlsPerLine'#2#1#12'ClientHeight'#2'l'#11'ClientWidth'#2'\'#11'Font'
-  +'.Height'#2#243#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6
-  +'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7'OnClick'#7#29'AlgorithmChoiceRadioBox2C'
-  +'lick'#18'OnSelectionChanged'#7'(AlgorithmChoiceRadioBox2SelectionChanged'#10
-  +'ParentFont'#8#8'TabOrder'#2#1#0#0#0#9'TTabSheet'#9'TabSheet3'#4'Hint'#6'iCo'
-  +'mpute hashes for multiple files in a directory'#13#10'recursively, or just '
-  +'those in the root of the directory'#7'Caption'#6#5'FileS'#12'ClientHeight'#3
-  +'d'#2#11'ClientWidth'#3#212#3#14'ParentShowHint'#8#8'ShowHint'#9#0#9'TGroupB'
-  +'ox'#24'DirectoryHashingGroupBox'#4'Left'#2'x'#6'Height'#3'Z'#2#3'Top'#2#10#5
-  +'Width'#3'L'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#8'akBottom'#0#7'C'
-  +'aption'#6'9Hash all files in chosen directory - recursive by default'#12'Cl'
-  +'ientHeight'#3'E'#2#11'ClientWidth'#3'H'#3#5'Color'#7#6'clForm'#11'Font.Heig'
-  +'ht'#2#243#11'ParentColor'#8#10'ParentFont'#8#8'TabOrder'#2#0#0#6'TLabel'#6
-  +'Label2'#23'AnchorSideRight.Control'#7#16'lblFilesExamined'#4'Left'#3'('#2#6
-  +'Height'#2#17#3'Top'#2#28#5'Width'#2'h'#7'Anchors'#11#5'akTop'#6'akLeft'#7'a'
-  +'kRight'#0#7'Caption'#6#15'Files Examined:'#11'Font.Height'#2#243#11'ParentC'
-  +'olor'#8#10'ParentFont'#8#0#0#7'TButton'#28'btnRecursiveDirectoryHashing'#4
-  +'Left'#2#6#6'Height'#2#27#4'Hint'#6'{All files and subdirectories below the '
-  +'chosen '#10'directory will be hashed, subject to selected'#10'options. Recu'
-  +'rsive by default.'#3'Top'#2'<'#5'Width'#2'w'#8'AutoSize'#9#7'Caption'#6#17
-  +'Select &Directory'#5'Color'#4#128#255#128#0#10'Font.Style'#11#6'fsBold'#0#7
-  +'OnClick'#7'!btnRecursiveDirectoryHashingClick'#10'ParentFont'#8#14'ParentSh'
-  +'owHint'#8#8'ShowHint'#9#8'TabOrder'#2#5#0#0#5'TEdit'#16'DirSelectedField'#4
-  +'Left'#2#8#6'Height'#2#27#4'Hint'#6#27'The chosen parent directory'#3'Top'#2
-  +'p'#5'Width'#3'@'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7
-  +#8'clSilver'#8'TabOrder'#2#0#4'Text'#6#14'Dir selected :'#0#0#6'TLabel'#6'La'
-  +'bel4'#23'AnchorSideRight.Control'#7#15'lblNoFilesInDir'#4'Left'#3'('#2#6'He'
-  +'ight'#2#17#3'Top'#2#6#5'Width'#2'h'#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRi'
-  +'ght'#0#7'Caption'#6#15'# Files in Dir:'#11'ParentColor'#8#0#0#6'TLabel'#18
-  +'PercentageComplete'#4'Left'#3'('#2#6'Height'#2#17#3'Top'#2'8'#5'Width'#2'\'
-  +#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#11'% Complete:'
-  +#11'ParentColor'#8#0#0#9'TCheckBox'#18'SaveToCSVCheckBox1'#4'Left'#2#6#6'Hei'
-  +'ght'#2#22#4'Hint'#6'7Tick to choose a filename and location for the log fil'
-  +'e'#3'Top'#2#6#5'Width'#2'n'#7'Caption'#6#12'Save to CSV?'#7'Checked'#9#14'P'
-  +'arentShowHint'#8#8'ShowHint'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#1#0#0#9
-  +'TCheckBox'#19'SaveToHTMLCheckBox1'#4'Left'#2#6#6'Height'#2#22#3'Top'#2#28#5
-  +'Width'#2'x'#7'Caption'#6#13'Save to HTML?'#8'TabOrder'#2#2#0#0#7'TButton'#19
-  +'btnClipboardResults'#4'Left'#3#232#0#6'Height'#2#29#4'Hint'#6'-Press this t'
-  +'o copy entire grid content to RAM'#3'Top'#2'<'#5'Width'#2'H'#8'AutoSize'#9#7
-  +'Caption'#6#9'Clipboard'#7'Enabled'#8#7'OnClick'#7#24'btnClipboardResultsCli'
-  +'ck'#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#7#0#0#7'TButton'#12'bt'
-  +'nStopScan1'#4'Left'#3#152#0#6'Height'#2#27#4'Hint'#6'NClick to abort the ha'
-  +'sh as soon as the'#10'current file hashing action completes. '#3'Top'#2'<'#5
-  +'Width'#2'&'#8'AutoSize'#9#7'Caption'#6#5'S&top'#7'OnClick'#7#17'btnStopScan'
-  +'1Click'#10'ParentFont'#8#8'TabOrder'#2#6#0#0#9'TCheckBox'#23'chkRecursiveDi'
-  +'rOverride'#4'Left'#3#152#0#6'Height'#2#22#3'Top'#2' '#5'Width'#3#185#0#7'Ca'
-  +'ption'#6#25'Ignoring sub-directories?'#8'TabOrder'#2#3#0#0#9'TCheckBox'#17
-  +'chkFlagDuplicates'#4'Left'#3#152#0#6'Height'#2#22#4'Hint'#6'/Have duplicate'
-  +' files (by hash value) identified'#3'Top'#2#6#5'Width'#3#131#0#7'Caption'#6
-  +#16'Flag Duplicates?'#8'TabOrder'#2#4#0#0#6'TLabel'#6'Label5'#4'Left'#2'n'#6
-  +'Height'#2#24#3'Top'#3'8'#1#5'Width'#3#163#2#7'Caption'#6'DThis area will be'
-  +' populated once the scan is complete...please wait!'#11'Font.Height'#2#236
-  +#11'ParentColor'#8#10'ParentFont'#8#7'Visible'#8#8'WordWrap'#9#0#0#11'TStrin'
-  +'gGrid'#21'RecursiveDisplayGrid1'#4'Left'#2#6#6'Height'#3#140#1#4'Hint'#6#156
-  +'Select single or multiple cells then ''Ctrl + C''  to copy content to clipb'
-  +'oard. Click headers to sort by column header,auto-expand and re-arrange by '
-  +'dragging'#3'Top'#3#152#0#5'Width'#3'@'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7
-  +'akRight'#8'akBottom'#0#5'Color'#7#9'clDefault'#8'ColCount'#2#6#16'ColumnCli'
-  +'ckSorts'#9#7'Columns'#14#1#7'MinSize'#2'('#7'MaxSize'#3#16''''#8'ReadOnly'#9
-  +#15'Title.Alignment'#7#8'taCenter'#13'Title.Caption'#6#9'File Name'#5'Width'
-  ,#3#250#0#0#1#13'Title.Caption'#6#4'Path'#5'Width'#3#250#0#0#1#8'ReadOnly'#9
-  +#15'Title.Alignment'#7#8'taCenter'#13'Title.Caption'#6#10'Hash Value'#5'Widt'
-  +'h'#3','#1#0#1#13'Title.Caption'#6#19'File Size (on Disk)'#5'Width'#3#200#0#0
-  +#1#13'Title.Caption'#6#10'Duplicate?'#0#0#7'Options'#11#15'goFixedVertLine'
-  +#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#13'goRangeSelect'#19'goDr'
-  +'awFocusSelected'#11'goColSizing'#11'goColMoving'#13'goColSpanning'#18'goDbl'
-  +'ClickAutoSize'#14'goSmoothScroll'#19'goScrollKeepVisible'#20'goDontScrollPa'
-  +'rtCell'#0#14'ParentShowHint'#8#8'RowCount'#2#2#8'ShowHint'#9#8'TabOrder'#2#8
-  +#16'TitleFont.Height'#2#243#10'TitleStyle'#7#10'tsStandard'#7'Visible'#8#0#0
-  +#10'TStatusBar'#10'StatusBar2'#23'AnchorSideRight.Control'#7#24'DirectoryHas'
-  +'hingGroupBox'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#2#0#6'Height'
-  +#2#23#3'Top'#3'1'#2#5'Width'#3'J'#3#6'Panels'#14#0#0#0#6'TLabel'#13'lblTimeT'
-  +'aken3'#23'AnchorSideRight.Control'#7#24'DirectoryHashingGroupBox'#20'Anchor'
-  +'SideRight.Side'#7#9'asrBottom'#4'Left'#3#192#2#6'Height'#2#17#3'Top'#2#6#5
-  +'Width'#3#138#0#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#3
-  +'...'#11'ParentColor'#8#0#0#6'TLabel'#13'lblTimeTaken4'#23'AnchorSideRight.C'
-  +'ontrol'#7#24'DirectoryHashingGroupBox'#20'AnchorSideRight.Side'#7#9'asrBott'
-  +'om'#4'Left'#3#192#2#6'Height'#2#17#3'Top'#2'8'#5'Width'#3#138#0#7'Anchors'
-  +#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0
-  +#6'TLabel'#15'lblNoFilesInDir'#23'AnchorSideRight.Control'#7#13'lblTimeTaken'
-  +'3'#4'Left'#3#144#2#6'Height'#2#17#3'Top'#2#6#5'Width'#2'0'#7'Anchors'#11#5
-  +'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'T'
-  +'Label'#21'lblPercentageComplete'#23'AnchorSideRight.Control'#7#13'lblTimeTa'
-  +'ken4'#4'Left'#3#144#2#6'Height'#2#17#3'Top'#2'8'#5'Width'#2'0'#7'Anchors'#11
+  +#0#9'TGroupBox'#17'SystemRAMGroupBox'#4'Left'#2#16#6'Height'#2'Q'#3'Top'#3
+  +#152#0#5'Width'#2'`'#7'Caption'#6#10'System RAM'#12'ClientHeight'#2'<'#11'Cl'
+  +'ientWidth'#2'\'#11'Font.Height'#2#243#10'ParentFont'#8#8'TabOrder'#2#2#0#6
+  +'TLabel'#6'lblRAM'#4'Left'#2#8#6'Height'#2#16#3'Top'#2#8#5'Width'#2#12#7'Cap'
+  +'tion'#6#3'...'#11'ParentColor'#8#0#0#0#0#9'TTabSheet'#9'TabSheet2'#4'Hint'#6
+  +'6Hash a single file (useful for hashing disks in Linux)'#7'Caption'#6#5'F&i'
+  +'le'#12'ClientHeight'#3'm'#2#11'ClientWidth'#3#210#3#14'ParentShowHint'#8#0#9
+  +'TGroupBox'#19'FileHashingGroupBox'#4'Left'#2'x'#6'Height'#3'>'#1#3'Top'#2#10
+  +#5'Width'#3'N'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6
+  +#19'Single File Hashing'#12'ClientHeight'#3')'#1#11'ClientWidth'#3'J'#3#5'Co'
+  +'lor'#7#6'clForm'#11'Font.Height'#2#243#11'ParentColor'#8#10'ParentFont'#8#14
+  +'ParentShowHint'#8#8'TabOrder'#2#0#0#6'TLabel'#6'Label6'#4'Left'#3'('#2#6'He'
+  +'ight'#2' '#3'Top'#2'/'#5'Width'#3#8#1#7'Caption'#6'WAs root, this section c'
+  +'an be used to hash disks'#10'e.g. /dev/sdX or /dev/sdaX, or /dev/hdX'#11'Pa'
+  +'rentColor'#8#8'WordWrap'#9#0#0#6'TLabel'#16'lblStartedFileAt'#4'Left'#3#16#1
+  +#6'Height'#2#16#3'Top'#2#8#5'Width'#2#12#7'Caption'#6#3'...'#11'ParentColor'
+  +#8#0#0#6'TLabel'#16'lblFileTimeTaken'#4'Left'#3#16#1#6'Height'#2#16#3'Top'#2
+  +'8'#5'Width'#2#12#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#5'TEdit'#21'edtF'
+  +'ileNameToBeHashed'#4'Left'#2#6#6'Height'#2#24#3'Top'#2'`'#5'Width'#3'>'#3#7
+  +'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7#8'clSilver'#8'ReadOn'
+  +'ly'#9#8'TabOrder'#2#0#4'Text'#6#20'File being hashed...'#0#0#7'TButton'#11
+  +'btnHashFile'#4'Left'#2#8#6'Height'#2#23#4'Hint'#6'EChoose a single file to '
+  +'hash (or Linux physical device e.g. /dev/sda)'#3'Top'#2'@'#5'Width'#2'S'#8
+  +'AutoSize'#9#7'Caption'#6#12'Select &File'#5'Color'#4#128#255#128#0#10'Font.'
+  +'Style'#11#6'fsBold'#0#7'OnClick'#7#16'btnHashFileClick'#10'ParentFont'#8#14
+  +'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#1#0#0#10'TStatusBar'#10'Statu'
+  +'sBar1'#4'Left'#2#0#6'Height'#2#20#3'Top'#3#21#1#5'Width'#3'J'#3#6'Panels'#14
+  +#0#0#0#6'TLabel'#19'lblDragAndDropNudge'#4'Left'#2'p'#6'Height'#2#16#3'Top'#2
+  +'@'#5'Width'#2's'#7'Caption'#6#21'or drag n drop a file'#11'ParentColor'#8#0
+  +#0#5'TMemo'#16'memFileHashField'#4'Left'#2#6#6'Height'#2':'#3'Top'#3#136#0#5
+  +'Width'#3'<'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7#8'cl'
+  +'Silver'#13'Lines.Strings'#1#6'!Computed hash will appear here...'#0#8'TabOr'
+  +'der'#2#3#0#0#12'TLabeledEdit'#16'lbleExpectedHash'#4'Left'#2#6#6'Height'#2
+  +#24#4'Hint'#6'YPaste an existing hash value here to see if'#13#10'the genera'
+  +'ted file hash matches it, or not. '#3'Top'#3#224#0#5'Width'#3'>'#3#7'Anchor'
+  +'s'#11#5'akTop'#6'akLeft'#7'akRight'#0' EditLabel.AnchorSideLeft.Control'#7
+  +#16'lbleExpectedHash!EditLabel.AnchorSideRight.Control'#7#16'lbleExpectedHas'
+  +'h'#30'EditLabel.AnchorSideRight.Side'#7#9'asrBottom"EditLabel.AnchorSideBot'
+  +'tom.Control'#7#16'lbleExpectedHash'#14'EditLabel.Left'#2#6#16'EditLabel.Hei'
+  +'ght'#2#16#13'EditLabel.Top'#3#205#0#15'EditLabel.Width'#3'>'#3#17'EditLabel'
+  +'.Caption'#6'.Expected Hash Value (paste from other utility)'#21'EditLabel.P'
+  +'arentColor'#8#8'TabOrder'#2#4#4'Text'#6#3'...'#0#0#6'TLabel'#13'lbEndedFile'
+  +'At'#4'Left'#3#16#1#6'Height'#2#16#3'Top'#2' '#5'Width'#2#12#7'Caption'#6#3
+  +'...'#11'ParentColor'#8#0#0#17'TZVDateTimePicker'#23'ZVDateTimePickerFileTab'
+  +#4'Left'#2#8#6'Height'#2#24#3'Top'#2' '#5'Width'#3#157#0#11'CenturyFrom'#3
+  +#149#7#7'MaxDate'#5#0#0#0#0#0#4#146#180#20'@'#7'MinDate'#5#0#0#0#0#0#0#240
+  +#166#14'@'#8'TabOrder'#2#5#7'Enabled'#8#17'TrailingSeparator'#8#15'TextForNu'
+  +'llDate'#6#4'NULL'#12'LeadingZeros'#9#7'Visible'#8#4'Kind'#7#11'dtkDateTime'
+  +#10'TimeFormat'#7#4'tf24'#11'TimeDisplay'#7#5'tdHMS'#8'DateMode'#7#10'dmComb'
+  +'oBox'#4'Date'#5#0#176#219#185#131#137#22#242#254'C'#4'Time'#5#0#176#219#185
+  +#131#137#22#242#254'C'#20'UseDefaultSeparators'#9#17'HideDateTimeParts'#11#0
+  +#10'MonthNames'#6#4'Long'#0#0#9'TCheckBox'#26'lblschedulertickboxFileTab'#4
+  ,'Left'#2#8#6'Height'#2#20#4'Hint'#6'UTick and set a date and time ahead of c'
+  +'urrent time'#13#10'and then select the file to hash.'#3'Top'#2#8#5'Width'#2
+  +'l'#7'Caption'#6#16'Start at a time:'#8'OnChange'#7' lblschedulertickboxFile'
+  +'TabChange'#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#6#0#0#0#11'TRad'
+  +'ioGroup'#24'AlgorithmChoiceRadioBox2'#4'Left'#2#16#6'Height'#3#129#0#3'Top'
+  +#2#10#5'Width'#2'`'#8'AutoFill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.L'
+  +'eftRightSpacing'#2#6#28'ChildSizing.TopBottomSpacing'#2#6#29'ChildSizing.En'
+  +'largeHorizontal'#7#24'crsHomogenousChildResize'#27'ChildSizing.EnlargeVerti'
+  +'cal'#7#24'crsHomogenousChildResize'#28'ChildSizing.ShrinkHorizontal'#7#14'c'
+  +'rsScaleChilds'#26'ChildSizing.ShrinkVertical'#7#14'crsScaleChilds'#18'Child'
+  +'Sizing.Layout'#7#29'cclLeftToRightThenTopToBottom'#27'ChildSizing.ControlsP'
+  +'erLine'#2#1#12'ClientHeight'#2'l'#11'ClientWidth'#2'\'#11'Font.Height'#2#243
+  +#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SH'
+  +'A512'#6#6'xxHash'#0#7'OnClick'#7#29'AlgorithmChoiceRadioBox2Click'#18'OnSel'
+  +'ectionChanged'#7'(AlgorithmChoiceRadioBox2SelectionChanged'#10'ParentFont'#8
+  +#8'TabOrder'#2#1#0#0#0#9'TTabSheet'#9'TabSheet3'#4'Hint'#6'iCompute hashes f'
+  +'or multiple files in a directory'#13#10'recursively, or just those in the r'
+  +'oot of the directory'#7'Caption'#6#5'FileS'#12'ClientHeight'#3'm'#2#11'Clie'
+  +'ntWidth'#3#210#3#14'ParentShowHint'#8#8'ShowHint'#9#0#9'TGroupBox'#24'Direc'
+  +'toryHashingGroupBox'#4'Left'#2'x'#6'Height'#3'c'#2#3'Top'#2#10#5'Width'#3'J'
+  +#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#8'akBottom'#0#7'Caption'#6'9H'
+  +'ash all files in chosen directory - recursive by default'#12'ClientHeight'#3
+  +'N'#2#11'ClientWidth'#3'F'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'P'
+  +'arentColor'#8#10'ParentFont'#8#8'TabOrder'#2#0#0#6'TLabel'#6'Label2'#23'Anc'
+  +'horSideRight.Control'#7#16'lblFilesExamined'#4'Left'#3'('#2#6'Height'#2#16#3
+  +'Top'#2#28#5'Width'#2'h'#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Cap'
+  +'tion'#6#15'Files Examined:'#11'Font.Height'#2#243#11'ParentColor'#8#10'Pare'
+  +'ntFont'#8#0#0#7'TButton'#28'btnRecursiveDirectoryHashing'#4'Left'#2#8#6'Hei'
+  +'ght'#2#23#4'Hint'#6'{All files and subdirectories below the chosen '#10'dir'
+  +'ectory will be hashed, subject to selected'#10'options. Recursive by defaul'
+  +'t.'#3'Top'#2']'#5'Width'#2'u'#8'AutoSize'#9#7'Caption'#6#17'Select &Directo'
+  +'ry'#5'Color'#4#128#255#128#0#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7'!bt'
+  +'nRecursiveDirectoryHashingClick'#10'ParentFont'#8#14'ParentShowHint'#8#8'Sh'
+  +'owHint'#9#8'TabOrder'#2#5#0#0#5'TEdit'#16'DirSelectedField'#4'Left'#2#8#6'H'
+  +'eight'#2#24#4'Hint'#6#27'The chosen parent directory'#3'Top'#3#136#0#5'Widt'
+  +'h'#3'<'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#5'Color'#7#8'clSilv'
+  +'er'#8'TabOrder'#2#0#4'Text'#6#14'Dir selected :'#0#0#6'TLabel'#6'Label4'#23
+  +'AnchorSideRight.Control'#7#15'lblNoFilesInDir'#4'Left'#3'('#2#6'Height'#2#16
+  +#3'Top'#2#6#5'Width'#2'h'#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Ca'
+  +'ption'#6#15'# Files in Dir:'#11'ParentColor'#8#0#0#6'TLabel'#18'PercentageC'
+  +'omplete'#4'Left'#3'('#2#6'Height'#2#16#3'Top'#2'8'#5'Width'#2'X'#7'Anchors'
+  +#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#11'% Complete:'#11'ParentCo'
+  +'lor'#8#0#0#9'TCheckBox'#18'SaveToCSVCheckBox1'#4'Left'#2#6#6'Height'#2#20#4
+  +'Hint'#6'7Tick to choose a filename and location for the log file'#3'Top'#2#6
+  +#5'Width'#2'a'#7'Caption'#6#12'Save to CSV?'#7'Checked'#9#14'ParentShowHint'
+  +#8#8'ShowHint'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#1#0#0#9'TCheckBox'#19
+  +'SaveToHTMLCheckBox1'#4'Left'#2#6#6'Height'#2#20#3'Top'#2#28#5'Width'#2'i'#7
+  +'Caption'#6#13'Save to HTML?'#8'TabOrder'#2#2#0#0#7'TButton'#19'btnClipboard'
+  +'Results'#4'Left'#3#224#0#6'Height'#2#26#4'Hint'#6'-Press this to copy entir'
+  +'e grid content to RAM'#3'Top'#2']'#5'Width'#2'P'#8'AutoSize'#9#7'Caption'#6
+  +#9'Clipboard'#7'Enabled'#8#7'OnClick'#7#24'btnClipboardResultsClick'#14'Pare'
+  +'ntShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#7#0#0#7'TButton'#12'btnStopScan1'
+  +#4'Left'#3#152#0#6'Height'#2#23#4'Hint'#6'NClick to abort the hash as soon a'
+  +'s the'#10'current file hashing action completes. '#3'Top'#2']'#5'Width'#2'0'
+  +#8'AutoSize'#9#7'Caption'#6#5'S&top'#7'OnClick'#7#17'btnStopScan1Click'#10'P'
+  +'arentFont'#8#8'TabOrder'#2#6#0#0#9'TCheckBox'#23'chkRecursiveDirOverride'#4
+  +'Left'#3#152#0#6'Height'#2#20#3'Top'#2' '#5'Width'#3#162#0#7'Caption'#6#25'I'
+  +'gnoring sub-directories?'#8'TabOrder'#2#3#0#0#9'TCheckBox'#17'chkFlagDuplic'
+  +'ates'#4'Left'#3#152#0#6'Height'#2#20#4'Hint'#6'/Have duplicate files (by ha'
+  +'sh value) identified'#3'Top'#2#6#5'Width'#2'p'#7'Caption'#6#16'Flag Duplica'
+  +'tes?'#8'TabOrder'#2#4#0#0#6'TLabel'#6'Label5'#4'Left'#2'n'#6'Height'#2#24#3
+  +'Top'#3'8'#1#5'Width'#3'^'#2#7'Caption'#6'DThis area will be populated once '
+  +'the scan is complete...please wait!'#11'Font.Height'#2#236#11'ParentColor'#8
+  +#10'ParentFont'#8#7'Visible'#8#8'WordWrap'#9#0#0#11'TStringGrid'#21'Recursiv'
+  ,'eDisplayGrid1'#4'Left'#2#6#6'Height'#3'z'#1#4'Hint'#6#156'Select single or '
+  +'multiple cells then ''Ctrl + C''  to copy content to clipboard. Click heade'
+  +'rs to sort by column header,auto-expand and re-arrange by dragging'#3'Top'#3
+  +#176#0#5'Width'#3'<'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#8'akBotto'
+  +'m'#0#5'Color'#7#9'clDefault'#8'ColCount'#2#6#16'ColumnClickSorts'#9#7'Colum'
+  +'ns'#14#1#7'MinSize'#2'('#7'MaxSize'#3#16''''#8'ReadOnly'#9#15'Title.Alignme'
+  +'nt'#7#8'taCenter'#13'Title.Caption'#6#9'File Name'#5'Width'#3#250#0#0#1#13
+  +'Title.Caption'#6#4'Path'#5'Width'#3#250#0#0#1#8'ReadOnly'#9#15'Title.Alignm'
+  +'ent'#7#8'taCenter'#13'Title.Caption'#6#10'Hash Value'#5'Width'#3','#1#0#1#13
+  +'Title.Caption'#6#19'File Size (on Disk)'#5'Width'#3#200#0#0#1#13'Title.Capt'
+  +'ion'#6#10'Duplicate?'#0#0#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzL'
+  +'ine'#10'goVertLine'#10'goHorzLine'#13'goRangeSelect'#19'goDrawFocusSelected'
+  +#11'goColSizing'#11'goColMoving'#13'goColSpanning'#18'goDblClickAutoSize'#14
+  +'goSmoothScroll'#19'goScrollKeepVisible'#20'goDontScrollPartCell'#0#14'Paren'
+  +'tShowHint'#8#8'RowCount'#2#2#8'ShowHint'#9#8'TabOrder'#2#8#16'TitleFont.Hei'
+  +'ght'#2#243#10'TitleStyle'#7#10'tsStandard'#7'Visible'#8#0#0#10'TStatusBar'
+  +#10'StatusBar2'#23'AnchorSideRight.Control'#7#24'DirectoryHashingGroupBox'#20
+  +'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#2#0#6'Height'#2#20#3'Top'#3':'
+  +#2#5'Width'#3'F'#3#6'Panels'#14#0#0#0#6'TLabel'#13'lblTimeTaken3'#23'AnchorS'
+  +'ideRight.Control'#7#24'DirectoryHashingGroupBox'#20'AnchorSideRight.Side'#7
+  +#9'asrBottom'#4'Left'#3#192#2#6'Height'#2#17#3'Top'#2#6#5'Width'#3#134#0#7'A'
+  +'nchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#8'AutoSize'#8#7'Caption'#6#3'...'
+  +#11'ParentColor'#8#0#0#6'TLabel'#13'lblTimeTaken4'#23'AnchorSideRight.Contro'
+  +'l'#7#24'DirectoryHashingGroupBox'#20'AnchorSideRight.Side'#7#9'asrBottom'#4
+  +'Left'#3#192#2#6'Height'#2#16#3'Top'#2'8'#5'Width'#3#134#0#7'Anchors'#11#5'a'
+  +'kTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TL'
+  +'abel'#15'lblNoFilesInDir'#23'AnchorSideRight.Control'#7#13'lblTimeTaken3'#4
+  +'Left'#3#144#2#6'Height'#2#16#3'Top'#2#6#5'Width'#2'0'#7'Anchors'#11#5'akTop'
+  +#6'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'
+  +#21'lblPercentageComplete'#23'AnchorSideRight.Control'#7#13'lblTimeTaken4'#4
+  +'Left'#3#144#2#6'Height'#2#16#3'Top'#2'8'#5'Width'#2'0'#7'Anchors'#11#5'akTo'
+  +'p'#6'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabe'
+  +'l'#16'lblFilesExamined'#23'AnchorSideRight.Control'#7#21'lblTotalBytesExami'
+  +'ned'#4'Left'#3#144#2#6'Height'#2#16#3'Top'#2#28#5'Width'#2'0'#7'Anchors'#11
   +#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6
-  +'TLabel'#16'lblFilesExamined'#23'AnchorSideRight.Control'#7#21'lblTotalBytes'
-  +'Examined'#4'Left'#3#144#2#6'Height'#2#17#3'Top'#2#28#5'Width'#2'0'#7'Anchor'
-  +'s'#11#5'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8
-  +#0#0#6'TLabel'#21'lblTotalBytesExamined'#23'AnchorSideRight.Control'#7#24'Di'
-  +'rectoryHashingGroupBox'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#3
-  +#192#2#6'Height'#2#17#3'Top'#2#28#5'Width'#3#138#0#7'Anchors'#11#5'akTop'#6
-  +'akLeft'#7'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#9'TCheckBox'
-  +#14'chkHiddenFiles'#4'Left'#3'P'#1#6'Height'#2#22#4'Hint'#6#157'Tick to have'
-  +' files in hidden folders hashed. '#13#10'Hidden files are hashed by default'
-  +' anyway '#13#10'but hidden folders, ergo their contents, are not found by d'
-  +'efault.'#3'Top'#2#6#5'Width'#3#151#0#7'Caption'#6#19'Hidden folders too?'#8
-  +'TabOrder'#2#10#0#0#5'TEdit'#14'FileMaskField2'#4'Left'#3'P'#1#6'Height'#2#27
-  +#4'Hint'#6'fUse an asterix, full stop and the file type '#10'extension, sepe'
-  +'rated by a semi-colon.'#10'NO space characters'#3'Top'#2'<'#5'Width'#3#200#0
-  +#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#11#4'Text'#6' *.doc;*.docx'
-  +';*.xls;*.xlsx;*.pdf;'#7'Visible'#8#0#0#9'TCheckBox'#21'FileTypeMaskCheckBox'
-  +'2'#4'Left'#3'P'#1#6'Height'#2#22#3'Top'#2' '#5'Width'#3#143#0#7'Caption'#6
-  +#18'Choose file types?'#8'OnChange'#7#27'FileTypeMaskCheckBox2Change'#8'TabO'
-  +'rder'#2#12#0#0#0#11'TRadioGroup'#24'AlgorithmChoiceRadioBox3'#4'Left'#2#8#6
-  +'Height'#3#129#0#3'Top'#2#10#5'Width'#2'h'#8'AutoFill'#9#7'Caption'#6#9'Algo'
-  +'rithm'#28'ChildSizing.LeftRightSpacing'#2#6#28'ChildSizing.TopBottomSpacing'
-  +#2#6#29'ChildSizing.EnlargeHorizontal'#7#24'crsHomogenousChildResize'#27'Chi'
-  +'ldSizing.EnlargeVertical'#7#24'crsHomogenousChildResize'#28'ChildSizing.Shr'
-  +'inkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'#7#14'crs'
-  +'ScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftToRightThenTopToBottom'#27
-  +'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2'l'#11'ClientWidth'#2'\'
-  +#11'Font.Height'#2#243#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA'
-  +'-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7'OnClick'#7#29'AlgorithmChoiceRa'
-  +'dioBox3Click'#10'ParentFont'#8#8'TabOrder'#2#1#0#0#12'TProgressBar'#7'pbFil'
-  +'eS'#4'Left'#3#8#3#6'Height'#2#20#3'Top'#2'h'#5'Width'#3#168#0#8'TabOrder'#2
-  +#2#0#0#0#9'TTabSheet'#9'TabSheet4'#4'Hint'#6'\Choose a directory, have its c'
-  +'ontent hashed, files are copied to destination, and re-hashed.'#7'Caption'#6
-  +#5'&Copy'#12'ClientHeight'#3'd'#2#11'ClientWidth'#3#212#3#14'ParentShowHint'
-  +#8#8'ShowHint'#9#0#9'TGroupBox'#24'CopyFilesHashingGroupBox'#4'Left'#2'x'#6
-  +'Height'#3'T'#2#3'Top'#2#10#5'Width'#3'H'#3#7'Anchors'#11#5'akTop'#6'akLeft'
-  +#7'akRight'#0#7'Caption'#6'_Hash files in chosen directory, copy them, and r'
-  +'e-hash the copied files (recursive by default) '#12'ClientHeight'#3'?'#2#11
-  +'ClientWidth'#3'D'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'ParentCol'
-  +'or'#8#10'ParentFont'#8#8'TabOrder'#2#0#0#6'TPanel'#24'Panel1CopyAndHashOpti'
-  ,'ons'#4'Left'#2#8#6'Height'#3#184#0#3'Top'#2#8#5'Width'#3'3'#3#7'Anchors'#11
-  +#5'akTop'#6'akLeft'#7'akRight'#0#12'ClientHeight'#3#184#0#11'ClientWidth'#3
-  +'3'#3#8'TabOrder'#2#3#7'OnClick'#7#29'Panel1CopyAndHashOptionsClick'#0#9'TCh'
-  +'eckBox'#22'CheckBoxListOfDirsOnly'#4'Left'#2#14#6'Height'#2#21#4'Hint'#6'AT'
-  +'ick to have child directories listed, but no files inside hashed'#3'Top'#2#9
-  +#5'Width'#3#161#0#7'Caption'#6#25'Just LIST sub-directories'#8'OnChange'#7#28
-  +'CheckBoxListOfDirsOnlyChange'#8'TabOrder'#2#0#0#0#9'TCheckBox'#30'CheckBoxL'
-  +'istOfDirsAndFilesOnly'#4'Left'#2#14#6'Height'#2#21#4'Hint'#6'MTick to have '
-  +'child directories and files listed, but no files actually hashed'#3'Top'#2
-  +'('#5'Width'#3#214#0#7'Caption'#6'#Just LIST sub-directories and files'#8'On'
-  +'Change'#7'$CheckBoxListOfDirsAndFilesOnlyChange'#8'TabOrder'#2#1#0#0#9'TChe'
-  +'ckBox'#19'SaveToHTMLCheckBox2'#4'Left'#3#0#1#6'Height'#2#21#4'Hint'#6#29'Sa'
-  +'ve results as HTML web page'#3'Top'#2#9#5'Width'#3#141#0#7'Caption'#6#20'Sa'
-  +'ve results (HTML)?'#8'TabOrder'#2#2#0#0#9'TCheckBox'#18'SaveToCSVCheckBox2'
-  +#4'Left'#3#0#1#6'Height'#2#21#4'Hint'#6'-Save results as CSV data (spreadshe'
-  +'et format)'#3'Top'#2'('#5'Width'#3#130#0#7'Caption'#6#19'Save results (CSV)'
-  +'?'#7'Checked'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#3#0#0#9'TCheckBox'#21
-  +'FileTypeMaskCheckBox1'#4'Left'#3#192#1#6'Height'#2#21#4'Hint'#6'$Only copy '
-  +'files of a particular type'#3'Top'#2'('#5'Width'#2'~'#7'Caption'#6#18'Choos'
-  +'e file types?'#8'OnChange'#7#27'FileTypeMaskCheckBox1Change'#8'TabOrder'#2#5
-  +#0#0#5'TEdit'#13'FileMaskField'#4'Left'#3#208#1#6'Height'#2#25#4'Hint'#6'fUs'
-  +'e an asterix, full stop and the file type '#10'extension, seperated by a se'
-  +'mi-colon.'#10'NO space characters'#3'Top'#2'@'#5'Width'#3#248#0#14'ParentSh'
-  +'owHint'#8#8'ShowHint'#9#8'TabOrder'#2#6#4'Text'#6' *.doc;*.docx;*.xls;*.xls'
-  +'x;*.pdf;'#7'Visible'#8#0#0#9'TCheckBox'#18'chkNoRecursiveCopy'#4'Left'#3#192
-  +#1#6'Height'#2#21#4'Hint'#6'5Only copy files found in the root of chosen dir'
-  +'ectory'#3'Top'#2#9#5'Width'#3#156#0#7'Caption'#6#23'Ignore sub-directories?'
-  +#8'TabOrder'#2#4#0#0#6'TLabel'#7'Label11'#4'Left'#2#14#6'Height'#2#17#3'Top'
-  +#2'H'#5'Width'#2'K'#7'Caption'#6#15'# Files in Dir:'#11'ParentColor'#8#0#0#6
-  +'TLabel'#7'Label12'#4'Left'#2#14#6'Height'#2#17#3'Top'#2'h'#5'Width'#2'd'#7
-  +'Caption'#6#17'# Files Examined:'#11'ParentColor'#8#0#0#6'TLabel'#7'Label13'
-  +#4'Left'#2#14#6'Height'#2#17#3'Top'#3#136#0#5'Width'#2'J'#7'Caption'#6#11'% '
-  +'Complete:'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken5A'#4'Left'#3#208
-  +#1#6'Height'#2#17#3'Top'#2'a'#5'Width'#2'B'#7'Caption'#6#12'Start Time: '#11
-  +'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken5B'#4'Left'#3#208#1#6'Height'#2
-  +#17#3'Top'#2'y'#5'Width'#2'A'#7'Caption'#6#11'End Time:  '#11'ParentColor'#8
-  +#0#0#6'TLabel'#14'lblTimeTaken6A'#4'Left'#3'0'#2#6'Height'#2#17#3'Top'#2'a'#5
-  +'Width'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTa'
-  +'ken6B'#4'Left'#3'0'#2#6'Height'#2#17#3'Top'#2'y'#5'Width'#2#9#7'Caption'#6#3
-  +'...'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken5C'#4'Left'#3#208#1#6'H'
-  +'eight'#2#17#3'Top'#3#145#0#5'Width'#2'E'#7'Caption'#6#11'Time Taken:'#11'Pa'
-  +'rentColor'#8#0#0#6'TLabel'#14'lblTimeTaken6C'#4'Left'#3'0'#2#6'Height'#2#17
-  +#3'Top'#3#145#0#5'Width'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLa'
-  +'bel'#21'lblNoOfFilesToExamine'#4'Left'#3#136#0#6'Height'#2#17#3'Top'#2'H'#5
-  +'Width'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#22'lblNoOfFi'
-  +'lesToExamine2'#4'Left'#3#136#0#6'Height'#2#17#3'Top'#2'h'#5'Width'#2#9#7'Ca'
-  +'ption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#18'lblDataCopiedSoFar'#4'Le'
-  +'ft'#3#184#0#6'Height'#2#17#3'Top'#2'h'#5'Width'#2#9#7'Caption'#6#3'...'#11
-  +'ParentColor'#8#0#0#6'TLabel'#24'lblFilesCopiedPercentage'#22'AnchorSideLeft'
-  +'.Control'#7#6'pbCopy'#19'AnchorSideLeft.Side'#7#9'asrBottom'#21'AnchorSideT'
-  +'op.Control'#7#6'pbCopy'#18'AnchorSideTop.Side'#7#9'asrBottom'#23'AnchorSide'
-  +'Right.Control'#7#6'pbCopy'#4'Left'#3'z'#1#6'Height'#2#17#3'Top'#3#136#0#5'W'
-  +'idth'#2#9#7'Anchors'#11#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#9'TChec'
-  +'kBox'#23'chkNoPathReconstruction'#4'Left'#3'p'#2#6'Height'#2#21#4'Hint'#6
-  +#176'Files will be copied to the root of your chosen '#10'destination direct'
-  +'ory. Duplicate file NAMES '#10'will have their names appended with '#10'Dup'
-  +'licatedNameX to avoid filesystem conflicts'#3'Top'#2#9#5'Width'#3#132#0#7'C'
-  +'aption'#6#19'Don''t rebuild path?'#8'TabOrder'#2#7#0#0#9'TCheckBox'#13'chkC'
-  +'opyHidden'#4'Left'#3'p'#2#6'Height'#2#21#4'Hint'#6'EIf checked, will find h'
-  +'idden directories and files and copy those too'#3'Top'#2'('#5'Width'#2#127#7
-  +'Caption'#6#18'Copy hidden files?'#8'TabOrder'#2#8#0#0#12'TProgressBar'#6'pb'
-  +'Copy'#23'AnchorSideRight.Control'#7#24'lblFilesCopiedPercentage'#4'Left'#3
-  +#136#0#6'Height'#2#20#3'Top'#3#136#0#5'Width'#3#216#0#8'TabOrder'#2#9#0#0#0#7
-  +'TButton'#18'Button8CopyAndHash'#4'Left'#3#128#1#6'Height'#2#23#4'Hint'#6#130
-  ,'Only enabled once a valid source and destination directory are chosen or ju'
-  +'st a valid source if only a list generation is needed. '#3'Top'#3' '#1#5'Wi'
-  +'dth'#2'P'#7'Caption'#6#4'&Go!'#5'Color'#4#137#250#137#0#7'Enabled'#8#10'Fon'
-  +'t.Style'#11#6'fsBold'#0#7'OnClick'#7#23'Button8CopyAndHashClick'#10'ParentF'
-  +'ont'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#0#0#0#5'TEdit'#15'E'
-  +'dit2SourcePath'#4'Left'#2#8#6'Height'#2#25#4'Hint'#6'SShow currently select'
-  +'ed source directory'#13#10'Switch to UNC path by ticking "UNC Mode?"'#3'Top'
-  +#3#216#0#5'Width'#3'm'#1#5'Color'#7#8'clSilver'#7'OnEnter'#7#20'Edit2SourceP'
-  +'athEnter'#8'TabOrder'#2#1#4'Text'#6'+Select source directory (or enter UNC '
-  +'path)'#7'Visible'#8#0#0#5'TEdit'#20'Edit3DestinationPath'#4'Left'#3#224#1#6
-  +'Height'#2#25#4'Hint'#6'XShow currently selected destination directory'#13#10
-  +'Switch to UNC path by ticking "UNC Mode?"'#3'Top'#3#216#0#5'Width'#3'e'#1#5
-  +'Color'#7#8'clSilver'#7'OnEnter'#7#25'Edit3DestinationPathEnter'#8'TabOrder'
-  +#2#2#4'Text'#6'0Select destination directory (or enter UNC path)'#7'Visible'
-  +#8#0#0#10'TStatusBar'#10'StatusBar3'#4'Left'#2#0#6'Height'#2#23#3'Top'#3''''
-  +#2#5'Width'#3'D'#3#6'Panels'#14#0#14'ParentShowHint'#8#0#0#14'TShellTreeView'
-  +#8'DirListA'#4'Left'#2#8#6'Height'#3#16#1#4'Hint'#6'%Single click where to c'
-  +'opy files FROM'#3'Top'#3#0#1#5'Width'#3'm'#1#7'Anchors'#11#6'akLeft'#8'akBo'
-  +'ttom'#0#10'AutoExpand'#9#12'FileSortType'#7#11'fstAlphabet'#8'HotTrack'#9#6
-  +'Images'#7#10'ImageList1'#8'ReadOnly'#9#8'TabOrder'#2#5#7'OnClick'#7#13'DirL'
-  +'istAClick'#7'Options'#11#19'tvoAllowMultiselect'#13'tvoAutoExpand'#17'tvoAu'
-  +'toItemHeight'#16'tvoHideSelection'#11'tvoHotTrack'#21'tvoKeepCollapsedNodes'
-  +#11'tvoReadOnly'#14'tvoShowButtons'#12'tvoShowLines'#11'tvoShowRoot'#11'tvoT'
-  +'oolTips'#13'tvoThemedDraw'#0#16'TreeLinePenStyle'#7#7'psSolid'#11'ObjectTyp'
-  +'es'#11#9'otFolders'#8'otHidden'#0#0#0#14'TShellTreeView'#8'DirListB'#4'Left'
-  +#3#224#1#6'Height'#3#16#1#4'Hint'#6'#Single click where to copy files TO'#3
-  +'Top'#3#0#1#5'Width'#3'e'#1#7'Anchors'#11#6'akLeft'#8'akBottom'#0#10'AutoExp'
-  +'and'#9#12'FileSortType'#7#11'fstAlphabet'#6'Images'#7#10'ImageList1'#8'TabO'
-  +'rder'#2#6#7'OnClick'#7#13'DirListBClick'#7'Options'#11#13'tvoAutoExpand'#17
-  +'tvoAutoItemHeight'#16'tvoHideSelection'#21'tvoKeepCollapsedNodes'#14'tvoSho'
-  +'wButtons'#12'tvoShowLines'#11'tvoShowRoot'#11'tvoToolTips'#13'tvoThemedDraw'
-  +#0#11'ObjectTypes'#11#9'otFolders'#8'otHidden'#0#0#0#7'TButton'#12'btnStopSc'
-  +'an2'#4'Left'#3#130#1#6'Height'#2#23#4'Hint'#6'NClick to abort the hash as s'
-  +'oon as the'#10'current file hashing action completes. '#3'Top'#3'H'#1#5'Wid'
-  +'th'#2'N'#7'Caption'#6#5'St&op'#7'OnClick'#7#17'btnStopScan2Click'#8'TabOrde'
-  +'r'#2#7#0#0#9'TCheckBox'#10'chkUNCMode'#4'Left'#3#128#1#6'Height'#2#21#4'Hin'
-  +'t'#6'DTick to enter UNC network path '#13#10'instead of using treeview sele'
-  +'ction'#3'Top'#3#216#0#5'Width'#2'\'#7'Caption'#6#9'UNC Mode?'#8'OnChange'#7
-  +#16'chkUNCModeChange'#8'TabOrder'#2#8#0#0#0#11'TRadioGroup'#24'AlgorithmChoi'
-  +'ceRadioBox4'#4'Left'#2#8#6'Height'#3#129#0#3'Top'#2#10#5'Width'#2'h'#8'Auto'
-  +'Fill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpacing'#2#6#28'C'
-  +'hildSizing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizontal'#7#24'crs'
-  +'HomogenousChildResize'#27'ChildSizing.EnlargeVertical'#7#24'crsHomogenousCh'
-  +'ildResize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSi'
-  +'zing.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLe'
-  +'ftToRightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeig'
-  +'ht'#2'l'#11'ClientWidth'#2'\'#11'Font.Height'#2#243#9'ItemIndex'#2#1#13'Ite'
-  +'ms.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7'O'
-  +'nClick'#7#29'AlgorithmChoiceRadioBox4Click'#10'ParentFont'#8#8'TabOrder'#2#1
-  +#0#0#0#9'TTabSheet'#9'TabSheet7'#7'Caption'#6#17'Compare Two Files'#12'Clien'
-  +'tHeight'#3'd'#2#11'ClientWidth'#3#212#3#0#11'TRadioGroup'#24'AlgorithmChoic'
-  +'eRadioBox5'#4'Left'#2#8#6'Height'#3#129#0#3'Top'#2#10#5'Width'#2'h'#8'AutoF'
-  +'ill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpacing'#2#6#28'Ch'
-  +'ildSizing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizontal'#7#24'crsH'
-  +'omogenousChildResize'#27'ChildSizing.EnlargeVertical'#7#24'crsHomogenousChi'
-  +'ldResize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSiz'
-  +'ing.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLef'
-  +'tToRightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeigh'
-  +'t'#2'l'#11'ClientWidth'#2'\'#11'Font.Height'#2#243#9'ItemIndex'#2#1#13'Item'
-  +'s.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7'On'
-  +'Click'#7#29'AlgorithmChoiceRadioBox5Click'#18'OnSelectionChanged'#7'(Algori'
-  +'thmChoiceRadioBox5SelectionChanged'#10'ParentFont'#8#8'TabOrder'#2#0#0#0#9
-  +'TGroupBox'#9'GroupBox4'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#2'x'
-  +#6'Height'#3#240#0#3'Top'#2#10#5'Width'#3'H'#3#7'Anchors'#11#5'akTop'#6'akLe'
-  ,'ft'#7'akRight'#0#7'Caption'#6'*Choose two files and click ''Compare Files'''
-  +#12'ClientHeight'#3#219#0#11'ClientWidth'#3'D'#3#11'Font.Height'#2#243#10'Pa'
-  +'rentFont'#8#8'TabOrder'#2#1#0#7'TButton'#15'btnFileACompare'#4'Left'#2#8#6
-  +'Height'#2#25#3'Top'#2#8#5'Width'#2'h'#7'Caption'#6#13'Select File A'#7'OnCl'
-  +'ick'#7#20'btnFileACompareClick'#8'TabOrder'#2#0#0#0#7'TButton'#15'btnFileBC'
-  +'ompare'#4'Left'#2#8#6'Height'#2#25#3'Top'#2'H'#5'Width'#2'h'#7'Caption'#6#13
-  +'Select File B'#7'OnClick'#7#20'btnFileBCompareClick'#8'TabOrder'#2#1#0#0#7
-  +'TButton'#18'btnCompareTwoFiles'#4'Left'#2#8#6'Height'#2#25#3'Top'#2'v'#5'Wi'
-  +'dth'#2'h'#7'Caption'#6#11'Compare Now'#5'Color'#4#128#255#128#0#7'OnClick'#7
-  +#23'btnCompareTwoFilesClick'#8'TabOrder'#2#2#0#0#6'TLabel'#6'Label9'#4'Left'
-  +#3#130#0#6'Height'#2#17#3'Top'#3#130#0#5'Width'#2'&'#7'Caption'#6#7'Result:'
-  +#11'ParentColor'#8#0#0#6'TLabel'#12'lblFileBHash'#4'Left'#3#130#0#6'Height'#2
-  +#17#4'Hint'#6'2Single left mouse click to copy value to clipboard'#3'Top'#2
-  +'d'#5'Width'#2#9#7'Caption'#6#3'...'#11'ParentColor'#8#14'ParentShowHint'#8#8
-  +'ShowHint'#9#8'WordWrap'#9#7'OnClick'#7#17'lblFileBHashClick'#0#0#6'TLabel'
-  +#12'lblFileAHash'#4'Left'#3#130#0#6'Height'#2#17#4'Hint'#6'2Single left mous'
-  +'e click to copy value to clipboard'#3'Top'#2'('#5'Width'#2#9#7'Caption'#6#3
-  +'...'#11'ParentColor'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'WordWrap'#9#7'O'
-  +'nClick'#7#17'lblFileAHashClick'#0#0#6'TLabel'#18'lblHashMatchResult'#4'Left'
-  +#3#180#0#6'Height'#2#15#3'Top'#3#130#0#5'Width'#2#9#7'Caption'#6#3'...'#10'F'
-  +'ont.Style'#11#6'fsBold'#0#11'ParentColor'#8#10'ParentFont'#8#0#0#7'TButton'
-  +#24'btnCompareTwoFilesSaveAs'#4'Left'#3#128#0#6'Height'#2#25#3'Top'#3#160#0#5
-  +'Width'#2'p'#7'Caption'#6#14'Save Result...'#7'Enabled'#8#7'OnClick'#7#29'bt'
-  +'nCompareTwoFilesSaveAsClick'#8'TabOrder'#2#3#0#0#10'TStatusBar'#10'StatusBa'
-  +'r4'#22'AnchorSideLeft.Control'#7#9'GroupBox4'#23'AnchorSideRight.Control'#7
-  +#9'GroupBox4'#4'Left'#2#0#6'Height'#2#23#3'Top'#3#195#0#5'Width'#3'D'#3#6'Pa'
-  +'nels'#14#0#0#0#5'TEdit'#12'edtFileAName'#4'Left'#3#128#0#6'Height'#2#25#4'H'
-  +'int'#6'vPath to the file you wish to analyse. '#13#10'Type or paste path he'
-  +'re directly, '#13#10'or use the button to the left to select it'#3'Top'#2#9
-  +#5'Width'#3#136#2#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#14'ParentSho'
-  +'wHint'#8#8'ShowHint'#9#8'TabOrder'#2#5#4'Text'#6'#Select File A or paste pa'
-  +'th to file'#0#0#5'TEdit'#12'edtFileBName'#4'Left'#3#128#0#6'Height'#2#25#4
-  +'Hint'#6'}Path to the second file you wish to analyse. '#13#10'Type or paste'
-  +' path here directly, '#13#10'or use the button to the left to select it'#3
-  +'Top'#2'H'#5'Width'#3#136#2#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#0#14
-  +'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#6#4'Text'#6'#Select File B or'
-  +' paste path to file'#0#0#0#0#9'TTabSheet'#9'TabSheet6'#4'Hint'#6'`Choose Di'
-  +'rectory A and compare it against Directory B to see if their contents are b'
-  +'oth the same'#7'Caption'#6#19'Compare Directories'#12'ClientHeight'#3'd'#2
-  +#11'ClientWidth'#3#212#3#0#9'TGroupBox'#9'GroupBox1'#4'Left'#2'x'#6'Height'#3
+  +'TLabel'#21'lblTotalBytesExamined'#23'AnchorSideRight.Control'#7#24'Director'
+  +'yHashingGroupBox'#20'AnchorSideRight.Side'#7#9'asrBottom'#4'Left'#3#192#2#6
+  +'Height'#2#16#3'Top'#2#28#5'Width'#3#134#0#7'Anchors'#11#5'akTop'#6'akLeft'#7
+  +'akRight'#0#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#9'TCheckBox'#14'chkHid'
+  +'denFiles'#4'Left'#3'P'#1#6'Height'#2#20#4'Hint'#6#157'Tick to have files in'
+  +' hidden folders hashed. '#13#10'Hidden files are hashed by default anyway '
+  +#13#10'but hidden folders, ergo their contents, are not found by default.'#3
+  +'Top'#2#6#5'Width'#3#130#0#7'Caption'#6#19'Hidden folders too?'#8'TabOrder'#2
+  +#10#0#0#5'TEdit'#14'FileMaskField2'#4'Left'#3'P'#1#6'Height'#2#24#4'Hint'#6
+  +'fUse an asterix, full stop and the file type '#10'extension, seperated by a'
+  +' semi-colon.'#10'NO space characters'#3'Top'#2'8'#5'Width'#3#200#0#14'Paren'
+  +'tShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#11#4'Text'#6' *.doc;*.docx;*.xls;*'
+  +'.xlsx;*.pdf;'#7'Visible'#8#0#0#9'TCheckBox'#21'FileTypeMaskCheckBox2'#4'Lef'
+  +'t'#3'P'#1#6'Height'#2#20#3'Top'#2' '#5'Width'#2'{'#7'Caption'#6#18'Choose f'
+  +'ile types?'#8'OnChange'#7#27'FileTypeMaskCheckBox2Change'#8'TabOrder'#2#12#0
+  +#0#17'TZVDateTimePicker'#24'ZVDateTimePickerFileSTab'#4'Left'#3#152#0#6'Heig'
+  +'ht'#2#24#3'Top'#2'8'#5'Width'#3#157#0#11'CenturyFrom'#3#149#7#7'MaxDate'#5#0
+  +#0#0#0#0#4#146#180#20'@'#7'MinDate'#5#0#0#0#0#0#0#240#166#14'@'#8'TabOrder'#2
+  +#13#7'Enabled'#8#17'TrailingSeparator'#8#15'TextForNullDate'#6#4'NULL'#12'Le'
+  +'adingZeros'#9#7'Visible'#8#4'Kind'#7#11'dtkDateTime'#10'TimeFormat'#7#4'tf2'
+  +'4'#11'TimeDisplay'#7#5'tdHMS'#8'DateMode'#7#10'dmComboBox'#4'Date'#5#0#176
+  +#219#185#131#137#22#242#254'C'#4'Time'#5#0#176#219#185#131#137#22#242#254'C'
+  +#20'UseDefaultSeparators'#9#17'HideDateTimeParts'#11#0#10'MonthNames'#6#4'Lo'
+  +'ng'#0#0#9'TCheckBox'#27'lblschedulertickboxFileSTab'#4'Left'#2#6#6'Height'#2
+  +#20#4'Hint'#6'ZTick and set a date and time ahead of current time'#13#10'and'
+  +' then select the directory to hash.'#3'Top'#2'8'#5'Width'#2'l'#7'Caption'#6
+  +#16'Start at a time:'#8'OnChange'#7'!lblschedulertickboxFileSTabChange'#8'Ta'
+  +'bOrder'#2#14#0#0#0#11'TRadioGroup'#24'AlgorithmChoiceRadioBox3'#4'Left'#2#16
+  +#6'Height'#3#129#0#3'Top'#2#10#5'Width'#2'`'#8'AutoFill'#9#7'Caption'#6#9'Al'
+  ,'gorithm'#28'ChildSizing.LeftRightSpacing'#2#6#28'ChildSizing.TopBottomSpaci'
+  +'ng'#2#6#29'ChildSizing.EnlargeHorizontal'#7#24'crsHomogenousChildResize'#27
+  +'ChildSizing.EnlargeVertical'#7#24'crsHomogenousChildResize'#28'ChildSizing.'
+  +'ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'#7#14
+  +'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftToRightThenTopToBottom'
+  +#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2'l'#11'ClientWidth'#2
+  +'\'#11'Font.Height'#2#243#9'ItemIndex'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5
+  +'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7'OnClick'#7#29'AlgorithmChoic'
+  +'eRadioBox3Click'#10'ParentFont'#8#8'TabOrder'#2#1#0#0#12'TProgressBar'#7'pb'
+  +'FileS'#4'Left'#3#8#3#6'Height'#2#20#3'Top'#2'h'#5'Width'#3#168#0#8'TabOrder'
+  +#2#2#0#0#0#9'TTabSheet'#9'TabSheet4'#4'Hint'#6'\Choose a directory, have its'
+  +' content hashed, files are copied to destination, and re-hashed.'#7'Caption'
+  +#6#5'&Copy'#12'ClientHeight'#3'm'#2#11'ClientWidth'#3#210#3#14'ParentShowHin'
+  +'t'#8#8'ShowHint'#9#0#9'TGroupBox'#24'CopyFilesHashingGroupBox'#4'Left'#2'x'
+  +#6'Height'#3'T'#2#3'Top'#2#10#5'Width'#3'H'#3#7'Anchors'#11#5'akTop'#6'akLef'
+  +'t'#7'akRight'#0#7'Caption'#6'_Hash files in chosen directory, copy them, an'
+  +'d re-hash the copied files (recursive by default) '#12'ClientHeight'#3'?'#2
+  +#11'ClientWidth'#3'D'#3#5'Color'#7#6'clForm'#11'Font.Height'#2#243#11'Parent'
+  +'Color'#8#10'ParentFont'#8#8'TabOrder'#2#0#0#6'TPanel'#24'Panel1CopyAndHashO'
+  +'ptions'#4'Left'#2#8#6'Height'#3#184#0#3'Top'#2#8#5'Width'#3'3'#3#7'Anchors'
+  +#11#5'akTop'#6'akLeft'#7'akRight'#0#12'ClientHeight'#3#184#0#11'ClientWidth'
+  +#3'3'#3#8'TabOrder'#2#3#7'OnClick'#7#29'Panel1CopyAndHashOptionsClick'#0#9'T'
+  +'CheckBox'#22'CheckBoxListOfDirsOnly'#4'Left'#2#14#6'Height'#2#20#4'Hint'#6
+  +'ATick to have child directories listed, but no files inside hashed'#3'Top'#2
+  +#0#5'Width'#3#161#0#7'Caption'#6#25'Just LIST sub-directories'#8'OnChange'#7
+  +#28'CheckBoxListOfDirsOnlyChange'#8'TabOrder'#2#0#0#0#9'TCheckBox'#30'CheckB'
+  +'oxListOfDirsAndFilesOnly'#4'Left'#2#14#6'Height'#2#20#4'Hint'#6'MTick to ha'
+  +'ve child directories and files listed, but no files actually hashed'#3'Top'
+  +#2' '#5'Width'#3#213#0#7'Caption'#6'#Just LIST sub-directories and files'#8
+  +'OnChange'#7'$CheckBoxListOfDirsAndFilesOnlyChange'#8'TabOrder'#2#1#0#0#9'TC'
+  +'heckBox'#19'SaveToHTMLCheckBox2'#4'Left'#3#0#1#6'Height'#2#20#4'Hint'#6#29
+  +'Save results as HTML web page'#3'Top'#2#0#5'Width'#3#142#0#7'Caption'#6#20
+  +'Save results (HTML)?'#8'TabOrder'#2#2#0#0#9'TCheckBox'#18'SaveToCSVCheckBox'
+  +'2'#4'Left'#3#0#1#6'Height'#2#20#4'Hint'#6'-Save results as CSV data (spread'
+  +'sheet format)'#3'Top'#2' '#5'Width'#3#134#0#7'Caption'#6#19'Save results (C'
+  +'SV)?'#7'Checked'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#3#0#0#9'TCheckBox'
+  +#21'FileTypeMaskCheckBox1'#4'Left'#3#192#1#6'Height'#2#20#4'Hint'#6'$Only co'
+  +'py files of a particular type'#3'Top'#2' '#5'Width'#2'{'#7'Caption'#6#18'Ch'
+  +'oose file types?'#8'OnChange'#7#27'FileTypeMaskCheckBox1Change'#8'TabOrder'
+  +#2#5#0#0#5'TEdit'#13'FileMaskField'#4'Left'#3#208#1#6'Height'#2#24#4'Hint'#6
+  +'fUse an asterix, full stop and the file type '#10'extension, seperated by a'
+  +' semi-colon.'#10'NO space characters'#3'Top'#2'@'#5'Width'#3#248#0#14'Paren'
+  +'tShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#6#4'Text'#6' *.doc;*.docx;*.xls;*.'
+  +'xlsx;*.pdf;'#7'Visible'#8#0#0#9'TCheckBox'#18'chkNoRecursiveCopy'#4'Left'#3
+  +#192#1#6'Height'#2#20#4'Hint'#6'5Only copy files found in the root of chosen'
+  +' directory'#3'Top'#2#0#5'Width'#3#152#0#7'Caption'#6#23'Ignore sub-director'
+  +'ies?'#8'TabOrder'#2#4#0#0#6'TLabel'#7'Label11'#4'Left'#2#14#6'Height'#2#16#3
+  +'Top'#2'H'#5'Width'#2'N'#7'Caption'#6#15'# Files in Dir:'#11'ParentColor'#8#0
+  +#0#6'TLabel'#7'Label12'#4'Left'#2#14#6'Height'#2#16#3'Top'#2'h'#5'Width'#2'g'
+  +#7'Caption'#6#17'# Files Examined:'#11'ParentColor'#8#0#0#6'TLabel'#7'Label1'
+  +'3'#4'Left'#2#14#6'Height'#2#16#3'Top'#3#136#0#5'Width'#2'K'#7'Caption'#6#11
+  +'% Complete:'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken5A'#4'Left'#3
+  +#208#1#6'Height'#2#16#3'Top'#2'a'#5'Width'#2'F'#7'Caption'#6#12'Start Time: '
+  +#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken5B'#4'Left'#3#208#1#6'Height'
+  +#2#16#3'Top'#2'y'#5'Width'#2'C'#7'Caption'#6#11'End Time:  '#11'ParentColor'
+  +#8#0#0#6'TLabel'#14'lblTimeTaken6A'#4'Left'#3'0'#2#6'Height'#2#16#3'Top'#2'a'
+  +#5'Width'#2#12#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTim'
+  +'eTaken6B'#4'Left'#3'0'#2#6'Height'#2#16#3'Top'#2'y'#5'Width'#2#12#7'Caption'
+  +#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken5C'#4'Left'#3#208#1
+  +#6'Height'#2#16#3'Top'#3#145#0#5'Width'#2'I'#7'Caption'#6#11'Time Taken:'#11
+  +'ParentColor'#8#0#0#6'TLabel'#14'lblTimeTaken6C'#4'Left'#3'0'#2#6'Height'#2
+  +#16#3'Top'#3#145#0#5'Width'#2#12#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6
+  +'TLabel'#21'lblNoOfFilesToExamine'#4'Left'#3#136#0#6'Height'#2#16#3'Top'#2'H'
+  +#5'Width'#2#12#7'Caption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#18'lblDat'
+  ,'aCopiedSoFar'#4'Left'#3#208#0#6'Height'#2#16#3'Top'#2'h'#5'Width'#2#12#7'Ca'
+  +'ption'#6#3'...'#11'ParentColor'#8#0#0#6'TLabel'#24'lblFilesCopiedPercentage'
+  +#22'AnchorSideLeft.Control'#7#6'pbCopy'#19'AnchorSideLeft.Side'#7#9'asrBotto'
+  +'m'#21'AnchorSideTop.Control'#7#6'pbCopy'#18'AnchorSideTop.Side'#7#9'asrBott'
+  +'om'#23'AnchorSideRight.Control'#7#6'pbCopy'#4'Left'#3'w'#1#6'Height'#2#16#3
+  +'Top'#3#139#0#5'Width'#2#12#7'Anchors'#11#0#7'Caption'#6#3'...'#11'ParentCol'
+  +'or'#8#0#0#9'TCheckBox'#23'chkNoPathReconstruction'#4'Left'#3'p'#2#6'Height'
+  +#2#20#4'Hint'#6#176'Files will be copied to the root of your chosen '#10'des'
+  +'tination directory. Duplicate file NAMES '#10'will have their names appende'
+  +'d with '#10'DuplicatedNameX to avoid filesystem conflicts'#3'Top'#2#0#5'Wid'
+  +'th'#2#127#7'Caption'#6#19'Don''t rebuild path?'#8'TabOrder'#2#7#0#0#9'TChec'
+  +'kBox'#13'chkCopyHidden'#4'Left'#3'p'#2#6'Height'#2#20#4'Hint'#6'EIf checked'
+  +', will find hidden directories and files and copy those too'#3'Top'#2' '#5
+  +'Width'#2'{'#7'Caption'#6#18'Copy hidden files?'#8'TabOrder'#2#8#0#0#12'TPro'
+  +'gressBar'#6'pbCopy'#23'AnchorSideRight.Control'#7#24'lblFilesCopiedPercenta'
+  +'ge'#4'Left'#3#136#0#6'Height'#2#20#3'Top'#3#136#0#5'Width'#3#216#0#8'TabOrd'
+  +'er'#2#9#0#0#9'TCheckBox'#26'lblschedulertickboxCopyTab'#4'Left'#3#0#1#6'Hei'
+  +'ght'#2#20#4'Hint'#6#157'Tick and set a date and time ahead of current time'
+  +#13#10'and then select the source and destination folders.'#13#10'Hash, copy'
+  +' and hash will start at the specified time'#3'Top'#2'@'#5'Width'#2'l'#7'Cap'
+  +'tion'#6#16'Start at a time:'#8'OnChange'#7' lblschedulertickboxCopyTabChang'
+  +'e'#8'TabOrder'#2#10#0#0#17'TZVDateTimePicker'#23'ZVDateTimePickerCopyTab'#4
+  +'Left'#3#16#1#6'Height'#2#24#3'Top'#2'`'#5'Width'#3#157#0#11'CenturyFrom'#3
+  +#149#7#7'MaxDate'#5#0#0#0#0#0#4#146#180#20'@'#7'MinDate'#5#0#0#0#0#0#0#240
+  +#166#14'@'#8'TabOrder'#2#11#7'Enabled'#8#17'TrailingSeparator'#8#15'TextForN'
+  +'ullDate'#6#4'NULL'#12'LeadingZeros'#9#7'Visible'#8#4'Kind'#7#11'dtkDateTime'
+  +#10'TimeFormat'#7#4'tf24'#11'TimeDisplay'#7#5'tdHMS'#8'DateMode'#7#10'dmComb'
+  +'oBox'#4'Date'#5#0#176#219#185#131#137#22#242#254'C'#4'Time'#5#0#176#219#185
+  +#131#137#22#242#254'C'#20'UseDefaultSeparators'#9#17'HideDateTimeParts'#11#0
+  +#10'MonthNames'#6#4'Long'#0#0#6'TLabel'#22'lblNoOfFilesToExamine2'#4'Left'#3
+  +#136#0#6'Height'#2#16#3'Top'#2'h'#5'Width'#2#12#7'Caption'#6#3'...'#11'Paren'
+  +'tColor'#8#0#0#0#7'TButton'#18'Button8CopyAndHash'#4'Left'#3#128#1#6'Height'
+  +#2#23#4'Hint'#6#130'Only enabled once a valid source and destination directo'
+  +'ry are chosen or just a valid source if only a list generation is needed. '
+  +#3'Top'#3' '#1#5'Width'#2'P'#7'Caption'#6#4'&Go!'#5'Color'#4#137#250#137#0#7
+  +'Enabled'#8#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7#23'Button8CopyAndHash'
+  +'Click'#10'ParentFont'#8#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#0#0
+  +#0#5'TEdit'#15'Edit2SourcePath'#4'Left'#2#8#6'Height'#2#24#4'Hint'#6'SShow c'
+  +'urrently selected source directory'#13#10'Switch to UNC path by ticking "UN'
+  +'C Mode?"'#3'Top'#3#216#0#5'Width'#3'm'#1#5'Color'#7#8'clSilver'#7'OnEnter'#7
+  +#20'Edit2SourcePathEnter'#8'TabOrder'#2#1#4'Text'#6'+Select source directory'
+  +' (or enter UNC path)'#7'Visible'#8#0#0#5'TEdit'#20'Edit3DestinationPath'#4
+  +'Left'#3#224#1#6'Height'#2#24#4'Hint'#6'XShow currently selected destination'
+  +' directory'#13#10'Switch to UNC path by ticking "UNC Mode?"'#3'Top'#3#216#0
+  +#5'Width'#3'e'#1#5'Color'#7#8'clSilver'#7'OnEnter'#7#25'Edit3DestinationPath'
+  +'Enter'#8'TabOrder'#2#2#4'Text'#6'0Select destination directory (or enter UN'
+  +'C path)'#7'Visible'#8#0#0#10'TStatusBar'#10'StatusBar3'#4'Left'#2#0#6'Heigh'
+  +'t'#2#20#3'Top'#3'+'#2#5'Width'#3'D'#3#6'Panels'#14#0#14'ParentShowHint'#8#0
+  +#0#14'TShellTreeView'#8'DirListA'#4'Left'#2#8#6'Height'#3#16#1#4'Hint'#6'%Si'
+  +'ngle click where to copy files FROM'#3'Top'#3#1#1#5'Width'#3'm'#1#7'Anchors'
+  +#11#6'akLeft'#8'akBottom'#0#10'AutoExpand'#9#12'FileSortType'#7#11'fstAlphab'
+  +'et'#8'HotTrack'#9#6'Images'#7#10'ImageList1'#8'ReadOnly'#9#8'TabOrder'#2#5#7
+  +'OnClick'#7#13'DirListAClick'#7'Options'#11#19'tvoAllowMultiselect'#13'tvoAu'
+  +'toExpand'#17'tvoAutoItemHeight'#16'tvoHideSelection'#11'tvoHotTrack'#21'tvo'
+  +'KeepCollapsedNodes'#11'tvoReadOnly'#14'tvoShowButtons'#12'tvoShowLines'#11
+  +'tvoShowRoot'#11'tvoToolTips'#13'tvoThemedDraw'#0#16'TreeLinePenStyle'#7#7'p'
+  +'sSolid'#11'ObjectTypes'#11#9'otFolders'#8'otHidden'#0#0#0#14'TShellTreeView'
+  +#8'DirListB'#4'Left'#3#224#1#6'Height'#3#16#1#4'Hint'#6'#Single click where '
+  +'to copy files TO'#3'Top'#3#1#1#5'Width'#3'e'#1#7'Anchors'#11#6'akLeft'#8'ak'
+  +'Bottom'#0#10'AutoExpand'#9#12'FileSortType'#7#11'fstAlphabet'#6'Images'#7#10
+  +'ImageList1'#8'TabOrder'#2#6#7'OnClick'#7#13'DirListBClick'#7'Options'#11#13
+  +'tvoAutoExpand'#17'tvoAutoItemHeight'#16'tvoHideSelection'#21'tvoKeepCollaps'
+  +'edNodes'#14'tvoShowButtons'#12'tvoShowLines'#11'tvoShowRoot'#11'tvoToolTips'
+  +#13'tvoThemedDraw'#0#11'ObjectTypes'#11#9'otFolders'#8'otHidden'#0#0#0#7'TBu'
+  ,'tton'#12'btnStopScan2'#4'Left'#3#130#1#6'Height'#2#23#4'Hint'#6'NClick to a'
+  +'bort the hash as soon as the'#10'current file hashing action completes. '#3
+  +'Top'#3'H'#1#5'Width'#2'N'#7'Caption'#6#5'St&op'#7'OnClick'#7#17'btnStopScan'
+  +'2Click'#8'TabOrder'#2#7#0#0#9'TCheckBox'#10'chkUNCMode'#4'Left'#3#128#1#6'H'
+  +'eight'#2#20#4'Hint'#6'DTick to enter UNC network path '#13#10'instead of us'
+  +'ing treeview selection'#3'Top'#3#216#0#5'Width'#2'U'#7'Caption'#6#9'UNC Mod'
+  +'e?'#8'OnChange'#7#16'chkUNCModeChange'#8'TabOrder'#2#8#0#0#0#11'TRadioGroup'
+  +#24'AlgorithmChoiceRadioBox4'#4'Left'#2#16#6'Height'#3#129#0#3'Top'#2#10#5'W'
+  +'idth'#2'`'#8'AutoFill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRight'
+  +'Spacing'#2#6#28'ChildSizing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHor'
+  +'izontal'#7#24'crsHomogenousChildResize'#27'ChildSizing.EnlargeVertical'#7#24
+  +'crsHomogenousChildResize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChi'
+  +'lds'#26'ChildSizing.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Lay'
+  +'out'#7#29'cclLeftToRightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1
+  +#12'ClientHeight'#2'l'#11'ClientWidth'#2'\'#11'Font.Height'#2#243#9'ItemInde'
+  +'x'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6
+  +'xxHash'#0#7'OnClick'#7#29'AlgorithmChoiceRadioBox4Click'#10'ParentFont'#8#8
+  +'TabOrder'#2#1#0#0#0#9'TTabSheet'#9'TabSheet7'#7'Caption'#6#17'Compare Two F'
+  +'iles'#12'ClientHeight'#3'm'#2#11'ClientWidth'#3#210#3#0#11'TRadioGroup'#24
+  +'AlgorithmChoiceRadioBox5'#4'Left'#2#16#6'Height'#3#129#0#3'Top'#2#10#5'Widt'
+  +'h'#2'`'#8'AutoFill'#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpa'
+  +'cing'#2#6#28'ChildSizing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizo'
+  +'ntal'#7#24'crsHomogenousChildResize'#27'ChildSizing.EnlargeVertical'#7#24'c'
+  +'rsHomogenousChildResize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChil'
+  +'ds'#26'ChildSizing.ShrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layo'
+  +'ut'#7#29'cclLeftToRightThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1
+  +#12'ClientHeight'#2'l'#11'ClientWidth'#2'\'#11'Font.Height'#2#243#9'ItemInde'
+  +'x'#2#1#13'Items.Strings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6
+  +'xxHash'#0#7'OnClick'#7#29'AlgorithmChoiceRadioBox5Click'#18'OnSelectionChan'
+  +'ged'#7'(AlgorithmChoiceRadioBox5SelectionChanged'#10'ParentFont'#8#8'TabOrd'
+  +'er'#2#0#0#0#9'TGroupBox'#9'GroupBox4'#20'AnchorSideRight.Side'#7#9'asrBotto'
+  +'m'#4'Left'#2'x'#6'Height'#3'('#1#3'Top'#2#10#5'Width'#3'H'#3#7'Anchors'#11#5
+  +'akTop'#6'akLeft'#7'akRight'#0#7'Caption'#6'*Choose two files and click ''Co'
+  +'mpare Files'''#12'ClientHeight'#3#19#1#11'ClientWidth'#3'D'#3#11'Font.Heigh'
+  +'t'#2#243#10'ParentFont'#8#8'TabOrder'#2#1#0#7'TButton'#15'btnFileACompare'#4
+  +'Left'#2#8#6'Height'#2#25#3'Top'#2#8#5'Width'#2'h'#7'Caption'#6#13'Select Fi'
+  +'le A'#7'OnClick'#7#20'btnFileACompareClick'#8'TabOrder'#2#0#0#0#7'TButton'
+  +#15'btnFileBCompare'#4'Left'#2#8#6'Height'#2#25#3'Top'#2'H'#5'Width'#2'h'#7
+  +'Caption'#6#13'Select File B'#7'OnClick'#7#20'btnFileBCompareClick'#8'TabOrd'
+  +'er'#2#1#0#0#7'TButton'#18'btnCompareTwoFiles'#4'Left'#2#8#6'Height'#2#25#3
+  +'Top'#3#168#0#5'Width'#2'h'#7'Caption'#6#11'Compare Now'#5'Color'#4#128#255
+  +#128#0#7'OnClick'#7#23'btnCompareTwoFilesClick'#8'TabOrder'#2#2#0#0#6'TLabel'
+  +#6'Label9'#4'Left'#3#130#0#6'Height'#2#16#3'Top'#3#176#0#5'Width'#2'('#7'Cap'
+  +'tion'#6#7'Result:'#11'ParentColor'#8#0#0#6'TLabel'#12'lblFileBHash'#4'Left'
+  +#3#130#0#6'Height'#2#16#4'Hint'#6'2Single left mouse click to copy value to '
+  +'clipboard'#3'Top'#2'd'#5'Width'#2#12#7'Caption'#6#3'...'#11'ParentColor'#8
+  +#14'ParentShowHint'#8#8'ShowHint'#9#8'WordWrap'#9#7'OnClick'#7#17'lblFileBHa'
+  +'shClick'#0#0#6'TLabel'#12'lblFileAHash'#4'Left'#3#130#0#6'Height'#2#16#4'Hi'
+  +'nt'#6'2Single left mouse click to copy value to clipboard'#3'Top'#2'('#5'Wi'
+  +'dth'#2#12#7'Caption'#6#3'...'#11'ParentColor'#8#14'ParentShowHint'#8#8'Show'
+  +'Hint'#9#8'WordWrap'#9#7'OnClick'#7#17'lblFileAHashClick'#0#0#6'TLabel'#18'l'
+  +'blHashMatchResult'#4'Left'#3#180#0#6'Height'#2#13#3'Top'#3#176#0#5'Width'#2
+  +#9#7'Caption'#6#3'...'#10'Font.Style'#11#6'fsBold'#0#11'ParentColor'#8#10'Pa'
+  +'rentFont'#8#0#0#7'TButton'#24'btnCompareTwoFilesSaveAs'#4'Left'#3#128#0#6'H'
+  +'eight'#2#25#3'Top'#3#200#0#5'Width'#2'p'#7'Caption'#6#14'Save Result...'#7
+  +'Enabled'#8#7'OnClick'#7#29'btnCompareTwoFilesSaveAsClick'#8'TabOrder'#2#3#0
+  +#0#10'TStatusBar'#10'StatusBar4'#22'AnchorSideLeft.Control'#7#9'GroupBox4'#23
+  +'AnchorSideRight.Control'#7#9'GroupBox4'#4'Left'#2#0#6'Height'#2#20#3'Top'#3
+  +#255#0#5'Width'#3'D'#3#6'Panels'#14#0#0#0#5'TEdit'#12'edtFileAName'#4'Left'#3
+  +#128#0#6'Height'#2#24#4'Hint'#6'vPath to the file you wish to analyse. '#13
+  +#10'Type or paste path here directly, '#13#10'or use the button to the left '
+  +'to select it'#3'Top'#2#9#5'Width'#3#136#2#7'Anchors'#11#5'akTop'#6'akLeft'#7
+  +'akRight'#0#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#5#4'Text'#6'#Se'
+  +'lect File A or paste path to file'#0#0#5'TEdit'#12'edtFileBName'#4'Left'#3
+  ,#128#0#6'Height'#2#24#4'Hint'#6'}Path to the second file you wish to analyse'
+  +'. '#13#10'Type or paste path here directly, '#13#10'or use the button to th'
+  +'e left to select it'#3'Top'#2'H'#5'Width'#3#136#2#7'Anchors'#11#5'akTop'#6
+  +'akLeft'#7'akRight'#0#14'ParentShowHint'#8#8'ShowHint'#9#8'TabOrder'#2#6#4'T'
+  +'ext'#6'#Select File B or paste path to file'#0#0#9'TCheckBox'#29'lblschedul'
+  +'ertickboxCompareTab'#4'Left'#2#8#6'Height'#2#20#4'Hint'#6'oAfter choosing F'
+  +'ileA and FileB, tick and set a date and time ahead of current time'#13#10'a'
+  +'nd then click Compare Now.'#3'Top'#3#132#0#5'Width'#2'l'#7'Caption'#6#16'St'
+  +'art at a time:'#8'OnChange'#7'#lblschedulertickboxCompareTabChange'#8'TabOr'
+  +'der'#2#7#0#0#17'TZVDateTimePicker'#26'ZVDateTimePickerCompareTab'#4'Left'#3
+  +#128#0#6'Height'#2#24#3'Top'#3#132#0#5'Width'#3#157#0#11'CenturyFrom'#3#149#7
+  +#7'MaxDate'#5#0#0#0#0#0#4#146#180#20'@'#7'MinDate'#5#0#0#0#0#0#0#240#166#14
+  +'@'#8'TabOrder'#2#8#7'Enabled'#8#17'TrailingSeparator'#8#15'TextForNullDate'
+  +#6#4'NULL'#12'LeadingZeros'#9#7'Visible'#8#4'Kind'#7#11'dtkDateTime'#10'Time'
+  +'Format'#7#4'tf24'#11'TimeDisplay'#7#5'tdHMS'#8'DateMode'#7#10'dmComboBox'#4
+  +'Date'#5#0#176#219#185#131#137#22#242#254'C'#4'Time'#5#0#176#219#185#131#137
+  +#22#242#254'C'#20'UseDefaultSeparators'#9#17'HideDateTimeParts'#11#0#10'Mont'
+  +'hNames'#6#4'Long'#0#0#0#0#9'TTabSheet'#9'TabSheet6'#4'Hint'#6'`Choose Direc'
+  +'tory A and compare it against Directory B to see if their contents are both'
+  +' the same'#7'Caption'#6#19'Compare Directories'#12'ClientHeight'#3'j'#2#11
+  +'ClientWidth'#3#210#3#0#9'TGroupBox'#9'GroupBox1'#4'Left'#2'x'#6'Height'#3
   +#220#1#3'Top'#2#10#5'Width'#3'J'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRigh'
   +'t'#8'akBottom'#0#7'Caption'#6#23'Compare two directories'#12'ClientHeight'#3
   +#199#1#11'ClientWidth'#3'F'#3#8'DragMode'#7#11'dmAutomatic'#11'Font.Height'#2
@@ -447,7 +494,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'ize'#14'goSmoothScroll'#0#8'TabOrder'#2#1#16'TitleFont.Height'#2#243#0#0#6
   +'TLabel'#10'lblStatusA'#4'Left'#2#24#6'Height'#2#15#3'Top'#2'p'#5'Width'#2')'
   +#7'Caption'#6#8'Status: '#10'Font.Style'#11#6'fsBold'#0#11'ParentColor'#8#10
-  ,'ParentFont'#8#0#0#6'TLabel'#10'lblStatusB'#4'Left'#2'('#6'Height'#2#15#3'To'
+  +'ParentFont'#8#0#0#6'TLabel'#10'lblStatusB'#4'Left'#2'('#6'Height'#2#15#3'To'
   +'p'#3#136#0#5'Width'#2#9#7'Caption'#6#3'...'#10'Font.Color'#7#5'clRed'#10'Fo'
   +'nt.Style'#11#6'fsBold'#0#11'ParentColor'#8#10'ParentFont'#8#0#0#6'TLabel'#11
   +'lblDirAName'#4'Left'#3#176#0#6'Height'#2#17#3'Top'#2#0#5'Width'#2#9#7'Capti'
@@ -466,7 +513,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'e'#7'#cbShowDetailsOfAllComparisonsChange'#5'State'#7#9'cbChecked'#8'TabOrd'
   +'er'#2#5#0#0#0#9'TGroupBox'#9'GroupBox2'#22'AnchorSideLeft.Control'#7#9'Grou'
   +'pBox1'#23'AnchorSideRight.Control'#7#9'GroupBox1'#20'AnchorSideRight.Side'#7
-  +#9'asrBottom'#4'Left'#2'x'#6'Height'#3#168#0#3'Top'#3#185#1#5'Width'#3'J'#3#7
+  ,#9'asrBottom'#4'Left'#2'x'#6'Height'#3#168#0#3'Top'#3#185#1#5'Width'#3'J'#3#7
   +'Anchors'#11#6'akLeft'#7'akRight'#8'akBottom'#0#7'Caption'#6#7'Summary'#12'C'
   +'lientHeight'#3#147#0#11'ClientWidth'#3'F'#3#11'Font.Height'#2#243#10'Parent'
   +'Font'#8#8'TabOrder'#2#1#0#6'TLabel'#17'lblFileCountDiffA'#4'Left'#2#8#6'Hei'
@@ -511,26 +558,26 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'Width'#3#172#0#7'Caption'#6#26'Copy to Clipboard (Grid B)'#7'Enabled'#8#7'O'
   +'nClick'#7#24'btnCopyToClipboardBClick'#8'TabOrder'#2#1#0#0#7'TButton'#18'bt'
   +'nSaveComparisons'#4'Left'#3'@'#1#6'Height'#2#25#3'Top'#2'H'#5'Width'#3#172#0
-  ,#7'Caption'#6#12'Save to File'#7'Enabled'#8#7'OnClick'#7#23'btnSaveCompariso'
+  +#7'Caption'#6#12'Save to File'#7'Enabled'#8#7'OnClick'#7#23'btnSaveCompariso'
   +'nsClick'#8'TabOrder'#2#2#0#0#12'TProgressBar'#13'pbCompareDirA'#4'Left'#3
   +#184#2#6'Height'#2#20#3'Top'#2'\'#5'Width'#3#129#0#8'TabOrder'#2#3#0#0#12'TP'
   +'rogressBar'#13'pbCompareDirB'#4'Left'#3#184#2#6'Height'#2#20#3'Top'#2'x'#5
   +'Width'#3#129#0#8'TabOrder'#2#4#0#0#0#11'TRadioGroup'#24'AlgorithmChoiceRadi'
-  +'oBox6'#4'Left'#2#8#6'Height'#3#129#0#3'Top'#2#10#5'Width'#2'h'#8'AutoFill'#9
-  +#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpacing'#2#6#28'ChildSizi'
-  +'ng.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizontal'#7#24'crsHomogeno'
-  +'usChildResize'#27'ChildSizing.EnlargeVertical'#7#24'crsHomogenousChildResiz'
-  +'e'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing.Shr'
-  +'inkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftToRigh'
-  +'tThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2'l'
-  +#11'ClientWidth'#2'\'#11'Font.Height'#2#243#9'ItemIndex'#2#1#13'Items.String'
-  +'s'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7'OnClick'#7
-  +#29'AlgorithmChoiceRadioBox6Click'#10'ParentFont'#8#8'TabOrder'#2#2#0#0#0#9
+  +'oBox6'#4'Left'#2#16#6'Height'#3#129#0#3'Top'#2#10#5'Width'#2'`'#8'AutoFill'
+  +#9#7'Caption'#6#9'Algorithm'#28'ChildSizing.LeftRightSpacing'#2#6#28'ChildSi'
+  +'zing.TopBottomSpacing'#2#6#29'ChildSizing.EnlargeHorizontal'#7#24'crsHomoge'
+  +'nousChildResize'#27'ChildSizing.EnlargeVertical'#7#24'crsHomogenousChildRes'
+  +'ize'#28'ChildSizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing.S'
+  +'hrinkVertical'#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftToRi'
+  +'ghtThenTopToBottom'#27'ChildSizing.ControlsPerLine'#2#1#12'ClientHeight'#2
+  +'l'#11'ClientWidth'#2'\'#11'Font.Height'#2#243#9'ItemIndex'#2#1#13'Items.Str'
+  +'ings'#1#6#3'MD5'#6#5'SHA-1'#6#6'SHA256'#6#6'SHA512'#6#6'xxHash'#0#7'OnClick'
+  +#7#29'AlgorithmChoiceRadioBox6Click'#10'ParentFont'#8#8'TabOrder'#2#2#0#0#0#9
   +'TTabSheet'#9'TabSheet5'#4'Hint'#6'vCompute a SHA-1 hash of a physical disk '
   +'in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows'
-  +' Vista or above'#7'Caption'#6#5'Disks'#12'ClientHeight'#3'd'#2#11'ClientWid'
-  +'th'#3#212#3#0#7'TButton'#23'btnCallDiskHasherModule'#4'Left'#3'x'#1#6'Heigh'
-  +'t'#2#25#3'Top'#2#24#5'Width'#3#227#0#7'Caption'#6#27'&Launch Disk Hashing M'
+  +' Vista or above'#7'Caption'#6#5'Disks'#12'ClientHeight'#3'j'#2#11'ClientWid'
+  +'th'#3#210#3#0#7'TButton'#23'btnCallDiskHasherModule'#4'Left'#3'x'#1#6'Heigh'
+  ,'t'#2#25#3'Top'#2#24#5'Width'#3#227#0#7'Caption'#6#27'&Launch Disk Hashing M'
   +'odule'#5'Color'#4#128#255#128#0#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7
   +#28'btnCallDiskHasherModuleClick'#10'ParentFont'#8#8'TabOrder'#2#0#0#0#6'TLa'
   +'bel'#31'lblDiskHashingRunAsAdminWarning'#4'Left'#3'p'#1#6'Height'#2#15#3'To'
@@ -539,8 +586,8 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'t'#2#30#3'Top'#2'p'#5'Width'#3''''#1#7'Caption'#6'jLINUX USERS - You may pr'
   +'efer to hash disks using '#10'"File" tab and navigate to /dev/sdX or /dev/s'
   +'dXX as root'#11'ParentColor'#8#0#0#0#0#6'TLabel'#7'Label15'#4'Left'#3#200#0
-  +#6'Height'#2#14#3'Top'#2#1#5'Width'#3#248#0#8'AutoSize'#8#7'Caption'#6'!Copy'
-  +'right '#194#169' 2011-2017  Ted Smith'#11'Font.Height'#2#11#10'Font.Style'
+  +#6'Height'#2#15#3'Top'#2#1#5'Width'#3#248#0#8'AutoSize'#8#7'Caption'#6'!Copy'
+  +'right '#194#169' 2011-2017  Ted Smith'#11'Font.Height'#2#16#10'Font.Style'
   +#11#6'fsBold'#0#11'ParentColor'#8#10'ParentFont'#8#11'OptimalFill'#9#0#0#6'T'
   +'Label'#12'lblURLBanner'#23'AnchorSideRight.Control'#7#5'Owner'#20'AnchorSid'
   +'eRight.Side'#7#9'asrBottom'#6'Cursor'#7#11'crHandPoint'#4'Left'#3#200#1#6'H'
@@ -575,7 +622,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +#132#131#131#255#241#239#240#255#241#239#240#255'BBB'#255'BBB'#255#241#239
   +#240#255'BBB'#255#246#246#246#255#246#246#246#255'BBB'#255#241#239#240#255
   +#241#239#240#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239#240
-  ,#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239
+  +#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239
   +#240#255#241#239#240#255'BBB'#255#246#246#246#255#246#246#246#255'BBB'#255
   +#241#239#240#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239#240
   +#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239#240#255#241#239
@@ -594,7 +641,7 @@ LazarusResources.Add('TMainForm','FORMDATA',[
   +'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'
   +#255'BBB'#255#246#246#246#255#246#246#246#255'BBB'#255'BBB'#255'BBB'#255'BBB'
   +#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255
-  +'BBB'#255'BBB'#255#246#246#246#255#246#246#246#255'BBB'#255'BBB'#255'BBB'#255
+  ,'BBB'#255'BBB'#255#246#246#246#255#246#246#246#255'BBB'#255'BBB'#255'BBB'#255
   +'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'#255'BBB'
   +#255'BBB'#255'BBB'#255#246#246#246#255#246#246#246#255#246#246#246#255#246
   +#246#246#255#246#246#246#255#246#246#246#255#246#246#246#255#246#246#246#255

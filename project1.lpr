@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, Unit2, FindAllFilesEnhanced, diskmodule, uDisplayGrid,
-  diskspecification, uProgress, frmAboutUnit;
+  diskspecification, uProgress, frmAboutUnit, zvdatetimectrls;
 
 //{$IFDEF WINDOWS}{$R project1.rc}{$ENDIF}
 

@@ -2079,7 +2079,7 @@ end;
 // MisMatchHashCompare : When file counts match in both directories but hashes differ, this works out what files are different by hash
 procedure TMainForm.MisMatchHashCompare(HashListA, HashListB, FileAndHashListA, FileAndHashListB : TStringList);
 var
-  i, j, indexA, HashPosStart, FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
+  i, j, indexA, HashPosStart , FileNameAndPathPosStart, FileNameAndPathPosEnd : integer;
   MisMatchList : TStringList;
   MissingHash, ExtractedFileName : string;
   OnlyTabulateErrors : boolean;

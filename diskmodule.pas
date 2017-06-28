@@ -134,8 +134,11 @@ implementation
 
 // Enable or disable elements depending on the OS hosting the application
 procedure TfrmDiskHashingModule.FormCreate(Sender: TObject);
+var
+  MissingFileCount : integer;
 begin
   Stop := false;
+  MissingFileCount := 0;
   ExecutionCount := 0;
   ledtComputedHashA.Enabled := false;
   ledtComputedHashB.Enabled := false;
@@ -241,15 +244,12 @@ const
 var
 
   DiskInfoProcess          : TProcess;
-  diskinfo                 : TStringList;
+  DiskInfoProcessUDISKS    : TProcess;
+  diskinfo, diskinfoUDISKS : TStringList;
   i                        : Integer;
   stmp, strModel, strVendor, strType, strSerial : String;
 
 begin
-  strModel := '';
-  strVendor := '';
-  strType := '';
-  strSerial := '';
 
   // Probe all attached disks and populate the interface
   DiskInfoProcess:=TProcess.Create(nil);
@@ -378,7 +378,7 @@ var
   DisksProcess: TProcess;
   i: Integer;
   slDisklist: TSTringList;
-  PhyDiskNode, DriveLetterNode : TTreeNode;
+  PhyDiskNode, PartitionNoNode, DriveLetterNode           : TTreeNode;
   strPhysDiskSize, strLogDiskSize, DiskDevName, DiskLabels, dmCryptDiscovered   : string;
 begin
   DisksProcess:=TProcess.Create(nil);
@@ -430,7 +430,7 @@ begin
   frmDiskHashingModule.Treeview1.AlphaSort;
   slDisklist.Free;
   DisksProcess.Free;
-end;
+ end;
 
 
 // Returns a string holding the disk block COUNT (not size) as extracted from the string from
@@ -454,11 +454,14 @@ end;
 function GetBlockSizeLinux(DiskDevName : string) : Integer;
 var
   DiskProcess: TProcess;
-  i : Integer;
+  BlockSize, StartOffset, i : Integer;
   slDevDisk: TSTringList;
   strBlockSize : string;
+  RelLine : boolean;
 
 begin
+  RelLine := false;
+  BlockSize := 0;
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
   DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
@@ -481,7 +484,7 @@ end;
 function GetByteCountLinux(DiskDevName : string) : QWord;
 var
   DiskProcess: TProcess;
-  i : Integer;
+  StartOffset, i : Integer;
   slDevDisk: TSTringList;
   strByteCount : string;
   ScanDiskData : boolean;
@@ -534,7 +537,6 @@ end;
 // Returns the exact disk size for BOTH physical disks and logical drives as
 // reported by the Windows API and is used during the imaging stage
 function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
-{$ifdef Windows}
 const
   // These are defined at the MSDN.Microsoft.com website for DeviceIOControl
   // and https://forum.tuts4you.com/topic/22361-deviceiocontrol-ioctl-codes/
@@ -601,12 +603,11 @@ var
   ByteSize: int64;
   BytesReturned: DWORD;
   DLength: TDiskLength;
-{$endif}
 
 begin
-  {$ifdef Windows}
   ByteSize      := 0;
   BytesReturned := 0;
+  {$ifdef Windows}
   // https://msdn.microsoft.com/en-us/library/aa365178%28v=vs.85%29.aspx
   if not DeviceIOControl(hSelectedDisk,
                          IOCTL_DISK_GET_LENGTH_INFO,
@@ -818,8 +819,6 @@ begin
   SelectedDisk     := '';
   Partitions       := 0;
   GPTData          := '';
-  SectorsPerTrack  := 0;
-  ReportedSectors  := 0;
   frmTechSpecs.Memo1.Clear;
 
   if Pos('\\.\PHYSICALDRIVE', TreeView1.Selected.Text) > 0 then
@@ -962,18 +961,17 @@ const
   var
     SourceDevice                            : widestring;
     hSelectedDisk                           : THandle;
-    ExactDiskSize, HashResult               : Int64;
+    ExactDiskSize, SectorCount, HashResult  : Int64;
+    ExactSectorSize                         : integer;
     slHashLog                               : TStringList;
-    {$ifdef Windows}
     BytesReturned                           : DWORD;
-    {$endif}
     StartedAt, EndedAt, TimeTakenToHash     : TDateTime;
 
   begin
-    {$ifdef Windows}
     BytesReturned   := 0;
-    {$endif}
     ExactDiskSize   := 0;
+    ExactSectorSize := 0;
+    SectorCount     := 0;
     HashResult      := 0;
     HashChoice      := -1;
     StartedAt       := 0;
@@ -1034,6 +1032,18 @@ const
         {$ifdef UNIX}
         ExactDiskSize   := GetByteCountLinux(SourceDevice);
         {$endif}
+
+        // Now query the sector size.
+        // 512 bytes is common with MBR but with GPT disks, 1024 or 4096 is likely
+        {$ifdef Windows}
+        ExactSectorSize := GetSectorSizeInBytes(hSelectedDisk);
+        {$endif}
+        {$ifdef Unix}
+        ExactSectorSize := GetBlockSizeLinux(SourceDevice);
+        {$endif}
+
+        // Now we can assign a sector count based on sector size and disk size
+        SectorCount   := ExactDiskSize DIV ExactSectorSize;
 
         frmProgress.lblTotalBytesSource.Caption := ' bytes hashed of ' + IntToStr(ExactDiskSize);
 
@@ -1478,10 +1488,8 @@ end;
 
 
 procedure TfrmDiskHashingModule.menShowDiskManagerClick(Sender: TObject);
-{$ifdef Windows}
 var
 ProcDiskManager : TProcess;
-{$endif}
 begin
   {$ifdef Windows}
   try
@@ -1730,7 +1738,7 @@ const
   IOCTL_DISK_GET_DRIVE_GEOMETRY      = $0070000;
 var
   DG : TDiskGeometry;
-  BytesReturned : Integer;
+  SectorSizeInBytes, BytesReturned : Integer;
 
 begin
   if not DeviceIOControl(hSelectedDisk,
