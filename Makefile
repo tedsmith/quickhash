@@ -23,7 +23,7 @@ all: $(BIN)
 
 clean:
 	rm -rf lib/ lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
-	rm -f $(BIN) $(PROJECT) zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
+	rm -f $(BIN) $(PROJECT) DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
 	$(foreach FILE,$(RESFILES),\
 	  test ! -f $(FILE).backup || mv -f $(FILE).backup $(FILE) ; ${\n})
 
