@@ -17,6 +17,7 @@
 *.rsj
 *.lrt
 /HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
+/DateTimePicker/zvdatetimectrls.pas
 
 # Lazarus local files (user-specific info)
 *.lps
