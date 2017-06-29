@@ -18,10 +18,10 @@ object MainForm: TMainForm
     Height = 647
     Top = 24
     Width = 986
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -222,12 +222,12 @@ object MainForm: TMainForm
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 120
-        Height = 318
+        Height = 342
         Top = 10
         Width = 846
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Single File Hashing'
-        ClientHeight = 297
+        ClientHeight = 321
         ClientWidth = 842
         Color = clForm
         Font.Height = -13
@@ -290,7 +290,7 @@ object MainForm: TMainForm
         object StatusBar1: TStatusBar
           Left = 0
           Height = 20
-          Top = 277
+          Top = 301
           Width = 842
           Panels = <>
         end
@@ -329,10 +329,11 @@ object MainForm: TMainForm
           EditLabel.Height = 16
           EditLabel.Top = 205
           EditLabel.Width = 830
-          EditLabel.Caption = 'Expected Hash Value (paste from other utility)'
+          EditLabel.Caption = 'Expected Hash Value (paste from other utility before or after file hashing)'
           EditLabel.ParentColor = False
           TabOrder = 4
           Text = '...'
+          OnKeyUp = lbleExpectedHashKeyUp
         end
         object lbEndedFileAt: TLabel
           Left = 272
@@ -377,6 +378,16 @@ object MainForm: TMainForm
           ParentShowHint = False
           ShowHint = True
           TabOrder = 6
+        end
+        object btnClearHashField: TButton
+          Left = 8
+          Height = 25
+          Top = 256
+          Width = 144
+          Caption = 'Clear Hash Field'
+          OnClick = btnClearHashFieldClick
+          OnKeyDown = btnClearHashFieldKeyDown
+          TabOrder = 7
         end
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup

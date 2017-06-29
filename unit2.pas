@@ -139,6 +139,7 @@ type
     btnSaveComparisons: TButton;
     btnStopScan1: TButton;
     btnStopScan2: TButton;
+    btnClearHashField: TButton;
     Button8CopyAndHash: TButton;
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
@@ -297,9 +298,15 @@ type
     procedure AlgorithmChoiceRadioBox4Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox6Click(Sender: TObject);
+    procedure btnClearHashFieldClick(Sender: TObject);
+    procedure btnClearHashFieldKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure lblDonateClick(Sender: TObject);
+    procedure lbleExpectedHashEnter(Sender: TObject);
+    procedure lbleExpectedHashKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure lblFileAHashClick(Sender: TObject);
     procedure lblFileBHashClick(Sender: TObject);
     procedure lblschedulertickboxFileSTabChange(Sender: TObject);
@@ -674,21 +681,24 @@ begin
       stop := Now;
       elapsed := stop - start;
 
+      lbEndedFileAt.Caption    := 'Ended at   : '+ DateTimeToStr(stop);
+      lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
+      Application.ProcessMessages;
+
       // If the user has ane existing hash to check, compare it here
-      if lbleExpectedHash.Text <> '...' then
+      if (lbleExpectedHash.Text = '') then exit
+      else
+        if (lbleExpectedHash.Text <> '...') then
         begin
           if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
             begin
               Showmessage('Expected hash matches the computed file hash, OK');
             end
-          else
-            begin
-              Showmessage('Expected hash DOES NOT match the computed file hash!');
-            end;
+        else
+          begin
+            Showmessage('Expected hash DOES NOT match the computed file hash!');
+          end;
         end;
-        lbEndedFileAt.Caption    := 'Ended at   : '+ DateTimeToStr(stop);
-        lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
-        Application.ProcessMessages;
      end
   else
     ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
@@ -712,17 +722,18 @@ begin
         begin
          strHashValueText := Trim(Uppercase(CalcTheHashString(memoHashText.Text)));
          StrHashValue.Caption := strHashValueText;
-         if lbleExpectedHashText.Text <> '...' then
-           begin
-           if strHashValueText = Trim(Uppercase(lbleExpectedHashText.Text)) then
-             begin
-               Showmessage('Expected hash matches the generated text hash, OK');
-             end
+         if (lbleExpectedHash.Text = '') then exit
+         else
+           if (lbleExpectedHash.Text = '...') then exit
            else
-             begin
-               Showmessage('Expected hash DOES NOT match the generated text hash!');
-             end;
-           end;
+             if strHashValueText = Trim(Uppercase(lbleExpectedHashText.Text)) then
+               begin
+                 Showmessage('Expected hash matches the generated text hash, OK');
+               end
+             else
+               begin
+                 Showmessage('Expected hash DOES NOT match the generated text hash!');
+               end;
         end;
 end;
 
@@ -788,22 +799,23 @@ begin
 
     stop := Now;
     elapsed := stop - start;
-
-    // If the user has ane existing hash to check, compare it here
-    if lbleExpectedHash.Text <> '...' then
-    begin
-      if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
-        begin
-          Showmessage('Expected hash matches the computed file hash, OK');
-        end
-    else
-      begin
-        Showmessage('Expected hash DOES NOT match the computed file hash!');
-      end;
-    end;
     lbEndedFileAt.Caption    := 'Ended at   : '+ DateTimeToStr(stop);
     lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
     Application.ProcessMessages;
+
+    // If the user has ane existing hash to check, compare it here
+    if (lbleExpectedHash.Text = '') then exit
+    else
+      if (lbleExpectedHash.Text = '...') then exit
+      else
+        if fileHashValue = Trim(Uppercase(lbleExpectedHashText.Text)) then
+          begin
+            Showmessage('Expected hash matches the generated text hash, OK');
+          end
+        else
+          begin
+            Showmessage('Expected hash DOES NOT match the generated text hash!');
+          end;
   end
   else
     ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
@@ -971,6 +983,35 @@ begin
   QuickHashDonateURL := 'https://paypal.me/quickhash';
   OpenURL(QuickHashDonateURL);
 end;
+
+procedure TMainForm.lbleExpectedHashEnter(Sender: TObject);
+begin
+
+end;
+
+// In the event that the user pastes an expected hash value AFTER computing
+// the hash of the file, this onKeyUp event will then see if the pasted value
+// matches the value just computed. New to v2.8.3
+procedure TMainForm.lbleExpectedHashKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if memFileHashField.Lines[0] = 'Computed hash will appear here...' then
+    exit
+   else if (lbleExpectedHash.Text = '') then exit
+    else
+     if (lbleExpectedHash.Text <> '...') then
+     begin
+       if Uppercase(memFileHashField.Lines[0]) = Trim(Uppercase(lbleExpectedHash.Text)) then
+         begin
+           Showmessage('Expected hash matches the computed file hash, OK');
+         end
+     else
+       begin
+         Showmessage('Expected hash DOES NOT match the computed file hash!');
+       end;
+     end;
+end;
+
 
 procedure TMainForm.lblFileAHashClick(Sender: TObject);
 var
@@ -1184,6 +1225,19 @@ begin
   AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
   AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
+end;
+
+// New to v2.8.3, to better facilitate use of the Expected Hash field
+procedure TMainForm.btnClearHashFieldClick(Sender: TObject);
+begin
+  lbleExpectedHash.Text:= '';
+end;
+
+// New to v2.8.3, to better facilitate use of the Expected Hash field
+procedure TMainForm.btnClearHashFieldKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  lbleExpectedHash.Text:= '';
 end;
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
