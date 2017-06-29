@@ -9,7 +9,9 @@ RESFILES = frmaboutunit.lrs udisplaygrid.lrs unit2.lrs
 OPTIONS ?=
 # use a local temporary config directory to not register
 # the used package(s) permanently and globally
-OPTIONS += --pcp=lazarus_cfg  HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk
+OPTIONS += --pcp=lazarus_cfg
+OPTIONS += HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk
+OPTIONS += DateTimePicker/zvdatetimectrls.lpk
 
 define \n
 
@@ -20,9 +22,8 @@ endef
 all: $(BIN)
 
 clean:
-	rm -rf lib/ lazarus_cfg/
-	rm -rf HashLib4Pascal/HashLib/src/Packages/FPC/lib/
-	rm -f $(BIN) $(PROJECT) HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
+	rm -rf lib/ lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
+	rm -f $(BIN) $(PROJECT) DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
 	$(foreach FILE,$(RESFILES),\
 	  test ! -f $(FILE).backup || mv -f $(FILE).backup $(FILE) ; ${\n})
 
