@@ -141,7 +141,7 @@ begin
   GUID1.Data2 := TablePortion.ReadWord;   // Bytes 5 & 6
   GUID1.Data3 := TablePortion.ReadWord;   // Bytes 7 & 8
 
-  FillChar(Data4Array, 8, 0);
+  FillChar(Data4Array{%H-}, 8, 0);
   for i := 0 to 7 do
   begin
     Data4Array[i] := TablePortion.ReadByte;
@@ -165,7 +165,7 @@ begin
   GUID2.Data2 := TablePortion.ReadWord;   // Bytes 5 & 6
   GUID2.Data3 := TablePortion.ReadWord;   // Bytes 7 & 8
 
-  FillChar(Data4Array, 8, 0);
+  FillChar(Data4Array{%H-}, 8, 0);
   for i := 0 to 7 do
   begin
     Data4Array[i] := TablePortion.ReadByte;
@@ -362,7 +362,7 @@ begin
 
   if DiskPos > -1 then
     begin
-      FillChar(ProtectiveMBR, SizeOf(ProtectiveMBR), 0);
+      FillChar(ProtectiveMBR{%H-}, SizeOf(ProtectiveMBR), 0);
       BytesRead := FileRead(Drive, ProtectiveMBR, ExactSectorSize);
       if BytesRead > -1 then
           begin
@@ -409,7 +409,7 @@ begin
 
   if DiskPos > -1 then
     begin
-      FillChar(GUIDPartitionTableHeader, SizeOf(GUIDPartitionTableHeader), 0);
+      FillChar(GUIDPartitionTableHeader{%H-}, SizeOf(GUIDPartitionTableHeader), 0);
       BytesRead := FileRead(Drive, GUIDPartitionTableHeader, ExactSectorSize);
 
       if BytesRead > -1 then
@@ -668,7 +668,7 @@ begin
   // Internally, FileOpen calls CreateFileW, so we don't need to use the direct
   // Windows disk call; the function does it for us
   hDevice := FileOpen(PWideChar(Drive), fmOpenRead);
-  if hDevice = -1 then
+  if int(hDevice) = -1 then
     begin
       RaiseLastOSError;  // disk handle opening failed
       result := 'Disk could not be accessed.';
