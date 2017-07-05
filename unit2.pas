@@ -145,6 +145,7 @@ type
     cbShowDetailsOfAllComparisons: TCheckBox;
     lblNoOfFilesToExamine2: TLabel;
     lblschedulertickboxCompareTab: TCheckBox;
+    lblschedulertickboxCompareDirsTab: TCheckBox;
     lblschedulertickboxFileSTab: TCheckBox;
     lblschedulertickboxCopyTab: TCheckBox;
     lblschedulertickboxFileTab: TCheckBox;
@@ -188,6 +189,8 @@ type
     pbCompareDirA: TProgressBar;
     pbCompareDirB: TProgressBar;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
+    StatusBar5: TStatusBar;
+    StatusBar6: TStatusBar;
     SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
     lblRAM: TLabel;
@@ -216,7 +219,6 @@ type
     lblTimeFinishedA: TLabel;
     lblTimeTakenA: TLabel;
     lblTimeStartA: TLabel;
-    lblStatusB: TLabel;
     lblStatusA: TLabel;
     lblHashMatchB: TLabel;
     lblHashMatchA: TLabel;
@@ -288,10 +290,12 @@ type
     TabSheet7: TTabSheet;
     TextHashingGroupBox: TGroupBox;
     QH_MainFormXMLPropStorage: TXMLPropStorage;
-    ZVDateTimePickerCopyTab: TZVDateTimePicker;
-    ZVDateTimePickerCompareTab: TZVDateTimePicker;
-    ZVDateTimePickerFileTab: TZVDateTimePicker;
-    ZVDateTimePickerFileSTab: TZVDateTimePicker;
+    SchedulerTimer: TTimer;
+    ZVDateTimePickerCompareDirsTab: TZVDateTimePicker;
+    ZVDateTimePickerCopyTab    : TZVDateTimePicker;
+    ZVDateTimePickerCompareTab : TZVDateTimePicker;
+    ZVDateTimePickerFileTab    : TZVDateTimePicker;
+    ZVDateTimePickerFileSTab   : TZVDateTimePicker;
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox3Click(Sender: TObject);
@@ -313,12 +317,15 @@ type
     procedure lblschedulertickboxFileTabChange(Sender: TObject);
     procedure lblschedulertickboxCopyTabChange(Sender: TObject);
     procedure lblschedulertickboxCompareTabChange(Sender: TObject);
+    procedure lblschedulertickboxCompareTwoDirectoriesTabChange(Sender: TObject);
     procedure MenuItem1AClick(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2AClick(Sender: TObject);
     procedure MenuItem1CClick(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
+    procedure sgDirAClick(Sender: TObject);
+    procedure sgDirBClick(Sender: TObject);
     procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
@@ -371,7 +378,8 @@ type
     function  RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     procedure SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
     procedure EmptyDisplayGrid(Grid : TStringGrid);
-
+    procedure CheckSchedule(DesiredStartTime : TDateTime);
+    procedure InvokeScheduler(Sender : TObject);
     // function FileSizeWithLongPath(strFileName : string) : Int64;
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
@@ -406,7 +414,7 @@ type
    sValue1 : string; // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
 
    slMultipleDirNames : TStringList;
-   MultipleDirsChosen : boolean;
+   MultipleDirsChosen, StartHashing : boolean;
 
    {$IFDEF WINDOWS}
    // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
@@ -466,6 +474,7 @@ begin
        frmDisplayGrid1.Width := MainForm.Width - 20;
     end;
 
+  StartHashing := false;
   StopScan1 := false;
   StopScan2 := false;
 
@@ -611,6 +620,141 @@ begin
 
 end;
 
+// Checks if the desired start date and time has arrived yet by starting timer
+// If it has, disable timer. Otherwise, keep it going.
+procedure TMainForm.CheckSchedule(DesiredStartTime : TDateTime);
+begin
+  if Now = DesiredStartTime then
+    begin
+      SchedulerTimer.Enabled := false;
+      StartHashing := true;
+    end
+  else
+  begin
+    SchedulerTimer.Enabled := true;
+    StartHashing := false;
+  end;
+end;
+
+// Start a timer schedule for future hashing
+procedure TMainForm.InvokeScheduler(Sender : TObject);
+var
+  scheduleStartTime : TDateTime;
+begin
+  // File Tab scheduling
+  if PageControl1.ActivePage = TabSheet2 then  // File tab
+    begin
+    if ZVDateTimePickerFileTab.DateTime < Now then
+      begin
+        ShowMessage('Scheduled start time is in the past. Correct it.');
+        exit;
+      end
+      else begin
+        StartHashing := false;
+        scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
+        StatusBar1.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
+        // Set the interval as the milliseconds remaining until the future start time
+        SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
+        // and then enable the timer
+        SchedulerTimer.Enabled := true;
+        // and then check if current date and time is equal to desired scheduled date and time
+        repeat
+          Application.ProcessMessages;
+          CheckSchedule(scheduleStartTime);
+        until (StartHashing = true);
+      end
+    end
+  // FileS Tab scheduling
+  else if PageControl1.ActivePage = TabSheet3 then
+    begin
+    if ZVDateTimePickerFileSTab.DateTime < Now then
+      begin
+        ShowMessage('Scheduled start time is in the past. Correct it.');
+        exit;
+      end
+      else begin
+        StartHashing := false;
+        scheduleStartTime     := ZVDateTimePickerFileSTab.DateTime;
+        StatusBar2.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
+        // Set the interval as the milliseconds remaining until the future start time
+        SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
+        // and then enable the timer
+        SchedulerTimer.Enabled := true;
+        // and then check if current date and time is equal to desired scheduled date and time
+        repeat
+          Application.ProcessMessages;
+          CheckSchedule(scheduleStartTime);
+        until (StartHashing = true);
+      end;
+    end
+  else if PageControl1.ActivePage = TabSheet4 then  // Copy tab
+    begin
+    if ZVDateTimePickerCopyTab.DateTime < Now then
+      begin
+        ShowMessage('Scheduled start time is in the past. Correct it.');
+        exit;
+      end
+      else begin
+        StartHashing := false;
+        scheduleStartTime     := ZVDateTimePickerCopyTab.DateTime;
+        StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
+        // Set the interval as the milliseconds remaining until the future start time
+        SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
+        // and then enable the timer
+        SchedulerTimer.Enabled := true;
+        // and then check if current date and time is equal to desired scheduled date and time
+        repeat
+          Application.ProcessMessages;
+          CheckSchedule(scheduleStartTime);
+        until (StartHashing = true);
+      end
+    end
+  // Compare Two Files scheduler
+  else if PageControl1.ActivePage = TabSheet5 then  // Compare Two Files tab
+    begin
+    if ZVDateTimePickerCompareTab.DateTime < Now then
+      begin
+        ShowMessage('Scheduled start time is in the past. Correct it.');
+        exit;
+      end
+    else begin
+        StartHashing := false;
+        scheduleStartTime     := ZVDateTimePickerCompareTab.DateTime;
+        StatusBar4.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
+        // Set the interval as the milliseconds remaining until the future start time
+        SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
+        // and then enable the timer
+        SchedulerTimer.Enabled := true;
+        // and then check if current date and time is equal to desired scheduled date and time
+        repeat
+         Application.ProcessMessages;
+         CheckSchedule(scheduleStartTime);
+        until (StartHashing = true);
+      end;
+    end
+  else if PageControl1.ActivePage = TabSheet6 then  // Compare Two Directories tab
+    begin
+    if ZVDateTimePickerCompareDirsTab.DateTime < Now then
+      begin
+        ShowMessage('Scheduled start time is in the past. Correct it.');
+        exit;
+      end
+    else begin
+        StartHashing := false;
+        scheduleStartTime     := ZVDateTimePickerCompareDirsTab.DateTime;
+        StatusBar6.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
+        // Set the interval as the milliseconds remaining until the future start time
+        SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
+        // and then enable the timer
+        SchedulerTimer.Enabled := true;
+        // and then check if current date and time is equal to desired scheduled date and time
+        repeat
+         Application.ProcessMessages;
+         CheckSchedule(scheduleStartTime);
+        until (StartHashing = true);
+      end;
+    end;
+end;
 
 // FormDropFiles is the same as btnHashFileClick, except it disables the OpenDialog
 // element and computes the filename from the drag n drop variable and hashes the file.
@@ -642,28 +786,7 @@ begin
         // Now start a scheduled time, if selected
         if lblschedulertickboxFileTab.Checked then
           begin
-            // Check user has not chosen a time in the past
-            if ZVDateTimePickerFileTab.DateTime < Now then
-            begin
-              ShowMessage('Scheduled start time is in the past. Correct it.');
-              exit;
-            end
-          else
-            scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
-            StatusBar1.SimpleText := 'Waiting....scheduled ' + filename + ' for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
-            repeat
-              // This sleep loop avoids straining the CPU too much but also ensures the
-              // interface stays responsive to button clicks etc.
-              // So every 1K itteration, refresh the interface until the scheduled start
-              // arrives or the user clicks Abort.
-              inc(LoopCounter,1);
-              if LoopCounter = 1000 then
-                begin
-                  Application.ProcessMessages;
-                  LoopCounter := 0;
-                end;
-              sleep(0);
-            until scheduleStartTime = Now;
+            InvokeScheduler(self);
           end;
 
       start := Now;
@@ -1120,7 +1243,7 @@ begin
   end;
 end;
 
-// Enables or disables time scheduler of Compare tab
+// Enables or disables time scheduler of Compare Two Files tab
 procedure TMainForm.lblschedulertickboxCompareTabChange(Sender: TObject);
 begin
   if lblschedulertickboxCompareTab.Checked then
@@ -1134,6 +1257,22 @@ begin
     ZVDateTimePickerCompareTab.Enabled := false;
   end;
 end;
+
+// Enables or disables time scheduler of Compare Directories tab
+procedure TMainForm.lblschedulertickboxCompareTwoDirectoriesTabChange(Sender: TObject);
+begin
+  if lblschedulertickboxCompareDirsTab.Checked then
+  begin
+    ZVDateTimePickerCompareDirsTab.Visible := true;
+    ZVDateTimePickerCompareDirsTab.Enabled := true;
+  end
+  else
+  begin
+    ZVDateTimePickerCompareDirsTab.Visible := false;
+    ZVDateTimePickerCompareDirsTab.Enabled := false;
+  end;
+end;
+
 
 procedure TMainForm.MenuItem1AClick(Sender: TObject);
 begin
@@ -1250,6 +1389,17 @@ begin
 
 end;
 
+// Highlights the corresponding row in the other grid when user left mouse clicks
+procedure TMainForm.sgDirAClick(Sender: TObject);
+begin
+  sgDirB.Row := sgDirA.Row;
+end;
+// Highlights the corresponding row in the other grid when user left mouse clicks
+procedure TMainForm.sgDirBClick(Sender: TObject);
+begin
+  sgDirA.Row := sgDirB.Row;
+end;
+
 {$IFDEF WINDOWS}
 // http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
 function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
@@ -1328,29 +1478,9 @@ var
         begin
         // If a scheduler has been set, wait for that future time to arrive
         if lblschedulertickboxFileSTab.Checked then
-          begin
-            if ZVDateTimePickerFileSTab.DateTime < Now then
-            begin
-              ShowMessage('Scheduled start time is in the past. Correct it.');
-              exit;
-            end
-            else
-            scheduleStartTime     := ZVDateTimePickerFileSTab.DateTime;
-            StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
-              repeat
-                // This sleep loop avoids straining the CPU too much but also ensures the
-                // interface stays responsive to button clicks etc.
-                // So every 1K itteration, refresh the interface until the scheduled start
-                // arrives or the user clicks Abort.
-                inc(LoopCounter,1);
-                if LoopCounter = 1000 then
-                  begin
-                    Application.ProcessMessages;
-                    LoopCounter := 0;
-                  end;
-                sleep(0);
-              until (scheduleStartTime = Now) or (StopScan1 = true);
-            end;
+        begin
+          InvokeScheduler(self);
+        end;
 
          // Now lets recursively count each file,
          start := Now;
@@ -1555,8 +1685,8 @@ var
               StatusBar2.Refresh;
               ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
             end;
+    if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
     end; // end of duplicate deletion phase
-  if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
 end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
@@ -1767,7 +1897,12 @@ begin
   end;
   {$endif}
 
-  //MisMatchStatus                   := false; // Switches to true if a mismatch is identified
+  // Check if a scheduler has been set for the comparison to start in the future
+  if lblschedulertickboxCompareDirsTab.Checked then
+  begin
+    InvokeScheduler(self);
+  end;
+
   StartTime                        := Now;
   sgDirA.Clean;
   sgDirB.Clean;
@@ -1783,7 +1918,7 @@ begin
 
   try
     // First, list and hash the files in DirA
-    lblStatusB.Caption      := 'Counting files in ' + DirA + ' ...please wait';
+    StatusBar6.SimpleText      := 'Counting files in ' + DirA + ' ...please wait';
     TotalFilesDirA          := TStringListUTF8.Create;
     TotalFilesDirA.Sorted   := true;
     Application.ProcessMessages;
@@ -1796,7 +1931,7 @@ begin
     HashListA.Sorted        := true;
     FileAndHashListA.Sorted := true;
 
-    lblStatusB.Caption      := 'Now, hashing files in ' + DirA + ' ...please wait';
+    StatusBar6.SimpleText      := 'Now, hashing files in ' + DirA + ' ...please wait';
     Application.ProcessMessages;
 
     for i := 0 to TotalFilesDirA.Count -1 do
@@ -1838,7 +1973,7 @@ begin
     lblTotalFileCountNumberA.Caption := IntToStr(TotalFilesDirA.Count);
 
     // Then, list and hash the files in DirB
-    lblStatusB.Caption       := 'Counting files in ' + DirB + ' ...please wait';
+    StatusBar6.SimpleText       := 'Counting files in ' + DirB + ' ...please wait';
     TotalFilesDirB           := TStringListUTF8.Create;
     TotalFilesDirB.Sorted    := true;
     Application.ProcessMessages;
@@ -1853,8 +1988,7 @@ begin
     HashListB.Sorted         := true;
     FileAndHashListB.Sorted  := true;
 
-    lblStatusB.Caption       := 'Now, hashing files in ' + DirB + ' ...please wait';
-    lblStatusB.Refresh;
+    StatusBar6.SimpleText       := 'Now, hashing files in ' + DirB + ' ...please wait';
     Application.ProcessMessages;
 
     for i := 0 to TotalFilesDirB.Count -1 do
@@ -1895,8 +2029,7 @@ begin
     //FileAndHashListB.Sort;
 
     lblTotalFileCountNumberB.Caption := IntToStr(TotalFilesDirB.Count);
-    lblStatusB.Caption := 'Comparing files in ' + DirA + ' against files in ' + DirB + ' ...please wait';
-    lblStatusB.Refresh;
+    StatusBar6.SimpleText := 'Comparing files in ' + DirA + ' against files in ' + DirB + ' ...please wait';
     Application.ProcessMessages;
     // Now work out where the differences are.
     // Start by establishing if the dirs are identical : same no of files + same hashes = matching dirs
@@ -1925,8 +2058,7 @@ begin
       HashOfListB    := ValidateTextWithHash(HashListB.Text);
       if HashOfListA = HashOfListB then
         begin
-        lblStatusB.Caption := 'Finished examining files. ' + DirA + ' matches ' + DirB;
-        lblStatusB.Refresh;
+        StatusBar6.SimpleText := 'Finished examining files. ' + DirA + ' matches ' + DirB;
         lblHashMatchB.Caption:= 'MATCH!';
         sgDirA.Visible := false;
         sgDirB.Visible := false;
@@ -1943,7 +2075,7 @@ begin
         begin
           // So the file counts match but the hash lists differ.
           //MisMatchStatus := true;
-          lblStatusB.Caption    := DirA + ' does not match match ' + DirB;
+          StatusBar6.SimpleText    := DirA + ' does not match match ' + DirB;
           lblHashMatchB.Caption := 'MIS-MATCH! File count is the same, but hashes differ.';
           sgDirA.Visible := true;
           sgDirB.Visible := true;
@@ -2036,8 +2168,7 @@ begin
 
     // Check the content of ListB against ListA
 
-    lblStatusB.Caption := 'Checking files in ' + DirB + ' against those in ' + DirA;
-    lblStatusB.Refresh;
+    StatusBar6.SimpleText := 'Checking files in ' + DirB + ' against those in ' + DirA;
     for i := 0 to HashListB.Count -1 do
      begin
        if not HashListA.Find(HashListB.Strings[i], indexA) then
@@ -2070,9 +2201,7 @@ begin
     j := 0;
 
     // Check the content of ListA against ListB
-
-    lblStatusB.Caption := 'Checking files in ' + DirA + ' against those in ' + DirB;
-    lblStatusB.Refresh;
+    StatusBar6.SimpleText := 'Checking files in ' + DirA + ' against those in ' + DirB;
     for i := 0 to HashListA.Count -1 do
      begin
        if not HashListB.Find(HashListA.Strings[i], indexA) then
@@ -2106,7 +2235,7 @@ begin
     // Notify user of mis-matched files that are in one dir but not the other
     if (MisMatchList.Count > 0) then
      begin
-       lblStatusB.Caption := 'There is a mis-match between the two directories.';
+       StatusBar6.SimpleText := 'There is a mis-match between the two directories.';
        SaveErrorsCompareDirsSaveDialog8.Title := 'Save errors as text file';
        SaveErrorsCompareDirsSaveDialog8.DefaultExt := 'txt';
        ShowMessage('Errors were encountered.' + #13#10 +
@@ -2151,12 +2280,8 @@ begin
 
   try
     MismatchList := TStringList.Create;
-
     // Check the content of ListB against ListA
-
-    lblStatusB.Caption := 'Checking files in ' + DirB + ' against those in ' + DirA;
-    lblStatusB.Refresh;
-
+    StatusBar6.SimpleText := 'Checking files in ' + DirB + ' against those in ' + DirA;
     for i := 0 to HashListB.Count -1 do
      begin
        if not HashListA.Find(HashListB.Strings[i], indexA) then
@@ -2193,8 +2318,8 @@ begin
 
     // Check the content of ListA against ListB
 
-    lblStatusB.Caption := 'Checking files in ' + DirA + ' against those in ' + DirB;
-    lblStatusB.Refresh;
+    StatusBar6.SimpleText := 'Checking files in ' + DirA + ' against those in ' + DirB;
+
     for i := 0 to HashListA.Count -1 do
      begin
        if not HashListB.Find(HashListA.Strings[i], indexA) then
@@ -2229,7 +2354,7 @@ begin
     // Notify user of mis-matched files that are in one dir but not the other
     if (MisMatchList.Count > 0) then
      begin
-       lblStatusB.Caption := 'There is a hash mis-match between the two directories.';
+       StatusBar6.SimpleText := 'There is a hash mis-match between the two directories.';
      end
      else
      begin

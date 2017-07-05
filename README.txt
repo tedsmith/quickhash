@@ -28,11 +28,17 @@ Ted Smith
 
 v2.8.3 (In Development)
 
-Added scheduler to most tabs (File, FileS, Copy and Compare), meaning the user can set a date and time in the future to start the hashing process. For example, say the user is copying a large file to a certain location that won't finish copying for a few hours; perhaps after the user has left the office or gone to bed it will finish, but he wants to have the file hashed for the next day. With QuickHash v2.8.3, the user can set a date & time in the future, to start a few hours ahead of time allowing the file to copy first, then select the file (given that even before it's finished copying it can still be selected) and QuickHash will start hashing at that time.  
+Added scheduler to most tabs (File, FileS, Copy, Compare Two Files and Compare Directories), meaning the user can set a date and time in the future to start the hashing process of their selected data. For example, say the user is copying a large file to a certain location that won't finish copying for a few hours; perhaps after the user has left the office or gone to bed, he knows it will finish, but he wants to have the file(s) hashed for the next day. With QuickHash v2.8.3, the user can set a date & time in the future (to hours and minutes precision, not seconds), to start a few hours ahead of time allowing the file to copy first, then select the file (given that even before it's finished copying, the file can still be selected) and QuickHash will start hashing at that time.  
 
 Added the package 'DateTimePicker' by Zoran Vu?enovi? (http://wiki.lazarus.freepascal.org/ZVDateTimeControls_Package). This is now also required to compile the project (see section 1 of README.txt) from source.
 
+In the “Compare Directories” tab, if the user chooses to tabulate the results, upon completion of the comparison, if the user single left mouse clicks in either grid, the corresponding row entry in the other grid will be selected, assuming both directories actually match. If they do not match, the user will be taken to the corresponding grid row count, but this is unlikely to contain the same filename data of course. 
+
 Minor tweak to README.txt to properly refer to the HashLib4Pascal library
+
+A line was added in 2.8.2 to free resources used by the check for duplicate files, but it was realised that this causes an error if a check for duplicates was not selected by the user, as there was no resource allocated to then free. That was fixed. 
+
+Minor alignment fix to the labels at the top right of the “FileS” tab to better enable the values to be seen. 
 
 Some unused variables removed. 
 
