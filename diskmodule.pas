@@ -18,7 +18,7 @@ uses
   {$endif}
     diskspecification, uProgress, Classes, SysUtils, FileUtil,
     Forms, Controls, Graphics, LazUTF8, strutils,
-    Dialogs, StdCtrls, ComCtrls, ExtCtrls, Menus,
+    Dialogs, StdCtrls, ComCtrls, ExtCtrls, Menus, ZVDateTimePicker,
 
     // DEPRECATED as of v2.8.0
     // sha1Customised, md5Customised,
@@ -37,6 +37,8 @@ type
     btnStartHashing: TButton;
     cbdisks: TComboBox;
     cbLogFile: TCheckBox;
+    lblDiskHashSchedulerStatus: TLabel;
+    lblschedulertickboxDiskModule: TCheckBox;
     comboHashChoice: TComboBox;
     ledtComputedHashE: TLabeledEdit;
     ledtComputedHashD: TLabeledEdit;
@@ -60,7 +62,9 @@ type
     menHashDisk: TMenuItem;
     PopupMenu1: TPopupMenu;
     sdLogFile: TSaveDialog;
+    DiskHashingTimer: TTimer;
     TreeView1: TTreeView;
+    ZVDateTimePickerDiskModule: TZVDateTimePicker;
 
     // http://forum.lazarus.freepascal.org/index.php/topic,28560.0.html
     procedure btnAbortHashingClick(Sender: TObject);
@@ -69,6 +73,7 @@ type
     procedure cbLogFileChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure lblschedulertickboxDiskModuleChange(Sender: TObject);
     procedure ledtSelectedItemChange(Sender: TObject);
     procedure menHashDiskClick(Sender: TObject);
     procedure menShowDiskManagerClick(Sender: TObject);
@@ -77,11 +82,14 @@ type
     procedure cbdisksChange(Sender: TObject);
     function GetDiskTechnicalSpecs(Sender: TObject) : Integer;
     function GetDiskTechnicalSpecsLinux(Sender: TObject) : Integer;
+    procedure InvokeDiskHashScheduler (Sender : TObject);
+    procedure CheckSchedule(DesiredStartTime : TDateTime);
 
   private
     { private declarations }
   public
     BytesPerSector : integer;
+    StartHashing : boolean;
     { public declarations }
   end;
 
@@ -176,6 +184,21 @@ begin
  {$endif}
 end;
 
+procedure TfrmDiskHashingModule.lblschedulertickboxDiskModuleChange(
+  Sender: TObject);
+begin
+  if lblschedulertickboxDiskModule.Checked then
+    begin
+     ZVDateTimePickerDiskModule.Enabled := true;
+     ZVDateTimePickerDiskModule.Visible := true;
+    end
+  else
+  begin
+    ZVDateTimePickerDiskModule.Enabled := false;
+    ZVDateTimePickerDiskModule.Visible := false;
+  end;
+end;
+
 procedure TfrmDiskHashingModule.ledtSelectedItemChange(Sender: TObject);
 begin
 
@@ -199,10 +222,57 @@ begin
   {$endif}
 end;
 
+
+
 procedure TfrmDiskHashingModule.btnStartHashingClick(Sender: TObject);
 begin
   diskmodule.Stop := false; // if a hash was previously run and aborted, the flag needs to be reset for run 2
+  if lblschedulertickboxDiskModule.Checked then
+    begin
+      InvokeDiskHashScheduler(self);
+    end;
   menHashDiskClick(Sender);
+end;
+
+// Checks if the desired start date and time has arrived yet by starting timer
+// If it has, disable timer. Otherwise, keep it going.
+procedure TfrmDiskHashingModule.CheckSchedule(DesiredStartTime : TDateTime);
+begin
+  if Now = DesiredStartTime then
+    begin
+      DiskHashingTimer.Enabled := false;
+      StartHashing := true;
+    end
+  else
+  begin
+    DiskHashingTimer.Enabled := true;
+    StartHashing := false;
+  end;
+end;
+
+procedure TfrmDiskHashingModule.InvokeDiskHashScheduler (Sender : TObject);
+var
+  scheduleStartTime : TDateTime;
+begin
+  if ZVDateTimePickerDiskModule.DateTime < Now then
+    begin
+      ShowMessage('Scheduled start time is in the past. Correct it.');
+      exit;
+    end
+    else begin
+      StartHashing := false;
+      scheduleStartTime     := ZVDateTimePickerDiskModule.DateTime;
+      lblDiskHashSchedulerStatus.Caption := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
+      // Set the interval as the milliseconds remaining until the future start time
+      DiskHashingTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
+      // and then enable the timer
+      DiskHashingTimer.Enabled := true;
+      // and then check if current date and time is equal to desired scheduled date and time
+      repeat
+        Application.ProcessMessages;
+        CheckSchedule(scheduleStartTime);
+      until (StartHashing = true);
+    end;
 end;
 
 procedure TfrmDiskHashingModule.cbLogFileChange(Sender: TObject);
