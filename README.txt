@@ -14,7 +14,7 @@ CloneOfQuickHashProject/HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPa
 
 then click the 'Compile' button. Then use the next button to the right called 'Use >>' and then click 'Add to Project' from the drop down menu. HashLib4Pascal is now added to your QuickHash project.
 
-Repeat the same process for the package 'DateTimePicker' by Zoran Vu?enovi? (http://wiki.lazarus.freepascal.org/ZVDateTimeControls_Package) which was added in v2.8.3 to enable scheduled hashing.  So simply choose 'Package' --> Open Package File (lpk)' from the top menu of Lazarus. Choose and navigate to:
+Repeat the same process for the package 'DateTimePicker' by Zoran Vucenovic (http://wiki.lazarus.freepascal.org/ZVDateTimeControls_Package) which was added in v2.8.3 to enable scheduled hashing.  So simply choose 'Package' --> Open Package File (lpk)' from the top menu of Lazarus. Choose and navigate to:
 
 CloneOfQuickHashProject/DateTimePicker/zvdatetimectrls.lpk, choose 'Compile' and then click 'Use >> Add to Project'. Better yet, choose “Install” so that it becomes a component of your Lazarus IDE, which will further reduce warnings. 
 
@@ -28,9 +28,9 @@ Ted Smith
 
 v2.8.3 (In Development)
 
-Added scheduler to most tabs (File, FileS, Copy, Compare Two Files and Compare Directories), meaning the user can set a date and time in the future to start the hashing process of their selected data. For example, say the user is copying a large file to a certain location that won't finish copying for a few hours; perhaps after the user has left the office or gone to bed, he knows it will finish, but he wants to have the file(s) hashed for the next day. With QuickHash v2.8.3, the user can set a date & time in the future (to hours and minutes precision, not seconds), to start a few hours ahead of time allowing the file to copy first, then select the file (given that even before it's finished copying, the file can still be selected) and QuickHash will start hashing at that time.  
+Added scheduler to most tabs (File, FileS, Copy, Compare Two Files, Compare Directories, and Disk Hashing Module), meaning the user can set a date and time in the future to start the hashing process of their chosen data. For example, say the user is copying a large file to a certain location that won't finish copying for a few hours; perhaps after the user has left the office or gone to bed it will finish, but he wants to have the file hashed for the next day. With QuickHash v2.8.3, the user can set a date & time in the future (to hours and minutes precision, not seconds), to start a few hours ahead of time allowing the file to copy first, then select the file (given that even before it's finished copying, the file can still be selected) and QuickHash will start hashing at that time. For obvious reasons, there is no scheduler for basic text hashing!  
 
-Added the package 'DateTimePicker' by Zoran Vu?enovi? (http://wiki.lazarus.freepascal.org/ZVDateTimeControls_Package). This is now also required to compile the project (see section 1 of README.txt) from source.
+Added the package 'DateTimePicker' by Zoran Vucenovic (http://wiki.lazarus.freepascal.org/ZVDateTimeControls_Package). This is now also required to compile the project (see section 1 of README.txt) from source.
 
 In the “Compare Directories” tab, if the user chooses to tabulate the results, upon completion of the comparison, if the user single left mouse clicks in either grid, the corresponding row entry in the other grid will be selected, assuming both directories actually match. If they do not match, the user will be taken to the corresponding grid row count, but this is unlikely to contain the same filename data of course. 
 
