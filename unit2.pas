@@ -74,7 +74,7 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
     LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls, XMLPropStorage,
-    uDisplayGrid, diskmodule, clipbrd, ZVDateTimePicker, frmAboutUnit,
+    uDisplayGrid, diskmodule, clipbrd, ZVDateTimePicker, frmAboutUnit, base64,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -120,6 +120,10 @@ type
     AlgorithmChoiceRadioBox1: TRadioGroup;
     AlgorithmChoiceRadioBox6: TRadioGroup;
     AlgorithmChoiceRadioBox5: TRadioGroup;
+    AlgorithmChoiceRadioBox7: TRadioGroup;
+    b64FileGridPopupMenu: TPopupMenu;
+    b64DecoderProgress: TEdit;
+    b64StringGrid2FileS: TStringGrid;
     btnClearTextArea: TButton;
     btnCompare: TButton;
     btnCompareTwoFiles: TButton;
@@ -140,9 +144,15 @@ type
     btnStopScan1: TButton;
     btnStopScan2: TButton;
     btnClearHashField: TButton;
+    btnB64FileChooser: TButton;
+    btnB64FileSChooser: TButton;
+    btnB64JustDecodeFiles: TButton;
     Button8CopyAndHash: TButton;
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
+    b64ProgressFileS: TEdit;
+    lblB64Warning: TLabel;
+    lblB64DecoderWarning: TLabel;
     lblNoOfFilesToExamine2: TLabel;
     lblschedulertickboxCompareTab: TCheckBox;
     lblschedulertickboxCompareDirsTab: TCheckBox;
@@ -184,13 +194,23 @@ type
     MenuItem1C: TMenuItem;
     MenuItem1A: TMenuItem;
     MenuItem1B: TMenuItem;
+    b64FileChooserDialog: TOpenDialog;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
     pbFileS: TProgressBar;
     pbCopy: TProgressBar;
     pbCompareDirA: TProgressBar;
     pbCompareDirB: TProgressBar;
+    b64FilesGridPopupMenu: TPopupMenu;
+    b64SaveDialog: TSaveDialog;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
+    b64FileSChooserDialog: TSelectDirectoryDialog;
+    b64FileSDecoderDialog: TSelectDirectoryDialog;
     StatusBar5: TStatusBar;
     StatusBar6: TStatusBar;
+    b64StringGrid1File: TStringGrid;
     SystemRAMGroupBox: TGroupBox;
     ImageList1: TImageList;
     lblRAM: TLabel;
@@ -288,9 +308,11 @@ type
     TabSheet5: TTabSheet;
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
+    TabSheet8: TTabSheet;
     TextHashingGroupBox: TGroupBox;
     QH_MainFormXMLPropStorage: TXMLPropStorage;
     SchedulerTimer: TTimer;
+    TextHashingGroupBox1: TGroupBox;
     ZVDateTimePickerCompareDirsTab: TZVDateTimePicker;
     ZVDateTimePickerCopyTab    : TZVDateTimePicker;
     ZVDateTimePickerCompareTab : TZVDateTimePicker;
@@ -302,9 +324,12 @@ type
     procedure AlgorithmChoiceRadioBox4Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox6Click(Sender: TObject);
+    procedure btnB64FileSChooserClick(Sender: TObject);
     procedure btnClearHashFieldClick(Sender: TObject);
     procedure btnClearHashFieldKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure btnB64FileChooserClick(Sender: TObject);
+    procedure btnB64JustDecodeFilesClick(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure lblDonateClick(Sender: TObject);
@@ -322,6 +347,10 @@ type
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2AClick(Sender: TObject);
     procedure MenuItem1CClick(Sender: TObject);
+    procedure MenuItem3Click(Sender: TObject);
+    procedure MenuItem4Click(Sender: TObject);
+    procedure MenuItem5Click(Sender: TObject);
+    procedure MenuItem6Click(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure sgDirAClick(Sender: TObject);
@@ -1294,6 +1323,39 @@ begin
   MainForm.Close;
 end;
 
+procedure TMainForm.MenuItem3Click(Sender: TObject);
+begin
+  b64StringGrid2FileS.CopyToClipboard(false);
+  Showmessage('All grid rows copied to clipboard OK');
+end;
+
+procedure TMainForm.MenuItem4Click(Sender: TObject);
+begin
+  b64StringGrid2FileS.CopyToClipboard(true);
+  Showmessage('Grid row data copied to clipboard OK');
+end;
+
+// Save data from the Base64 hashing data grid to TSV text file
+procedure TMainForm.MenuItem5Click(Sender: TObject);
+begin
+  b64SaveDialog.Title := 'Save grid results as...';
+  b64SaveDialog.InitialDir := GetCurrentDir;
+  b64SaveDialog.Filter := 'Comma Sep|*.csv';
+  b64SaveDialog.DefaultExt := 'csv';
+
+  if b64SaveDialog.Execute then
+  begin
+    b64StringGrid2FileS.SaveToCSVFile(b64SaveDialog.FileName);
+    ShowMessage('Grid data saved as ' + b64SaveDialog.FileName);
+  end;
+end;
+
+procedure TMainForm.MenuItem6Click(Sender: TObject);
+begin
+  b64StringGrid1File.CopyToClipboard(true);
+  Showmessage('Grid row data copied to clipboard OK');
+end;
+
 procedure TMainForm.cbShowDetailsOfAllComparisonsChange(Sender: TObject);
 begin
   if cbShowDetailsOfAllComparisons.Checked then
@@ -1366,6 +1428,90 @@ begin
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
 end;
 
+// Recursively find, decode and then hash Base64 encoded files
+procedure TMainForm.btnB64FileSChooserClick(Sender: TObject);
+var
+  TotalB64FilesToExamine : TStringList;
+  i : integer;
+  DecodedStream  : TMemoryStream;
+  EncodedStream  : TFileStream;
+  Decoder        : TBase64DecodingStream;
+  DirToHash, HashValA, HashValB : string;
+begin
+  i        := 0;
+  HashValA := '';
+  HashValB := '';
+
+  if b64FileSChooserDialog.Execute then
+    begin
+      {$ifdef Windows}
+      LongPathOverride := '\\?\';
+      {$endif}
+
+      // Where we are going to look for Base64 files, then create a list of those files
+      DirToHash := b64FileSChooserDialog.FileName;
+      try
+        TotalB64FilesToExamine := TStringList.Create;
+        b64ProgressFileS.Caption := 'Finding and counting files...please wait';
+        Application.ProcessMessages;
+        // Ensure files in long paths on that Windows OS can be examined...urrggh
+        {$ifdef Windows}
+          TotalB64FilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, '*', False, True);
+        {$else}
+          TotalB64FilesToExamine := FindAllFilesEx(DirToHash, '*', False, True);
+        {$endif}
+      finally
+      end;
+
+      // Make sure the display grid has sufficient rows for the file count
+      b64StringGrid2FileS.RowCount := TotalB64FilesToExamine.Count + 1;
+
+      // For each file, compute the Base64 encoded and decoded values and output to grid
+      for i := 0 to TotalB64FilesToExamine.Count -1 do
+        begin
+          Application.ProcessMessages;
+          b64ProgressFileS.Text:= 'Currently decoding and hashing ' + ExtractFileName(TotalB64FilesToExamine.Strings[i]);
+          HashValA := CalcTheHashFile(TotalB64FilesToExamine.Strings[i]);
+          try
+            EncodedStream := TFileStream.Create(TotalB64FilesToExamine.Strings[i], fmOpenRead);
+            try
+             DecodedStream := TMemoryStream.Create;
+             Decoder       := TBase64DecodingStream.Create(EncodedStream);
+             DecodedStream.CopyFrom(Decoder, Decoder.Size);
+             // Create a temporary copy of the decoded file to hash it
+             DecodedStream.SaveToFile((TotalB64FilesToExamine.Strings[i]) + '-Base64Decoded');
+             try
+               HashValB := CalcTheHashFile((TotalB64FilesToExamine.Strings[i]) + '-Base64Decoded');
+               // And now delete the temporary copy
+               SysUtils.DeleteFile(TotalB64FilesToExamine.Strings[i] + '-Base64Decoded');
+             finally
+             end;
+            finally
+             DecodedStream.Free;
+             Decoder.Free;
+            end;
+          finally
+            EncodedStream.Free;
+          end;
+          b64StringGrid2FileS.Cells[0, i+1] := IntToStr(i);
+          {$ifdef Windows}
+          b64StringGrid2FileS.Cells[1, i+1] := RemoveLongPathOverrideChars(TotalB64FilesToExamine.Strings[i], LongPathOverride);
+          {$else}
+          b64StringGrid2FileS.Cells[1, i+1] := TotalB64FilesToExamine.Strings[i];
+          {$endif}
+          b64StringGrid2FileS.Cells[2, i+1] := HashValA;
+          b64StringGrid2FileS.Cells[3, i+1] := HashValB;
+        end;
+    end;
+  if assigned(TotalB64FilesToExamine) then TotalB64FilesToExamine.Free;
+
+  // Reset the long path override for any other procedures triggered
+  LongPathOverride := '';
+  b64ProgressFileS.Caption:= 'Decoded and hashed ' + IntToStr(i) + ' files. Completed at ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now);
+end;
+
+
+
 // New to v2.8.3, to better facilitate use of the Expected Hash field
 procedure TMainForm.btnClearHashFieldClick(Sender: TObject);
 begin
@@ -1377,6 +1523,113 @@ procedure TMainForm.btnClearHashFieldKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   lbleExpectedHash.Text:= '';
+end;
+
+// Select, decode and then hash a Base64 encoded file
+procedure TMainForm.btnB64FileChooserClick(Sender: TObject);
+var
+  DecodedStream  : TMemoryStream;
+  EncodedStream  : TFileStream;
+  Decoder        : TBase64DecodingStream;
+  HashValA, HashValB : string;
+begin
+  if b64FileChooserDialog.Execute then
+  begin
+    b64StringGrid1File.Clear;
+    // Compute hash of encoded file first
+    HashValA := CalcTheHashFile(b64FileChooserDialog.FileName);
+    // Now compute hash of decoded file
+    try
+      EncodedStream := TFileStream.Create(b64FileChooserDialog.FileName, fmOpenRead);
+      try
+        DecodedStream := TMemoryStream.Create;
+        Decoder       := TBase64DecodingStream.Create(EncodedStream);
+        DecodedStream.CopyFrom(Decoder, Decoder.Size);
+        DecodedStream.SaveToFile((b64FileChooserDialog.FileName) + '-Base64Decoded');
+        try
+          HashValB := CalcTheHashFile((b64FileChooserDialog.FileName) + '-Base64Decoded');
+          SysUtils.DeleteFile(b64FileChooserDialog.FileName + '-Base64Decoded');
+        finally
+          b64StringGrid1File.RowCount:= 2;
+          b64StringGrid1File.Cells[0,1] := '1';
+          b64StringGrid1File.Cells[1,1] := b64FileChooserDialog.FileName;
+          b64StringGrid1File.Cells[2,1] := HashValA;
+          b64StringGrid1File.Cells[3,1] := HashValB;
+        end;
+      finally
+        DecodedStream.Free;
+        Decoder.Free;
+      end;
+    finally
+      EncodedStream.Free;
+    end;
+  end;
+end;
+
+// Recursively find and decode all Base64 encoded files found in the selected folder
+// Output decoded versions with the appended name '-Base64Decoded'
+// So taking the example of a PDF that may be Base64 encoded as an e-mail attachment:
+// MsgAttachment.emlx, which is the encoded attachment, becomes MsgAttachment.emlx-Base64Decoded
+// and the user will then have to adjust the extension to MsgAttachment.emlx-Base64Decoded.pdf
+procedure TMainForm.btnB64JustDecodeFilesClick(Sender: TObject);
+var
+  TotalB64FilesToExamine : TStringList;
+  i : integer;
+  DecodedStream  : TMemoryStream;
+  EncodedStream  : TFileStream;
+  Decoder        : TBase64DecodingStream;
+  DirToDecode    : string;
+begin
+  lblB64DecoderWarning.Caption := '';
+  i := 0;
+  if b64FileSDecoderDialog.Execute then
+    begin
+    {$ifdef Windows}
+      LongPathOverride := '\\?\';
+    {$endif}
+
+      // Where we are going to look for Base64 files, then create a list of those files
+      DirToDecode := b64FileSDecoderDialog.FileName;
+      try
+        TotalB64FilesToExamine := TStringList.Create;
+        b64DecoderProgress.Caption := 'Finding and counting files...please wait';
+        Application.ProcessMessages;
+        // Ensure files in long paths on that Windows OS can be examined...urrggh
+        {$ifdef Windows}
+        TotalB64FilesToExamine := FindAllFilesEx(LongPathOverride+DirToDecode, '*', False, True);
+        {$else}
+        TotalB64FilesToExamine := FindAllFilesEx(DirToDecode, '*', False, True);
+        {$endif}
+      finally
+      end;
+
+      // For each file, compute the Base64 encoded and decoded values and output to grid
+      for i := 0 to TotalB64FilesToExamine.Count -1 do
+        begin
+          Application.ProcessMessages;
+          b64DecoderProgress.Text:= 'Currently decoding ' + ExtractFileName(TotalB64FilesToExamine.Strings[i] + ' ...please wait');
+          try
+            EncodedStream := TFileStream.Create(TotalB64FilesToExamine.Strings[i], fmOpenRead);
+            try
+             DecodedStream := TMemoryStream.Create;
+             Decoder       := TBase64DecodingStream.Create(EncodedStream);
+             DecodedStream.CopyFrom(Decoder, Decoder.Size);
+             // Create a temporary copy of the decoded file to hash it
+             DecodedStream.SaveToFile((TotalB64FilesToExamine.Strings[i]) + '-Base64Decoded');
+            finally
+             DecodedStream.Free;
+             Decoder.Free;
+            end;
+          finally
+            EncodedStream.Free;
+          end;
+        end;
+        TotalB64FilesToExamine.Free;
+    end;
+  // Reset the long path override for any other procedures triggered
+  LongPathOverride := '';
+  b64DecoderProgress.Caption:= 'Decoded ' + IntToStr(i) + ' Base64 files. Completed at ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now);
+  lblB64DecoderWarning.Caption := 'Add appropriate file extensions to your decoded files. e.g MsgAttach-Base64Decoded to MsgAttach-Base64Decoded.pdf';
 end;
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
@@ -2923,6 +3176,7 @@ begin
         3: TabRadioGroup2 := AlgorithmChoiceRadioBox4;  //RadioGroup for Copy.
         4: TabRadioGroup2 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
         5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Direcories.
+        7: TabRadioGroup2 := AlgorithmChoiceRadioBox7;  //RadioGroup for Base64
   end;
 
   { For each hash instance, it has to be created, then initialised, populated,
