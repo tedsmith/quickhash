@@ -1056,29 +1056,16 @@ const
     HashChoice := frmDiskHashingModule.InitialiseHashChoice(nil);
     if HashChoice = -1 then abort;
 
-    // Create handle to source disk. Abort if fails
-    {$ifdef Windows}
-    hSelectedDisk := CreateFileW(PWideChar(SourceDevice),
-                                 FILE_READ_DATA,
-                                 FILE_SHARE_READ AND FILE_SHARE_WRITE,
-                                 nil,
-                                 OPEN_EXISTING,
-                                 FILE_FLAG_SEQUENTIAL_SCAN,
-                                 0);
+    // Create handle to source disk in the most graceful of ways.
+    // -1 returned if fails
+    hSelectedDisk := FileOpen(SourceDevice, fmOpenRead OR fmShareDenyNone);
+
     // Check if handle is valid before doing anything else
-    if hSelectedDisk = INVALID_HANDLE_VALUE then
+    if hSelectedDisk = -1 then
     begin
      ShowMessage('Could not get exclusive disk access ' +
      'OS error and code : ' + SysErrorMessageUTF8(GetLastOSError));
     end
-    {$else ifdef UNIX}
-    hSelectedDisk := FileOpen(SourceDevice, fmOpenRead);
-    // Check if handle is valid before doing anything else
-    if hSelectedDisk = -1 then
-    begin
-      RaiseLastOSError;
-    end
-    {$endif}
     else
       begin
         // If chosen device is logical volume, initiate FSCTL_ALLOW_EXTENDED_DASD_IO
