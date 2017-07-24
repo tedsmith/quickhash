@@ -1847,7 +1847,7 @@ var
          // and conclude timings and update display
          stop := Now;
          elapsed := stop - start;
-         lblTimeTaken4.Caption := 'Time taken : '+ TimeToStr(elapsed);
+         lblTimeTaken4.Caption := 'Time taken : '+ FormatDateTime('HH:MM:SS', elapsed);
          StatusBar2.SimpleText := ' DONE! ';
          btnClipboardResults.Enabled := true;
 
