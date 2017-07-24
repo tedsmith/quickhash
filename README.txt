@@ -1,4 +1,4 @@
-﻿* Compiling the Project
+* Compiling the Project
 
 Binaries for Windows, Linux and Apple Mac OSX are available from http://quickhash-gui.org ? Downloads. But if you need or want to compile yourself, then first clone the source code from https://github.com/tedsmith/quickhash.git 
 
@@ -16,7 +16,7 @@ then click the 'Compile' button. Then use the next button to the right called 'U
 
 Repeat the same process for the package 'DateTimePicker' by Zoran Vu?enovi? (http://wiki.lazarus.freepascal.org/ZVDateTimeControls_Package) which was added in v2.8.3 to enable scheduled hashing.  So simply choose 'Package' --> Open Package File (lpk)' from the top menu of Lazarus. Choose and navigate to:
 
-CloneOfQuickHashProject/DateTimePicker/zvdatetimectrls.lpk, choose 'Compile' and then click 'Use >> Add to Project'. Better yet, choose Install so that it becomes a component of your Lazarus IDE, which will further reduce warnings. 
+CloneOfQuickHashProject/DateTimePicker/zvdatetimectrls.lpk, choose 'Compile' and then click 'Use >> Add to Project'. Better yet, choose ?Install? so that it becomes a component of your Lazarus IDE, which will further reduce warnings. 
 
 Now save your project (Project ? Save Project') which will create a new LPI file. Then you can compile QuickHash yourself using Lazarus. 
 
@@ -28,23 +28,25 @@ Ted Smith
 
 v2.8.3 (In Development)
 
-A new tab (the first new tab since disk hashing was added a couple of years ago!!) dedicated to Base64 decoding. The user can now select a file or a folder of files that are all Base64 encoded, and QuickHash will compute the hashes of both the encoded and decoded versions of the file, without the user having to supply a Base64 decoded version. In addition, as a little extra, theres also a third button in the new tab that the user can click to simply select a folder of Base64 encoded files and QuickHash will generate decoded versions of those files for the user with a slightly different filename. He can then go on to hash them if he so pleases, using the File or FileS tab of Quickhash. The user has to establish what file types he has though, and, for Windows users, this will mean adding the appropriate extension such as .pdf or .jpg to such files. Linux users will not have that problem because the operating system will work out what application is needed based on the file signature. 
+A new tab (the first new tab since disk hashing was added a couple of years ago!!) dedicated to Base64 decoding. The user can now select a file or a folder of files that are all Base64 encoded, and QuickHash will compute the hashes of both the encoded and decoded versions of the file, without the user having to supply a Base64 decoded version. In addition, as a little extra, there?s also a third button in the new tab that the user can click to simply select a folder of Base64 encoded files and QuickHash will generate decoded versions of those files for the user with a slightly different filename. He can then go on to hash them if he so pleases, using the ?File? or ?FileS? tab of Quickhash. The user has to establish what file types he has though, and, for Windows users, this will mean adding the appropriate extension such as .pdf or .jpg to such files. Linux users will not have that problem because the operating system will work out what application is needed based on the file signature. 
 
 Added scheduler to most tabs (File, FileS, Copy and Compare), meaning the user can set a date and time in the future to start the hashing process. For example, say the user is copying a large file to a certain location that won't finish copying for a few hours; perhaps after the user has left the office or gone to bed it will finish, but he wants to have the file hashed for the next day. With QuickHash v2.8.3, the user can set a date & time in the future (to hours and minutes precision, not seconds), to start a few hours ahead of time allowing the file to copy first, then select the file (given that even before it's finished copying, the file can still be selected) and QuickHash will start hashing at that time.  
 
+Changed the way disk handles are initiated in Disk Module for disk hashing such that if another tool (typically forensic tools like FTK Imager or X-Ways Forensics) has the disk open, QuickHash can still probably initiate a handle to it as well now, still in read only mode. In all earlier versions the user would get a sharing violation. This change was needed to allow the scheduler to work � there�s no point shceduling disk hashing to commence in 5 hours if the forensic tool has not released the handle and QuickHash cannot initiate one of its own. Hopefully now it can. 
+
 Added the package 'DateTimePicker' by Zoran Vu?enovi? (http://wiki.lazarus.freepascal.org/ZVDateTimeControls_Package). This is now also required to compile the project (see section 1 of README.txt) from source.
 
-In the Compare Directories tab, if the user chooses to tabulate the results, upon completion of the comparison, if the user single left mouse clicks in either grid, the corresponding row entry in the other grid will be selected, assuming both directories actually match. If they do not match, the user will be taken to the corresponding grid row count, but this is unlikely to contain the same filename data of course. 
+In the ?Compare Directories? tab, if the user chooses to tabulate the results, upon completion of the comparison, if the user single left mouse clicks in either grid, the corresponding row entry in the other grid will be selected, assuming both directories actually match. If they do not match, the user will be taken to the corresponding grid row count, but this is unlikely to contain the same filename data of course. 
 
 Minor tweak to README.txt to properly refer to the HashLib4Pascal library
 
 A line was added in 2.8.2 to free resources used by the check for duplicate files, but it was realised that this causes an error if a check for duplicates was not selected by the user, as there was no resource allocated to then free. That was fixed. 
 
-Minor alignment fix to the labels at the top right of the “FileS” tab to better enable the values to be seen. 
+Minor alignment fix to the labels at the top right of the �FileS� tab to better enable the values to be seen. 
 
-The “Time Taken” value in “FileS” tab was showing incorrectly as “a time”, for example, 12 seconds was being displayed as “12:00”. Fixed using FormatDateTime and now shows as HH:MM:SS
+The �Time Taken� value in �FileS� tab was showing incorrectly as �a time�, for example, 12 seconds was being displayed as �12:00�. Fixed using FormatDateTime and now shows as HH:MM:SS
 
-Minor alignment adjustment to progress window at the bottom of “FileS” tab reduce chances of it being overlayed by the display grid. 
+Minor alignment adjustment to progress window at the bottom of �FileS� tab reduce chances of it being overlayed by the display grid. 
 
 Some unused variables removed. 
 
@@ -52,7 +54,7 @@ v2.8.2
 
 If the user clicks an alternative hash algorithm from the default (of currently SHA-1), the same selection will be applied to all the other tabs automatically. This is as a result of several requests to ensure that once the user chooses, say SHA256, that the selection remains as that selection throughout their session, even if they jump to other tabs. 
 
-In the copy tab, there was a minor fault with multiple selection of source directories and some memory leaks due to unfreed lists. It should work better now, so the user can select FolderA and FolderB in source (as selected in the left pane) and have them both hashed, copied and re-hashed in a single new destination folder (as selected in right pane). 
+In the ?copy? tab, there was a minor fault with multiple selection of source directories and some memory leaks due to unfreed lists. It should work better now, so the user can select FolderA and FolderB in source (as selected in the left pane) and have them both hashed, copied and re-hashed in a single new destination folder (as selected in right pane). 
 
 Main menu added, comprising the ability to choose files and a folder (for now), and an About page to enable more information about the program to be visible. This includes information such as information about how to donate to the project financially, the homepage URL, author details, license info etc. 
 
@@ -64,27 +66,27 @@ v2.8.1
 
 All version of QuickHash prior (1.0 to v2.8.0) had problems accessing files that were opened by certain programs (not all programs) due to the way some programs share open files, and the way many refuse access to open files by other programs. For data hashing, ideally, open files should be closed. But in some cases this may not be possible and the inability to use QuickHash on such files was frustrating some users. So with this release, the file handle initiation has been altered to allow access to open files, on the understanding that the hash that the user gets may not be the same once that open file is closed later. 
 
-The File tab now has the ended at date and time, instead of just the time, for instances where the end date may be the following day (e.g. started at 01/01/17 13:50 and ended at 02/01/17 00:10). Also neatened the alignment and ensured date formats were consistently presented as dd/mm/yyyy, instead of dd/mm/yy in one place and dd/mm/yyyy in another. Applied same presentation to drag and dropped files. 
+The ?File? tab now has the ?ended at? date and time, instead of just the time, for instances where the end date may be the following day (e.g. started at 01/01/17 13:50 and ended at 02/01/17 00:10). Also neatened the alignment and ensured date formats were consistently presented as dd/mm/yyyy, instead of dd/mm/yy in one place and dd/mm/yyyy in another. Applied same presentation to drag and dropped files. 
 
-The File tab now has a bytes read countdown in the status bar of that tab, similar to the other tabs that have progress bars. This ensures that when a user is hashing a large file that takes more than a few seconds, he has some feedback as to what progress has been made, rather than the common belief that the program has just hanged. 
+The ?File? tab now has a ?bytes read? countdown in the status bar of that tab, similar to the other tabs that have progress bars. This ensures that when a user is hashing a large file that takes more than a few seconds, he has some feedback as to what progress has been made, rather than the common belief that the program has just hanged. 
  
-Fixed the -1 return count for files successfully copied in the Copy tab, as per issue raised http://quickhash-gui.org/bugs/copy-tab-summary-form-show-1-file-count/ 
+Fixed the -1 return count for files successfully copied in the ?Copy? tab, as per issue raised http://quickhash-gui.org/bugs/copy-tab-summary-form-show-1-file-count/ 
 
-In the Copy tab, the currently selected path of the chosen Source directory and the currently selected path of the chosen Destination Directory will be visible by default now, unless the user ticks UNC Mode?, in which case they switch over to allow direct UNC network path input. As per user request http://quickhash-gui.org/bugs/location-bar-for-copy-tab/ 
+In the ?Copy? tab, the currently selected path of the chosen ?Source directory? and the currently selected path of the chosen ?Destination Directory? will be visible by default now, unless the user ticks ?UNC Mode??, in which case they switch over to allow direct UNC network path input. As per user request http://quickhash-gui.org/bugs/location-bar-for-copy-tab/ 
 
-Some clearer hints added to the Copy tab and the percentage complete indicator aligned with status bar. 
+Some clearer hints added to the ?Copy? tab and the percentage complete indicator aligned with status bar. 
 
 The mouseover hint in the 'Text' tab for the button 'TEXT Line-by-Line' was not showing. Now it does. 
 
-In the Compare Two Files tab, the user can now use either the buttons to select their files, or they can paste the path directly into a path field. These fields are anchored to the right so maximising QuickHash makes them wider. Hint added to explain this. 
+In the ?Compare Two Files? tab, the user can now use either the buttons to select their files, or they can paste the path directly into a path field. These fields are anchored to the right so maximising QuickHash makes them wider. Hint added to explain this. 
 
-In the Compare Two Files tab, the user can single-click the resulting hash value and it will be copied to the clipboard, allowing the user to paste into whatever tool they wish (Notepad etc). The chosen hash algorithm will be prefixed to the value. Hint added to explain this. 
+In the ?Compare Two Files? tab, the user can single-click the resulting hash value and it will be copied to the clipboard, allowing the user to paste into whatever tool they wish (Notepad etc). The chosen hash algorithm will be prefixed to the value. Hint added to explain this. 
 
-In the Compare Files tab, if the result is a match, it will say so in black (as it always has done) or it will be displayed in red if it is a mis-match, to ensure the user notices it more easily.  
+In the ?Compare Files? tab, if the result is a match, it will say so in black (as it always has done) or it will be displayed in red if it is a mis-match, to ensure the user notices it more easily.  
 
 Many redundant variables removed that have been left in over time that were no longer needed. 
 
-Added a Donate Now label to the main interface, to try and encourage users to make small donations that can, in turn, help with the hosting costs of the website at AWS. 
+Added a ?Donate Now? label to the main interface, to try and encourage users to make small donations that can, in turn, help with the hosting costs of the website at AWS. 
 
 v2.8.0 Feb 2017
 
@@ -92,25 +94,25 @@ Major change the the hash library. All version of QuickHash prior to and includi
 
 SHA256, SHA-1 & SHA256 concurrently and SHA512 hash algorithms added to the disk hashing module. 
 
-xxHash64 added to all areas of QuickHash  text, files and disks. XxHash was a hash library that I wanted to include a couple of years ago but never got round to. But a Freepascal form of it is also part of the HashLib4Pascal library, so implementing it was as easy as for the other algorithms. It is true what they say about how fast it is  it really is crazy fast! 
+xxHash64 added to all areas of QuickHash ? text, files and disks. XxHash was a hash library that I wanted to include a couple of years ago but never got round to. But a Freepascal form of it is also part of the HashLib4Pascal library, so implementing it was as easy as for the other algorithms. It is true what they say about how fast it is ? it really is crazy fast! 
 
-New save dialog added to disk hashing module (prompted by default by the enabled Created and save a log file checkbox) to enable the user to save all the results of the hashing process as a text file in a location of their choosing. Or they can disable the option. 
+New save dialog added to disk hashing module (prompted by default by the enabled ?Created and save a log file? checkbox) to enable the user to save all the results of the hashing process as a text file in a location of their choosing. Or they can disable the option. 
 
-New date and time values added to File tab so the user can report on the time the process started and ended and the elapsed time as per feature request http://quickhash-gui.org/bugs/add-date-and-document-output/ . Useful for benchmarking and so on. 
+New date and time values added to ?File? tab so the user can report on the time the process started and ended and the elapsed time as per feature request http://quickhash-gui.org/bugs/add-date-and-document-output/ . Useful for benchmarking and so on. 
 
-Also fixed the fact that the Elapsed time for the File tab did not refresh if the user changed the hash algorithm using the radio box. It only refreshed if the user chose a new file using the button. That was fixed so that regardless of how the user adds the file or what hash algorithm is chosen, the timers are reset. 
+Also fixed the fact that the ?Elapsed time? for the ?File? tab did not refresh if the user changed the hash algorithm using the radio box. It only refreshed if the user chose a new file using the button. That was fixed so that regardless of how the user adds the file or what hash algorithm is chosen, the timers are reset. 
 
 Horizontal scroll bar added to the hash value field in 'Text' tab, to allow the whole hash to be read more easily. 
 
 Improved anchoring of several visual elements meaning text labels were not cut off or made less visible and looked better when maximising the GUI. Thanks to Dareal Shinji for his help with that. See https://github.com/tedsmith/quickhash/issues/11 
 
-New debian package added for experimentation  see https://github.com/tedsmith/quickhash/issues/2   
+New debian package added for experimentation ? see https://github.com/tedsmith/quickhash/issues/2   
 
 The settings file that was implemented in v2.7.0 caused some problems for Linux and OSX users. That was fixed by adjusting to a generic filename based on the name of the application. See https://github.com/tedsmith/quickhash/issues/6 
 
-The progress bars didn't automatically reset to zero when the same tabbed interface was used multiple times without restarting QuickHash. Now, for each tab where a progress is found, when the user clicks Start, or equivalent thereof, the progress bar will reset. 
+The progress bars didn't automatically reset to zero when the same tabbed interface was used multiple times without restarting QuickHash. Now, for each tab where a progress is found, when the user clicks ?Start?, or equivalent thereof, the progress bar will reset. 
 
-Fixed an issue in the disk hashing module; after hashing a volume or disk, if the user selects a different hash algorithm and then clicks the start button again, 65K of data was read and hashed and then the program then just reports that no more data can be read. This was caused by the tripping of a boolean flag to true when the progress form was closed, thus, the repeat loop when executed again stopped at the until line because the abort condition was true. This was fixed. So now users can keep hashing the disk with various algorithms without restarting Quickhash.
+Fixed an issue in the disk hashing module; after hashing a volume or disk, if the user selects a different hash algorithm and then clicks the start button again, 65K of data was read and hashed and then the program then just reports that no more data can be read. This was caused by the tripping of a boolean flag to true when the progress form was closed, thus, the repeat loop when executed again stopped at the ?until? line because the abort condition was true. This was fixed. So now users can keep hashing the disk with various algorithms without restarting Quickhash.
 
 New start date and time, end date and time and time taken labels added to the disk hashing module. This information is also saved to the log file by default. 
 
@@ -118,15 +120,15 @@ Stop button added to disk hashing module to allow the user to easily abort if ne
 
 V2.7.0 Dec 2016
 
-The Compare Directories now has a checkbox titled Tabulate only encountered errors instead of all files (faster)? to ask the user whether he wishes to tabulate only errors (hash mismatches or file count differences) rather than tabulating the entire folder selection of FolderA and FolderB. By not tabulating everything and instead only the few files that are different, lots of time is saved, making the program MUCH faster with large data volumes, and it is unnecessary to tabulate and log the comparisons of both folders if they are both the same anyway. If, in fact, the user wants a log of all the files and hashes of two given folders, he should use the FileS tab instead for this purpose (and as has always been the case). The save buttons are now disabled if no errors are detected, and enabled if there are errors. Unless the user unticks the Tabulate only encountered errors instead of all files (faster)? option, in which case everything is tabulated whether there are errors or not. Note, however, that with the option disabled, and if errors are encountered, there is likely to be two entries for a file with an error. One entry relating to it's file listing and mere existence, and then another entry relating to either its hash mismatch or absence from the other directory.  For example, if MyFolderA\FileA.doc in in DirA, whereas in DirB it has a different hash, the user is likely to see:
+The ?Compare Directories? now has a checkbox titled ?Tabulate only encountered errors instead of all files (faster)?? to ask the user whether he wishes to tabulate only errors (hash mismatches or file count differences) rather than tabulating the entire folder selection of FolderA and FolderB. By not tabulating everything and instead only the few files that are different, lots of time is saved, making the program MUCH faster with large data volumes, and it is unnecessary to tabulate and log the comparisons of both folders if they are both the same anyway. If, in fact, the user wants a log of all the files and hashes of two given folders, he should use the ?FileS? tab instead for this purpose (and as has always been the case). The save buttons are now disabled if no errors are detected, and enabled if there are errors. Unless the user unticks the ?Tabulate only encountered errors instead of all files (faster)?? option, in which case everything is tabulated whether there are errors or not. Note, however, that with the option disabled, and if errors are encountered, there is likely to be two entries for a file with an error. One entry relating to it's file listing and mere existence, and then another entry relating to either its hash mismatch or absence from the other directory.  For example, if MyFolderA\FileA.doc in in DirA, whereas in DirB it has a different hash, the user is likely to see:
 1) an entry in GridA for for FileA.doc, and 
 2) an entry in DridB for FileA.doc, and then 
 3) a third entry in GridB relating to the hash mis-match, which does not match what it found for the hash value of FileA.doc in GridA. 
 Either way, the user can spot the mis-matched files by sorting the column. This will put the mis-matched entries to the top, or the bottom, together. 
 
-The Compare Directories tab displayed the filename value in the hash column and the hash value in the filename column! That was fixed. 
+The ?Compare Directories? tab displayed the filename value in the hash column and the hash value in the filename column! That was fixed. 
 
-Diskmodule (for hashing of physical disks) massively improved and based on my sister project YAFFI. Now the interface is much improved and easier to use. Included is the ability to query disk attributes by right clicking and choosing View Technical Data. 
+Diskmodule (for hashing of physical disks) massively improved and based on my sister project YAFFI. Now the interface is much improved and easier to use. Included is the ability to query disk attributes by right clicking and choosing ?View Technical Data?. 
 
 Uses clause for Disk Module implements a compiler directive to avoid the need to adjust comma positions when compiling on platforms that do not support the disk module, i.e. Linux and Apple Mac. 
 
@@ -136,7 +138,7 @@ DiskModule unit updated for use with Freepascal 3.0. Before, any coders wanting 
 
 which needed to be changed. See comments in source code. 
 
-Program is now set to launch in centre of the main screen as defined by windows instead of desktop centre as with earlier versions. This means that in the case of multi screen systems, quickhash will not be split down the middle with half on one screen, half on the other. It will launch in the centre of whichever screen is the main one. 
+Program is now set to launch in centre of the ?main screen? as defined by windows instead of ?desktop centre? as with earlier versions. This means that in the case of multi screen systems, quickhash will not be split down the middle with half on one screen, half on the other. It will launch in the centre of whichever screen is the main one. 
 
 
 Changed website URL to the new website of http://quickhash-gui.org 
@@ -147,13 +149,13 @@ V2.6.9.2
 
 Minor improvements
 
-V2.6.9.1  August 2016
+V2.6.9.1 ? August 2016
 
-Fixed a drag n drop error that occurred even when there was no error with dragging and dropping  it was introduced in error with v2.6.9
+Fixed a drag n drop error that occurred even when there was no error with dragging and dropping ? it was introduced in error with v2.6.9
 
 Converted all file saves in the 'Compare Directories' tab to a streamed creation and save to avoid QuickHash running out of memory during large folder comparisons. Known issue : a strange insertion of data above the top table in HTML mode. 
 
-V2.6.9  July 2016
+V2.6.9 ? July 2016
 
 The UNC and long path name fixes still had not entirely worked as hoped when tested on big data sets. Further fixes implemented to ensure the filename and path to an existing file in a very long path is detected, and likewise re-created when copied. 
 
@@ -163,12 +165,12 @@ If QuickHash fails to initiate a handle to a file at the time of hashing, not on
 
 If the user pastes the path of a mounted drive as a UNC path (e.g. M:\MyServer\MyDataShare\MyFolder) as either source or destination, the user will now be told to fix it to a true UNC path rather than simply crashing out!  
 
-Status bar in the bottom of the Copy tab (the part that shows the user what file is currently being hashed) was being truncated if the path length was particularly long, and was still truncated even if maximised to the full screen size on a 40 monitor! That has been improved. 
+Status bar in the bottom of the Copy tab (the part that shows the user what file is currently being hashed) was being truncated if the path length was particularly long, and was still truncated even if maximised to the full screen size on a 40? monitor! That has been improved. 
 
 
-V2.6.8  June 2016
+V2.6.8 ? June 2016
 
-In the 'Copy' tab, users can now select multiple source folders so that multiple folder content can be hashed, copied to a single destination folder, and then hashed again. Note that an experimental limit exists  if the list of files in memory exceeds 2Gb, Quickhash will likely crash. Please report such instances. If they are too many, I will implement another technique. 
+In the 'Copy' tab, users can now select multiple source folders so that multiple folder content can be hashed, copied to a single destination folder, and then hashed again. Note that an experimental limit exists ? if the list of files in memory exceeds 2Gb, Quickhash will likely crash. Please report such instances. If they are too many, I will implement another technique. 
 
 In the copy tab, a bug was fixed for UNC paths when long path names were encountered. Seemingly my earlier efforts to correct this issue had not worked. Now, as of v2.6.8, long paths should not be a problem with UNC mode in the 'Copy' tab for either source or destination locations. 
 
@@ -191,7 +193,7 @@ Added a toggle for text line-by-line hashing. Users asked if it would be possibl
 
 Some other minor improvements.  
 
-V2.6.6-b  Mar 2016
+V2.6.6-b ? Mar 2016
 
 Windows Only : Removed one element from the RAM box because it was reporting incorrect amount of free RAM and it wasn't really that necessary anyway.
 
@@ -208,23 +210,23 @@ https://en.wikipedia.org/wiki/WoW64
 
 This means, essentially, that the 32-bit mode of QH, when run on 64-bit systems, is presented with different data to what it is expecting by the filename natively. The users affected by this are minimal (perhaps none except the user who reported it) because it only impacts upon files in that specific folder. Other folders are not affected. Nevertheless, to resolve this, as of v2.6.6, a dedicated 32-bit and 64-bit executable are now provided for Windows. Users are encouraged to use the appropriate executable for their system, but in 99% of cases the 32-bit one should work fine in 32-bit emulated mode, unless the content of C:\Windows\System32 is to be examined.  
 
-V2.6.5  Dec 2015
+V2.6.5 ? Dec 2015
 
 At user request, the "Text" tab now allows line-by-line hashing of each line. The results are saved to a comma separated text file that can be opened in a text file editor or spreadsheet software.
 
 For example, Google Adwords requires SHA256 lowercase hashes of customer e-mail addresses. So with QuickHash, you can easily paste your list of addresses into the text field, click the "Hash Line-By-Line" button and the output is saved as CSV output for you, ready for use with Google Adwords or any similar product line (https://support.google.com/adwords/answer/6276125?hl=en-GB). Tested with data sets of the low tens of thousands. Would be interested to hear how it copes with larger volumes of data. 
 
-V2.6.4-a Dec 2015 Bug #16 (https://sourceforge.net/p/quickhash/tickets/16/) highlighted an issues with the Don't rebuild path' option of the Copy tab wherein the copy failed. This was tracked back to v2.6.3 when the new treeview feature was added, replacing the former button path selection functionality. The bug was caused as a result to a path parameter that no longer existed. That was fixed. 
+V2.6.4-a Dec 2015 Bug #16 (https://sourceforge.net/p/quickhash/tickets/16/) highlighted an issues with the ?Don't rebuild path' option of the ?Copy? tab wherein the copy failed. This was tracked back to v2.6.3 when the new treeview feature was added, replacing the former button path selection functionality. The bug was caused as a result to a path parameter that no longer existed. That was fixed. 
 
 V2.6.4 Nov 2015
 
 QuickHash can now READ and WRITE from and to folders that exceed the MAX_PATH limit of MS Windows, which is 260 characters. A limit of 32K is now adhered to with QuickHash 2.6.4, meaning files may be found on filesystems that were put there by software that is able to bypass the MAX_PATH limit even if regular software like Windows Explorer is unaware of their existence. 
 
-UNC Mode added to the Copy tab, specifically to enable the user to operate in pure UNC mode but with the new 32K path length limits. Useful for comparing data on multiple network nodes that may not be mapped as a drive letter. Windows only feature (not needed for Linux and Apple Mac). 
+?UNC Mode? added to the ?Copy? tab, specifically to enable the user to operate in pure UNC mode but with the new 32K path length limits. Useful for comparing data on multiple network nodes that may not be mapped as a drive letter. Windows only feature (not needed for Linux and Apple Mac). 
 
 The tree view in the copy tab are now sorted alphabetically. 
 
-The Choose file types option that has existed in the Copy tab for a while has now been added to the Files tab by user request. Meaning the user can now recursively hash a folder and sub-folder of files but choose which files to include and which to include. Extension basis only and not file type signature analysis. 
+The ?Choose file types? option that has existed in the ?Copy? tab for a while has now been added to the ?Files? tab by user request. Meaning the user can now recursively hash a folder and sub-folder of files but choose which files to include and which to include. Extension basis only and not file type signature analysis. 
 
 Further GUI anchoring improvements, to make the program display elements better when maximised, with less overlapping hopefully. 
 
@@ -234,7 +236,7 @@ User manual updated and revised for v2.6.4
 
 Some other minor improvements
 
-V2.6.3  Sept 2015
+V2.6.3 ? Sept 2015
 
 NEW: Replaced two buttons with two treeview panes in the 'Copy' tab. Left pane is for the user to choose where to copy files FROM. Right pane is for the user to choose where to copy files TO. On appropriate selection, the user needs just press 'Go' and on completion a new form shows the results. 
 
@@ -243,15 +245,15 @@ FIX: In the 'Compare Directories' tab, the save button will now also save the ha
 FIX: In the 'Compare Directories' tab, the file counts of the grids and difference counts were overlapping with the labels when high file counts were examined (tens of thousands upwards). Fixed by anchoring the elements. 
 
 
-V2.6.2.b  August 2015  Linux only
+V2.6.2.b ? August 2015 ? Linux only
 
 The exclusion of files that were zero bytes (functionality that was introduced in v2.1 back in 2013) meant that block devices in Linux, like /dev/sda or /dev/sda1, were simply ignored if selected by the user and not hashed. A new compiler directive added to ensure that if the file is reported as zero byte that a secondary check is then done to see if its a block device in Linux. If so, it will be hashed providing QuickHash is ran as root or sudo.  
 
-V2.6.2  August 2015
+V2.6.2 ? August 2015
 
-As per feature request #15, and in part request #7, added an 'Expected Hash Value' field to Text and File tabs to enable the user to paste an already computed hash value (perhaps from another tool, e-mail, webpage) into QuickHash. If the field contains anything other than three dots, once the data hash is generated in QuickHash, it will compare it against the expected hash in this field and report match or mis-match. 
+As per feature request #15, and in part request #7, added an 'Expected Hash Value' field to ?Text? and ?File? tabs to enable the user to paste an already computed hash value (perhaps from another tool, e-mail, webpage) into QuickHash. If the field contains anything other than three dots, once the data hash is generated in QuickHash, it will compare it against the expected hash in this field and report match or mis-match. 
 
-Corrected the fact that that the values for Total Files in Dir A and Dir B in the comparison of two directories, were the wrong way round. 
+Corrected the fact that that the values for ?Total Files in Dir A? and ?Dir B? in the comparison of two directories, were the wrong way round. 
 
 Updated copyright date range in the form captions for both the disk hashing module and QuickHash itself
 
@@ -259,17 +261,17 @@ Minor GUI improvements like anchoring.
 
 User manual updated 
 
-V2.6.1  31/03/15
+V2.6.1 ? 31/03/15
 
-Added two buttons for copying the grid content of Compare Directories to the clipboard, to enable the user to simply paste the results of one or both grids to another tool like Excel, Notepad etc. See ticket ref #9 (https://sourceforge.net/p/quickhash/feature-requests/8/)
+Added two buttons for copying the grid content of ?Compare Directories? to the clipboard, to enable the user to simply paste the results of one or both grids to another tool like Excel, Notepad etc. See ticket ref #9 (https://sourceforge.net/p/quickhash/feature-requests/8/)
 
-Added a Save to Files button in the same tab to allow the content of grids A and B to be saved as two seperate CSV files (one for each grid) and a single combined HTML file (with the content of table A displayed in one table, the content of table B displayed in the other). 
+Added a ?Save to Files? button in the same tab to allow the content of grids A and B to be saved as two seperate CSV files (one for each grid) and a single combined HTML file (with the content of table A displayed in one table, the content of table B displayed in the other). 
 
 Throughout all of Quickhash, a line is automatically inserted into both CSV and HTML output stating the name and version of QuickHash used and the date the log file was generated. See ticket ref 7 (https://sourceforge.net/p/quickhash/feature-requests/7/) 
 
-Fixed the truncation of Total Files in DirA and Total Files in DirB in Compare Directories tab, where counts more than 99 (i.e. 100+) were being truncated. So 150 files was being written as 15. Note this only affected the user display  not the log or display grid. 
+Fixed the truncation of ?Total Files in DirA? and ?Total Files in DirB? in Compare Directories tab, where counts more than 99 (i.e. 100+) were being truncated. So 150 files was being written as ?15?. Note this only affected the user display ? not the log or display grid. 
 
-Ensured that if the user re-runs a comparison of two directories using the Compare Directories tab, any values from the previous comparisons are cleared, such as the values in the display grids, the time ended, the hash match status, etc. Prior to 2.6.1, once a scan had been conducted, the display was not updated until the second scan had finished, as opposed to clearing it at the start of the subsequent scan. 
+Ensured that if the user re-runs a comparison of two directories using the ?Compare Directories? tab, any values from the previous comparisons are cleared, such as the values in the display grids, the time ended, the hash match status, etc. Prior to 2.6.1, once a scan had been conducted, the display was not updated until the second scan had finished, as opposed to clearing it at the start of the subsequent scan. 
 
 Added a clickable link to the QuickHash projects homepage at sourceforge. 
 
@@ -277,7 +279,7 @@ V2.6.0
 
 New tab added titled 'Compare Two Files' to allow the user to check if two files in two different places (folders) are identical, or not, without having to hash all the other files in those respective folders. For example, C:\Data\FileA.doc and C:\BackupFiles\FileA.doc
 
-Fixed column mis-alignment for HTML output of the FileS tab; the mis-alignment was caused by the seperation of file name and file path into two different columns in v2.5.2. where the seperation in the grid was not carried forward to the HTML output.  
+Fixed column mis-alignment for HTML output of the ?FileS? tab; the mis-alignment was caused by the seperation of file name and file path into two different columns in v2.5.2. where the seperation in the grid was not carried forward to the HTML output.  
 
 Added the ability to delete duplicate files where found, if the user chooses to detect duplicate files only. 
 
@@ -295,17 +297,17 @@ Several hints on various buttons and labels corrected to show informative instru
 
 The file type mask told users to separate extensions with a space, when no space is needed. In fact, adding a space might case file types not to be found.   
 
-The Disks tab was made accessible in the Linux version, but the button disabled and a descriptor to users to just use the File tab instead, because users were confused thinking they could use the tab on the Linux platform but they were unsure why it was greyed out. 
+The ?Disks? tab was made accessible in the Linux version, but the button disabled and a descriptor to users to just use the ?File? tab instead, because users were confused thinking they could use the tab on the Linux platform but they were unsure why it was greyed out. 
 
-When hashing individual files in the File tab, if the user single clicked a file, but then clicked 'Cancel', the file was still being passed to the hashing procedures. That was fixed so that if the user cancels, the file is not hashed. 
+When hashing individual files in the ?File? tab, if the user single clicked a file, but then clicked 'Cancel', the file was still being passed to the hashing procedures. That was fixed so that if the user cancels, the file is not hashed. 
 
 v2.5.2 October 2014
 
 For the Windows version only : Implemented a scheduler for disk hashing, allowing the user the ability to schedule a start time for their chosen disk. Useful, for example, if a disk is currently being used or examined with an estimated completion time of 2 hours which is after the examining user may have gone home and unable to start the disk hashing process. Now, the user can specify a start date and time that is two or 3 hours after the estimated end time of the other task, and QuickHash will then commence hashing automatically without the need for the user to start it. If no valid start time is entered, the program starts hashing as soon as the chosen disk is double clicked, as normal. 
 
-For all versions : At user request, added an additional column to FileS tab to seperate the path from the filename. So now the FileName column contains just the filename. And the new 'Path' column contains the files path.  
+For all versions : At user request, added an additional column to ?FileS? tab to seperate the path from the filename. So now the FileName column contains just the filename. And the new 'Path' column contains the files path.  
 
-Added an option in Copy tab called Don't rebuild path?. If checked, the files in the source directory and all sub-directories will simply be dumped into the root of the destination directory without having the original path rebuilt. Any files with the same name will be appended with 'Filename.ext_DuplicatedFileNameX'. 
+Added an option in ?Copy? tab called ?Don't rebuild path??. If checked, the files in the source directory and all sub-directories will simply be dumped into the root of the destination directory without having the original path rebuilt. Any files with the same name will be appended with 'Filename.ext_DuplicatedFileNameX'. 
 
 Changed progress status labelling to look neater and more compact. 
 
@@ -382,7 +384,7 @@ All versions prior to 2.1 suffered a 32-bit 4Gb limitation when copying (as part
 
 International language support added for filenames and directories that contain or might be created of a non-English nature by use of UTF8 casting. For example, the destination directory for "Hash, Copy, Hash" can now contain non-English characters. 
 
-All hashing in Quick Hash utilises MerkleDamgård constructions (http://en.wikipedia.org/wiki/Merkle%E2%80%93Damg%C3%A5rd_construction). 
+All hashing in Quick Hash utilises Merkle?Damg�rd constructions (http://en.wikipedia.org/wiki/Merkle%E2%80%93Damg%C3%A5rd_construction). 
 As such, zero byte files will always generate a predetermined hash, depending on the algorithm; sha-1, for example, is always da39a3ee5e6b4b0d3255bfef95601890afd80709. To avoid confusion, if a file is zero bytes, it is not hashed at all and the entry 'Not computed, zero byte file' is enetered into the results. Though I acknowledge some users may feel it is necessary to hash zero byte files for security reasons, on the whole, I don't think it is for 99% of users. 
 
 Files of zero bytes are now copied as part of the "Hash, Copy, Hash" routine to facilitate those who wish to use QuickHash as a backup system where, on occasion, zero byte files are created by software and are required in order to function properly. 
