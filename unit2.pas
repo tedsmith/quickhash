@@ -207,7 +207,8 @@ type
     b64SaveDialog: TSaveDialog;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     b64FileSChooserDialog: TSelectDirectoryDialog;
-    b64FileSDecoderDialog: TSelectDirectoryDialog;
+    b64FileSSourceDecoderDialog: TSelectDirectoryDialog;
+    b64FileSDestinationDecoderDialog: TSelectDirectoryDialog;
     StatusBar5: TStatusBar;
     StatusBar6: TStatusBar;
     b64StringGrid1File: TStringGrid;
@@ -1326,13 +1327,13 @@ end;
 procedure TMainForm.MenuItem3Click(Sender: TObject);
 begin
   b64StringGrid2FileS.CopyToClipboard(false);
-  Showmessage('All grid rows copied to clipboard OK');
+  Showmessage('Grid copied to clipboard OK');
 end;
 
 procedure TMainForm.MenuItem4Click(Sender: TObject);
 begin
   b64StringGrid2FileS.CopyToClipboard(true);
-  Showmessage('Grid row data copied to clipboard OK');
+  Showmessage('Grid row(s) copied to clipboard OK');
 end;
 
 // Save data from the Base64 hashing data grid to TSV text file
@@ -1428,6 +1429,93 @@ begin
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
 end;
 
+
+// New to v2.8.3, to better facilitate use of the Expected Hash field
+procedure TMainForm.btnClearHashFieldClick(Sender: TObject);
+begin
+  lbleExpectedHash.Text:= '';
+end;
+
+// New to v2.8.3, to better facilitate use of the Expected Hash field
+procedure TMainForm.btnClearHashFieldKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  lbleExpectedHash.Text:= '';
+end;
+
+// Attempts to validate if the source data is Base64 encoded, to reduce stream
+// read errors if the user gives QuickHash a load of non-encoded data
+// *** Not implemented, yet, as results not perfect and perhaps not necessary anyway ***
+{function TMainForm.CanBeValidBase64EncodedString(var Buf: array of byte): Boolean;
+const
+  // Base64 often ends with a padding character of one or two equal signs
+  // Though it doesn't have to necessarily. Spaces and carriage returns are not
+  // part of the B64 alphabet, but are needed for formatting.
+  Base64Alphabet = ['A'..'Z', 'a'..'z', '0'..'9', '+', '/', '=', ' '];
+var
+  I: Integer;
+begin
+  result := true;
+  for i := 0 to SizeOf(Buf) do
+    begin
+      // Is the byte NOT in the Base64 range?
+      if (not (Chr(Buf[I]) in Base64Alphabet)) then
+      begin
+        // Is the byte NOT a carriage return?
+        if (not Buf[i] = 13) or (not Buf[i] = 10) then
+        begin
+          // It's not in the Base64 range and its not a carriage return. So reject
+          Result := False;
+        end;
+      end;
+    end;
+end;
+}
+// Select, decode and then hash a Base64 encoded file
+procedure TMainForm.btnB64FileChooserClick(Sender: TObject);
+var
+  DecodedStream  : TMemoryStream;
+  EncodedStream  : TFileStream;
+  Decoder        : TBase64DecodingStream;
+  HashValA, HashValB : string;
+begin
+  if b64FileChooserDialog.Execute then
+  begin
+    b64StringGrid1File.Clear;
+    // Compute hash of encoded file first
+    HashValA := CalcTheHashFile(b64FileChooserDialog.FileName);
+    // Now compute hash of decoded file
+    try
+      EncodedStream := TFileStream.Create(b64FileChooserDialog.FileName, fmOpenRead);
+      try
+        DecodedStream := TMemoryStream.Create;
+        // Create a Base64 decoder stream. Note than passing bdmStrict can exclude
+        // relevant Base64, despite it being better in theory. bdmMIME is less strict
+        // but gives some checking and follows follows RFC2045.
+        Decoder       := TBase64DecodingStream.Create(EncodedStream, bdmMIME);
+        DecodedStream.CopyFrom(Decoder, Decoder.Size);
+        DecodedStream.SaveToFile((b64FileChooserDialog.FileName) + '-Base64Decoded');
+        try
+          HashValB := CalcTheHashFile((b64FileChooserDialog.FileName) + '-Base64Decoded');
+          SysUtils.DeleteFile(b64FileChooserDialog.FileName + '-Base64Decoded');
+        finally
+          b64StringGrid1File.RowCount:= 2;
+          b64StringGrid1File.Cells[0,1] := '1';
+          b64StringGrid1File.Cells[1,1] := b64FileChooserDialog.FileName;
+          b64StringGrid1File.Cells[2,1] := HashValA;
+          b64StringGrid1File.Cells[3,1] := HashValB;
+        end;
+      finally
+        DecodedStream.Free;
+        Decoder.Free;
+      end;
+    finally
+      EncodedStream.Free;
+    end;
+  end;
+end;
+
+
 // Recursively find, decode and then hash Base64 encoded files
 procedure TMainForm.btnB64FileSChooserClick(Sender: TObject);
 var
@@ -1476,7 +1564,7 @@ begin
             EncodedStream := TFileStream.Create(TotalB64FilesToExamine.Strings[i], fmOpenRead);
             try
              DecodedStream := TMemoryStream.Create;
-             Decoder       := TBase64DecodingStream.Create(EncodedStream);
+             Decoder       := TBase64DecodingStream.Create(EncodedStream, bdmMIME);
              DecodedStream.CopyFrom(Decoder, Decoder.Size);
              // Create a temporary copy of the decoded file to hash it
              DecodedStream.SaveToFile((TotalB64FilesToExamine.Strings[i]) + '-Base64Decoded');
@@ -1510,62 +1598,6 @@ begin
   b64ProgressFileS.Caption:= 'Decoded and hashed ' + IntToStr(i) + ' files. Completed at ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now);
 end;
 
-
-
-// New to v2.8.3, to better facilitate use of the Expected Hash field
-procedure TMainForm.btnClearHashFieldClick(Sender: TObject);
-begin
-  lbleExpectedHash.Text:= '';
-end;
-
-// New to v2.8.3, to better facilitate use of the Expected Hash field
-procedure TMainForm.btnClearHashFieldKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  lbleExpectedHash.Text:= '';
-end;
-
-// Select, decode and then hash a Base64 encoded file
-procedure TMainForm.btnB64FileChooserClick(Sender: TObject);
-var
-  DecodedStream  : TMemoryStream;
-  EncodedStream  : TFileStream;
-  Decoder        : TBase64DecodingStream;
-  HashValA, HashValB : string;
-begin
-  if b64FileChooserDialog.Execute then
-  begin
-    b64StringGrid1File.Clear;
-    // Compute hash of encoded file first
-    HashValA := CalcTheHashFile(b64FileChooserDialog.FileName);
-    // Now compute hash of decoded file
-    try
-      EncodedStream := TFileStream.Create(b64FileChooserDialog.FileName, fmOpenRead);
-      try
-        DecodedStream := TMemoryStream.Create;
-        Decoder       := TBase64DecodingStream.Create(EncodedStream);
-        DecodedStream.CopyFrom(Decoder, Decoder.Size);
-        DecodedStream.SaveToFile((b64FileChooserDialog.FileName) + '-Base64Decoded');
-        try
-          HashValB := CalcTheHashFile((b64FileChooserDialog.FileName) + '-Base64Decoded');
-          SysUtils.DeleteFile(b64FileChooserDialog.FileName + '-Base64Decoded');
-        finally
-          b64StringGrid1File.RowCount:= 2;
-          b64StringGrid1File.Cells[0,1] := '1';
-          b64StringGrid1File.Cells[1,1] := b64FileChooserDialog.FileName;
-          b64StringGrid1File.Cells[2,1] := HashValA;
-          b64StringGrid1File.Cells[3,1] := HashValB;
-        end;
-      finally
-        DecodedStream.Free;
-        Decoder.Free;
-      end;
-    finally
-      EncodedStream.Free;
-    end;
-  end;
-end;
-
 // Recursively find and decode all Base64 encoded files found in the selected folder
 // Output decoded versions with the appended name '-Base64Decoded'
 // So taking the example of a PDF that may be Base64 encoded as an e-mail attachment:
@@ -1579,57 +1611,76 @@ var
   EncodedStream  : TFileStream;
   Decoder        : TBase64DecodingStream;
   DirToDecode    : string;
+  DecodedDestDir : string;
 begin
   lblB64DecoderWarning.Caption := '';
+  DecodedDestDir := '';
   i := 0;
-  if b64FileSDecoderDialog.Execute then
+
+  // ** SOURCE LOCATION
+  b64FileSSourceDecoderDialog.Title:= 'Choose SOURCE folder of Base64 ENcoded files';
+  b64FileSSourceDecoderDialog.InitialDir := GetCurrentDir;
+  if b64FileSSourceDecoderDialog.Execute then
     begin
     {$ifdef Windows}
       LongPathOverride := '\\?\';
     {$endif}
+    // Where we are going to look for Base64 encoded files
+    DirToDecode := b64FileSSourceDecoderDialog.FileName;
 
-      // Where we are going to look for Base64 files, then create a list of those files
-      DirToDecode := b64FileSDecoderDialog.FileName;
-      try
-        TotalB64FilesToExamine := TStringList.Create;
-        b64DecoderProgress.Caption := 'Finding and counting files...please wait';
-        Application.ProcessMessages;
-        // Ensure files in long paths on that Windows OS can be examined...urrggh
-        {$ifdef Windows}
-        TotalB64FilesToExamine := FindAllFilesEx(LongPathOverride+DirToDecode, '*', False, True);
-        {$else}
-        TotalB64FilesToExamine := FindAllFilesEx(DirToDecode, '*', False, True);
-        {$endif}
-      finally
-      end;
-
-      // For each file, compute the Base64 encoded and decoded values and output to grid
-      for i := 0 to TotalB64FilesToExamine.Count -1 do
-        begin
+    // ** DESTINATION LOCATION
+    // Where are are going to save Base64 decoded files
+    b64FileSDestinationDecoderDialog.Title := 'Choose DESTINATION folder for DEcoded files';
+    b64FileSDestinationDecoderDialog.InitialDir := GetCurrentDir;
+    if b64FileSDestinationDecoderDialog.Execute then
+      begin
+        DecodedDestDir := IncludeTrailingPathDelimiter(b64FileSDestinationDecoderDialog.FileName);
+        // ** FIND THE FILES IN SOURCE
+        try
+          TotalB64FilesToExamine := TStringList.Create;
+          b64DecoderProgress.Caption := 'Finding and counting files...please wait';
           Application.ProcessMessages;
-          b64DecoderProgress.Text:= 'Currently decoding ' + ExtractFileName(TotalB64FilesToExamine.Strings[i] + ' ...please wait');
-          try
-            EncodedStream := TFileStream.Create(TotalB64FilesToExamine.Strings[i], fmOpenRead);
-            try
-             DecodedStream := TMemoryStream.Create;
-             Decoder       := TBase64DecodingStream.Create(EncodedStream);
-             DecodedStream.CopyFrom(Decoder, Decoder.Size);
-             // Create a temporary copy of the decoded file to hash it
-             DecodedStream.SaveToFile((TotalB64FilesToExamine.Strings[i]) + '-Base64Decoded');
-            finally
-             DecodedStream.Free;
-             Decoder.Free;
-            end;
-          finally
-            EncodedStream.Free;
-          end;
+          // Ensure files in long paths on that Windows OS can be examined...urrggh
+          {$ifdef Windows}
+          TotalB64FilesToExamine := FindAllFilesEx(LongPathOverride+DirToDecode, '*', False, True);
+          {$else}
+          TotalB64FilesToExamine := FindAllFilesEx(DirToDecode, '*', False, True);
+          {$endif}
+        finally
         end;
+
+        // ** DECODE THE FILES TO DESTINATION
+        // For each file, compute the Base64 encoded and decoded values and output to grid
+        for i := 0 to TotalB64FilesToExamine.Count -1 do
+          begin
+            Application.ProcessMessages;
+            b64DecoderProgress.Text:= 'Currently decoding ' + ExtractFileName(TotalB64FilesToExamine.Strings[i] + ' ...please wait');
+            try
+              EncodedStream := TFileStream.Create(TotalB64FilesToExamine.Strings[i], fmOpenRead);
+              try
+               DecodedStream := TMemoryStream.Create;
+               Decoder       := TBase64DecodingStream.Create(EncodedStream, bdmMIME);
+               DecodedStream.CopyFrom(Decoder, Decoder.Size);
+               DecodedStream.SaveToFile((DecodedDestDir+(ExtractFileName(TotalB64FilesToExamine.Strings[i])) + '-Base64Decoded'));
+              finally
+               DecodedStream.Free;
+               Decoder.Free;
+              end;
+            finally
+              EncodedStream.Free;
+            end;
+          end;
+
+        lblB64DecoderWarning.Caption := 'Add appropriate file extensions to your decoded files. e.g MsgAttach-Base64Decoded to MsgAttach-Base64Decoded.pdf';
+        if TotalB64FilesToExamine.Count > 0 then
+          begin
+            b64DecoderProgress.Caption:= 'Decoded ' + IntToStr(i) + ' Base64 files. Completed at ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now);
+          end;
         TotalB64FilesToExamine.Free;
+      end;
+      // Reset the long path override for any other procedures triggered
+      LongPathOverride := '';
     end;
-  // Reset the long path override for any other procedures triggered
-  LongPathOverride := '';
-  b64DecoderProgress.Caption:= 'Decoded ' + IntToStr(i) + ' Base64 files. Completed at ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now);
-  lblB64DecoderWarning.Caption := 'Add appropriate file extensions to your decoded files. e.g MsgAttach-Base64Decoded to MsgAttach-Base64Decoded.pdf';
 end;
 
 procedure TMainForm.PageControl1Change(Sender: TObject);

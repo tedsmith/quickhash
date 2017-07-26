@@ -9,7 +9,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  Grids, StdCtrls;
+  Grids, StdCtrls, Menus;
 
 type
 
@@ -18,8 +18,16 @@ type
   TfrmDisplayGrid1 = class(TForm)
     btnClipboardResults2: TButton;
     CopyAndHashGrid: TStringGrid;
+    frmDisplayGridPopupMenu: TPopupMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    frmDisplayGridSaveDialog1: TSaveDialog;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure btnClipboardResults2Click(Sender: TObject);
+    procedure MenuItem1Click(Sender: TObject);
+    procedure MenuItem2Click(Sender: TObject);
+    procedure MenuItem3Click(Sender: TObject);
   private
     { private declarations }
   public
@@ -46,6 +54,27 @@ begin
   finally
     ShowMessage('Grid content now in clipboard...Paste (Ctrl+V) into spreadsheet or text editor')
   end
+end;
+
+// Copy selected row to clipboard
+procedure TfrmDisplayGrid1.MenuItem1Click(Sender: TObject);
+begin
+  CopyAndHashGrid.CopyToClipboard(true);
+end;
+
+// Copy the whole grid to clipboard
+procedure TfrmDisplayGrid1.MenuItem2Click(Sender: TObject);
+begin
+    CopyAndHashGrid.CopyToClipboard(false);
+end;
+
+// Copy whole grid to TSV file
+procedure TfrmDisplayGrid1.MenuItem3Click(Sender: TObject);
+begin
+  if frmDisplayGridSaveDialog1.Execute then
+    begin
+      CopyAndHashGrid.SaveToCSVFile(frmDisplayGridSaveDialog1.FileName);
+    end;
 end;
 
 

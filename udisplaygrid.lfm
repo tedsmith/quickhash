@@ -1,14 +1,14 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 520
+  Left = 583
   Height = 430
-  Top = 305
+  Top = 406
   Width = 980
   Caption = 'QuickHash - Copy Results'
   ClientHeight = 430
   ClientWidth = 980
   OnClose = FormClose
   Position = poDesktopCenter
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.6.4.0'
   object CopyAndHashGrid: TStringGrid
     Left = 16
     Height = 336
@@ -40,6 +40,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
         Width = 300
       end>
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goColMoving, goRowSelect, goDblClickAutoSize, goSmoothScroll, goScrollKeepVisible]
+    PopupMenu = frmDisplayGridPopupMenu
     RowCount = 2
     TabOrder = 0
     Visible = False
@@ -54,5 +55,25 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     Enabled = False
     OnClick = btnClipboardResults2Click
     TabOrder = 1
+  end
+  object frmDisplayGridPopupMenu: TPopupMenu
+    left = 405
+    top = 142
+    object MenuItem1: TMenuItem
+      Caption = 'Copy row(s) to clipboard'
+      OnClick = MenuItem1Click
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'Copy grid to clipboard'
+      OnClick = MenuItem2Click
+    end
+    object MenuItem3: TMenuItem
+      Caption = 'Save grid to file...'
+      OnClick = MenuItem3Click
+    end
+  end
+  object frmDisplayGridSaveDialog1: TSaveDialog
+    left = 405
+    top = 224
   end
 end
