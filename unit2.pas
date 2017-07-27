@@ -205,6 +205,7 @@ type
     pbCompareDirB: TProgressBar;
     b64FilesGridPopupMenu: TPopupMenu;
     b64SaveDialog: TSaveDialog;
+    pbFile: TProgressBar;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     b64FileSChooserDialog: TSelectDirectoryDialog;
     b64FileSSourceDecoderDialog: TSelectDirectoryDialog;
@@ -334,9 +335,8 @@ type
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure lblDonateClick(Sender: TObject);
+    procedure lbleExpectedHashChange(Sender: TObject);
     procedure lbleExpectedHashEnter(Sender: TObject);
-    procedure lbleExpectedHashKeyUp(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure lblFileAHashClick(Sender: TObject);
     procedure lblFileBHashClick(Sender: TObject);
     procedure lblschedulertickboxFileSTabChange(Sender: TObject);
@@ -1137,22 +1137,21 @@ begin
   OpenURL(QuickHashDonateURL);
 end;
 
-procedure TMainForm.lbleExpectedHashEnter(Sender: TObject);
-begin
-
-end;
 
 // In the event that the user pastes an expected hash value AFTER computing
 // the hash of the file, this onKeyUp event will then see if the pasted value
 // matches the value just computed. New to v2.8.3
-procedure TMainForm.lbleExpectedHashKeyUp(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TMainForm.lbleExpectedHashChange(Sender: TObject);
 begin
    if memFileHashField.Lines[0] = 'Computed hash will appear here...' then
     exit
-   else if (lbleExpectedHash.Text = '') then exit
-    else
-     if (lbleExpectedHash.Text <> '...') then
+   else if (lbleExpectedHash.Text = '') then
+     exit
+    else if (lbleExpectedHash.Text = '...') then
+      exit
+     else if (Length(trim(lbleExpectedHash.Text)) = 32) or (Length(trim(lbleExpectedHash.Text)) = 40)
+          or (Length(trim(lbleExpectedHash.Text)) = 64) or (Length(trim(lbleExpectedHash.Text)) = 128)
+          or (Length(trim(lbleExpectedHash.Text)) = 7) then
      begin
        if Uppercase(memFileHashField.Lines[0]) = Trim(Uppercase(lbleExpectedHash.Text)) then
          begin
@@ -1163,6 +1162,11 @@ begin
          Showmessage('Expected hash DOES NOT match the computed file hash!');
        end;
      end;
+end;
+
+procedure TMainForm.lbleExpectedHashEnter(Sender: TObject);
+begin
+
 end;
 
 
@@ -3037,6 +3041,9 @@ begin
       StatusBar1.SimpleText := 'RECOMPUTED NEW HASH VALUE.';
       lbEndedFileAt.Caption:= 'Ended at : '+ TimeToStr(stop);
       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
+      // If the user has pasted an expected hash value, since the last hash computation,
+      // then check if it matches the newly computed hash
+      lbleExpectedHashChange(self);
       Application.ProcessMessages;
     end;
 end;
@@ -3234,6 +3241,7 @@ begin
     and finally converted to a string result.
   }
   try
+    pbFile.Position := 0;
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
     strFileSize := FormatByteSize(fsFileToBeHashed.Size);
     case TabRadioGroup2.ItemIndex of
@@ -3248,19 +3256,17 @@ begin
           else
             begin
               HashInstanceMD5.TransformUntyped(Buffer, i);
-              // All the tabs have a per file progress bar, except the File tab.
-              // So provide the user with feedback, if the active tab is File tab
-              // To reduce lag due to application refresh, a loop counter is used
+              // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
                 begin
-                inc(TotalBytesRead_B, i);
-                inc(LoopCounter, 1);
-                if LoopCounter = 40 then
-                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
+                  pbFile.BarShowText:= true;
+                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  {
                     StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
                     StatusBar1.Refresh;
-                    LoopCounter := 0;
-                  end;
+                  }
                 end;
             end;
           until false;
@@ -3279,15 +3285,21 @@ begin
           else
             begin
               HashInstanceSHA1.TransformUntyped(Buffer, i);
-              if PageControl1.ActivePage = TabSheet2 then
+                // If the File tab is the tab doing the hashing, refresh the interface
+                if PageControl1.ActivePage = TabSheet2 then
                 begin
                 inc(TotalBytesRead_B, i);
                 inc(LoopCounter, 1);
                 if LoopCounter = 40 then
                   begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
+                  pbFile.BarShowText:= true;
+                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  {
                     StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
                     StatusBar1.Refresh;
-                    LoopCounter := 0;
+                  }
                   end;
                 end;
             end;
@@ -3307,16 +3319,17 @@ begin
           else
             begin
               HashInstanceSHA256.TransformUntyped(Buffer, i);
+              // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
                 begin
-                  inc(TotalBytesRead_B, i);
-                  inc(LoopCounter, 1);
-                  if LoopCounter = 40 then
-                    begin
-                      StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
-                      StatusBar1.Refresh;
-                      LoopCounter := 0;
-                    end;
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
+                  pbFile.BarShowText:= true;
+                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  {
+                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
+                    StatusBar1.Refresh;
+                  }
                 end;
             end;
           until false;
@@ -3335,16 +3348,17 @@ begin
           else
             begin
               HashInstanceSHA512.TransformUntyped(Buffer, i);
+              // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
                 begin
-                  inc(TotalBytesRead_B, i);
-                  inc(LoopCounter, 1);
-                  if LoopCounter = 40 then
-                    begin
-                      StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
-                      StatusBar1.Refresh;
-                      LoopCounter := 0;
-                    end;
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
+                  pbFile.BarShowText:= true;
+                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  {
+                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
+                    StatusBar1.Refresh;
+                  }
                 end;
             end;
           until false;
@@ -3378,12 +3392,17 @@ begin
           else
             begin
               HashInstancexxHash32.TransformUntyped(Buffer, i);
-              // All the tabs have a per file progress bar, except the File tab.
-              // So provide the user with feedback, if the active tab is File tab
+              // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
                 begin
-                  inc(TotalBytesRead, i);
-                  StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read.';
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
+                  pbFile.BarShowText:= true;
+                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  {
+                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
+                    StatusBar1.Refresh;
+                  }
                 end;
             end;
           until false;

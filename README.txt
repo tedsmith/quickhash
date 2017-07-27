@@ -36,6 +36,10 @@ In the “Copy” tab, a grid display is shown on completion and that has been impro
 
 In the “Compare Directories” tab, if the user chooses to tabulate the results, upon completion of the comparison, if the user single left mouse clicks in either grid, the corresponding row entry in the other grid will be selected, assuming both directories actually match. If they do not match, the user will be taken to the corresponding grid row count, but this is unlikely to contain the same filename data of course. 
 
+Progress bar added to “File” tab, for better progress feedback
+
+“Expected hash value” field behaviour in “File” tab improved such that it only checks if the value pasted or typed into it is itself a valid hash value length for MD5 (32), SHA-1 (40) etc. And it is triggered not by a key press but by a changing value. And it will also apply if the user switches the hash algorithm to recompute a new hash as he may perhaps have chosen the wrong to start with.  
+
 Minor tweak to README.txt to properly refer to the HashLib4Pascal library
 
 A line was added in 2.8.2 to free resources used by the check for duplicate files, but it was realised that this causes an error if a check for duplicates was not selected by the user, as there was no resource allocated to then free. That was fixed. 
