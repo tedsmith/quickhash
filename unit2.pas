@@ -151,6 +151,7 @@ type
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
     b64ProgressFileS: TEdit;
+    lblPercentageProgressFileTab: TLabel;
     lblB64Warning: TLabel;
     lblB64DecoderWarning: TLabel;
     lblNoOfFilesToExamine2: TLabel;
@@ -3220,13 +3221,15 @@ var
 {$endif}
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
-  TotalBytesRead_B, LoopCounter : QWord;
+  TotalBytesRead_B, LoopCounter, IntFileSize : QWord;
   strFileSize : string;
 
 begin
   TotalBytesRead_B := 0;
-  LoopCounter := 0;
-  strFileSize := '';
+  IntFileSize      := 0;
+  strFileSize      := '';
+  LoopCounter      := 0; // Used for periodic interface refresh, to avoid slowing things down.
+
   case PageControl1.TabIndex of
         0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
         1: TabRadioGroup2 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
@@ -3241,9 +3244,12 @@ begin
     and finally converted to a string result.
   }
   try
-    pbFile.Position := 0;
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
-    strFileSize := FormatByteSize(fsFileToBeHashed.Size);
+    strFileSize      := FormatByteSize(fsFileToBeHashed.Size);
+    IntFileSize      := fsFileToBeHashed.Size;
+    pbFile.Position  := 0;
+    pbFile.Max       := 100;
+
     case TabRadioGroup2.ItemIndex of
       0: begin
         // MD5
@@ -3258,15 +3264,16 @@ begin
               HashInstanceMD5.TransformUntyped(Buffer, i);
               // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
-                begin
-                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
-                  pbFile.BarShowText:= true;
-                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+               begin
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then // Every X buffer reads, refresh interface
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
                   LoopCounter := 0;
-                  {
-                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
-                    StatusBar1.Refresh;
-                  }
+                  Application.ProcessMessages;
+                  end;
                 end;
             end;
           until false;
@@ -3292,14 +3299,10 @@ begin
                 inc(LoopCounter, 1);
                 if LoopCounter = 40 then
                   begin
-                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
-                  pbFile.BarShowText:= true;
-                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
                   LoopCounter := 0;
-                  {
-                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
-                    StatusBar1.Refresh;
-                  }
+                  Application.ProcessMessages;
                   end;
                 end;
             end;
@@ -3321,15 +3324,16 @@ begin
               HashInstanceSHA256.TransformUntyped(Buffer, i);
               // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
-                begin
-                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
-                  pbFile.BarShowText:= true;
-                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+               begin
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
                   LoopCounter := 0;
-                  {
-                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
-                    StatusBar1.Refresh;
-                  }
+                  Application.ProcessMessages;
+                  end;
                 end;
             end;
           until false;
@@ -3351,14 +3355,15 @@ begin
               // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
                 begin
-                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
-                  pbFile.BarShowText:= true;
-                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
                   LoopCounter := 0;
-                  {
-                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
-                    StatusBar1.Refresh;
-                  }
+                  Application.ProcessMessages;
+                  end;
                 end;
             end;
           until false;
@@ -3394,15 +3399,16 @@ begin
               HashInstancexxHash32.TransformUntyped(Buffer, i);
               // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
-                begin
-                  pbFile.Position := ((TotalBytesRead_B * 100) DIV fsFileToBeHashed.Size);
-                  pbFile.BarShowText:= true;
-                  pbfile.Caption:= FormatByteSize(TotalBytesRead_B) + ' ' + IntToStr(pbFile.Position) + '%';
+               begin
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
                   LoopCounter := 0;
-                  {
-                    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T...' + FormatByteSize(TotalBytesRead_B) + ' read of ' + strFileSize;
-                    StatusBar1.Refresh;
-                  }
+                  Application.ProcessMessages;
+                  end;
                 end;
             end;
           until false;
@@ -3412,6 +3418,18 @@ begin
         end;  // End of xxHash
     end; // end of case statement
   finally
+   if PageControl1.ActivePage = TabSheet2 then
+     begin
+       // Last sweep to catch data that fell outside the loop counter
+       // i.e. if the loop counter is 40, then the last 40 reads won't be in the
+       // progress updater. So you end up with "995" complete when its finished.
+       // This will clear that up.
+       pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+       lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+       LoopCounter := 0;
+     end;
+    Application.ProcessMessages;
+    // Free the source file
     fsFileToBeHashed.free;
   end;
 end;
