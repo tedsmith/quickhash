@@ -40,6 +40,10 @@ Progress bar added to “File” tab, for better progress feedback
 
 “Expected hash value” field behaviour in “File” tab improved such that it only checks if the value pasted or typed into it is itself a valid hash value length for MD5 (32), SHA-1 (40) etc. And it is triggered not by a key press but by a changing value. And it will also apply if the user switches the hash algorithm to recompute a new hash as he may perhaps have chosen the wrong to start with.  
 
+The “FileS” tab will now accept a root drive as a valid start location (e.g. C:\) allowing users to hash an entire logical drive volume, if they wish to do so (note that due to the fact that some files will be locked by the operating system, this approach is not recommended, save perhaps for USB drives and so on where it is less likely that the OS will have open handles to files). 
+
+The source and destination path fields in the “Copy” tab are now read-only until the user (or if the user) clicks “UNC Mode”, and then they become writable. If the user deselects UNC Mode again, they become read-only again. This is to avoid users mistakenly typing UNC paths in them before enabling UNC Mode.  
+
 Minor tweak to README.txt to properly refer to the HashLib4Pascal library
 
 A line was added in 2.8.2 to free resources used by the check for duplicate files, but it was realised that this causes an error if a check for duplicates was not selected by the user, as there was no resource allocated to then free. That was fixed. 

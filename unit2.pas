@@ -1782,220 +1782,212 @@ var
 
       RecursiveDisplayGrid1.Visible := false;
       RecursiveDisplayGrid1.rowcount := 0;
-      // Check selected dir exists. If it does, start the process.
-      if DirPathExists(LongPathOverride+DirToHash) then
-        begin
-        // If a scheduler has been set, wait for that future time to arrive
-        if lblschedulertickboxFileSTab.Checked then
-        begin
-          InvokeScheduler(self);
-        end;
+      // If a scheduler has been set, wait for that future time to arrive
+      if lblschedulertickboxFileSTab.Checked then
+      begin
+        InvokeScheduler(self);
+      end;
 
-         // Now lets recursively count each file,
-         start := Now;
-         lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
-         StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
-         Label5.Visible        := true;
-         Application.ProcessMessages;
+       // Now lets recursively count each file,
+       start := Now;
+       lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
+       StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
+       Label5.Visible        := true;
+       Application.ProcessMessages;
 
-         // By default, the recursive dir hashing will hash all files of all sub-dirs
-         // from the root of the chosen dir. If the box is ticked, the user just wants
-         // to hash the files in the root of the chosen dir.
+       // By default, the recursive dir hashing will hash all files of all sub-dirs
+       // from the root of the chosen dir. If the box is ticked, the user just wants
+       // to hash the files in the root of the chosen dir.
 
-         if chkRecursiveDirOverride.Checked then   // User does NOT want recursive
+       if chkRecursiveDirOverride.Checked then   // User does NOT want recursive
+         begin
+           if chkHiddenFiles.Checked then        // ...but does want hidden files
+             begin
+               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, '*', False, True);
+             end
+           else                                  // User does not want hidden
+             begin
+               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', False);
+             end;
+         end
+       else
+         begin                                  // User DOES want recursive
+           if chkHiddenFiles.Checked then         // ...and he wants hidden
+             begin
+               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, '*', true, true);
+             end
+           else                                  // ...but not want hidden
+             begin
+               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', true);
+             end;
+         end;
+
+       lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
+       NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
+       RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
+       Application.ProcessMessages;
+
+       // Create and assign a File Searcher instance and dictate its behaviour.
+       // Then hash each file accordingly.
+       try
+         FS := TFileSearcher.Create;
+
+         // Set parameters for searching for hidden or non-hidden files and dirs
+         // and (since v2.6.4) with a mask, or not
+         if chkHiddenFiles.Checked then
            begin
-             if chkHiddenFiles.Checked then        // ...but does want hidden files
-               begin
-                 TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, '*', False, True);
-               end
-             else                                  // User does not want hidden
-               begin
-                 TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', False);
-               end;
+             if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
+             FS.DirectoryAttribute := faAnyFile or faHidden;
+             FS.FileAttribute := faAnyFile or faHidden;
+             FS.OnFileFound := @HashFile;
            end
          else
-           begin                                  // User DOES want recursive
-             if chkHiddenFiles.Checked then         // ...and he wants hidden
-               begin
-                 TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, '*', true, true);
-               end
-             else                                  // ...but not want hidden
-               begin
-                 TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', true);
-               end;
+           begin
+             if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
+             FS.FileAttribute := faAnyFile;
+             FS.OnFileFound := @HashFile;
            end;
 
-         lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
-         NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
-         RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
-         Application.ProcessMessages;
+         // Set parameters for searching recursivley or not, and (since v2.6.4)
+         // with a mask, or not
+         if chkRecursiveDirOverride.Checked then
+           begin
+             if FileTypeMaskCheckBox2.Checked then
+               SearchMask := FileMaskField2.Text
+               else SearchMask := '';
+             FS.Search(LongPathOverride+DirToHash, SearchMask, False, False);
+           end
+         else
+           begin
+             if FileTypeMaskCheckBox2.Checked then
+               SearchMask := FileMaskField2.Text
+               else SearchMask := '';
+             FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
+           end;
+       finally
+         // Hashing complete. Now free resources
+         FS.Free;
+         TotalFilesToExamine.Free;
+       end;
 
-         // Create and assign a File Searcher instance and dictate its behaviour.
-         // Then hash each file accordingly.
-         try
-           FS := TFileSearcher.Create;
+       {  Now that the data is all computed, display the grid in the GUI.
+          We have this hidden during processing for speed purposes.
+          In a test, 3K files took 3 minutes with the grid display refreshed for each file.
+          With the grid hidden until this point though, the same files took just 12 seconds! }
 
-           // Set parameters for searching for hidden or non-hidden files and dirs
-           // and (since v2.6.4) with a mask, or not
-           if chkHiddenFiles.Checked then
+       RecursiveDisplayGrid1.Visible := true;
+
+       // Now traverse the grid for duplicate hash entries, if the user wishes to
+
+       if chkFlagDuplicates.Checked then
+       try
+         slDuplicates := TStringList.Create;
+         slDuplicates.Sorted := true;
+         RecursiveDisplayGrid1.SortOrder := soAscending;
+         RecursiveDisplayGrid1.SortColRow(true, 3, RecursiveDisplayGrid1.FixedRows, RecursiveDisplayGrid1.RowCount - 1);
+         for i := 1 to RecursiveDisplayGrid1.RowCount -1 do
+           begin
+             if RecursiveDisplayGrid1.Cells[3, i] = RecursiveDisplayGrid1.Cells[3, i-1] then
+               begin
+                RecursiveDisplayGrid1.Cells[5, i] := 'Yes, of file ' + RecursiveDisplayGrid1.Cells[1,i-1];
+                slDuplicates.Add(RecursiveDisplayGrid1.Cells[2,i-1] + RecursiveDisplayGrid1.Cells[1, i-1]);
+               end;
+           end;
+       finally
+         slDuplicates.Sort;
+       end;
+
+       // and conclude timings and update display
+       stop := Now;
+       elapsed := stop - start;
+       lblTimeTaken4.Caption := 'Time taken : '+ FormatDateTime('HH:MM:SS', elapsed);
+       StatusBar2.SimpleText := ' DONE! ';
+       btnClipboardResults.Enabled := true;
+
+      // Now output the complete StringGrid to a csv text file
+
+      // FYI, RecursiveDisplayGrid1.Cols[X].savetofile('/home/ted/test.txt'); is good for columns
+      // RecursiveDisplayGrid1.Rows[X].savetofile('/home/ted/test.txt'); is good for rows
+
+       if SaveToCSVCheckBox1.Checked then
+         begin
+           SaveDialog1.Title := 'Save your CSV text log file as...';
+           SaveDialog1.InitialDir := GetCurrentDir;
+           SaveDialog1.Filter := 'Comma Sep|*.csv|Text file|*.txt';
+           SaveDialog1.DefaultExt := 'csv';
+           if SaveDialog1.Execute then
              begin
-               if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
-               FS.DirectoryAttribute := faAnyFile or faHidden;
-               FS.FileAttribute := faAnyFile or faHidden;
-               FS.OnFileFound := @HashFile;
-             end
-           else
-             begin
-               if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
-               FS.FileAttribute := faAnyFile;
-               FS.OnFileFound := @HashFile;
+              SaveOutputAsCSV(SaveDialog1.FileName, RecursiveDisplayGrid1);
              end;
-
-           // Set parameters for searching recursivley or not, and (since v2.6.4)
-           // with a mask, or not
-           if chkRecursiveDirOverride.Checked then
-             begin
-               if FileTypeMaskCheckBox2.Checked then
-                 SearchMask := FileMaskField2.Text
-                 else SearchMask := '';
-               FS.Search(LongPathOverride+DirToHash, SearchMask, False, False);
-             end
-           else
-             begin
-               if FileTypeMaskCheckBox2.Checked then
-                 SearchMask := FileMaskField2.Text
-                 else SearchMask := '';
-               FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
-             end;
-         finally
-           // Hashing complete. Now free resources
-           FS.Free;
-           TotalFilesToExamine.Free;
          end;
 
-         {  Now that the data is all computed, display the grid in the GUI.
-            We have this hidden during processing for speed purposes.
-            In a test, 3K files took 3 minutes with the grid display refreshed for each file.
-            With the grid hidden until this point though, the same files took just 12 seconds! }
+       // And\Or, output the complete StringGrid to a HTML file
 
-         RecursiveDisplayGrid1.Visible := true;
-
-         // Now traverse the grid for duplicate hash entries, if the user wishes to
-
-         if chkFlagDuplicates.Checked then
-         try
-           slDuplicates := TStringList.Create;
-           slDuplicates.Sorted := true;
-           RecursiveDisplayGrid1.SortOrder := soAscending;
-           RecursiveDisplayGrid1.SortColRow(true, 3, RecursiveDisplayGrid1.FixedRows, RecursiveDisplayGrid1.RowCount - 1);
-           for i := 1 to RecursiveDisplayGrid1.RowCount -1 do
-             begin
-               if RecursiveDisplayGrid1.Cells[3, i] = RecursiveDisplayGrid1.Cells[3, i-1] then
+       if SaveToHTMLCheckBox1.Checked then
+         begin
+         SaveDialog2.Title := 'Save your HTML log file as...';
+         SaveDialog2.InitialDir := GetCurrentDir;
+         SaveDialog2.Filter := 'HTML|*.html';
+         SaveDialog2.DefaultExt := 'html';
+         if SaveDialog2.Execute then
+           begin
+             i := 0;
+             j := 0;
+             HTMLLogFile1 := SaveDialog2.FileName;
+             with TStringList.Create do
+             try
+               Add('<html>');
+               Add('<title>QuickHash HTML Output</title>');
+               Add('<body>');
+               Add('<br />');
+               Add('<p><strong>' + MainForm.Caption + '. ' + 'Log Created: ' + DateTimeToStr(Now)+'</strong></p>');
+               Add('<p><strong>File and Hash listing for: ' + DirToHash + '</strong></p>');
+               Add('<table border=1>');
+               Add('<tr>');
+               Add('<td>' + 'ID');
+               Add('<td>' + 'File Name');
+               Add('<td>' + 'File Path');
+               Add('<td>' + 'Hash');
+               Add('<td>' + 'Size');
+               for i := 0 to RecursiveDisplayGrid1.RowCount-1 do
                  begin
-                  RecursiveDisplayGrid1.Cells[5, i] := 'Yes, of file ' + RecursiveDisplayGrid1.Cells[1,i-1];
-                  slDuplicates.Add(RecursiveDisplayGrid1.Cells[2,i-1] + RecursiveDisplayGrid1.Cells[1, i-1]);
+                   Add('<tr>');
+                   for j := 0 to RecursiveDisplayGrid1.ColCount-1 do
+                     Add('<td>' + RecursiveDisplayGrid1.Cells[j,i] + '</td>');
+                     add('</tr>');
                  end;
+               Add('</table>');
+               Add('</body>');
+               Add('</html>');
+               SaveToFile(HTMLLogFile1);
+             finally
+               Free;
+               HTMLLogFile1 := '';
              end;
-         finally
-           slDuplicates.Sort;
-         end;
-
-         // and conclude timings and update display
-         stop := Now;
-         elapsed := stop - start;
-         lblTimeTaken4.Caption := 'Time taken : '+ FormatDateTime('HH:MM:SS', elapsed);
-         StatusBar2.SimpleText := ' DONE! ';
-         btnClipboardResults.Enabled := true;
-
-        // Now output the complete StringGrid to a csv text file
-
-        // FYI, RecursiveDisplayGrid1.Cols[X].savetofile('/home/ted/test.txt'); is good for columns
-        // RecursiveDisplayGrid1.Rows[X].savetofile('/home/ted/test.txt'); is good for rows
-
-         if SaveToCSVCheckBox1.Checked then
-           begin
-             SaveDialog1.Title := 'Save your CSV text log file as...';
-             SaveDialog1.InitialDir := GetCurrentDir;
-             SaveDialog1.Filter := 'Comma Sep|*.csv|Text file|*.txt';
-             SaveDialog1.DefaultExt := 'csv';
-             if SaveDialog1.Execute then
-               begin
-                SaveOutputAsCSV(SaveDialog1.FileName, RecursiveDisplayGrid1);
-               end;
            end;
+         end;
+    end; // end of SelectDirectoryDialog1.Execute
 
-         // And\Or, output the complete StringGrid to a HTML file
-
-         if SaveToHTMLCheckBox1.Checked then
-           begin
-           SaveDialog2.Title := 'Save your HTML log file as...';
-           SaveDialog2.InitialDir := GetCurrentDir;
-           SaveDialog2.Filter := 'HTML|*.html';
-           SaveDialog2.DefaultExt := 'html';
-           if SaveDialog2.Execute then
-             begin
-               i := 0;
-               j := 0;
-               HTMLLogFile1 := SaveDialog2.FileName;
-               with TStringList.Create do
-               try
-                 Add('<html>');
-                 Add('<title>QuickHash HTML Output</title>');
-                 Add('<body>');
-                 Add('<br />');
-                 Add('<p><strong>' + MainForm.Caption + '. ' + 'Log Created: ' + DateTimeToStr(Now)+'</strong></p>');
-                 Add('<p><strong>File and Hash listing for: ' + DirToHash + '</strong></p>');
-                 Add('<table border=1>');
-                 Add('<tr>');
-                 Add('<td>' + 'ID');
-                 Add('<td>' + 'File Name');
-                 Add('<td>' + 'File Path');
-                 Add('<td>' + 'Hash');
-                 Add('<td>' + 'Size');
-                 for i := 0 to RecursiveDisplayGrid1.RowCount-1 do
-                   begin
-                     Add('<tr>');
-                     for j := 0 to RecursiveDisplayGrid1.ColCount-1 do
-                       Add('<td>' + RecursiveDisplayGrid1.Cells[j,i] + '</td>');
-                       add('</tr>');
-                   end;
-                 Add('</table>');
-                 Add('</body>');
-                 Add('</html>');
-                 SaveToFile(HTMLLogFile1);
-               finally
-                 Free;
-                 HTMLLogFile1 := '';
-               end;
-             end;
-          end;
-        end
-        else
-        begin
-          ShowMessage('Invalid directory selected' + sLineBreak + 'You must select a directory. Error code : ' + SysErrorMessageUTF8(GetLastOSError));
-        end;
-    end;
-
-  // Now see if the user wishes to delete any found duplicates
-  if chkFlagDuplicates.Checked then
-    begin
-      if slDuplicates.Count > 0 then
-        if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
-          [mbCancel, mbNo, mbYes],0) = mrYes then
-            begin
-              for i := 0 to (slDuplicates.Count -1) do
-                begin
-                  StatusBar2.SimpleText:= 'Deleting duplicate file ' + slDuplicates.Strings[i];
-                  StatusBar2.Refresh;
-                  if SysUtils.DeleteFile(slDuplicates.Strings[i]) then
-                    inc(DuplicatesDeleted);
-                end;
-              StatusBar2.SimpleText:= 'Finished deleting ' + IntToStr(DuplicatesDeleted) + ' duplicate files';
-              StatusBar2.Refresh;
-              ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
-            end;
-    if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
-    end; // end of duplicate deletion phase
+    // Now see if the user wishes to delete any found duplicates
+    if chkFlagDuplicates.Checked then
+      begin
+        if slDuplicates.Count > 0 then
+          if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
+            [mbCancel, mbNo, mbYes],0) = mrYes then
+              begin
+                for i := 0 to (slDuplicates.Count -1) do
+                  begin
+                    StatusBar2.SimpleText:= 'Deleting duplicate file ' + slDuplicates.Strings[i];
+                    StatusBar2.Refresh;
+                    if SysUtils.DeleteFile(slDuplicates.Strings[i]) then
+                      inc(DuplicatesDeleted);
+                  end;
+                StatusBar2.SimpleText:= 'Finished deleting ' + IntToStr(DuplicatesDeleted) + ' duplicate files';
+                StatusBar2.Refresh;
+                ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
+              end;
+      if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
+      end; // end of duplicate deletion phase
 end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
@@ -4578,29 +4570,37 @@ procedure TMainForm.chkUNCModeChange(Sender: TObject);
 begin
   if chkUNCMode.Checked then
     begin
-    Edit2SourcePath.Color      := clWhite;
-    Edit2SourcePath.Text       := 'Enter source UNC path (e.g. \\DCSERVER\DATA-1)';
-    Edit2SourcePath.Visible    := true;
-    Edit3DestinationPath.Color := clWhite;
-    Edit3DestinationPath.Text  := 'Enter destination UNC path (e.g \\FILESERVER\DATA-2';;
-    Edit3DestinationPath.Visible:=true;
-    Button8CopyAndHash.Enabled := true;
-    DirListA.Enabled           := false;
-    DirListA.Visible           := false;
-    DirListB.Enabled           := false;
-    DirListB.Visible           := false;
+    Edit2SourcePath.Color         := clWhite;
+    Edit2SourcePath.Text          := 'Enter source UNC path (e.g. \\DCSERVER\DATA-1)';
+    Edit2SourcePath.Visible       := true;
+    Edit2SourcePath.ReadOnly      := false;
+    Edit3DestinationPath.Color    := clWhite;
+
+    Edit3DestinationPath.Text     := 'Enter destination UNC path (e.g \\FILESERVER\DATA-2';;
+    Edit3DestinationPath.Visible  :=true;
+    Edit3DestinationPath.ReadOnly := false;
+
+    Button8CopyAndHash.Enabled    := true;
+    DirListA.Enabled              := false;
+    DirListA.Visible              := false;
+    DirListB.Enabled              := false;
+    DirListB.Visible              := false;
     end
   else
     begin
-      Edit2SourcePath.Color      := clSilver;
-      Edit3DestinationPath.Color := clSilver;
-      Edit2SourcePath.Text       := 'Select source directory below ';
-      Edit3DestinationPath.Text  := 'Select destitnation directory below ';
-      Button8CopyAndHash.Enabled := false;
-      DirListA.Enabled           := true;
-      DirListA.Visible           := true;
-      DirListB.Enabled           := true;
-      DirListB.Visible           := true;
+      Edit2SourcePath.Color         := clSilver;
+      Edit2SourcePath.ReadOnly      := true;
+      Edit2SourcePath.Text          := 'Select source directory below ';
+
+      Edit3DestinationPath.Color    := clSilver;
+      Edit3DestinationPath.Text     := 'Select destitnation directory below ';
+      Edit3DestinationPath.ReadOnly := true;
+
+      Button8CopyAndHash.Enabled    := false;
+      DirListA.Enabled              := true;
+      DirListA.Visible              := true;
+      DirListB.Enabled              := true;
+      DirListB.Visible              := true;
     end;
 end;
 
@@ -4671,12 +4671,16 @@ end;
 
 procedure TMainForm.Edit2SourcePathEnter(Sender: TObject);
 begin
-  Edit2SourcePath.Text:= '';
+  if chkUNCMode.Checked then
+    Edit2SourcePath.Text:= ''
+  else Edit2SourcePath.Text:= 'Select source directory below';
 end;
 
 procedure TMainForm.Edit3DestinationPathEnter(Sender: TObject);
 begin
-  Edit3DestinationPath.Text:= '';
+  if chkUNCMode.Checked then
+    Edit3DestinationPath.Text:= ''
+  else Edit3DestinationPath.Text:= 'Select destination directory below';
 end;
 
 function TMainForm.FormatByteSize(const bytes: QWord): string;
