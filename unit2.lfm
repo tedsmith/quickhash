@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 353
+  Left = 342
   Height = 714
-  Top = 107
+  Top = 73
   Width = 1018
   AllowDropFiles = True
   Caption = 'QuickHash v2.8.3 - The easy and convenient way to hash data in Linux, OSX and Windows'

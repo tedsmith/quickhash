@@ -15,6 +15,7 @@ uses
 {$R *.res}
 
 begin
+  Application.Title:='QuickHash';
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);

@@ -2691,6 +2691,7 @@ begin
   lblTimeTaken6C.Caption           := '...';
   pbCopy.Position                  := 0;
   LoopCounter                      := 0;
+  Button8CopyAndHash.Enabled       := false; // disable the go button until finished
   Application.ProcessMessages;
 
   // First, wait for the scheduler time to arrive, if set by the user
@@ -2699,6 +2700,7 @@ begin
       if ZVDateTimePickerCopyTab.DateTime < Now then
       begin
         ShowMessage('Scheduled start time is in the past. Correct it.');
+        Button8CopyAndHash.Enabled       := true;
         exit;
       end
       else
@@ -2736,6 +2738,7 @@ begin
           end
           else
             begin
+              Button8CopyAndHash.Enabled       := false;
               {$ifdef Windows}
               // If chosen source path is a UNC path, we need to append the UNC prefix to the
               // Unicode 32K long API call of \\?\
@@ -2777,6 +2780,7 @@ begin
           // give ProcessDir function the first folder name in the list for now...
           // ProcessDir will then do the itterations itself using the same stringlist
           SourceDir := slMultipleDirNames.Strings[0];
+          Button8CopyAndHash.Enabled       := false;
           // Now process the chosen folders
           ProcessDir(SourceDir);
         end
