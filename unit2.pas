@@ -874,7 +874,7 @@ begin
       end
       else
         begin
-         strHashValueText := Trim(Uppercase(CalcTheHashString(memoHashText.Text)));
+         strHashValueText := Uppercase(Trim(CalcTheHashString(memoHashText.Text)));
          StrHashValue.Caption := strHashValueText;
          if (lbleExpectedHash.Text = '') then exit
          else
@@ -953,23 +953,13 @@ begin
 
     stop := Now;
     elapsed := stop - start;
-    lbEndedFileAt.Caption    := 'Ended at   : '+ DateTimeToStr(stop);
-    lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
+    lbEndedFileAt.Caption    := 'Ended at   : ' + FormatDateTime('DD/MM/YYYY HH:MM:SS', stop);
+    lblFileTimeTaken.Caption := 'Time taken : ' + FormatDateTime('HH:MM:SS', elapsed);
     Application.ProcessMessages;
 
-    // If the user has ane existing hash to check, compare it here
-    if (lbleExpectedHash.Text = '') then exit
-    else
-      if (lbleExpectedHash.Text = '...') then exit
-      else
-        if fileHashValue = Trim(Uppercase(lbleExpectedHashText.Text)) then
-          begin
-            Showmessage('Expected hash matches the generated text hash, OK');
-          end
-        else
-          begin
-            Showmessage('Expected hash DOES NOT match the generated text hash!');
-          end;
+    // If the user has ane existing hash to check in expected hash value field,
+    // compare it here
+    lbleExpectedHashChange(Sender);
   end
   else
     ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
@@ -1152,7 +1142,7 @@ begin
       exit
      else if (Length(trim(lbleExpectedHash.Text)) = 32) or (Length(trim(lbleExpectedHash.Text)) = 40)
           or (Length(trim(lbleExpectedHash.Text)) = 64) or (Length(trim(lbleExpectedHash.Text)) = 128)
-          or (Length(trim(lbleExpectedHash.Text)) = 7) then
+          or (Length(trim(lbleExpectedHash.Text)) = 8) then
      begin
        if Uppercase(memFileHashField.Lines[0]) = Trim(Uppercase(lbleExpectedHash.Text)) then
          begin
@@ -3080,10 +3070,8 @@ end;
 function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 var
   TabRadioGroup1: TRadioGroup;
-  _strToBeHashed: UnicodeString;
 begin
   TabRadioGroup1 := AlgorithmChoiceRadioBox1;
-  _strToBeHashed := PWideChar(strToBeHashed);
   result := '';
   if Length(strToBeHashed) > 0 then
     begin
@@ -3097,22 +3085,22 @@ begin
 
       case TabRadioGroup1.ItemIndex of
         0: begin
-             result := THashFactory.TCrypto.CreateMD5().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateMD5().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
         1: begin
-             result := THashFactory.TCrypto.CreateSHA1().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA1().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
         2: begin
-             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
         3: begin
-             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
         4: begin
            {$ifdef CPU64}
-            result := THashFactory.THash64.CreateXXHash64().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
+            result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            {$else if CPU32}
-            result := THashFactory.THash32.CreateXXHash32().ComputeString(_strToBeHashed, TEncoding.UTF8).ToString();
+            result := THashFactory.THash32.CreateXXHash32().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            {$endif}
            end;
       end;

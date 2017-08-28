@@ -1,6 +1,13 @@
 Version History
 ===============
 
+V2.8.4
+------
+The "Expected Hash Value" field had been broke a little in the 2.8.3 release meaning that when the user first pasted a value, it would report a mis-match even when it matched. But if the user re-pasted the value, it would match as intended (https://quickhash-gui.org/bugs/expected-hash-value-report-wrongly-on-single-file-hashing/). That fault was fixed. 
+The "Expected Hash Value" was comparing only 7 characters instead of 8 for xxHash. That was fixed. 
+The date and time formatting that was reported as fixed in v2.8.3 was not as fixed as it should be, and also was not included in the Linux version as it should have been.
+The "Text" field had been accidentally adjusted to use pointers to widestrings. The commit was accepted without realisng the impact. So 'hello' was not being hashed but it's Unicode widestring version was being hashed. That was fixed and reverted to it's previous settings. 
+
 v2.8.3
 ------
 

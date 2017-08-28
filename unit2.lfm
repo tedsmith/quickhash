@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 73
   Width = 1018
   AllowDropFiles = True
-  Caption = 'QuickHash v2.8.3 - The easy and convenient way to hash data in Linux, OSX and Windows'
+  Caption = 'QuickHash v2.8.4 - The easy and convenient way to hash data in Linux, OSX and Windows'
   ClientHeight = 695
   ClientWidth = 1018
   Menu = MainMenu1
@@ -18,11 +18,11 @@ object MainForm: TMainForm
     Height = 657
     Top = 24
     Width = 986
-    ActivePage = TabSheet4
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -314,6 +314,7 @@ object MainForm: TMainForm
             'Computed hash will appear here...'
           )
           TabOrder = 3
+          WordWrap = False
         end
         object lbleExpectedHash: TLabeledEdit
           Left = 6
