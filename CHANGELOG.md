@@ -1,6 +1,13 @@
 Version History
 ===============
 
+v3.0.0
+Now with SQLite!! The reason why the development numbering has moved to v3.0...the first whole number release since v2.0 in 2013, is due to the move to SQLIte. This has been a massive re-write and a total overhaul of large parts of the program. 
+SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and 
+copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
+
+The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed.  
+
 V2.8.4
 ------
 The "Expected Hash Value" field had been broke a little in the 2.8.3 release meaning that when the user first pasted a value, it would report a mis-match even when it matched. But if the user re-pasted the value, it would match as intended (https://quickhash-gui.org/bugs/expected-hash-value-report-wrongly-on-single-file-hashing/). That fault was fixed. 

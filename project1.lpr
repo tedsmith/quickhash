@@ -7,8 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit2, FindAllFilesEnhanced, diskmodule, uDisplayGrid,
-  diskspecification, uProgress, frmAboutUnit, zvdatetimectrls;
+  Forms, lazdbexport, Unit2, FindAllFilesEnhanced, diskmodule, uDisplayGrid,
+  diskspecification, uProgress, frmAboutUnit, zvdatetimectrls, dbases_sqlite;
 
 //{$IFDEF WINDOWS}{$R project1.rc}{$ENDIF}
 
@@ -34,6 +34,7 @@ begin
   {$ENDIF}
   {$ENDIF}
   Application.CreateForm(TfrmAbout, frmAbout);
+  Application.CreateForm(TfrmSQLiteDBases, frmSQLiteDBases);
   Application.Run;
 end.
 

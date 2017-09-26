@@ -73,8 +73,9 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
 
     Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
     Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
-    LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls, XMLPropStorage,
-    uDisplayGrid, diskmodule, clipbrd, ZVDateTimePicker, frmAboutUnit, base64,
+    LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
+    XMLPropStorage, uDisplayGrid, diskmodule, clipbrd, DBGrids, DbCtrls,
+    ZVDateTimePicker, frmAboutUnit, base64,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -82,6 +83,9 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
   HlpHashFactory,
   HlpIHash,
   HlpIHashResult,
+
+  // New as of v3.0.0
+  dbases_sqlite,
 
 
   // Remaining Uses clauses for specific OS's
@@ -147,10 +151,24 @@ type
     btnB64FileChooser: TButton;
     btnB64FileSChooser: TButton;
     btnB64JustDecodeFiles: TButton;
+    Button1: TButton;
     Button8CopyAndHash: TButton;
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
     b64ProgressFileS: TEdit;
+    FileSDBNavigator: TDBNavigator;
+    RecursiveDisplayGrid1: TDBGrid;
+    MenuItem_CopyFilepathOfSelectedCell: TMenuItem;
+    MenuItem_CopyHashOfSelectedCell: TMenuItem;
+    MenuItem_CopyFileNameOfSelectedCell: TMenuItem;
+    MenuItem_CopySelectedRow: TMenuItem;
+    MenuItem_SortByFilePath: TMenuItem;
+    MenuItem_SortByFilename: TMenuItem;
+    MenuItem_SortByHash: TMenuItem;
+    MenuItem_RemoveDupFileFilter: TMenuItem;
+    MenuItem_SaveToCSV: TMenuItem;
+    MenuItem_ShowDuplicates: TMenuItem;
+    popmenuDBGrid_Files: TPopupMenu;
     lblPercentageProgressFileTab: TLabel;
     lblB64Warning: TLabel;
     lblB64DecoderWarning: TLabel;
@@ -168,7 +186,6 @@ type
     chkCopyHidden: TCheckBox;
     CheckBoxListOfDirsAndFilesOnly: TCheckBox;
     CheckBoxListOfDirsOnly: TCheckBox;
-    chkFlagDuplicates: TCheckBox;
     chkNoRecursiveCopy: TCheckBox;
     chkNoPathReconstruction: TCheckBox;
     chkRecursiveDirOverride: TCheckBox;
@@ -207,6 +224,7 @@ type
     b64FilesGridPopupMenu: TPopupMenu;
     b64SaveDialog: TSaveDialog;
     pbFile: TProgressBar;
+    FilesDBGrid_SaveCSVDialog: TSaveDialog;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     b64FileSChooserDialog: TSelectDirectoryDialog;
     b64FileSSourceDecoderDialog: TSelectDirectoryDialog;
@@ -301,7 +319,6 @@ type
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SelectDirectoryDialog2: TSelectDirectoryDialog;
     SelectDirectoryDialog3: TSelectDirectoryDialog;
-    RecursiveDisplayGrid1: TStringGrid;
     sgDirA: TStringGrid;
     sysRAMTimer: TTimer;
     TabSheet1: TTabSheet;
@@ -333,6 +350,7 @@ type
       Shift: TShiftState);
     procedure btnB64FileChooserClick(Sender: TObject);
     procedure btnB64JustDecodeFilesClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure lblDonateClick(Sender: TObject);
@@ -353,6 +371,16 @@ type
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
+    procedure MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
+    procedure MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
+    procedure MenuItem_CopyFileNameOfSelectedCellClick(Sender: TObject);
+    procedure MenuItem_CopySelectedRowClick(Sender: TObject);
+    procedure MenuItem_RemoveDupFileFilterClick(Sender: TObject);
+    procedure MenuItem_SaveToCSVClick(Sender: TObject);
+    procedure MenuItem_ShowDuplicatesClick(Sender: TObject);
+    procedure MenuItem_SortByFilenameClick(Sender: TObject);
+    procedure MenuItem_SortByFilePathClick(Sender: TObject);
+    procedure MenuItem_SortByHashClick(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure sgDirAClick(Sender: TObject);
@@ -411,6 +439,7 @@ type
     procedure EmptyDisplayGrid(Grid : TStringGrid);
     procedure CheckSchedule(DesiredStartTime : TDateTime);
     procedure InvokeScheduler(Sender : TObject);
+    procedure CommitCount(Sender : TObject);
     // function FileSizeWithLongPath(strFileName : string) : Int64;
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
@@ -436,7 +465,9 @@ type
     { private declarations }
   public
     { public declarations }
+
    FileCounter, NoOfFilesInDir2: integer; // Used jointly by Button3Click and Hashfile procedures
+   CommitFrequencyChecker : integer; // To keep track of SQLite commits
    TotalBytesRead : UInt64;
    StopScan1, StopScan2, SourceDirValid, DestDirValid : Boolean;
    SourceDir, DestDir : string; // For the joint copy and hash routines
@@ -475,7 +506,20 @@ type
 var
   MainForm: TMainForm;
 
+// Global function, CommitCount, keeps track of file counts and updates the SQLIte DB periodically
+// to avoid unnecessary database commits, which slow it down
+
 implementation
+
+procedure TMainForm.CommitCount(Sender : TObject);
+begin
+  inc(CommitFrequencyChecker, 1);
+  if CommitFrequencyChecker = 1000 then
+  begin
+    frmSQLiteDBases.SQLTransaction1.Commit;
+    CommitFrequencyChecker := 0;
+  end;
+end;
 
 {$IFDEF WINDOWS}
 // Populate interface with quick view to RAM status
@@ -483,7 +527,6 @@ function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; extern
 {$ENDIF}
 
 { TMainForm }
-
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
@@ -532,6 +575,9 @@ begin
   // (as of v2.7.0)
   sgDirA.Visible := false;
   sgDirB.Visible := false;
+
+  // The DBGrid in FileS tab to be hidden initially
+  RecursiveDisplayGrid1.Visible:= false;
 
   {$ifdef CPU64}
   AlgorithmChoiceRadioBox1.Items.Strings[4] := 'xxHash64';
@@ -585,8 +631,6 @@ begin
     Edit2SourcePath.Visible:=true;
     Edit3DestinationPath.Enabled:=true;
     Edit3DestinationPath.Visible:=true;
-
-
   {$ENDIF}
 
   {$IFDEF Windows}
@@ -648,7 +692,6 @@ begin
       Edit3DestinationPath.Text := 'Destination directory selection';
     {$ENDIF}
  {$ENDIF}
-
 end;
 
 // Checks if the desired start date and time has arrived yet by starting timer
@@ -696,7 +739,7 @@ begin
       end
     end
   // FileS Tab scheduling
-  else if PageControl1.ActivePage = TabSheet3 then
+  else if PageControl1.ActivePage = TabSheet3 then  // FileS tab
     begin
     if ZVDateTimePickerFileSTab.DateTime < Now then
       begin
@@ -913,54 +956,62 @@ begin
   memFileHashField.Clear;
 
   if LazFileUtils.FileExistsUTF8(filename) then
-  begin
-    if lblschedulertickboxFileTab.Checked then
     begin
-      if ZVDateTimePickerFileTab.DateTime < Now then
+      if FileSize(filename) > 0 then
       begin
-        ShowMessage('Scheduled start time is in the past. Correct it.');
-        exit;
+        if lblschedulertickboxFileTab.Checked then
+        begin
+          if ZVDateTimePickerFileTab.DateTime < Now then
+          begin
+            ShowMessage('Scheduled start time is in the past. Correct it.');
+            exit;
+          end
+          else
+          scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
+          StatusBar1.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+            repeat
+              // This sleep loop avoids straining the CPU too much but also ensures the
+              // interface stays responsive to button clicks etc.
+              // So every 1K itteration, refresh the interface until the scheduled start
+              // arrives or the user clicks Abort.
+              inc(LoopCounter,1);
+              if LoopCounter = 1000 then
+                begin
+                  Application.ProcessMessages;
+                  LoopCounter := 0;
+                end;
+              sleep(0);
+            until scheduleStartTime = Now;
+        end;
+
+        start := Now;
+        lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
+
+        edtFileNameToBeHashed.Caption := (filename);
+        StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
+        Application.ProcessMessages;
+        fileHashValue := CalcTheHashFile(Filename); // Custom function
+        memFileHashField.Lines.Add(UpperCase(fileHashValue));
+        StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
+
+        OpenDialog1.Close;
+
+        stop := Now;
+        elapsed := stop - start;
+        lbEndedFileAt.Caption    := 'Ended at   : ' + FormatDateTime('DD/MM/YYYY HH:MM:SS', stop);
+        lblFileTimeTaken.Caption := 'Time taken : ' + FormatDateTime('HH:MM:SS', elapsed);
+        Application.ProcessMessages;
+
+        // If the user has ane existing hash to check in expected hash value field,
+        // compare it here
+        lbleExpectedHashChange(Sender);
       end
       else
-      scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
-      StatusBar1.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
-        repeat
-          // This sleep loop avoids straining the CPU too much but also ensures the
-          // interface stays responsive to button clicks etc.
-          // So every 1K itteration, refresh the interface until the scheduled start
-          // arrives or the user clicks Abort.
-          inc(LoopCounter,1);
-          if LoopCounter = 1000 then
-            begin
-              Application.ProcessMessages;
-              LoopCounter := 0;
-            end;
-          sleep(0);
-        until scheduleStartTime = Now;
-    end;
-
-    start := Now;
-    lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
-
-    edtFileNameToBeHashed.Caption := (filename);
-    StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
-    Application.ProcessMessages;
-    fileHashValue := CalcTheHashFile(Filename); // Custom function
-    memFileHashField.Lines.Add(UpperCase(fileHashValue));
-    StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
-
-    OpenDialog1.Close;
-
-    stop := Now;
-    elapsed := stop - start;
-    lbEndedFileAt.Caption    := 'Ended at   : ' + FormatDateTime('DD/MM/YYYY HH:MM:SS', stop);
-    lblFileTimeTaken.Caption := 'Time taken : ' + FormatDateTime('HH:MM:SS', elapsed);
-    Application.ProcessMessages;
-
-    // If the user has ane existing hash to check in expected hash value field,
-    // compare it here
-    lbleExpectedHashChange(Sender);
-  end
+      begin
+       ShowMessage('File size is zero. The file cannot be hashed');
+       Abort;
+      end;
+    end
   else
     ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
   end;
@@ -1352,6 +1403,73 @@ begin
   Showmessage('Grid row data copied to clipboard OK');
 end;
 
+procedure TMainForm.MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
+begin
+  frmSQLiteDBases.CopyFilePathOfSelectedCell(RecursiveDisplayGrid1);
+end;
+
+
+procedure TMainForm.MenuItem_CopyFileNameOfSelectedCellClick(Sender: TObject);
+begin
+  frmSQLiteDBases.CopyFileNameOfSelectedCell(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_CopySelectedRowClick(Sender: TObject);
+begin
+  frmSQLiteDBases.CopySelectedRow(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
+var
+  CellOfInterest : string;
+begin
+  CellOfInterest := '';
+  frmSQLiteDBases.CopyHashOfSelectedCell(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_RemoveDupFileFilterClick(Sender: TObject);
+begin
+  frmSQLiteDBases.ShowAll(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_SaveToCSVClick(Sender: TObject);
+begin
+  FilesDBGrid_SaveCSVDialog.Title := 'Save grid results as...';
+  FilesDBGrid_SaveCSVDialog.InitialDir := GetCurrentDir;
+  FilesDBGrid_SaveCSVDialog.Filter := 'Comma Sep|*.csv';
+  FilesDBGrid_SaveCSVDialog.DefaultExt := 'csv';
+  if FilesDBGrid_SaveCSVDialog.Execute then
+  begin
+    frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid1, FilesDBGrid_SaveCSVDialog.Filename);
+  end;
+end;
+
+// New to v3.0. If the grid in FileS tab is right clicked and the user
+// chooses to filter duplicate files, refresh the view to show them
+procedure TMainForm.MenuItem_ShowDuplicatesClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.ShowDuplicates(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_SortByFilenameClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.SortByFilename(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_SortByFilePathClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.SortByFilePath(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_SortByHashClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.SortByHash(RecursiveDisplayGrid1);
+end;
+
 procedure TMainForm.cbShowDetailsOfAllComparisonsChange(Sender: TObject);
 begin
   if cbShowDetailsOfAllComparisons.Checked then
@@ -1678,6 +1796,11 @@ begin
     end;
 end;
 
+procedure TMainForm.Button1Click(Sender: TObject);
+begin
+  frmSQLiteDBases.Show;
+end;
+
 procedure TMainForm.PageControl1Change(Sender: TObject);
 begin
 
@@ -1754,7 +1877,13 @@ var
   lblTotalBytesExamined.Caption := '...';
   pbFileS.Position              := 0;
   LoopCounter                   := 0;
+  Label5.Caption                := 'This area will be populated once the scan is complete...please wait!';
 
+  // Empty database table TBL_FILES from earlier runs, otherwise entries from
+  // previous runs will be listed with this new run
+  frmSQLiteDBases.EmptyDBTable('TBL_FILES', RecursiveDisplayGrid1);
+
+  // Now get the user to choose his folder for hashing
   if SelectDirectoryDialog1.Execute then
     begin
       DirSelectedField.Caption := SelectDirectoryDialog1.FileName;
@@ -1771,7 +1900,7 @@ var
       {$endif}
 
       RecursiveDisplayGrid1.Visible := false;
-      RecursiveDisplayGrid1.rowcount := 0;
+      RecursiveDisplayGrid1.Clear;
       // If a scheduler has been set, wait for that future time to arrive
       if lblschedulertickboxFileSTab.Checked then
       begin
@@ -1814,7 +1943,7 @@ var
 
        lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
        NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
-       RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
+       //RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
        Application.ProcessMessages;
 
        // Create and assign a File Searcher instance and dictate its behaviour.
@@ -1843,14 +1972,18 @@ var
          if chkRecursiveDirOverride.Checked then
            begin
              if FileTypeMaskCheckBox2.Checked then
-               SearchMask := FileMaskField2.Text
+               begin
+                 SearchMask := FileMaskField2.Text;
+               end
                else SearchMask := '';
              FS.Search(LongPathOverride+DirToHash, SearchMask, False, False);
            end
          else
            begin
              if FileTypeMaskCheckBox2.Checked then
-               SearchMask := FileMaskField2.Text
+               begin
+               SearchMask := FileMaskField2.Text;
+               end
                else SearchMask := '';
              FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
            end;
@@ -1860,32 +1993,12 @@ var
          TotalFilesToExamine.Free;
        end;
 
-       {  Now that the data is all computed, display the grid in the GUI.
-          We have this hidden during processing for speed purposes.
-          In a test, 3K files took 3 minutes with the grid display refreshed for each file.
-          With the grid hidden until this point though, the same files took just 12 seconds! }
-
+       // Now that the data is all computed, display the grid in the GUI.
+       // Update the SQLite database with any remaining commits and display
+       // content in DBGrid
+       frmSQLiteDBases.SQLTransaction1.Commit;
+       frmSQLiteDBases.UpdateGridFILES(nil);
        RecursiveDisplayGrid1.Visible := true;
-
-       // Now traverse the grid for duplicate hash entries, if the user wishes to
-
-       if chkFlagDuplicates.Checked then
-       try
-         slDuplicates := TStringList.Create;
-         slDuplicates.Sorted := true;
-         RecursiveDisplayGrid1.SortOrder := soAscending;
-         RecursiveDisplayGrid1.SortColRow(true, 3, RecursiveDisplayGrid1.FixedRows, RecursiveDisplayGrid1.RowCount - 1);
-         for i := 1 to RecursiveDisplayGrid1.RowCount -1 do
-           begin
-             if RecursiveDisplayGrid1.Cells[3, i] = RecursiveDisplayGrid1.Cells[3, i-1] then
-               begin
-                RecursiveDisplayGrid1.Cells[5, i] := 'Yes, of file ' + RecursiveDisplayGrid1.Cells[1,i-1];
-                slDuplicates.Add(RecursiveDisplayGrid1.Cells[2,i-1] + RecursiveDisplayGrid1.Cells[1, i-1]);
-               end;
-           end;
-       finally
-         slDuplicates.Sort;
-       end;
 
        // and conclude timings and update display
        stop := Now;
@@ -1907,12 +2020,12 @@ var
            SaveDialog1.DefaultExt := 'csv';
            if SaveDialog1.Execute then
              begin
-              SaveOutputAsCSV(SaveDialog1.FileName, RecursiveDisplayGrid1);
+               frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid1, SaveDialog1.FileName);
              end;
          end;
 
        // And\Or, output the complete StringGrid to a HTML file
-
+       {
        if SaveToHTMLCheckBox1.Checked then
          begin
          SaveDialog2.Title := 'Save your HTML log file as...';
@@ -1955,11 +2068,11 @@ var
                HTMLLogFile1 := '';
              end;
            end;
-         end;
+         end; }
     end; // end of SelectDirectoryDialog1.Execute
 
     // Now see if the user wishes to delete any found duplicates
-    if chkFlagDuplicates.Checked then
+    {if chkFlagDuplicates.Checked then
       begin
         if slDuplicates.Count > 0 then
           if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
@@ -1977,7 +2090,7 @@ var
                 ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
               end;
       if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
-      end; // end of duplicate deletion phase
+      end; // end of duplicate deletion phase      }
 end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
@@ -2082,14 +2195,10 @@ begin
     end; // End of Savedialog6.Execute for HTML
 end;
 
-
+// The clipboard button on the 'FileS' tab, this will copy the DBGrid to clipboard
 procedure TMainForm.btnClipboardResultsClick(Sender: TObject);
 begin
-  try
-    RecursiveDisplayGrid1.CopyToClipboard();
-  finally
-    ShowMessage('Grid content now in clipboard...Paste (Ctrl+V) into spreadsheet or text editor')
-  end
+  frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid1);
 end;
 
 procedure TMainForm.btnStopScan1Click(Sender: TObject);
@@ -2097,6 +2206,7 @@ begin
   StopScan1 := TRUE;
   if StopScan1 = TRUE then
   begin
+    Label5.Caption := 'Populating display with database values...please wait';
     Abort;
   end;
 end;
@@ -2671,7 +2781,7 @@ var
   scheduleStartTime : TDateTime;
   LoopCounter       : Integer;
 begin
-  frmDisplayGrid1.CopyAndHashGrid.Visible := false; // Hide the grid if it was left visible from an earlier run
+  frmDisplayGrid1.RecursiveDisplayGrid_COPY.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
   lblNoOfFilesToExamine2.Caption   := '';
   lblFilesCopiedPercentage.Caption := '';
@@ -2682,6 +2792,11 @@ begin
   pbCopy.Position                  := 0;
   LoopCounter                      := 0;
   Button8CopyAndHash.Enabled       := false; // disable the go button until finished
+
+  // Empty database table TBL_COPY from any earlier runs, otherwise entries from
+  // previous runs will be listed with this new run
+  frmSQLiteDBases.EmptyDBTable('TBL_COPY', frmDisplayGrid1.RecursiveDisplayGrid_COPY);
+
   Application.ProcessMessages;
 
   // First, wait for the scheduler time to arrive, if set by the user
@@ -3584,51 +3699,37 @@ begin
   SizeOfFile    := 0;
   fileHashValue := '';
 
-  if StopScan1 = FALSE then    // If Stop button clicked, cancel scan
+  if StopScan1 = FALSE then    // If Stop button NOT clicked, work
     begin
+      NameOfFileToHashFull := FileIterator.FileName;
+      PathOnly   := FileIterator.Path;
+      NameOnly   := ExtractFileName(FileIterator.FileName);
+      SizeOfFile := FileIterator.FileInfo.Size;
 
-    NameOfFileToHashFull := FileIterator.FileName;
-    PathOnly   := FileIterator.Path;
-    NameOnly   := ExtractFileName(FileIterator.FileName);
-    SizeOfFile := FileIterator.FileInfo.Size;
-
-    // This function is called by all three tabs seperately but I dont know how
-    // to tell it to update the progress bar of its calling tab, so all three
-    // updated for now.
-
-    StatusBar1.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
-    StatusBar2.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
-    StatusBar3.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
+      if PageControl1.ActivePage = TabSheet2 then  // File tab
+        begin
+          StatusBar1.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
+        end else
+      if PageControl1.ActivePage = TabSheet3 then  // FileS tab
+        begin
+          StatusBar2.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
+        end else
+      if PageControl1.ActivePage = TabSheet4 then  // Copy tab
+        begin
+          StatusBar3.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
+        end;
 
     // Now generate the hash value using a custom function and convert the result to uppercase
 
     FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
-
-    // Now lets update the stringgrid and text fields
-
-    // StringGrid Elements:
-    // Col 0 is FileCounter. Col 1 is File Name. Col 2 is Hash. Col 3 is filesize as a string
-
-    RecursiveDisplayGrid1.Cells[0,FileCounter] := IntToStr(FileCounter);
-    RecursiveDisplayGrid1.Cells[1,FileCounter] := NameOnly;
     {$IFDEF Windows}
-      RecursiveDisplayGrid1.Cells[2,FileCounter] := RemoveLongPathOverrideChars(PathOnly, LongPathOverride);
+      PathOnly := RemoveLongPathOverrideChars(PathOnly, LongPathOverride); // Remove the \\?\ for display purposes
     {$ENDIF}
-      {$IFDEF Darwin}
-        RecursiveDisplayGrid1.Cells[2,FileCounter] := PathOnly;
-      {$else}
-        {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
-           RecursiveDisplayGrid1.Cells[2,FileCounter] := PathOnly;
-        {$ENDIF}
-      {$ENDIF}
-    RecursiveDisplayGrid1.Cells[3,FileCounter] := FileHashValue;
-    RecursiveDisplayGrid1.Cells[4,FileCounter] := IntToStr(SizeOfFile) + ' bytes ' + '(' + FormatByteSize(SizeOfFile) + ')';
 
-    // Dynamically scroll the list so the user always has the most recently hashed
-    // file insight
-
-    RecursiveDisplayGrid1.row := FileCounter;
-
+    // Save to database
+    frmSQLiteDBases.WriteFILESValuesToDatabase(NameOnly, PathOnly, FileHashValue, FormatByteSize(SizeOfFile));
+    // Periodically commit database changes. If too often, slows it down
+    CommitCount(nil);
     // Progress Status Elements:
 
     lblFilesExamined.Caption:= IntToStr(FileCounter);
@@ -3672,7 +3773,8 @@ var
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
     FormattedSystemDate, OutputDirDateFormatted, CrDateModDateAccDate,
     CSVLogFile2, HTMLLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
-    strTimeDifference : string;
+    strTimeDifference,
+    Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute: string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
@@ -3971,58 +4073,6 @@ begin
     Application.ProcessMessages;
 
     try
-      // If the user just wants a list of the source dir, do that. Otherwise, do
-      // the copying and hashing and everything after the else
-
-      // 1st if : User wants to just generate a list of dirs & files. Date values added, too
-      if CheckBoxListOfDirsAndFilesOnly.Checked then
-        begin
-        i := 0;
-          for i := 0 to FilesFoundToCopy.Count -1 do
-            begin
-              {$IFDEF Windows}
-              CurrentFile := FilesFoundToCopy.Strings[i];
-              CrDateModDateAccDate := DateAttributesOfCurrentFile(CurrentFile);
-              {$ENDIF}
-              frmDisplayGrid1.CopyAndHashGrid.rowcount    := i + 1;
-              frmDisplayGrid1.CopyAndHashGrid.Cells[0, i] := IntToStr(i);
-              frmDisplayGrid1.CopyAndHashGrid.Cells[1, i] := FilesFoundToCopy.Strings[i];
-              frmDisplayGrid1.CopyAndHashGrid.Cells[5, i] := CrDateModDateAccDate;
-              frmDisplayGrid1.CopyAndHashGrid.row         := i;
-              frmDisplayGrid1.CopyAndHashGrid.col         := 1;
-            end;
-          {$IFDEF Windows}
-          ShowMessage('An attempt to compute file date attributes was also conducted. Scroll to the right if they are not visible.');
-          {$endif}
-          frmDisplayGrid1.btnClipboardResults2.Enabled := true;
-        end
-      else
-      // 2nd if : User wants to just generate a list of directories
-      if CheckBoxListOfDirsOnly.Checked then
-        begin
-        i := 0;
-        DirectoriesFoundList := FindAllDirectories(SourceDir, true);
-        if DirectoriesFoundList.Count = 0 then
-          ShowMessage('No subdirectories found (though files may exist). No data to display.')
-        else
-          try
-            for i := 0 to DirectoriesFoundList.Count -1 do
-              begin
-                frmDisplayGrid1.CopyAndHashGrid.rowcount    := i + 1;
-                frmDisplayGrid1.CopyAndHashGrid.Cells[0, i] := IntToStr(i);
-                frmDisplayGrid1.CopyAndHashGrid.Cells[1, i] := DirectoriesFoundList.Strings[i];
-                frmDisplayGrid1.CopyAndHashGrid.Row         := i;
-                frmDisplayGrid1.CopyAndHashGrid.col         := 1;
-              end;
-          finally
-            frmDisplayGrid1.btnClipboardResults2.Enabled := true;
-            DirectoriesFoundList.free;
-          end;
-        end
-      else
-
-      // Else: User wants to do a full copy and hash of all files, so lets begin
-
       for i := 0 to FilesFoundToCopy.Count -1 do
         begin
           // StopScan2 is set to false if the "Stop" button in 'Copy' tab is pressed
@@ -4223,70 +4273,66 @@ begin
                 begin
                   HashMismtachCount := HashMismtachCount + 1;
                   SLCopyErrors.Add('Hash mismatch. Source file ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash + ' Hash of copied file: ' + CopiedFilePathAndName + ' ' + DestinationFileHasHash);
-                  frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
-                    frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
-                    {$IFDEF WINDOWS}
-                      frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+
+                  {$IFDEF WINDOWS}
+                  Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
                     {$else}
                        {$IFDEF Darwin}
-                         frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                         Col1Filename := FilesFoundToCopy.Strings[i];
                        {$else}
                          {$IFDEF UNIX and !$ifdef Darwin}
-                           frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
+                           Col1Filename := FilesFoundToCopy.Strings[i];
                          {$ENDIF}
                        {$ENDIF}
                     {$ENDIF}
-                    frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
+                   Col2SourceHash := SourceFileHasHash;
                     {$IFDEF WINDOWS}
-                    frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                   Col3CopiedFilePathAndName := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
                     {$else}
                       {$IFDEF Darwin}
-                        frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                        Col3CopiedFilePathAndName := CopiedFilePathAndName;
                       {$else}
                          {$IFDEF UNIX and !$ifdef Darwin}
-                           frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                           Col3CopiedFilePathAndName := CopiedFilePathAndName;
                          {$endif}
                       {$endif}
                     {$endif}
-                    frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
-                    frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
-                    frmDisplayGrid1.CopyAndHashGrid.row           := i + 1;
-                    frmDisplayGrid1.CopyAndHashGrid.col           := 1;
+                    Col4DestinationHash := DestinationFileHasHash;
+                    Col5DateAttribute   := CrDateModDateAccDate;
                 end
               // Else, no errors. No need to log to file but still display to user
               else if SourceFileHasHash = DestinationFileHasHash then
                 begin
-                  // With the display grid, adding one to each value ensures the first row headings do not conceal the first file
-                  frmDisplayGrid1.CopyAndHashGrid.rowcount      := i + 2; // Add a grid buffer count to allow for failed copies - avoids 'Index Out of Range' error
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[0, i+1] := IntToStr(i);
                   {$IFDEF WINDOWS}
-                    frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
-                  {$else}
-                     {$IFDEF Darwin}
-                       frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
-                     {$else}
-                       {$IFDEF UNIX and !$ifdef Darwin}
-                         frmDisplayGrid1.CopyAndHashGrid.Cells[1, i+1] := FilesFoundToCopy.Strings[i];
-                       {$ENDIF}
-                     {$ENDIF}
-                  {$ENDIF}
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[2, i+1] := SourceFileHasHash;
-                  {$IFDEF WINDOWS}
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
-                  {$else}
-                    {$IFDEF Darwin}
-                      frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
+                  Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
                     {$else}
-                       {$IFDEF UNIX and !$ifdef Darwin}
-                         frmDisplayGrid1.CopyAndHashGrid.Cells[3, i+1] := CopiedFilePathAndName;
-                       {$endif}
+                       {$IFDEF Darwin}
+                         Col1Filename := FilesFoundToCopy.Strings[i];
+                       {$else}
+                         {$IFDEF UNIX and !$ifdef Darwin}
+                           Col1Filename := FilesFoundToCopy.Strings[i];
+                         {$ENDIF}
+                       {$ENDIF}
+                    {$ENDIF}
+                   Col2SourceHash := SourceFileHasHash;
+                    {$IFDEF WINDOWS}
+                   Col3CopiedFilePathAndName := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                    {$else}
+                      {$IFDEF Darwin}
+                        Col3CopiedFilePathAndName := CopiedFilePathAndName;
+                      {$else}
+                         {$IFDEF UNIX and !$ifdef Darwin}
+                           Col3CopiedFilePathAndName := CopiedFilePathAndName;
+                         {$endif}
+                      {$endif}
                     {$endif}
-                  {$endif}
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[4, i+1] := DestinationFileHasHash;
-                  frmDisplayGrid1.CopyAndHashGrid.Cells[5, i+1] := CrDateModDateAccDate;
-                  frmDisplayGrid1.CopyAndHashGrid.row           := i + 1; //NoOfFilesCopiedOK +1 ;
-                  frmDisplayGrid1.CopyAndHashGrid.col           := 1;
+                    Col4DestinationHash := DestinationFileHasHash;
+                    Col5DateAttribute   := CrDateModDateAccDate;
                 end;
+
+              // Write values to database
+              frmSQLiteDBases.WriteCOPYValuesToDatabase(Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute);
+              CommitCount(nil);
 
               // Progress Status Elements:
               lblNoOfFilesToExamine.Caption := strNoOfFilesToExamine;
@@ -4317,10 +4363,14 @@ begin
             end;
         end;   // End of the 'for Count' of Memo StringList loop
 
+      // Commit any final database values that may not have yet been comitted
+      frmSQLiteDBases.SQLTransaction1.Commit;
+      frmSQLiteDBases.UpdateGridCOPYTAB(nil);
+
       // Now we can show the grid. Having it display for every file as it processes
       // wastes time and isn't especially necessary given the other progress indicators
 
-      frmDisplayGrid1.CopyAndHashGrid.Visible := true;
+      frmDisplayGrid1.RecursiveDisplayGrid_COPY.Visible := true;
       frmDisplayGrid1.Show;
       EndTime := Now;
       lblTimeTaken6B.Caption  := FormatDateTime('dd/mm/yy hh:mm:ss', EndTime);
@@ -4340,10 +4390,10 @@ begin
         if SaveDialog3.Execute then
           begin
             CSVLogFile2 := SaveDialog3.FileName;
-            SaveOutputAsCSV(CSVLogFile2, frmDisplayGrid1.CopyAndHashGrid);
+            frmSQLiteDBases.SaveDBToCSV(frmDisplayGrid1.RecursiveDisplayGrid_COPY, CSVLogFile2);
           end;
       end;
-
+      {
       if SaveToHTMLCheckBox2.Checked then
         begin
           i := 0;
@@ -4390,7 +4440,7 @@ begin
                end;
            end;
         end;
-
+      }
       // If there is one or more errors, save them to a log file of users choosing
       if Length(SLCopyErrors.Text) > 0 then
        begin
