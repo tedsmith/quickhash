@@ -1,0 +1,28 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TfrmSQLiteDBases','FORMDATA',[
+  'TPF0'#16'TfrmSQLiteDBases'#15'frmSQLiteDBases'#4'Left'#3#229#3#6'Height'#3
+  +#250#1#3'Top'#3#159#0#5'Width'#3#252#0#7'Caption'#6#15'frmSQLiteDBases'#12'C'
+  +'lientHeight'#3#250#1#11'ClientWidth'#3#252#0#7'OnClose'#7#9'FormClose'#8'On'
+  +'Create'#7#10'FormCreate'#10'LCLVersion'#6#7'1.6.4.0'#7'Visible'#9#0#6'TLabe'
+  +'l'#19'lblConnectionStatus'#4'Left'#2' '#6'Height'#2#13#3'Top'#2' '#5'Width'
+  +#2'H'#7'Caption'#6#13'Not Connected'#11'ParentColor'#8#0#0#11'TDataSource'#11
+  +'DataSource1'#7'DataSet'#7#9'SQLQuery1'#4'left'#2'0'#3'top'#3#144#0#0#0#9'TS'
+  +'QLQuery'#9'SQLQuery1'#9'FieldDefs'#14#0#8'Database'#7#18'SQLite3Connection1'
+  +#11'Transaction'#7#15'SQLTransaction1'#7'Options'#11#0#6'Params'#14#0#4'left'
+  +#2'0'#3'top'#2'P'#0#0#15'TSQLTransaction'#15'SQLTransaction1'#6'Active'#8#8
+  +'Database'#7#18'SQLite3Connection1'#7'Options'#11#0#4'left'#2'0'#3'top'#3#224
+  +#0#0#0#18'TSQLite3Connection'#18'SQLite3Connection1'#9'Connected'#8#11'Login'
+  +'Prompt'#8#14'KeepConnection'#8#11'Transaction'#7#15'SQLTransaction1'#7'Opti'
+  +'ons'#11#0#4'left'#2'0'#3'top'#3'('#1#0#0#12'TCSVExporter'#12'CSVExporter1'
+  +#12'ExportFields'#14#0#15'RestorePosition'#8#31'FormatSettings.DecimalSepara'
+  +'tor'#6#1#0#29'FormatSettings.CurrencyDigits'#2#0#29'FormatSettings.FieldDel'
+  +'imiter'#6#1',$FormatSettings.IgnoreOuterWhitespace'#8#27'FormatSettings.Row'
+  +'Delimiter'#6#2#13#10#24'FormatSettings.QuoteChar'#6#1'"'#4'left'#2'0'#3'top'
+  +#3'x'#1#0#0#11'TDataSource'#11'DataSource2'#7'DataSet'#7#9'SQLQuery2'#4'left'
+  +#3#139#0#3'top'#3#144#0#0#0#9'TSQLQuery'#9'SQLQuery2'#9'FieldDefs'#14#0#8'Da'
+  +'tabase'#7#18'SQLite3Connection1'#11'Transaction'#7#15'SQLTransaction1'#7'Op'
+  +'tions'#11#0#6'Params'#14#0#4'left'#3#139#0#3'top'#2'P'#0#0#15'TSQLTransacti'
+  +'on'#15'SQLTransaction2'#6'Active'#8#8'Database'#7#18'SQLite3Connection1'#7
+  +'Options'#11#0#4'left'#3#136#0#3'top'#3#224#0#0#0#0
+]);
