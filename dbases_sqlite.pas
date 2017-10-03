@@ -27,26 +27,27 @@ type
     procedure CreateDatabase(DBaseName : string);
     procedure WriteFILESValuesToDatabase(Filename, Filepath, HashValue, FileSize : string);
     procedure WriteCOPYValuesToDatabase(Col1, Col2, Col3, Col4, Col5 : string);
-    procedure EmptyDBTable(TableName : string; DBGridName : TDBGrid);
+    procedure EmptyDBTable(TableName : string; DBGrid : TDBGrid);
     procedure UpdateGridFILES(Sender: TObject);
     procedure UpdateGridCOPYTAB(Sender: TObject);
-    procedure SaveDBToCSV(DBGridName : TDBGrid; Filename : string);
-    procedure DatasetToClipBoard(const aDataset:TDBGrid);
-    procedure ShowDuplicates(DataSource : TDBGrid);
-    procedure SortByFileName(DataSource : TDBGrid);
-    procedure SortByFilePath(DataSource : TDBGrid);
-    procedure SortByHash(DataSource : TDBGrid);
-    procedure ShowAll(DataSource : TDBGrid);
-    procedure ShowAllCOPYGRID(DataSource : TDBGrid);
-    procedure CopyFileNameOfSelectedCell(DBData : TDBGrid);
-    procedure CopyFilePathOfSelectedCell(DBData : TDBGrid);
-    procedure CopyHashOfSelectedCell(DBData : TDBGrid);
-    procedure CopySelectedRow(DBData : TDBGrid);
-    procedure SortBySourceFilename(DataSource : TDBGrid);
-    procedure SortByDestinationFilename(DataSource : TDBGrid);
-    procedure SortBySourceHash(DataSource : TDBGrid);
-    procedure SortByDestinationHash(DataSource : TDBGrid);
-    function GetTableRowCount(TableName : string; DataSource : TDBGrid) : integer; // If there's more than 2 billion entries, then someone is getting their mileage out of Quickhash!!!
+    procedure SaveDBToCSV(DBGrid : TDBGrid; Filename : string);
+    procedure DatasetToClipBoard(DBGrid : TDBGrid);
+    procedure ShowDuplicates(DBGrid : TDBGrid);
+    procedure SortByFileName(DBGrid : TDBGrid);
+    procedure SortByFilePath(DBGrid : TDBGrid);
+    procedure SortByHash(DBGrid : TDBGrid);
+    procedure ShowAll(DBGrid : TDBGrid);
+    procedure ShowAllCOPYGRID(DBGrid : TDBGrid);
+    procedure CopyFileNameOfSelectedCell(DBGrid : TDBGrid);
+    procedure CopyFilePathOfSelectedCell(DBGrid : TDBGrid);
+    procedure CopyHashOfSelectedCell(DBGrid : TDBGrid);
+    procedure CopySelectedRowFILESTAB(DBGrid : TDBGrid);
+    procedure CopySelectedRowCOPYTAB(DBGrid : TDBGrid);
+    procedure SortBySourceFilename(DBGrid : TDBGrid);
+    procedure SortByDestinationFilename(DBGrid : TDBGrid);
+    procedure SortBySourceHash(DBGrid : TDBGrid);
+    procedure SortByDestinationHash(DBGrid : TDBGrid);
+    function GetTableRowCount(TableName : string; DBGrid : TDBGrid) : integer; // If there's more than 2 billion entries, then someone is getting their mileage out of Quickhash!!!
   private
     { private declarations }
   public
@@ -191,23 +192,43 @@ end;
 // I've spent what seems like half my life working out how to copy the entire selected
 // row of a DBGrid component without success!! So I resorted to childhood logic.
 // Anyone who knows of a better way, let me know!
-procedure TfrmSQLiteDBases.CopySelectedRow(DBData : TDBGrid);
+procedure TfrmSQLiteDBases.CopySelectedRowFILESTAB(DBGrid : TDBGrid);
 var
   FileNameCell, FilePathCell, FileHashCell, AllRowCells : string;
 begin
   // Get the data from the filename cell that the user has selected
-  FileNameCell := DBData.DataSource.DataSet.Fields[1].Value;
+  FileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
   // Get the data from the filepath cell that the user has selected
-  FilePathCell := DBData.DataSource.DataSet.Fields[2].Value;
+  FilePathCell := DBGrid.DataSource.DataSet.Fields[2].Value;
   // Get the data from the filehash cell that the user has selected
-  FileHashCell := DBData.DataSource.DataSet.Fields[3].Value;
+  FileHashCell := DBGrid.DataSource.DataSet.Fields[3].Value;
   // and just add them all together :-)
   AllRowCells := FileNameCell + ',' + FilePathCell + ',' + FileHashCell;
   Clipboard.AsText := AllRowCells;
 end;
 
+procedure TfrmSQLiteDBases.CopySelectedRowCOPYTAB(DBGrid : TDBGrid);
+var
+  AllRowCells, SourceFileNameCell, SourceHash,
+    DestinationFilenameCell, DestinationHash, DateAttr : string;
+begin
+  // Get the data from the source filename cell that the user has selected
+  SourceFileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
+  // Get the source file hash cell that the user has selected
+  SourceHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+  // Get the destination filename
+  DestinationFilenameCell := DBGrid.DataSource.DataSet.Fields[3].Value;
+  // Get the destination hash
+  DestinationHash  := DBGrid.DataSource.DataSet.Fields[4].Value;
+  // Get the date attributes
+  DateAttr         := DBGrid.DataSource.DataSet.Fields[5].Value;
+  // and just add them all together :-)
+  AllRowCells := SourceFileNameCell + ',' + SourceHash  + ',' + DestinationFilenameCell + ',' + DestinationHash + ',' + DateAttr;
+  Clipboard.AsText := AllRowCells;
+end;
+
 // Deletes a DB table from the SQLite DB
-procedure TfrmSQLiteDBases.EmptyDBTable(TableName : string; DBGridName : TDBGrid);
+procedure TfrmSQLiteDBases.EmptyDBTable(TableName : string; DBGrid : TDBGrid);
 var
   DynamicSQLQuery: TSQLQuery;
 begin
@@ -237,7 +258,7 @@ end;
 // SaveDBToCSV exports the DBGrid (DBGridName) to a CSV file (filename) for the user
 // Based on example in FPC\3.0.2\source\packages\fcl-db\tests\testdbexport.pas
 // Requires the lazdbexport package be installed in Lazarus IDE
-procedure TfrmSQLiteDBases.SaveDBToCSV(DBGridName : TDBGrid; Filename : string);
+procedure TfrmSQLiteDBases.SaveDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
   Exporter : TCSVExporter;
   ExportSettings: TCSVFormatSettings;
@@ -245,7 +266,7 @@ begin
   Exporter := TCSVExporter.Create(nil);
   ExportSettings := TCSVFormatSettings.Create(true);
   Exporter.FormatSettings := ExportSettings;
-  Exporter.Dataset := DBGridName.DataSource.DataSet;
+  Exporter.Dataset := DBGrid.DataSource.DataSet;
   Exporter.FileName := FileName;
   if Exporter.Execute > 0 then
     begin
@@ -255,7 +276,7 @@ begin
 end;
 
 // Copies a DBGrid content to a temp text file then reads it into clipboard
-procedure TfrmSQLiteDBases.DatasetToClipBoard(const aDataset:TDBGrid);
+procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
 var
   DeletedOK : boolean;
   vStringList : TStringList;
@@ -270,7 +291,7 @@ begin
       try
         ExportSettings := TCSVFormatSettings.Create(true);
         Exporter.FormatSettings := ExportSettings;
-        Exporter.Dataset := aDataset.DataSource.DataSet;
+        Exporter.Dataset := DBGrid.DataSource.DataSet;
         Exporter.FileName := FileName;
         // if the temp outfile is written successfully with DBGrid content, load it to clipboard
         if Exporter.Execute > 0 then
@@ -298,7 +319,7 @@ begin
 end;
 
 // Counts the rows of a given database table
-function TfrmSQLiteDBases.GetTableRowCount(TableName : string; DataSource : TDBGrid) : integer;
+function TfrmSQLiteDBases.GetTableRowCount(TableName : string; DBGrid : TDBGrid) : integer;
 begin
   result := 0;
   try
@@ -318,22 +339,18 @@ end;
 // ShowDuplicates lists entries with duplicate hash values from the FILES tab,
 // by searching hash column for matches and then displays all rows fully
 // for which duplicate hashes were found
-procedure TfrmSQLiteDBases.ShowDuplicates(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.ShowDuplicates(DBGrid : TDBGrid);
 // Sourced from https://stackoverflow.com/questions/46345862/sql-how-to-return-all-column-fields-for-one-column-containing-duplicates
 begin
   try
-  SQLQuery1.Close;
-  SQLQuery1.SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+  DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+  TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
                         'FROM TBL_FILES WHERE HashValue IN ' +
                         '(SELECT HashValue FROM TBL_FILES ' +
                         'GROUP BY HashValue HAVING COUNT(*) > 1) ORDER BY hashvalue';
   SQLite3Connection1.Connected := True;
   SQLTransaction1.Active := True;
-  SQLQuery1.Open;
-
-  // Allow the DBGrid to view the results of our query
-  DataSource1.DataSet := SQLQuery1;
-  MainForm.RecursiveDisplayGrid1.DataSource := DataSource1;
+  DBGrid.DataSource.Dataset.Open;
   MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
   except
     on E: EDatabaseError do
@@ -369,19 +386,15 @@ begin
 end;
 
 // Used by the FILES tab to sort entries by filename alphabetically
-procedure TfrmSQLiteDBases.SortByFileName(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.SortByFileName(DBGrid : TDBGrid);
 begin
   try
-    SQLQuery1.Close;
-    SQLQuery1.SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
                           'FROM TBL_FILES ORDER BY FileName';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    SQLQuery1.Open;
-
-    // Allow the DBGrid to view the results of our query
-    DataSource1.DataSet := SQLQuery1;
-    MainForm.RecursiveDisplayGrid1.DataSource := DataSource1;
+    DBGrid.DataSource.Dataset.Open;
     MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
     except
       on E: EDatabaseError do
@@ -393,20 +406,16 @@ end;
 
 
 // Used by FILES tab for sorting entries by file path alphabetically
-procedure TfrmSQLiteDBases.SortByFilePath(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.SortByFilePath(DBGrid : TDBGrid);
 begin
  try
-  SQLQuery1.Close;
-  SQLQuery1.SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+   DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
                         'FROM TBL_FILES ORDER BY FilePath';
-  SQLite3Connection1.Connected := True;
-  SQLTransaction1.Active := True;
-  SQLQuery1.Open;
-
-  // Allow the DBGrid to view the results of our query
-  DataSource1.DataSet := SQLQuery1;
-  MainForm.RecursiveDisplayGrid1.DataSource := DataSource1;
-  MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
+   SQLite3Connection1.Connected := True;
+   SQLTransaction1.Active := True;
+   DBGrid.DataSource.Dataset.Open;
+   MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
   except
     on E: EDatabaseError do
     begin
@@ -417,20 +426,16 @@ end;
 
 
 // Used by the FILES tab display grid to sort by hash
-procedure TfrmSQLiteDBases.SortByHash(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.SortByHash(DBGrid : TDBGrid);
 begin
  try
-  SQLQuery1.Close;
-  SQLQuery1.SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+   DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
                         'FROM TBL_FILES ORDER BY HashValue';
-  SQLite3Connection1.Connected := True;
-  SQLTransaction1.Active := True;
-  SQLQuery1.Open;
-
-  // Allow the DBGrid to view the results of our query
-  DataSource1.DataSet := SQLQuery1;
-  MainForm.RecursiveDisplayGrid1.DataSource := DataSource1;
-  MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
+   SQLite3Connection1.Connected := True;
+   SQLTransaction1.Active := True;
+   DBGrid.DataSource.Dataset.Open;
+   MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
   except
     on E: EDatabaseError do
     begin
@@ -440,19 +445,15 @@ begin
 end;
 
 // Used by the FILES tab display grid to list all again
-procedure TfrmSQLiteDBases.ShowAll(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.ShowAll(DBGrid : TDBGrid);
 begin
   try
-  SQLQuery1.Close;
-  SQLQuery1.SQL.Text := 'SELECT * FROM TBL_FILES';
-  SQLite3Connection1.Connected := True;
-  SQLTransaction1.Active := True;
-  SQLQuery1.Open;
-
-  // Allow the DBGrid to view the results of our query
-  DataSource1.DataSet := SQLQuery1;
-  MainForm.RecursiveDisplayGrid1.DataSource := DataSource1;
-  MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_FILES';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    DBGrid.DataSource.Dataset.Open;
+    MainForm.RecursiveDisplayGrid1.AutoFillColumns := true;
   except
     on E: EDatabaseError do
     begin
@@ -462,40 +463,40 @@ begin
 end;
 
 // Used by the FILES tab display grid to copy the content of Column 1 (filename) to clipboard
-procedure TfrmSQLiteDBases.CopyFilenameOfSelectedCell(DBData : TDBGrid);
+procedure TfrmSQLiteDBases.CopyFilenameOfSelectedCell(DBGrid : TDBGrid);
 var
   CellOfInterest : string;
 begin
   CellOfInterest := '';
-  if not (DBData.DataSource.DataSet.Fields[1].Value = NULL) then
+  if not (DBGrid.DataSource.DataSet.Fields[1].Value = NULL) then
   begin
-    CellOfInterest := DBData.DataSource.DataSet.Fields[1].Value;
+    CellOfInterest := DBGrid.DataSource.DataSet.Fields[1].Value;
     Clipboard.AsText := CellOfInterest;
   end;
 end;
 
 // // Used by the FILES tab display grid to copy the content of Column 2 (file path) to clipboard
-procedure TfrmSQLiteDBases.CopyFilePathOfSelectedCell(DBData : TDBGrid);
+procedure TfrmSQLiteDBases.CopyFilePathOfSelectedCell(DBGrid : TDBGrid);
 var
   CellOfInterest : string;
 begin
   CellOfInterest := '';
-  if not (DBData.DataSource.DataSet.Fields[2].Value = NULL) then
+  if not (DBGrid.DataSource.DataSet.Fields[2].Value = NULL) then
   begin
-    CellOfInterest := DBData.DataSource.DataSet.Fields[2].Value;
+    CellOfInterest := DBGrid.DataSource.DataSet.Fields[2].Value;
     Clipboard.AsText := CellOfInterest;
   end;
 end;
 
 // // Used by the FILES tab display grid to copy the content of Column 3 (Hash Value) to clipboard
-procedure TfrmSQLiteDBases.CopyHashOfSelectedCell(DBData : TDBGrid);
+procedure TfrmSQLiteDBases.CopyHashOfSelectedCell(DBGrid : TDBGrid);
 var
   CellOfInterest : string;
 begin
   CellOfInterest := '';
-  if not (DBData.DataSource.DataSet.Fields[3].Value = NULL) then
+  if not (DBGrid.DataSource.DataSet.Fields[3].Value = NULL) then
   begin
-    CellOfInterest := DBData.DataSource.DataSet.Fields[3].Value;
+    CellOfInterest := DBGrid.DataSource.DataSet.Fields[3].Value;
     Clipboard.AsText := CellOfInterest;
   end;
 end;
@@ -531,19 +532,15 @@ begin
 end;
 
 // Used by the COPY tab display grid, to sort by source filename...Col 1
-procedure TfrmSQLiteDBases.SortBySourceFilename(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.SortBySourceFilename(DBGrid : TDBGrid);
 begin
   try
-    SQLQuery2.Close;
-    SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                           'FROM TBL_COPY ORDER BY SourceFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    SQLQuery2.Open;
-
-    // Allow the DBGrid to view the results of our query
-    DataSource2.DataSet := SQLQuery2;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
+    DBGrid.DataSource.Dataset.Open;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
     except
       on E: EDatabaseError do
@@ -554,19 +551,15 @@ begin
 end;
 
 // Used by the COPY tab display grid to sort by destination filename...Col 3
-procedure TfrmSQLiteDBases.SortByDestinationFilename(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.SortByDestinationFilename(DBGrid : TDBGrid);
 begin
   try
-    SQLQuery2.Close;
-    SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
-                          'FROM TBL_COPY ORDER BY DestinationFilename';
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+                        'FROM TBL_COPY ORDER BY DestinationFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    SQLQuery2.Open;
-
-    // Allow the DBGrid to view the results of our query
-    DataSource2.DataSet := SQLQuery2;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
+    DBGrid.DataSource.Dataset.Open;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
     except
       on E: EDatabaseError do
@@ -577,20 +570,16 @@ begin
 end;
 
 // Used by the COPY tab display grid to sort by source hash, Col 2
-procedure TfrmSQLiteDBases.SortBySourceHash(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.SortBySourceHash(DBGrid : TDBGrid);
 begin
  try
-  SQLQuery2.Close;
-  SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+   DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                           'FROM TBL_COPY ORDER BY SourceHash';
-  SQLite3Connection1.Connected := True;
-  SQLTransaction1.Active := True;
-  SQLQuery2.Open;
-
-  // Allow the DBGrid to view the results of our query
-  DataSource2.DataSet := SQLQuery2;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
+   SQLite3Connection1.Connected := True;
+   SQLTransaction1.Active := True;
+   DBGrid.DataSource.Dataset.Open;
+   frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
   except
     on E: EDatabaseError do
     begin
@@ -600,20 +589,16 @@ begin
 end;
 
 // Used by the COPY tab display grid to sort by destination hash...Col 4
-procedure TfrmSQLiteDBases.SortByDestinationHash(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.SortByDestinationHash(DBGrid : TDBGrid);
 begin
  try
-  SQLQuery2.Close;
-  SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+   DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                           'FROM TBL_COPY ORDER BY DestinationHash';
-  SQLite3Connection1.Connected := True;
-  SQLTransaction1.Active := True;
-  SQLQuery2.Open;
-
-  // Allow the DBGrid to view the results of our query
-  DataSource2.DataSet := SQLQuery2;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
+   SQLite3Connection1.Connected := True;
+   SQLTransaction1.Active := True;
+   DBGrid.DataSource.Dataset.Open;
+   frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
   except
     on E: EDatabaseError do
     begin
@@ -623,19 +608,15 @@ begin
 end;
 
 // Used by the COPY grid to show all items
-procedure TfrmSQLiteDBases.ShowAllCOPYGRID(DataSource : TDBGrid);
+procedure TfrmSQLiteDBases.ShowAllCOPYGRID(DBGrid : TDBGrid);
 begin
   try
-  SQLQuery2.Close;
-  SQLQuery2.SQL.Text := 'SELECT * FROM TBL_COPY';
-  SQLite3Connection1.Connected := True;
-  SQLTransaction1.Active := True;
-  SQLQuery2.Open;
-
-  // Allow the DBGrid to view the results of our query
-  DataSource2.DataSet := SQLQuery2;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use SQLQuery1 but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COPY';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    DBGrid.DataSource.Dataset.Open;
+    frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
   except
     on E: EDatabaseError do
     begin

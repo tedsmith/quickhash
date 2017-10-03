@@ -18,8 +18,9 @@ type
   { TfrmDisplayGrid1 }
 
   TfrmDisplayGrid1 = class(TForm)
-    btnClipboardResults2: TButton;
-    DBNavigator1: TDBNavigator;
+    btnClipboardResultsCOPYTAB: TButton;
+    CopyTabDBNavigator: TDBNavigator;
+    MenuItem_CopySelectedRowCOPYGRID: TMenuItem;
     MenuItem_CopyToClipboard: TMenuItem;
     MenuItem_SaveDBToCSV: TMenuItem;
     MenuItem_ShowAllCOPYGRID: TMenuItem;
@@ -31,7 +32,9 @@ type
     frmDisplayGridPopupMenu: TPopupMenu;
     frmDisplayGridSaveDialog1: TSaveDialog;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure btnClipboardResults2Click(Sender: TObject);
+    procedure btnClipboardResultsCOPYTABClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure MenuItem_CopySelectedRowCOPYGRIDClick(Sender: TObject);
     procedure MenuItem_CopyToClipboardClick(Sender: TObject);
     procedure MenuItem_SaveDBToCSVClick(Sender: TObject);
     procedure MenuItem_ShowAllCOPYGRIDClick(Sender: TObject);
@@ -64,9 +67,19 @@ begin
   RecursiveDisplayGrid_COPY.Clear
 end;
 
-procedure TfrmDisplayGrid1.btnClipboardResults2Click(Sender: TObject);
+procedure TfrmDisplayGrid1.btnClipboardResultsCOPYTABClick(Sender: TObject);
 begin
   frmSQLiteDBases.DatasetToClipBoard(frmDisplayGrid1.RecursiveDisplayGrid_COPY);
+end;
+
+procedure TfrmDisplayGrid1.FormCreate(Sender: TObject);
+begin
+
+end;
+
+procedure TfrmDisplayGrid1.MenuItem_CopySelectedRowCOPYGRIDClick(Sender: TObject);
+begin
+  frmSQLiteDBases.CopySelectedRowCOPYTAB(RecursiveDisplayGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.MenuItem_CopyToClipboardClick(Sender: TObject);
@@ -75,7 +88,10 @@ begin
 end;
 
 procedure TfrmDisplayGrid1.MenuItem_SaveDBToCSVClick(Sender: TObject);
+var
+  ExportFilename : string;
 begin
+  ExportFilename := '';
   frmDisplayGridSaveDialog1.Title := 'Save results as...';
   frmDisplayGridSaveDialog1.InitialDir := GetCurrentDir;
   frmDisplayGridSaveDialog1.Filter := 'Comma Sep|*.csv';
@@ -83,7 +99,8 @@ begin
 
   if frmDisplayGridSaveDialog1.Execute then
   begin
-    frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid_COPY, frmDisplayGridSaveDialog1.FileName);
+    ExportFilename := frmDisplayGridSaveDialog1.FileName;
+    frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid_COPY, ExportFilename);
   end;
 end;
 

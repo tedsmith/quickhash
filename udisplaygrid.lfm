@@ -7,17 +7,18 @@ object frmDisplayGrid1: TfrmDisplayGrid1
   ClientHeight = 430
   ClientWidth = 980
   OnClose = FormClose
+  OnCreate = FormCreate
   Position = poDesktopCenter
   LCLVersion = '1.6.4.0'
-  object btnClipboardResults2: TButton
+  object btnClipboardResultsCOPYTAB: TButton
     Left = 296
     Height = 23
-    Hint = 'Click to have the display grid content copied '#10'to clipboard. You can then paste into spreadsheet'
+    Hint = 'Click to have the display grid content copied '#13#10'to clipboard. To have ENTIRE grid copied, '#13#10'ensure top left cell is selected using mouse. '#13#10'Otherwise it copies from active position in the grid. '
     Top = 378
     Width = 80
     Caption = 'Clipboard'
     Enabled = False
-    OnClick = btnClipboardResults2Click
+    OnClick = btnClipboardResultsCOPYTABClick
     TabOrder = 0
   end
   object RecursiveDisplayGrid_COPY: TDBGrid
@@ -31,7 +32,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     PopupMenu = frmDisplayGridPopupMenu
     TabOrder = 1
   end
-  object DBNavigator1: TDBNavigator
+  object CopyTabDBNavigator: TDBNavigator
     Left = 16
     Height = 25
     Top = 376
@@ -45,7 +46,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     ChildSizing.ControlsPerLine = 100
     ClientHeight = 25
     ClientWidth = 241
-    DataSource = frmSQLiteDBases.DataSource1
+    DataSource = frmSQLiteDBases.DataSource2
     Options = []
     TabOrder = 2
     VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast]
@@ -68,6 +69,10 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     object MenuItem_SortByDestinationHashCOPYGRID: TMenuItem
       Caption = 'Sort by Destination Hash'
       OnClick = MenuItem_SortByDestinationHashCOPYGRIDClick
+    end
+    object MenuItem_CopySelectedRowCOPYGRID: TMenuItem
+      Caption = 'Copy selected row'
+      OnClick = MenuItem_CopySelectedRowCOPYGRIDClick
     end
     object MenuItem_ShowAllCOPYGRID: TMenuItem
       Caption = 'Show All'

@@ -161,7 +161,7 @@ type
     MenuItem_CopyFilepathOfSelectedCell: TMenuItem;
     MenuItem_CopyHashOfSelectedCell: TMenuItem;
     MenuItem_CopyFileNameOfSelectedCell: TMenuItem;
-    MenuItem_CopySelectedRow: TMenuItem;
+    MenuItem_CopySelectedRowFILESTAB: TMenuItem;
     MenuItem_SortByFilePath: TMenuItem;
     MenuItem_SortByFilename: TMenuItem;
     MenuItem_SortByHash: TMenuItem;
@@ -375,7 +375,7 @@ type
     procedure MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopyFileNameOfSelectedCellClick(Sender: TObject);
-    procedure MenuItem_CopySelectedRowClick(Sender: TObject);
+    procedure MenuItem_CopySelectedRowFILESTABClick(Sender: TObject);
     procedure MenuItem_RemoveDupFileFilterClick(Sender: TObject);
     procedure MenuItem_SaveToCSVClick(Sender: TObject);
     procedure MenuItem_ShowDuplicatesClick(Sender: TObject);
@@ -1426,9 +1426,9 @@ begin
   frmSQLiteDBases.CopyFileNameOfSelectedCell(RecursiveDisplayGrid1);
 end;
 
-procedure TMainForm.MenuItem_CopySelectedRowClick(Sender: TObject);
+procedure TMainForm.MenuItem_CopySelectedRowFILESTABClick(Sender: TObject);
 begin
-  frmSQLiteDBases.CopySelectedRow(RecursiveDisplayGrid1);
+  frmSQLiteDBases.CopySelectedRowFILESTAB(RecursiveDisplayGrid1);
 end;
 
 procedure TMainForm.MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
@@ -4472,7 +4472,7 @@ begin
         FilesFoundToCopy.Free;
         SLCopyErrors.Free;
         StatusBar3.SimpleText := 'Finished.';
-        frmDisplayGrid1.btnClipboardResults2.Enabled := true;
+        frmDisplayGrid1.btnClipboardResultsCOPYTAB.Enabled := true;
       end;
 
     ShowMessage('Files copied : '   + IntToStr(NoOfFilesCopiedOK) + #13#10 +
