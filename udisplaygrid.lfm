@@ -27,6 +27,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     Width = 952
     Color = clWindow
     Columns = <>
+    DataSource = frmSQLiteDBases.DataSource2
     PopupMenu = frmDisplayGridPopupMenu
     TabOrder = 1
   end

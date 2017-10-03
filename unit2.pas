@@ -353,6 +353,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure lblDonateClick(Sender: TObject);
     procedure lbleExpectedHashChange(Sender: TObject);
     procedure lbleExpectedHashEnter(Sender: TObject);
@@ -506,6 +507,8 @@ type
 var
   MainForm: TMainForm;
 
+  {$R *.lfm}
+
 // Global function, CommitCount, keeps track of file counts and updates the SQLIte DB periodically
 // to avoid unnecessary database commits, which slow it down
 
@@ -516,7 +519,7 @@ begin
   inc(CommitFrequencyChecker, 1);
   if CommitFrequencyChecker = 1000 then
   begin
-    frmSQLiteDBases.SQLTransaction1.Commit;
+    frmSQLiteDBases.SQLTransaction1.CommitRetaining;
     CommitFrequencyChecker := 0;
   end;
 end;
@@ -1169,6 +1172,15 @@ begin
   if cbToggleInputDataToOutputFile.Checked then
     cbToggleInputDataToOutputFile.Caption := 'Source text EXcluded in output'
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
+end;
+
+procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  try
+    frmSQLiteDBases.SQLite3Connection1.Close(true);
+  finally
+   frmSQLiteDBases.SQLite3Connection1.Free;
+  end;
 end;
 
 procedure TMainForm.lblDonateClick(Sender: TObject);
@@ -1996,7 +2008,7 @@ var
        // Now that the data is all computed, display the grid in the GUI.
        // Update the SQLite database with any remaining commits and display
        // content in DBGrid
-       frmSQLiteDBases.SQLTransaction1.Commit;
+       frmSQLiteDBases.SQLTransaction1.CommitRetaining;
        frmSQLiteDBases.UpdateGridFILES(nil);
        RecursiveDisplayGrid1.Visible := true;
 
@@ -4364,7 +4376,7 @@ begin
         end;   // End of the 'for Count' of Memo StringList loop
 
       // Commit any final database values that may not have yet been comitted
-      frmSQLiteDBases.SQLTransaction1.Commit;
+      frmSQLiteDBases.SQLTransaction1.CommitRetaining;
       frmSQLiteDBases.UpdateGridCOPYTAB(nil);
 
       // Now we can show the grid. Having it display for every file as it processes
@@ -4833,7 +4845,6 @@ begin
 end;
 
 initialization
-  {$I unit2.lrs}
 
 end.
 

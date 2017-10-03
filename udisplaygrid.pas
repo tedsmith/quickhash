@@ -50,6 +50,8 @@ var
 
 implementation
 
+{$R *.lfm}
+
 uses
 // New as of v3.0.0
 dbases_sqlite;
@@ -117,7 +119,6 @@ end;
 
 
 initialization
-  {$I udisplaygrid.lrs}
 
 end.
 

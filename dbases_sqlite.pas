@@ -16,9 +16,11 @@ type
   TfrmSQLiteDBases = class(TForm)
     CSVExporter1: TCSVExporter;
     DataSource1: TDataSource;
+    DataSource2: TDataSource;
     lblConnectionStatus: TLabel;
     SQLite3Connection1: TSQLite3Connection;
     SQLQuery1: TSQLQuery;
+    SQLQuery2: TSQLQuery;
     SQLTransaction1: TSQLTransaction;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -60,6 +62,8 @@ var
   frmSQLiteDBases: TfrmSQLiteDBases;
 
 implementation
+
+{$R *.lfm}
 
 { TfrmSQLiteDBases }
 
@@ -175,7 +179,7 @@ begin
         SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FOLDERB_FILES_id_idx" ON "TBL_COMPAREFOLDERSB"( "id" );');
 
         // Now write to the new database
-        SQLTransaction1.Commit;
+        SQLTransaction1.CommitRetaining;
       except
         ShowMessage('Unable to create a new SQLite Database');
       end;
@@ -204,22 +208,29 @@ end;
 
 // Deletes a DB table from the SQLite DB
 procedure TfrmSQLiteDBases.EmptyDBTable(TableName : string; DBGridName : TDBGrid);
+var
+  DynamicSQLQuery: TSQLQuery;
 begin
+  DynamicSQLQuery := TSQLQuery.Create(nil);
   try
-    SQLQuery1.Close;
-    SQLQuery1.Active:=false;
-    SQLQuery1.SQL.Text := 'DELETE FROM ' + TableName;
-    if SQLite3Connection1.Connected then
-    begin
-      SQLTransaction1.Active := True;
-      SQLQuery1.ExecSQL;
-      SQLTransaction1.Commit;
+    try
+      DynamicSQLQuery.DataBase := SQLQuery1.Database;
+      DynamicSQLQuery.Transaction := SQLQuery1.Transaction;
+      DynamicSQLQuery.SQL.Text := 'DELETE FROM ' + TableName;
+      if SQLite3Connection1.Connected then
+      begin
+        SQLTransaction1.Active := True;
+        DynamicSQLQuery.ExecSQL;
+        SQLTransaction1.CommitRetaining; // Retain transaction is important here
+      end;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
     end;
-  except
-    on E: EDatabaseError do
-    begin
-      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
-    end;
+  finally
+    DynamicSQLQuery.Free;
   end;
 end;
 
@@ -291,7 +302,6 @@ function TfrmSQLiteDBases.GetTableRowCount(TableName : string; DataSource : TDBG
 begin
   result := 0;
   try
-    SQLQuery1.Close;
     SQLQuery1.SQL.Text := 'SELECT Count(*) FROM ' + TableName;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
@@ -501,17 +511,17 @@ procedure TfrmSQLiteDBases.WriteCOPYValuesToDatabase(Col1, Col2, Col3, Col4, Col
  Col5 : DateAttributes;}
 begin
   try
-    SQLQuery1.Close;
     // Insert the values into the database. We're using ParamByName which prevents SQL Injection
     // http://wiki.freepascal.org/Working_With_TSQLQuery#Parameters_in_TSQLQuery.SQL
-    SQLQuery1.SQL.Text := 'INSERT into TBL_COPY (SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes) values (:SourceFilename,:SourceHash,:DestinationFilename,:DestinationHash,:DateAttributes)';
+    SQLQuery2.Close;
+    SQLQuery2.SQL.Text := 'INSERT into TBL_COPY (SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes) values (:SourceFilename,:SourceHash,:DestinationFilename,:DestinationHash,:DateAttributes)';
     SQLTransaction1.Active := True;
-    SQLQuery1.Params.ParamByName('SourceFilename').AsString := Col1;
-    SQLQuery1.Params.ParamByName('SourceHash').AsString := Col2;
-    SQLQuery1.Params.ParamByName('DestinationFilename').AsString := Col3;
-    SQLQuery1.Params.ParamByName('DestinationHash').AsString := Col4;
-    SQLQuery1.Params.ParamByName('DateAttributes').AsString := Col5;
-    SQLQuery1.ExecSQL;
+    SQLQuery2.Params.ParamByName('SourceFilename').AsString := Col1;
+    SQLQuery2.Params.ParamByName('SourceHash').AsString := Col2;
+    SQLQuery2.Params.ParamByName('DestinationFilename').AsString := Col3;
+    SQLQuery2.Params.ParamByName('DestinationHash').AsString := Col4;
+    SQLQuery2.Params.ParamByName('DateAttributes').AsString := Col5;
+    SQLQuery2.ExecSQL;
   except
     on E: EDatabaseError do
     begin
@@ -524,16 +534,16 @@ end;
 procedure TfrmSQLiteDBases.SortBySourceFilename(DataSource : TDBGrid);
 begin
   try
-    SQLQuery1.Close;
-    SQLQuery1.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+    SQLQuery2.Close;
+    SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                           'FROM TBL_COPY ORDER BY SourceFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    SQLQuery1.Open;
+    SQLQuery2.Open;
 
     // Allow the DBGrid to view the results of our query
-    DataSource1.DataSet := SQLQuery1;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource1;
+    DataSource2.DataSet := SQLQuery2;
+    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
     except
       on E: EDatabaseError do
@@ -547,16 +557,16 @@ end;
 procedure TfrmSQLiteDBases.SortByDestinationFilename(DataSource : TDBGrid);
 begin
   try
-    SQLQuery1.Close;
-    SQLQuery1.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+    SQLQuery2.Close;
+    SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                           'FROM TBL_COPY ORDER BY DestinationFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    SQLQuery1.Open;
+    SQLQuery2.Open;
 
     // Allow the DBGrid to view the results of our query
-    DataSource1.DataSet := SQLQuery1;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource1;
+    DataSource2.DataSet := SQLQuery2;
+    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
     except
       on E: EDatabaseError do
@@ -570,16 +580,16 @@ end;
 procedure TfrmSQLiteDBases.SortBySourceHash(DataSource : TDBGrid);
 begin
  try
-  SQLQuery1.Close;
-  SQLQuery1.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+  SQLQuery2.Close;
+  SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                           'FROM TBL_COPY ORDER BY SourceHash';
   SQLite3Connection1.Connected := True;
   SQLTransaction1.Active := True;
-  SQLQuery1.Open;
+  SQLQuery2.Open;
 
   // Allow the DBGrid to view the results of our query
-  DataSource1.DataSet := SQLQuery1;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource1;
+  DataSource2.DataSet := SQLQuery2;
+  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
   frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
   except
     on E: EDatabaseError do
@@ -593,16 +603,16 @@ end;
 procedure TfrmSQLiteDBases.SortByDestinationHash(DataSource : TDBGrid);
 begin
  try
-  SQLQuery1.Close;
-  SQLQuery1.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+  SQLQuery2.Close;
+  SQLQuery2.SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                           'FROM TBL_COPY ORDER BY DestinationHash';
   SQLite3Connection1.Connected := True;
   SQLTransaction1.Active := True;
-  SQLQuery1.Open;
+  SQLQuery2.Open;
 
   // Allow the DBGrid to view the results of our query
-  DataSource1.DataSet := SQLQuery1;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource1;
+  DataSource2.DataSet := SQLQuery2;
+  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
   frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
   except
     on E: EDatabaseError do
@@ -616,15 +626,15 @@ end;
 procedure TfrmSQLiteDBases.ShowAllCOPYGRID(DataSource : TDBGrid);
 begin
   try
-  SQLQuery1.Close;
-  SQLQuery1.SQL.Text := 'SELECT * FROM TBL_COPY';
+  SQLQuery2.Close;
+  SQLQuery2.SQL.Text := 'SELECT * FROM TBL_COPY';
   SQLite3Connection1.Connected := True;
   SQLTransaction1.Active := True;
-  SQLQuery1.Open;
+  SQLQuery2.Open;
 
   // Allow the DBGrid to view the results of our query
-  DataSource1.DataSet := SQLQuery1;
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource1;
+  DataSource2.DataSet := SQLQuery2;
+  frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
   frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
   except
     on E: EDatabaseError do
@@ -663,15 +673,15 @@ end;
 procedure TfrmSQLiteDBases.UpdateGridCOPYTAB(Sender: TObject);
   begin
     try
-    SQLQuery1.Close;
-    SQLQuery1.SQL.Text := 'SELECT * FROM TBL_COPY';
+    SQLQuery2.Close;
+    SQLQuery2.SQL.Text := 'SELECT * FROM TBL_COPY';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    SQLQuery1.Open;
+    SQLQuery2.Open;
 
     // Allow the DBGrid to view the results of our query
-    DataSource1.DataSet := SQLQuery1;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource1;
+    DataSource2.DataSet := SQLQuery2;
+    frmDisplayGrid1.RecursiveDisplayGrid_COPY.DataSource := DataSource2;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.AutoFillColumns := true;
     except
     on E: EDatabaseError do
@@ -715,7 +725,6 @@ end;
 }
 
 initialization
-{$I dbases_sqlite.lrs}
 
 end.
 
