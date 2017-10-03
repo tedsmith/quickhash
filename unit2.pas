@@ -156,7 +156,9 @@ type
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
     b64ProgressFileS: TEdit;
+    cbFlipCase: TCheckBox;
     FileSDBNavigator: TDBNavigator;
+    MenuItem_CopySelectedRow: TMenuItem;
     RecursiveDisplayGrid1: TDBGrid;
     MenuItem_CopyFilepathOfSelectedCell: TMenuItem;
     MenuItem_CopyHashOfSelectedCell: TMenuItem;
@@ -351,6 +353,7 @@ type
     procedure btnB64FileChooserClick(Sender: TObject);
     procedure btnB64JustDecodeFilesClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure cbFlipCaseChange(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -1812,6 +1815,29 @@ procedure TMainForm.Button1Click(Sender: TObject);
 begin
   frmSQLiteDBases.Show;
 end;
+
+procedure TMainForm.cbFlipCaseChange(Sender: TObject);
+var
+  i : integer;
+  s : string;
+begin
+  s := StrHashValue.Text;
+  if cbFlipCase.Checked then
+  begin
+    cbFlipCase.Caption:= 'Switch case (lower mode)';
+    for i := 0 to Length(s) do
+      begin
+        if (s[i] = 'A') or (s[i] = 'B') or (s[i] = 'C') or (s[i] = 'D') or (s[i] = 'E') or (s[i] = 'F')
+        then StrHashValue.Text := LowerCase(StrHashValue.Text);
+      end
+  end
+  else
+  begin
+    cbFlipCase.Caption:= 'Switch case (upper mode)';
+    StrHashValue.Text := UpperCase(StrHashValue.Text);
+  end;
+end;
+
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
 begin

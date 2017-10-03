@@ -19,28 +19,28 @@ object MainForm: TMainForm
     Height = 681
     Top = 24
     Width = 984
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
       Caption = 'Te&xt'
-      ClientHeight = 652
+      ClientHeight = 655
       ClientWidth = 976
       OnContextPopup = TabSheet1ContextPopup
       ParentShowHint = False
       object TextHashingGroupBox: TGroupBox
         Left = 120
-        Height = 438
+        Height = 470
         Top = 10
         Width = 840
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Text Hashing'
-        ClientHeight = 417
+        ClientHeight = 449
         ClientWidth = 836
         Color = clForm
         Font.Height = -13
@@ -69,7 +69,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 56
           Hint = 'This is the hash of ALL THE TEXT in the textarea above'#13#10'For line-by-line analysis, use the button'#13#10#13#10'The hash value can be copied from here'#13#10'to clipboard (highlight and press Ctrl + C or right click ''Copy'''
-          Top = 352
+          Top = 344
           Width = 814
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
@@ -85,7 +85,7 @@ object MainForm: TMainForm
         end
         object lbleExpectedHashText: TLabeledEdit
           Left = 8
-          Height = 25
+          Height = 24
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated hash matches the computed.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3 dots only)'
           Top = 304
           Width = 815
@@ -95,8 +95,8 @@ object MainForm: TMainForm
           EditLabel.AnchorSideRight.Side = asrBottom
           EditLabel.AnchorSideBottom.Control = lbleExpectedHashText
           EditLabel.Left = 8
-          EditLabel.Height = 17
-          EditLabel.Top = 284
+          EditLabel.Height = 16
+          EditLabel.Top = 285
           EditLabel.Width = 815
           EditLabel.Caption = 'Expected Hash Value (clear, then paste value from other utility)'
           EditLabel.ParentColor = False
@@ -149,16 +149,25 @@ object MainForm: TMainForm
           end
           object cbToggleInputDataToOutputFile: TCheckBox
             Left = 352
-            Height = 21
+            Height = 20
             Hint = 'If left unticked, the source '#13#10'text including corresponding hashes '#13#10'will be output. If ticked, only the'#13#10'hashes will be output on their own.'
             Top = 13
-            Width = 194
+            Width = 190
             Caption = 'Source text included in output'
             OnChange = cbToggleInputDataToOutputFileChange
             ParentShowHint = False
             ShowHint = True
             TabOrder = 3
           end
+        end
+        object cbFlipCase: TCheckBox
+          Left = 8
+          Height = 20
+          Top = 408
+          Width = 88
+          Caption = 'Switch case'
+          OnChange = cbFlipCaseChange
+          TabOrder = 4
         end
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
@@ -208,9 +217,9 @@ object MainForm: TMainForm
         TabOrder = 2
         object lblRAM: TLabel
           Left = 8
-          Height = 17
+          Height = 16
           Top = 8
-          Width = 9
+          Width = 12
           Caption = '...'
           ParentColor = False
         end
