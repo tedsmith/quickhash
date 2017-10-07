@@ -1,29 +1,29 @@
 object frmSQLiteDBases: TfrmSQLiteDBases
-  Left = 1003
+  Left = 1213
   Height = 506
-  Top = 340
+  Top = 258
   Width = 252
   Caption = 'frmSQLiteDBases'
   ClientHeight = 506
   ClientWidth = 252
   OnClose = FormClose
   OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '1.6.4.0'
-  Visible = True
   object lblConnectionStatus: TLabel
     Left = 32
-    Height = 13
+    Height = 15
     Top = 32
-    Width = 72
+    Width = 81
     Caption = 'Not Connected'
     ParentColor = False
   end
   object DataSource1: TDataSource
-    DataSet = SQLQuery1
+    DataSet = sqlFILES
     left = 48
     top = 144
   end
-  object SQLQuery1: TSQLQuery
+  object sqlFILES: TSQLQuery
     FieldDefs = <>
     Database = SQLite3Connection1
     Transaction = SQLTransaction1
@@ -61,11 +61,11 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     top = 376
   end
   object DataSource2: TDataSource
-    DataSet = SQLQuery2
+    DataSet = sqlCOPY
     left = 160
     top = 144
   end
-  object SQLQuery2: TSQLQuery
+  object sqlCOPY: TSQLQuery
     FieldDefs = <>
     Database = SQLite3Connection1
     Transaction = SQLTransaction1

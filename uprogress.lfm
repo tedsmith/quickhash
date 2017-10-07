@@ -1,47 +1,47 @@
 object frmProgress: TfrmProgress
-  Left = 675
-  Height = 322
+  Left = 619
+  Height = 348
   Hint = 'Close this window if you wish to abort.'
-  Top = 231
+  Top = 650
   Width = 421
   Caption = 'QuickHash - Disk Hashing Module'
-  ClientHeight = 322
+  ClientHeight = 348
   ClientWidth = 421
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
-  Position = poDesktopCenter
+  Position = poScreenCenter
   ShowHint = True
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.6.4.0'
   object GroupBox1: TGroupBox
     Left = 8
     Height = 304
     Top = 8
     Width = 400
     Caption = 'Status:'
-    ClientHeight = 286
+    ClientHeight = 284
     ClientWidth = 396
     TabOrder = 0
     object lblStatus: TLabel
       Left = 8
-      Height = 13
+      Height = 15
       Top = 16
-      Width = 12
+      Width = 9
       Caption = '...'
       ParentColor = False
     end
     object lblResult: TLabel
       Left = 8
-      Height = 13
+      Height = 15
       Top = 256
-      Width = 12
+      Width = 9
       Caption = '...'
       ParentColor = False
     end
     object lblTotalBytesRead: TLabel
       Left = 8
-      Height = 13
+      Height = 15
       Top = 48
-      Width = 12
+      Width = 9
       BorderSpacing.Right = 5
       Caption = '...'
       ParentColor = False
@@ -49,10 +49,10 @@ object frmProgress: TfrmProgress
     object lblTotalBytesSource: TLabel
       AnchorSideLeft.Control = lblTotalBytesRead
       AnchorSideLeft.Side = asrBottom
-      Left = 25
-      Height = 13
+      Left = 22
+      Height = 15
       Top = 48
-      Width = 12
+      Width = 9
       Caption = '...'
       ParentColor = False
     end
@@ -68,10 +68,10 @@ object frmProgress: TfrmProgress
     object lblPercent: TLabel
       AnchorSideLeft.Control = lblTotalBytesSource
       AnchorSideLeft.Side = asrBottom
-      Left = 37
-      Height = 13
+      Left = 31
+      Height = 15
       Top = 48
-      Width = 12
+      Width = 9
       Caption = '...'
       ParentColor = False
     end
@@ -86,25 +86,25 @@ object frmProgress: TfrmProgress
     end
     object lblProgressStartTime: TLabel
       Left = 11
-      Height = 13
+      Height = 15
       Top = 88
-      Width = 50
+      Width = 52
       Caption = 'Started At'
       ParentColor = False
     end
     object lblProgressEndedAt: TLabel
       Left = 11
-      Height = 13
+      Height = 15
       Top = 120
-      Width = 44
+      Width = 48
       Caption = 'Ended At'
       ParentColor = False
     end
     object lblProgressTimeTaken: TLabel
       Left = 11
-      Height = 13
+      Height = 15
       Top = 152
-      Width = 54
+      Width = 62
       Caption = 'Time Taken'
       ParentColor = False
     end

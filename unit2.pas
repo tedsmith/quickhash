@@ -153,11 +153,14 @@ type
     btnB64JustDecodeFiles: TButton;
     Button1: TButton;
     Button8CopyAndHash: TButton;
+    cbFlipCaseFILE: TCheckBox;
     cbToggleInputDataToOutputFile: TCheckBox;
     cbShowDetailsOfAllComparisons: TCheckBox;
     b64ProgressFileS: TEdit;
-    cbFlipCase: TCheckBox;
+    cbFlipCaseTEXT: TCheckBox;
     FileSDBNavigator: TDBNavigator;
+    MenuItem_SaveFILESTabToHTML: TMenuItem;
+    MenuItem_CopyGridToClipboardFILES: TMenuItem;
     MenuItem_CopySelectedRow: TMenuItem;
     RecursiveDisplayGrid1: TDBGrid;
     MenuItem_CopyFilepathOfSelectedCell: TMenuItem;
@@ -167,7 +170,7 @@ type
     MenuItem_SortByFilePath: TMenuItem;
     MenuItem_SortByFilename: TMenuItem;
     MenuItem_SortByHash: TMenuItem;
-    MenuItem_RemoveDupFileFilter: TMenuItem;
+    MenuItem_RestoreListFILES: TMenuItem;
     MenuItem_SaveToCSV: TMenuItem;
     MenuItem_ShowDuplicates: TMenuItem;
     popmenuDBGrid_Files: TPopupMenu;
@@ -227,6 +230,7 @@ type
     b64SaveDialog: TSaveDialog;
     pbFile: TProgressBar;
     FilesDBGrid_SaveCSVDialog: TSaveDialog;
+    FilesSaveAsHTMLDialog: TSaveDialog;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     b64FileSChooserDialog: TSelectDirectoryDialog;
     b64FileSSourceDecoderDialog: TSelectDirectoryDialog;
@@ -314,10 +318,8 @@ type
     SaveDialog2: TSaveDialog;
     SaveDialog3: TSaveDialog;
     SaveDialog4: TSaveDialog;
-    SaveToCSVCheckBox1: TCheckBox;
     SaveToCSVCheckBox2: TCheckBox;
-    SaveToHTMLCheckBox1: TCheckBox;
-    SaveToHTMLCheckBox2: TCheckBox;
+    SaveFILESTabToHTMLCheckBox2: TCheckBox;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SelectDirectoryDialog2: TSelectDirectoryDialog;
     SelectDirectoryDialog3: TSelectDirectoryDialog;
@@ -353,7 +355,8 @@ type
     procedure btnB64FileChooserClick(Sender: TObject);
     procedure btnB64JustDecodeFilesClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure cbFlipCaseChange(Sender: TObject);
+    procedure cbFlipCaseFILEChange(Sender: TObject);
+    procedure cbFlipCaseTEXTChange(Sender: TObject);
     procedure cbShowDetailsOfAllComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -375,12 +378,14 @@ type
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
+    procedure MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
     procedure MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopyFileNameOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopySelectedRowFILESTABClick(Sender: TObject);
-    procedure MenuItem_RemoveDupFileFilterClick(Sender: TObject);
+    procedure MenuItem_RestoreListFILESClick(Sender: TObject);
     procedure MenuItem_SaveToCSVClick(Sender: TObject);
+    procedure MenuItem_SaveToHTMLClick(Sender: TObject);
     procedure MenuItem_ShowDuplicatesClick(Sender: TObject);
     procedure MenuItem_SortByFilenameClick(Sender: TObject);
     procedure MenuItem_SortByFilePathClick(Sender: TObject);
@@ -1418,22 +1423,32 @@ begin
   Showmessage('Grid row data copied to clipboard OK');
 end;
 
+// Copy entire FILES tab grid to clipboard
+procedure TMainForm.MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
+begin
+  frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid1);
+end;
+
+// Copy file path of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
 begin
   frmSQLiteDBases.CopyFilePathOfSelectedCell(RecursiveDisplayGrid1);
 end;
 
-
+// Copy file name of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyFileNameOfSelectedCellClick(Sender: TObject);
 begin
   frmSQLiteDBases.CopyFileNameOfSelectedCell(RecursiveDisplayGrid1);
 end;
 
+// Copy entire selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopySelectedRowFILESTABClick(Sender: TObject);
 begin
   frmSQLiteDBases.CopySelectedRowFILESTAB(RecursiveDisplayGrid1);
 end;
 
+
+// Copy hash value of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
 var
   CellOfInterest : string;
@@ -1442,7 +1457,8 @@ begin
   frmSQLiteDBases.CopyHashOfSelectedCell(RecursiveDisplayGrid1);
 end;
 
-procedure TMainForm.MenuItem_RemoveDupFileFilterClick(Sender: TObject);
+// Restore list of all values in FILES grid
+procedure TMainForm.MenuItem_RestoreListFILESClick(Sender: TObject);
 begin
   frmSQLiteDBases.ShowAll(RecursiveDisplayGrid1);
 end;
@@ -1459,8 +1475,17 @@ begin
   end;
 end;
 
-// New to v3.0. If the grid in FileS tab is right clicked and the user
-// chooses to filter duplicate files, refresh the view to show them
+// Saves the content of a grid as HTML
+procedure TMainForm.MenuItem_SaveToHTMLClick(Sender: TObject);
+begin
+  FilesSaveAsHTMLDialog.Title := 'Save grid as HTML file...';
+  FilesSaveAsHTMLDialog.InitialDir := GetCurrentDir;
+  FilesSaveAsHTMLDialog.Filter := 'HTML|*.html';
+  FilesSaveAsHTMLDialog.DefaultExt := 'html';
+  if FilesSaveAsHTMLDialog.Execute then
+  frmSQLiteDBases.SaveFILESTabToHTML(RecursiveDisplayGrid1, FilesSaveAsHTMLDialog.FileName);
+end;
+
 procedure TMainForm.MenuItem_ShowDuplicatesClick(Sender: TObject);
 begin
   RecursiveDisplayGrid1.Clear;
@@ -1816,15 +1841,37 @@ begin
   frmSQLiteDBases.Show;
 end;
 
-procedure TMainForm.cbFlipCaseChange(Sender: TObject);
+procedure TMainForm.cbFlipCaseFILEChange(Sender: TObject);
+var
+  i : integer;
+  s : string;
+begin
+  s := memFileHashField.Text;
+  if cbFlipCaseFILE.Checked then
+  begin
+    cbFlipCaseFILE.Caption:= 'Switch case (now in lower mode)?';
+    for i := 0 to Length(s) do
+      begin
+        if (s[i] = 'A') or (s[i] = 'B') or (s[i] = 'C') or (s[i] = 'D') or (s[i] = 'E') or (s[i] = 'F')
+        then memFileHashField.Text := LowerCase(memFileHashField.Text);
+      end
+  end
+  else
+    begin
+      cbFlipCaseFILE.Caption:= 'Switch case (now in UPPER mode)?';
+      memFileHashField.Text := UpperCase(memFileHashField.Text);
+    end;
+end;
+
+procedure TMainForm.cbFlipCaseTEXTChange(Sender: TObject);
 var
   i : integer;
   s : string;
 begin
   s := StrHashValue.Text;
-  if cbFlipCase.Checked then
+  if cbFlipCaseTEXT.Checked then
   begin
-    cbFlipCase.Caption:= 'Switch case (lower mode)';
+    cbFlipCaseTEXT.Caption:= 'Switch case (now in lower mode)?';
     for i := 0 to Length(s) do
       begin
         if (s[i] = 'A') or (s[i] = 'B') or (s[i] = 'C') or (s[i] = 'D') or (s[i] = 'E') or (s[i] = 'F')
@@ -1833,7 +1880,7 @@ begin
   end
   else
   begin
-    cbFlipCase.Caption:= 'Switch case (upper mode)';
+    cbFlipCaseTEXT.Caption:= 'Switch case (now in UPPER mode)?';
     StrHashValue.Text := UpperCase(StrHashValue.Text);
   end;
 end;
@@ -2044,69 +2091,6 @@ var
        lblTimeTaken4.Caption := 'Time taken : '+ FormatDateTime('HH:MM:SS', elapsed);
        StatusBar2.SimpleText := ' DONE! ';
        btnClipboardResults.Enabled := true;
-
-      // Now output the complete StringGrid to a csv text file
-
-      // FYI, RecursiveDisplayGrid1.Cols[X].savetofile('/home/ted/test.txt'); is good for columns
-      // RecursiveDisplayGrid1.Rows[X].savetofile('/home/ted/test.txt'); is good for rows
-
-       if SaveToCSVCheckBox1.Checked then
-         begin
-           SaveDialog1.Title := 'Save your CSV text log file as...';
-           SaveDialog1.InitialDir := GetCurrentDir;
-           SaveDialog1.Filter := 'Comma Sep|*.csv|Text file|*.txt';
-           SaveDialog1.DefaultExt := 'csv';
-           if SaveDialog1.Execute then
-             begin
-               frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid1, SaveDialog1.FileName);
-             end;
-         end;
-
-       // And\Or, output the complete StringGrid to a HTML file
-       {
-       if SaveToHTMLCheckBox1.Checked then
-         begin
-         SaveDialog2.Title := 'Save your HTML log file as...';
-         SaveDialog2.InitialDir := GetCurrentDir;
-         SaveDialog2.Filter := 'HTML|*.html';
-         SaveDialog2.DefaultExt := 'html';
-         if SaveDialog2.Execute then
-           begin
-             i := 0;
-             j := 0;
-             HTMLLogFile1 := SaveDialog2.FileName;
-             with TStringList.Create do
-             try
-               Add('<html>');
-               Add('<title>QuickHash HTML Output</title>');
-               Add('<body>');
-               Add('<br />');
-               Add('<p><strong>' + MainForm.Caption + '. ' + 'Log Created: ' + DateTimeToStr(Now)+'</strong></p>');
-               Add('<p><strong>File and Hash listing for: ' + DirToHash + '</strong></p>');
-               Add('<table border=1>');
-               Add('<tr>');
-               Add('<td>' + 'ID');
-               Add('<td>' + 'File Name');
-               Add('<td>' + 'File Path');
-               Add('<td>' + 'Hash');
-               Add('<td>' + 'Size');
-               for i := 0 to RecursiveDisplayGrid1.RowCount-1 do
-                 begin
-                   Add('<tr>');
-                   for j := 0 to RecursiveDisplayGrid1.ColCount-1 do
-                     Add('<td>' + RecursiveDisplayGrid1.Cells[j,i] + '</td>');
-                     add('</tr>');
-                 end;
-               Add('</table>');
-               Add('</body>');
-               Add('</html>');
-               SaveToFile(HTMLLogFile1);
-             finally
-               Free;
-               HTMLLogFile1 := '';
-             end;
-           end;
-         end; }
     end; // end of SelectDirectoryDialog1.Execute
 
     // Now see if the user wishes to delete any found duplicates
@@ -4432,7 +4416,7 @@ begin
           end;
       end;
       {
-      if SaveToHTMLCheckBox2.Checked then
+      if SaveFILESTabToHTMLCheckBox2.Checked then
         begin
           i := 0;
           j := 0;

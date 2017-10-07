@@ -1,20 +1,20 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 1071
-  Height = 430
-  Top = 354
-  Width = 980
+  Left = 648
+  Height = 687
+  Top = 513
+  Width = 903
   Caption = 'QuickHash - Copy Results'
-  ClientHeight = 430
-  ClientWidth = 980
+  ClientHeight = 687
+  ClientWidth = 903
   OnClose = FormClose
   OnCreate = FormCreate
-  Position = poDesktopCenter
+  Position = poScreenCenter
   LCLVersion = '1.6.4.0'
   object btnClipboardResultsCOPYTAB: TButton
-    Left = 296
+    Left = 280
     Height = 23
     Hint = 'Click to have the display grid content copied '#13#10'to clipboard. To have ENTIRE grid copied, '#13#10'ensure top left cell is selected using mouse. '#13#10'Otherwise it copies from active position in the grid. '
-    Top = 378
+    Top = 640
     Width = 80
     Caption = 'Clipboard'
     Enabled = False
@@ -23,19 +23,20 @@ object frmDisplayGrid1: TfrmDisplayGrid1
   end
   object RecursiveDisplayGrid_COPY: TDBGrid
     Left = 16
-    Height = 336
+    Height = 592
     Top = 24
-    Width = 952
+    Width = 864
     Color = clWindow
     Columns = <>
     DataSource = frmSQLiteDBases.DataSource2
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
     PopupMenu = frmDisplayGridPopupMenu
     TabOrder = 1
   end
   object CopyTabDBNavigator: TDBNavigator
     Left = 16
     Height = 25
-    Top = 376
+    Top = 640
     Width = 241
     BevelOuter = bvNone
     ChildSizing.EnlargeHorizontal = crsScaleChilds

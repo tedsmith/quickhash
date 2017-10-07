@@ -6,7 +6,12 @@ Now with SQLite!! The reason why the development numbering has moved to v3.0...t
 SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and 
 copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
 
-The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed.  
+The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed. 
+
+Some helpful interface hints added to the check boxes in the FileS tab,which seemed to have been left out of earlier versions
+
+Following a feature request, added a "case switcher" to the Text and File tabs. This allows the user to toggle the output hash between upper or lower case. Useful for users who need to compute hashes of hashes, instead of just hashes of some data. For users who may need to compute the hash of a hash value, the case sensitivity is 
+important obviously. Upper case is still the default output as it is easier for humans to read.   
 
 V2.8.4
 ------
