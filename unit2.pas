@@ -159,9 +159,11 @@ type
     b64ProgressFileS: TEdit;
     cbFlipCaseTEXT: TCheckBox;
     FileSDBNavigator: TDBNavigator;
+    MenuItem_DeleteDups: TMenuItem;
     MenuItem_SaveFILESTabToHTML: TMenuItem;
     MenuItem_CopyGridToClipboardFILES: TMenuItem;
     MenuItem_CopySelectedRow: TMenuItem;
+    MenuItem_SaveToHTML: TMenuItem;
     RecursiveDisplayGrid1: TDBGrid;
     MenuItem_CopyFilepathOfSelectedCell: TMenuItem;
     MenuItem_CopyHashOfSelectedCell: TMenuItem;
@@ -378,6 +380,7 @@ type
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
+    procedure MenuItem_DeleteDupsClick(Sender: TObject);
     procedure MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
     procedure MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
@@ -1423,6 +1426,15 @@ begin
   Showmessage('Grid row data copied to clipboard OK');
 end;
 
+procedure TMainForm.MenuItem_DeleteDupsClick(Sender: TObject);
+
+begin
+  // Firstly change the grid to list only the files with duplicates
+  frmSQLiteDBases.ShowDuplicates(RecursiveDisplayGrid1);
+  // Now go through and delete duplicate entries
+  frmSQLiteDBases.DeleteDuplicates(RecursiveDisplayGrid1);
+end;
+
 // Copy entire FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
 begin
@@ -1945,7 +1957,7 @@ end;
 procedure TMainForm.btnRecursiveDirectoryHashingClick(Sender: TObject);
 
 var
-  DirToHash, HTMLLogFile1, SearchMask : string;
+  DirToHash, SearchMask : string;
   FS                                              : TFileSearcher;
   TotalFilesToExamine, slDuplicates               : TStringList;
   start, stop, elapsed, scheduleStartTime         : TDateTime;
@@ -2092,27 +2104,6 @@ var
        StatusBar2.SimpleText := ' DONE! ';
        btnClipboardResults.Enabled := true;
     end; // end of SelectDirectoryDialog1.Execute
-
-    // Now see if the user wishes to delete any found duplicates
-    {if chkFlagDuplicates.Checked then
-      begin
-        if slDuplicates.Count > 0 then
-          if MessageDlg(IntToStr(slDuplicates.Count) + ' duplicate files were found. Delete them now?', mtConfirmation,
-            [mbCancel, mbNo, mbYes],0) = mrYes then
-              begin
-                for i := 0 to (slDuplicates.Count -1) do
-                  begin
-                    StatusBar2.SimpleText:= 'Deleting duplicate file ' + slDuplicates.Strings[i];
-                    StatusBar2.Refresh;
-                    if SysUtils.DeleteFile(slDuplicates.Strings[i]) then
-                      inc(DuplicatesDeleted);
-                  end;
-                StatusBar2.SimpleText:= 'Finished deleting ' + IntToStr(DuplicatesDeleted) + ' duplicate files';
-                StatusBar2.Refresh;
-                ShowMessage(IntToStr(DuplicatesDeleted) + ' duplicate files deleted.');
-              end;
-      if Assigned(slDuplicates) then slDuplicates.Free;  // this needs to be freed, regardless of whether it contained any entries or not
-      end; // end of duplicate deletion phase      }
 end;
 
 procedure TMainForm.btnSaveComparisonsClick(Sender: TObject);
@@ -3789,7 +3780,7 @@ var
   i, NoOfFilesCopiedOK, j, HashMismtachCount,
     FileCopyErrors, ZeroByteFilesCounter, DupCount : integer;
 
-  SizeOfFile2, TotalBytesRead2, NoFilesExamined, m: Int64;
+  SizeOfFile2, TotalBytesRead2, NoFilesExamined, SizeOfCurrentFile: Int64;
 
   SubDirStructure, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
@@ -3827,7 +3818,7 @@ begin
   {$IFDEF Windows}
   k                       := 0;
   {$ENDIF}
-  m                       := 0;
+  SizeOfCurrentFile       := -1;
 
   SLCopyErrors := TStringListUTF8.Create;
 
@@ -4104,280 +4095,290 @@ begin
             DestinationFileHasHash := '';
 
             // Check the file has a size greater than 0 bytes to avoid default hash values.
-            m := FileSize(FilesFoundToCopy.Strings[i]);
+            SizeOfCurrentFile := FileSize(FilesFoundToCopy.Strings[i]);
 
-            if m >= 0 then
-              begin
-              StatusBar3.SimpleText := 'Processing: ' + RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
-              Application.ProcessMessages;
-              { Now we have some output directory jiggery pokery to deal with, that
-                needs to accomodate both OS's. Firstly,
-                In Linux   : /home/ted/SrcDir/ needs to become /home/ted/NewDestDir/home/ted/SrcDir
-                In Windows : C:\SrcDir\SubDirA needs to become E:\NewDestDir\SrcDir\SubDirA
+            StatusBar3.SimpleText := 'Processing: ' + RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+            Application.ProcessMessages;
+            { Now we have some output directory jiggery pokery to deal with, that
+              needs to accomodate both OS's. Firstly,
+              In Linux   : /home/ted/SrcDir/ needs to become /home/ted/NewDestDir/home/ted/SrcDir
+              In Windows : C:\SrcDir\SubDirA needs to become E:\NewDestDir\SrcDir\SubDirA
 
-                In addition, we need to generate a datestamped parent directory for the output
-                in case the user generates several seperate outputs to the same parent dir
-              }
-                // Firstly, compute the original filename and path, less trailing slash
+              In addition, we need to generate a datestamped parent directory for the output
+              in case the user generates several seperate outputs to the same parent dir
+            }
+              // Firstly, compute the original filename and path, less trailing slash
 
-                {$IFDEF WINDOWS}
-                   SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride)));
-                {$else}
-                   {$IFDEF Darwin}
+              {$IFDEF WINDOWS}
+                 SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride)));
+              {$else}
+                 {$IFDEF Darwin}
+                   SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(FilesFoundToCopy.Strings[i]));
+                 {$else}
+                   {$IFDEF UNIX and !$ifdef Darwin}
                      SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(FilesFoundToCopy.Strings[i]));
-                   {$else}
-                     {$IFDEF UNIX and !$ifdef Darwin}
-                       SourceDirectoryAndFileName := ChompPathDelim(CleanAndExpandDirectory(FilesFoundToCopy.Strings[i]));
-                     {$ENDIF}
                    {$ENDIF}
-                {$ENDIF}
-
-
-                // Now reformulate the source sub-dir structure, from the selected dir downwards
-                // but only if the user has not checked the box "Dont rebuild path?"
-                // If he has, then just dump the files to the root of the destination dir
-                if chkNoPathReconstruction.Checked = false then
-                  begin
-                    SubDirStructure := IncludeTrailingPathDelimiter(ExtractFileDir(SourceDirectoryAndFileName));
-                    if chkUNCMode.Checked then
-                      begin
-                        Delete(SubDirStructure, 1, 1); // remove one of two \ from the \\ prefix to form the slash of the directory split
-                      end;
-                  end
-                else
-                 begin
-                    SubDirStructure := IncludeTrailingPathDelimiter(DestDir);
-                  end;
-
-                // And also generate a timestamped parent directory for the output dir, named after the time of execution
-                SubDirStructureParent := ChompPathDelim(IncludeTrailingPathDelimiter(DestDir) + IncludeTrailingPathDelimiter('QH_' + OutputDirDateFormatted));
-
-              { Now concatenate the original sub directory to the destination directory
-                and the datestamped parent directory to form the total path, inc filename
-                Note : Only directories containing files will be recreated in destination.
-                Empty dirs and files whose extension do match a chosen mask (if any)
-                are skipped.
-                If user wishes to dump files to root of destination, use destination dir name instead}
-
-                if chkNoPathReconstruction.Checked = false then
-                  begin
-                    FinalisedDestDir := SubDirStructureParent + SubDirStructure;
-                  end
-                else
-                  begin
-                     FinalisedDestDir := SubDirStructureParent;
-                  end;
-
-              {$IFDEF Windows}
-              { Due to the nonsensories of Windows drive lettering, we have to allow
-                for driver lettering in the finalised destination path.
-
-                We only do this if UNC mode is not selected though, because if
-                it isn't, drive letters should not be needed anyway.
-
-                This loop finds 'C:' in the middle of the concatanated path and
-                return its position. It then deletes 'C:' of 'C:\' if found, or any
-                other A-Z drive letter, leaving the '\' for the path
-                So, C:\SrcDir\SubDirA becomes E:\NewDestDir\SrcDir\SubDirA instead of
-                E:\NewDestDir\C:SrcDir\SubDirA. UNC paths are taken care of by ForceDirectories }
-
-                if chkUNCMode.Checked = false then
-                  begin
-                    for DriveLetter in TRange do
-                      begin
-                        k := posex(DriveLetter+':', FinalisedDestDir, 4);
-                        Delete(FinalisedDestDir, k, 2);
-                      end;
-                  end;
-
-              // *** SOURCE DIRECTORY ***
-              // SourceDirectoryAndFileName may include '\\' at the start, which
-              // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
-              // So we just reduce it back to one, to follow immediately after the prefix.
-              // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
-
-              SourceDirectoryAndFileName := LongPathOverride+SourceDirectoryAndFileName;
-              if Pos('\\\', SourceDirectoryAndFileName) > 0 then
-              begin
-                SourceDirectoryAndFileName := StringReplace(SourceDirectoryAndFileName, '\\\', '\', [rfReplaceAll]);
-              end;
-
-              {Now, again, only if Windows, obtain the Created, Modified and Last Accessed
-              dates from the sourcefile by calling custom function 'DateAttributesOfCurrentFile'
-              Linux does not have 'Created Dates' so this does not need to run on Linux platforms}
-
-              CrDateModDateAccDate := DateAttributesOfCurrentFile(SourceDirectoryAndFileName);
+                 {$ENDIF}
               {$ENDIF}
 
-              {$IFDEF LINUX}
-              // Get the 'Last Modified' date, only, for Linux files
-              CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-              {$ENDIF}
-                {$IFDEF UNIX}
-                  {$IFDEF Darwin}
-                    // Get the 'Last Modified' date, only, for Apple Mac files
-                    CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
-                  {$ENDIF}
-                {$ENDIF}
-              // Determine the filename string of the file to be copied
-              FinalisedFileName := ExtractFileName(FilesFoundToCopy.Strings[i]);
 
-              // Before copying the file and creating storage areas, lets hash the source file
-
-              SourceFileHasHash := Uppercase(CalcTheHashFile(SourceDirectoryAndFileName));
-
-              // Now create the destination directory structure, if it is not yet created.
-
-              if not LazFileUtils.DirectoryExistsUTF8(FinalisedDestDir) then
+              // Now reformulate the source sub-dir structure, from the selected dir downwards
+              // but only if the user has not checked the box "Dont rebuild path?"
+              // If he has, then just dump the files to the root of the destination dir
+              if chkNoPathReconstruction.Checked = false then
                 begin
-                  try
-                    if not CustomisedForceDirectoriesUTF8(LongPathOverride+FinalisedDestDir, true) then
-                      begin
-                        ShowMessage(FinalisedDestDir+' cannot be created. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-                      end;
-                  finally
-                  end;
+                  SubDirStructure := IncludeTrailingPathDelimiter(ExtractFileDir(SourceDirectoryAndFileName));
+                  if chkUNCMode.Checked then
+                    begin
+                      Delete(SubDirStructure, 1, 1); // remove one of two \ from the \\ prefix to form the slash of the directory split
+                    end;
+                end
+              else
+               begin
+                  SubDirStructure := IncludeTrailingPathDelimiter(DestDir);
                 end;
 
-              // *** DESTINATION DIRECTORY ***
-              // CopiedFilePathAndName may include '\\' at the start, which
-              // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
-              // So we just reduce it back to one, to follow immediately after the prefix.
-              // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
-              // We add a Windows compiler directive because UNC mode isnt in the Linux version
+              // And also generate a timestamped parent directory for the output dir, named after the time of execution
+              SubDirStructureParent := ChompPathDelim(IncludeTrailingPathDelimiter(DestDir) + IncludeTrailingPathDelimiter('QH_' + OutputDirDateFormatted));
 
-              // Now copy the file to the newly formed or already existing destination dir
-              // and hash it. Then check that source and destination hashes match.
-              // Then total up how many copied and hashed OK, or not.
-              // If the user chooses not to reconstruct source dir structure,
-              // check for filename conflicts, create an incrementer to ensure uniqueness,
-              // and rename to "name.ext_DuplicatedNameX". Otherwise, reconstruct source path
-              {$ifdef Windows}
-              CopiedFilePathAndName := LongPathOverride+CopiedFilePathAndName;
-              if Pos('\\\', CopiedFilePathAndName) > 0 then
-              begin
-                CopiedFilePathAndName := StringReplace(CopiedFilePathAndName, '\\\', '\', [rfReplaceAll]);
-              end;
-              {$endif}
+            { Now concatenate the original sub directory to the destination directory
+              and the datestamped parent directory to form the total path, inc filename
+              Note : Only directories containing files will be recreated in destination.
+              Empty dirs and files whose extension do match a chosen mask (if any)
+              are skipped.
+              If user wishes to dump files to root of destination, use destination dir name instead}
 
               if chkNoPathReconstruction.Checked = false then
                 begin
-                  CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
-                end
-                else
-                  begin
-                    if LazFileUtils.FileExistsUTF8(IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName) then
-                    begin
-                      DupCount := DupCount + 1;
-                      CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName + '_DuplicatedName' + IntToStr(DupCount);
-                    end
-                    else
-                    CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
-                  end;
-
-              // Now copy the file, either to the reconstructed path or to the root
-              // Note that FileCopyEx from JawWindows unit is better for monitoring copy progress.
-              // though it seems unable to adjust created date from Vol1 to Vol2 too, same as CopyFile from FileUtil
-              // But one day, look at adding it for user feedback when copying large files if nothing else
-              if not FileUtil.CopyFile(SourceDirectoryAndFileName, CopiedFilePathAndName, true) then
-                begin
-                  ShowMessage('Failed to copy file : ' + SourceDirectoryAndFileName + ' Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-                  SLCopyErrors.Add('Failed to copy: ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash);
-                  FileCopyErrors := FileCopyErrors + 1;
+                  FinalisedDestDir := SubDirStructureParent + SubDirStructure;
                 end
               else
-              DestinationFileHasHash := UpperCase(CalcTheHashFile(CopiedFilePathAndName));
-              NoOfFilesCopiedOK := NoOfFilesCopiedOK + 1;
-
-              // Check for hash errors. Does source and destination hashes match?
-              // If not, log it to text file and also display in grid.
-              if SourceFileHasHash <> DestinationFileHasHash then
                 begin
-                  HashMismtachCount := HashMismtachCount + 1;
-                  SLCopyErrors.Add('Hash mismatch. Source file ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash + ' Hash of copied file: ' + CopiedFilePathAndName + ' ' + DestinationFileHasHash);
-
-                  {$IFDEF WINDOWS}
-                  Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
-                    {$else}
-                       {$IFDEF Darwin}
-                         Col1Filename := FilesFoundToCopy.Strings[i];
-                       {$else}
-                         {$IFDEF UNIX and !$ifdef Darwin}
-                           Col1Filename := FilesFoundToCopy.Strings[i];
-                         {$ENDIF}
-                       {$ENDIF}
-                    {$ENDIF}
-                   Col2SourceHash := SourceFileHasHash;
-                    {$IFDEF WINDOWS}
-                   Col3CopiedFilePathAndName := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
-                    {$else}
-                      {$IFDEF Darwin}
-                        Col3CopiedFilePathAndName := CopiedFilePathAndName;
-                      {$else}
-                         {$IFDEF UNIX and !$ifdef Darwin}
-                           Col3CopiedFilePathAndName := CopiedFilePathAndName;
-                         {$endif}
-                      {$endif}
-                    {$endif}
-                    Col4DestinationHash := DestinationFileHasHash;
-                    Col5DateAttribute   := CrDateModDateAccDate;
-                end
-              // Else, no errors. No need to log to file but still display to user
-              else if SourceFileHasHash = DestinationFileHasHash then
-                begin
-                  {$IFDEF WINDOWS}
-                  Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
-                    {$else}
-                       {$IFDEF Darwin}
-                         Col1Filename := FilesFoundToCopy.Strings[i];
-                       {$else}
-                         {$IFDEF UNIX and !$ifdef Darwin}
-                           Col1Filename := FilesFoundToCopy.Strings[i];
-                         {$ENDIF}
-                       {$ENDIF}
-                    {$ENDIF}
-                   Col2SourceHash := SourceFileHasHash;
-                    {$IFDEF WINDOWS}
-                   Col3CopiedFilePathAndName := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
-                    {$else}
-                      {$IFDEF Darwin}
-                        Col3CopiedFilePathAndName := CopiedFilePathAndName;
-                      {$else}
-                         {$IFDEF UNIX and !$ifdef Darwin}
-                           Col3CopiedFilePathAndName := CopiedFilePathAndName;
-                         {$endif}
-                      {$endif}
-                    {$endif}
-                    Col4DestinationHash := DestinationFileHasHash;
-                    Col5DateAttribute   := CrDateModDateAccDate;
+                   FinalisedDestDir := SubDirStructureParent;
                 end;
 
-              // Write values to database
-              frmSQLiteDBases.WriteCOPYValuesToDatabase(Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute);
-              CommitCount(nil);
+            {$IFDEF Windows}
+            { Due to the nonsensories of Windows drive lettering, we have to allow
+              for driver lettering in the finalised destination path.
 
-              // Progress Status Elements:
-              lblNoOfFilesToExamine.Caption := strNoOfFilesToExamine;
-              NoFilesExamined := (i + 1);  // The total of files examined plus those that didnt hash or copy OK
-              lblNoOfFilesToExamine2.Caption := IntToStr(NoFilesExamined);
-              SizeOfFile2 := FileSize(FilesFoundToCopy.Strings[i]);
-              TotalBytesRead2 := TotalBytesRead2 + SizeOfFile2;
-              lblDataCopiedSoFar.Caption := '(' + FormatByteSize(TotalBytesRead2) + ')';
-              // When or if the stop button is pressed, we need to prevent any
-              // division by zero, thus the count check next...
-              if FilesFoundToCopy.Count > 0 then
+              We only do this if UNC mode is not selected though, because if
+              it isn't, drive letters should not be needed anyway.
+
+              This loop finds 'C:' in the middle of the concatanated path and
+              return its position. It then deletes 'C:' of 'C:\' if found, or any
+              other A-Z drive letter, leaving the '\' for the path
+              So, C:\SrcDir\SubDirA becomes E:\NewDestDir\SrcDir\SubDirA instead of
+              E:\NewDestDir\C:SrcDir\SubDirA. UNC paths are taken care of by ForceDirectories }
+
+              if chkUNCMode.Checked = false then
                 begin
-                  lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
-                  pbCopy.Position := ((NoFilesExamined *100) DIV FilesFoundToCopy.Count);
-                  Application.ProcessMessages;
+                  for DriveLetter in TRange do
+                    begin
+                      k := posex(DriveLetter+':', FinalisedDestDir, 4);
+                      Delete(FinalisedDestDir, k, 2);
+                    end;
                 end;
-              end; // End of the if m > 0 then statement
 
-            // Otherwise file is probably a zero byte file
-            if m = 0 then
+            // *** SOURCE DIRECTORY ***
+            // SourceDirectoryAndFileName may include '\\' at the start, which
+            // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
+            // So we just reduce it back to one, to follow immediately after the prefix.
+            // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
+
+            SourceDirectoryAndFileName := LongPathOverride+SourceDirectoryAndFileName;
+            if Pos('\\\', SourceDirectoryAndFileName) > 0 then
+            begin
+              SourceDirectoryAndFileName := StringReplace(SourceDirectoryAndFileName, '\\\', '\', [rfReplaceAll]);
+            end;
+
+            {Now, again, only if Windows, obtain the Created, Modified and Last Accessed
+            dates from the sourcefile by calling custom function 'DateAttributesOfCurrentFile'
+            Linux does not have 'Created Dates' so this does not need to run on Linux platforms}
+
+            CrDateModDateAccDate := DateAttributesOfCurrentFile(SourceDirectoryAndFileName);
+            {$ENDIF}
+
+            {$IFDEF LINUX}
+            // Get the 'Last Modified' date, only, for Linux files
+            CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
+            {$ENDIF}
+              {$IFDEF UNIX}
+                {$IFDEF Darwin}
+                  // Get the 'Last Modified' date, only, for Apple Mac files
+                  CrDateModDateAccDate := DateAttributesOfCurrentFileLinux(SourceDirectoryAndFileName);
+                {$ENDIF}
+              {$ENDIF}
+            // Determine the filename string of the file to be copied
+            FinalisedFileName := ExtractFileName(FilesFoundToCopy.Strings[i]);
+
+            // Before copying the file and creating storage areas, lets hash the source file
+            if SizeOfCurrentFile > 0 then
+            begin
+              SourceFileHasHash := Uppercase(CalcTheHashFile(SourceDirectoryAndFileName));
+            end
+            else
               begin
-                ZeroByteFilesCounter := ZeroByteFilesCounter + 1; // A file of zero bytes was found in this loop
+                SourceFileHasHash := 'zero byte file';
+                inc(ZeroByteFilesCounter, 1);
               end;
+
+            // Now create the destination directory structure, if it is not yet created.
+
+
+            if not LazFileUtils.DirectoryExistsUTF8(FinalisedDestDir) then
+              begin
+                try
+                  if not CustomisedForceDirectoriesUTF8(LongPathOverride+FinalisedDestDir, true) then
+                    begin
+                      ShowMessage(FinalisedDestDir+' cannot be created. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
+                    end;
+                finally
+                end;
+              end;
+
+            // *** DESTINATION DIRECTORY ***
+            // CopiedFilePathAndName may include '\\' at the start, which
+            // will become '\\\MyPath\SubFolder' by the time the longpathoverride is added.
+            // So we just reduce it back to one, to follow immediately after the prefix.
+            // i.e \\?\MyData\MyFolder instead of \\?\\\MyData\MyFolder
+            // We add a Windows compiler directive because UNC mode isnt in the Linux version
+
+            // Now copy the file to the newly formed or already existing destination dir
+            // and hash it. Then check that source and destination hashes match.
+            // Then total up how many copied and hashed OK, or not.
+            // If the user chooses not to reconstruct source dir structure,
+            // check for filename conflicts, create an incrementer to ensure uniqueness,
+            // and rename to "name.ext_DuplicatedNameX". Otherwise, reconstruct source path
+            {$ifdef Windows}
+            CopiedFilePathAndName := LongPathOverride+CopiedFilePathAndName;
+            if Pos('\\\', CopiedFilePathAndName) > 0 then
+            begin
+              CopiedFilePathAndName := StringReplace(CopiedFilePathAndName, '\\\', '\', [rfReplaceAll]);
+            end;
+            {$endif}
+
+            if chkNoPathReconstruction.Checked = false then
+              begin
+                CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
+              end
+              else
+                begin
+                  if LazFileUtils.FileExistsUTF8(IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName) then
+                  begin
+                    DupCount := DupCount + 1;
+                    CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName + '_DuplicatedName' + IntToStr(DupCount);
+                  end
+                  else
+                  CopiedFilePathAndName := IncludeTrailingPathDelimiter(LongPathOverride+FinalisedDestDir) + FinalisedFileName;
+                end;
+
+            // Now copy the file, either to the reconstructed path or to the root
+            // Note that FileCopyEx from JawWindows unit is better for monitoring copy progress.
+            // though it seems unable to adjust created date from Vol1 to Vol2 too, same as CopyFile from FileUtil
+            // But one day, look at adding it for user feedback when copying large files if nothing else
+            if not FileUtil.CopyFile(SourceDirectoryAndFileName, CopiedFilePathAndName, true) then
+              begin
+                ShowMessage('Failed to copy file : ' + SourceDirectoryAndFileName + ' Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
+                SLCopyErrors.Add('Failed to copy: ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash);
+                FileCopyErrors := FileCopyErrors + 1;
+              end
+            else
+            begin
+              if SizeOfCurrentFile > 0 then
+                begin
+                  DestinationFileHasHash := UpperCase(CalcTheHashFile(CopiedFilePathAndName));
+                  NoOfFilesCopiedOK := NoOfFilesCopiedOK + 1;
+                end
+              else
+              begin
+                DestinationFileHasHash := 'zero byte file';
+                NoOfFilesCopiedOK := NoOfFilesCopiedOK + 1; // copy still valid, even if it is zero byte
+              end;
+            end;
+
+            // Check for hash errors. Does source and destination hashes match?
+            // If not, log it to text file and also display in grid.
+            if SourceFileHasHash <> DestinationFileHasHash then
+              begin
+                HashMismtachCount := HashMismtachCount + 1;
+                SLCopyErrors.Add('Hash mismatch. Source file ' + SourceDirectoryAndFileName + ' ' + SourceFileHasHash + ' Hash of copied file: ' + CopiedFilePathAndName + ' ' + DestinationFileHasHash);
+
+                {$IFDEF WINDOWS}
+                Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+                  {$else}
+                     {$IFDEF Darwin}
+                       Col1Filename := FilesFoundToCopy.Strings[i];
+                     {$else}
+                       {$IFDEF UNIX and !$ifdef Darwin}
+                         Col1Filename := FilesFoundToCopy.Strings[i];
+                       {$ENDIF}
+                     {$ENDIF}
+                  {$ENDIF}
+                 Col2SourceHash := SourceFileHasHash;
+                  {$IFDEF WINDOWS}
+                 Col3CopiedFilePathAndName := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                  {$else}
+                    {$IFDEF Darwin}
+                      Col3CopiedFilePathAndName := CopiedFilePathAndName;
+                    {$else}
+                       {$IFDEF UNIX and !$ifdef Darwin}
+                         Col3CopiedFilePathAndName := CopiedFilePathAndName;
+                       {$endif}
+                    {$endif}
+                  {$endif}
+                  Col4DestinationHash := DestinationFileHasHash;
+                  Col5DateAttribute   := CrDateModDateAccDate;
+              end
+            // Else, no errors. No need to log to file but still display to user
+            else if SourceFileHasHash = DestinationFileHasHash then
+              begin
+                {$IFDEF WINDOWS}
+                Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
+                  {$else}
+                     {$IFDEF Darwin}
+                       Col1Filename := FilesFoundToCopy.Strings[i];
+                     {$else}
+                       {$IFDEF UNIX and !$ifdef Darwin}
+                         Col1Filename := FilesFoundToCopy.Strings[i];
+                       {$ENDIF}
+                     {$ENDIF}
+                  {$ENDIF}
+                 Col2SourceHash := SourceFileHasHash;
+                  {$IFDEF WINDOWS}
+                 Col3CopiedFilePathAndName := RemoveLongPathOverrideChars(CopiedFilePathAndName, LongPathOverride);
+                  {$else}
+                    {$IFDEF Darwin}
+                      Col3CopiedFilePathAndName := CopiedFilePathAndName;
+                    {$else}
+                       {$IFDEF UNIX and !$ifdef Darwin}
+                         Col3CopiedFilePathAndName := CopiedFilePathAndName;
+                       {$endif}
+                    {$endif}
+                  {$endif}
+                  Col4DestinationHash := DestinationFileHasHash;
+                  Col5DateAttribute   := CrDateModDateAccDate;
+              end;
+
+            // Write values to database
+            frmSQLiteDBases.WriteCOPYValuesToDatabase(Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute);
+            CommitCount(nil);
+
+            // Progress Status Elements:
+            lblNoOfFilesToExamine.Caption := strNoOfFilesToExamine;
+            NoFilesExamined := (i + 1);  // The total of files examined plus those that didnt hash or copy OK
+            lblNoOfFilesToExamine2.Caption := IntToStr(NoFilesExamined);
+            SizeOfFile2 := FileSize(FilesFoundToCopy.Strings[i]);
+            TotalBytesRead2 := TotalBytesRead2 + SizeOfFile2;
+            lblDataCopiedSoFar.Caption := '(' + FormatByteSize(TotalBytesRead2) + ')';
+            // When or if the stop button is pressed, we need to prevent any
+            // division by zero, thus the count check next...
+            if FilesFoundToCopy.Count > 0 then
+              begin
+                lblFilesCopiedPercentage.Caption := IntToStr((NoFilesExamined * 100) DIV FilesFoundToCopy.Count) + '%';
+                pbCopy.Position := ((NoFilesExamined *100) DIV FilesFoundToCopy.Count);
+                Application.ProcessMessages;
+              end;
+
           end // End of the "If Stop button not pressed" if
           else
             begin
@@ -4415,54 +4416,7 @@ begin
             frmSQLiteDBases.SaveDBToCSV(frmDisplayGrid1.RecursiveDisplayGrid_COPY, CSVLogFile2);
           end;
       end;
-      {
-      if SaveFILESTabToHTMLCheckBox2.Checked then
-        begin
-          i := 0;
-          j := 0;
-          SaveDialog4.Title := 'DONE! Save your HTML log file of results as...';
-          // Try to help make sure the log file goes to the users destination dir and NOT source dir!:
-          SaveDialog4.InitialDir := DestDir;
-          SaveDialog4.Filter := 'HTML|*.html';
-          SaveDialog4.DefaultExt := 'html';
-          if SaveDialog4.Execute then
-           begin
-             HTMLLogFile2 := SaveDialog4.FileName;
-             with TStringList.Create do
-               try
-                 Add('<html>');
-                 Add('<title> QuickHash HTML Output </title>');
-                 Add('<body>');
-                 Add('<p><strong>' + MainForm.Caption + '. ' + 'Log Created: ' + DateTimeToStr(Now)+'</strong></p>');
-                 Add('<p><strong>File and Hash listing for: ' + SourceDirName + '</strong></p>');
-                 Add('<p>System date & time was ' + FormattedSystemDate + #$0D#$0A +'</p>');
-                 Add('<br />');
-                 Add('<table border=1>');
-                 Add('<tr>');
-                 Add('<td>' + 'ID');
-                 Add('<td>' + 'Source Name');
-                 Add('<td>' + 'Source Hash');
-                 Add('<td>' + 'Destination Name');
-                 Add('<td>' + 'Destination Hash');
-                 Add('<td>' + 'Source Date Attributes');
-                 for i := 0 to frmDisplayGrid1.CopyAndHashGrid.RowCount-1 do
-                   begin
-                     Add('<tr>');
-                     for j := 0 to frmDisplayGrid1.CopyAndHashGrid.ColCount-1 do
-                       Add('<td>' + frmDisplayGrid1.CopyAndHashGrid.Cells[j,i] + '</td>');
-                       add('</tr>');
-                   end;
-                 Add('</table>');
-                 Add('</body>');
-                 Add('</html>');
-                 SaveToFile(HTMLLogFile2);
-               finally
-                 Free;
-                 HTMLLogFile2 := '';
-               end;
-           end;
-        end;
-      }
+
       // If there is one or more errors, save them to a log file of users choosing
       if Length(SLCopyErrors.Text) > 0 then
        begin

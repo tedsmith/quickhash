@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 540
+  Left = 557
   Height = 738
-  Top = 326
+  Top = 317
   Width = 1016
   AllowDropFiles = True
   Caption = 'QuickHash v3.0.0 - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 680
     Top = 24
     Width = 984
-    ActivePage = TabSheet3
+    ActivePage = TabSheet4
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 2
+    TabIndex = 3
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -809,7 +809,7 @@ object MainForm: TMainForm
     object TabSheet4: TTabSheet
       Hint = 'Choose a directory, have its content hashed, files are copied to destination, and re-hashed.'
       Caption = '&Copy'
-      ClientHeight = 655
+      ClientHeight = 652
       ClientWidth = 976
       ParentShowHint = False
       ShowHint = True
@@ -839,7 +839,7 @@ object MainForm: TMainForm
           OnClick = Panel1CopyAndHashOptionsClick
           object CheckBoxListOfDirsOnly: TCheckBox
             Left = 14
-            Height = 20
+            Height = 21
             Hint = 'Tick to have child directories listed, but no files inside hashed'
             Top = 0
             Width = 161
@@ -850,152 +850,142 @@ object MainForm: TMainForm
           end
           object CheckBoxListOfDirsAndFilesOnly: TCheckBox
             Left = 14
-            Height = 20
+            Height = 21
             Hint = 'Tick to have child directories and files listed, but no files actually hashed'
             Top = 32
-            Width = 213
+            Width = 214
             Caption = 'Just LIST sub-directories and files'
             OnChange = CheckBoxListOfDirsAndFilesOnlyChange
             TabOrder = 1
           end
-          object SaveToHTMLCheckBox2: TCheckBox
-            Left = 256
-            Height = 20
-            Hint = 'Save results as HTML web page'
-            Top = 0
-            Width = 142
-            Anchors = [akLeft]
-            Caption = 'Save results (HTML)?'
-            TabOrder = 2
-          end
           object SaveToCSVCheckBox2: TCheckBox
             Left = 256
-            Height = 20
+            Height = 21
             Hint = 'Save results as CSV data (spreadsheet format)'
             Top = 32
-            Width = 134
+            Width = 130
             Caption = 'Save results (CSV)?'
             Checked = True
             State = cbChecked
-            TabOrder = 3
+            TabOrder = 2
           end
           object FileTypeMaskCheckBox1: TCheckBox
             Left = 448
-            Height = 20
+            Height = 21
             Hint = 'Only copy files of a particular type'
             Top = 32
-            Width = 123
+            Width = 126
             Caption = 'Choose file types?'
             OnChange = FileTypeMaskCheckBox1Change
-            TabOrder = 5
+            TabOrder = 4
           end
           object FileMaskField: TEdit
             Left = 464
-            Height = 24
+            Height = 25
             Hint = 'Use an asterix, full stop and the file type '#10'extension, seperated by a semi-colon.'#10'NO space characters'
             Top = 64
             Width = 248
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 6
+            TabOrder = 5
             Text = '*.doc;*.docx;*.xls;*.xlsx;*.pdf;'
             Visible = False
           end
           object chkNoRecursiveCopy: TCheckBox
             Left = 448
-            Height = 20
+            Height = 21
             Hint = 'Only copy files found in the root of chosen directory'
             Top = 0
-            Width = 152
+            Width = 156
             Anchors = [akLeft]
             Caption = 'Ignore sub-directories?'
-            TabOrder = 4
+            TabOrder = 3
           end
           object Label11: TLabel
             Left = 14
-            Height = 16
+            Height = 17
             Top = 72
-            Width = 78
+            Width = 75
             Caption = '# Files in Dir:'
             ParentColor = False
           end
           object Label12: TLabel
             Left = 14
-            Height = 16
+            Height = 17
             Top = 104
-            Width = 103
+            Width = 100
             Caption = '# Files Examined:'
             ParentColor = False
           end
           object Label13: TLabel
             Left = 14
-            Height = 16
+            Height = 17
             Top = 136
-            Width = 75
+            Width = 74
             Caption = '% Complete:'
             ParentColor = False
           end
           object lblTimeTaken5A: TLabel
             Left = 464
-            Height = 16
+            Height = 17
             Top = 97
-            Width = 70
+            Width = 66
             Caption = 'Start Time: '
             ParentColor = False
           end
           object lblTimeTaken5B: TLabel
             Left = 464
-            Height = 16
+            Height = 17
             Top = 121
-            Width = 67
+            Width = 65
             Caption = 'End Time:  '
             ParentColor = False
           end
           object lblTimeTaken6A: TLabel
             Left = 560
-            Height = 16
+            Height = 17
             Top = 97
-            Width = 12
+            Width = 9
             Caption = '...'
             ParentColor = False
           end
           object lblTimeTaken6B: TLabel
             Left = 560
-            Height = 16
+            Height = 17
             Top = 121
-            Width = 12
+            Width = 9
             Caption = '...'
             ParentColor = False
           end
           object lblTimeTaken5C: TLabel
             Left = 464
-            Height = 16
+            Height = 17
             Top = 145
-            Width = 73
+            Width = 69
             Caption = 'Time Taken:'
             ParentColor = False
           end
           object lblTimeTaken6C: TLabel
             Left = 560
-            Height = 16
+            Height = 17
             Top = 145
-            Width = 12
+            Width = 9
             Caption = '...'
             ParentColor = False
           end
           object lblNoOfFilesToExamine: TLabel
             Left = 136
-            Height = 16
+            Height = 17
             Top = 72
-            Width = 12
+            Width = 9
             Caption = '...'
             ParentColor = False
           end
           object lblDataCopiedSoFar: TLabel
             Left = 208
-            Height = 16
+            Height = 17
             Top = 104
-            Width = 12
+            Width = 9
             Caption = '...'
             ParentColor = False
           end
@@ -1005,32 +995,32 @@ object MainForm: TMainForm
             AnchorSideTop.Control = pbCopy
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = pbCopy
-            Left = 372
-            Height = 16
+            Left = 374
+            Height = 17
             Top = 139
-            Width = 12
+            Width = 9
             Anchors = []
             Caption = '...'
             ParentColor = False
           end
           object chkNoPathReconstruction: TCheckBox
             Left = 624
-            Height = 20
+            Height = 21
             Hint = 'Files will be copied to the root of your chosen '#10'destination directory. Duplicate file NAMES '#10'will have their names appended with '#10'DuplicatedNameX to avoid filesystem conflicts'
             Top = 0
-            Width = 127
+            Width = 132
             Anchors = [akLeft]
             Caption = 'Don''t rebuild path?'
-            TabOrder = 7
+            TabOrder = 6
           end
           object chkCopyHidden: TCheckBox
             Left = 624
-            Height = 20
+            Height = 21
             Hint = 'If checked, will find hidden directories and files and copy those too'
             Top = 32
-            Width = 123
+            Width = 127
             Caption = 'Copy hidden files?'
-            TabOrder = 8
+            TabOrder = 7
           end
           object pbCopy: TProgressBar
             AnchorSideRight.Control = lblFilesCopiedPercentage
@@ -1038,28 +1028,28 @@ object MainForm: TMainForm
             Height = 20
             Top = 136
             Width = 216
-            TabOrder = 9
+            TabOrder = 8
           end
           object lblschedulertickboxCopyTab: TCheckBox
             Left = 256
-            Height = 20
+            Height = 21
             Hint = 'Tick and set a date and time ahead of current time'#13#10'and then select the source and destination folders.'#13#10'Hash, copy and hash will start at the specified time'
             Top = 64
-            Width = 108
+            Width = 105
             Caption = 'Start at a time:'
             OnChange = lblschedulertickboxCopyTabChange
-            TabOrder = 10
+            TabOrder = 9
           end
           object ZVDateTimePickerCopyTab: TZVDateTimePicker
             Left = 272
-            Height = 24
+            Height = 25
             Hint = 'Enter date and time (hours and minutes) '
             Top = 96
-            Width = 138
+            Width = 136
             CenturyFrom = 1941
             MaxDate = 73050
             MinDate = 42736
-            TabOrder = 11
+            TabOrder = 10
             Enabled = False
             TrailingSeparator = False
             TextForNullDate = 'Choose date & time'
@@ -1077,9 +1067,9 @@ object MainForm: TMainForm
           end
           object lblNoOfFilesToExamine2: TLabel
             Left = 136
-            Height = 16
+            Height = 17
             Top = 104
-            Width = 12
+            Width = 9
             Caption = '...'
             ParentColor = False
           end
@@ -1102,7 +1092,7 @@ object MainForm: TMainForm
         end
         object Edit2SourcePath: TEdit
           Left = 8
-          Height = 24
+          Height = 25
           Hint = 'Show currently selected source directory'#13#10'Switch to UNC path by ticking "UNC Mode?"'
           Top = 216
           Width = 365
@@ -1115,7 +1105,7 @@ object MainForm: TMainForm
         end
         object Edit3DestinationPath: TEdit
           Left = 480
-          Height = 24
+          Height = 25
           Hint = 'Show currently selected destination directory'#13#10'Switch to UNC path by ticking "UNC Mode?"'
           Top = 216
           Width = 357
@@ -1128,8 +1118,8 @@ object MainForm: TMainForm
         end
         object StatusBar3: TStatusBar
           Left = 0
-          Height = 20
-          Top = 555
+          Height = 23
+          Top = 551
           Width = 830
           Panels = <>
           ParentShowHint = False
@@ -1179,10 +1169,10 @@ object MainForm: TMainForm
         end
         object chkUNCMode: TCheckBox
           Left = 384
-          Height = 20
+          Height = 21
           Hint = 'Tick to enter UNC network path '#13#10'instead of using treeview selection'
           Top = 216
-          Width = 85
+          Width = 92
           Caption = 'UNC Mode?'
           OnChange = chkUNCModeChange
           TabOrder = 8
@@ -2310,6 +2300,10 @@ object MainForm: TMainForm
     object MenuItem_ShowDuplicates: TMenuItem
       Caption = 'Show only duplicates'
       OnClick = MenuItem_ShowDuplicatesClick
+    end
+    object MenuItem_DeleteDups: TMenuItem
+      Caption = 'Delete Duplicates'
+      OnClick = MenuItem_DeleteDupsClick
     end
     object MenuItem_RestoreListFILES: TMenuItem
       Caption = 'Show all'

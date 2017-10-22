@@ -32,8 +32,10 @@ type
     procedure UpdateGridCOPYTAB(Sender: TObject);
     procedure SaveDBToCSV(DBGrid : TDBGrid; Filename : string);
     procedure SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : string);
+    procedure SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
     procedure DatasetToClipBoard(DBGrid : TDBGrid);
     procedure ShowDuplicates(DBGrid : TDBGrid);
+    procedure DeleteDuplicates(DBGrid : TDBGrid);
     procedure SortByFileName(DBGrid : TDBGrid);
     procedure SortByFilePath(DBGrid : TDBGrid);
     procedure SortByHash(DBGrid : TDBGrid);
@@ -274,7 +276,7 @@ begin
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
   if DBGrid.Name = 'RecursiveDisplayGrid1' then
     begin
-      {NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
+      NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
       if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
       try
         MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
@@ -313,7 +315,7 @@ begin
         MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
         Application.ProcessMessages;
       end
-      else} // Use filestream method because there's more than 10K rows. Too many to add HTML tags and store in memory
+      else // Use filestream method because there's more than 10K rows. Too many to add HTML tags and store in memory
         try
         if not FileExists(filename) then
           begin
@@ -378,7 +380,7 @@ begin
         end;
         fs.Write(strTABLEFooter, 8);
         fs.Write(#13#10, 2);
-        fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' records hashed.');
+        fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
         fs.Write(strBODYFooter, 7);
         fs.Write(#13#10, 2);
         fs.Write(strHTMLFooter, 7);
@@ -487,7 +489,6 @@ begin
     end;
 end;
 
-
 // ShowDuplicates lists entries with duplicate hash values from the FILES tab,
 // by searching hash column for matches and then displays all rows fully
 // for which duplicate hashes were found
@@ -509,6 +510,72 @@ begin
     begin
       MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
     end;
+  end;
+end;
+
+// DeleteDuplicates remove duplicate files as found in the 'FILES' tab
+procedure TfrmSQLiteDBases.DeleteDuplicates(DBGrid : TDBGrid);
+var
+  FileName, FilePath, NameAndPath, FileHash : string;
+  i, FileDeletedCount : integer;
+  FilesDeletedOK : boolean;
+  slDuplicates, slDuplicatesDeleted : TStringList;
+begin
+  FilesDeletedOK := false;
+  FileDeletedCount := 0;
+  try
+  slDuplicates := TStringList.Create;
+  slDuplicates.Sorted := true;
+
+  slDuplicatesDeleted := TStringList.Create;
+  slDuplicatesDeleted.Sorted := true;
+
+  while not DBGrid.DataSource.DataSet.EOF do
+    begin
+      for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
+      begin
+        FileName := DBGrid.DataSource.DataSet.Fields[1].Value;
+        FilePath := DBGrid.DataSource.DataSet.Fields[2].Value;
+        FileHash := DBGrid.DataSource.DataSet.Fields[3].Value;
+        NameAndPath := FilePath+FileName;
+        // Now, add the hash value, but only if it's not already in the stringlist
+        // If the currently examined hashvalue IS in the list, then it must be a duplicate
+        // and can therefore be deleted
+        if slDuplicates.IndexOf(FileHash) > -1 then
+          begin
+            FilesDeletedOK := DeleteFile(NameAndPath); // it's a duplicate
+            if FilesDeletedOK = true then
+            begin
+              inc(FileDeletedCount, 1);
+              slDuplicatesDeleted.Add(NameAndPath + ',' + FileHash + ', was deleted OK');
+            end;
+            // reset deletion flag
+            FilesDeletedOK := false;
+          end
+          else slDuplicates.add(FileHash);
+        // Go to next record
+        DBGrid.DataSource.DataSet.Next;
+      end;
+    end;
+    // Allow user the choice to save results of the duplicate file deletions
+    try
+      if MessageDlg(IntToStr(FileDeletedCount) + ' duplicate files deleted. Save details to text file?', mtConfirmation,
+        [mbCancel, mbNo, mbYes],0) = mrYes then
+        begin
+          MainForm.FilesDBGrid_SaveCSVDialog.Title := 'Save deleted file record as...';
+          MainForm.FilesDBGrid_SaveCSVDialog.InitialDir := GetCurrentDir;
+          MainForm.FilesDBGrid_SaveCSVDialog.Filter := 'Comma Sep|*.csv';
+          MainForm.FilesDBGrid_SaveCSVDialog.DefaultExt := 'csv';
+          if MainForm.FilesDBGrid_SaveCSVDialog.Execute then
+            begin
+               slDuplicatesDeleted.SaveToFile(MainForm.FilesDBGrid_SaveCSVDialog.Filename);
+            end;
+        end;
+    except
+      // do nothing
+    end;
+  finally
+    slDuplicates.free;
   end;
 end;
 
@@ -775,6 +842,168 @@ begin
       MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
     end;
   end;
+end;
+
+// Saves the grid in COPY window to HTML. If small volume of records, uses a stringlist.
+// If big volume, uses file stream.
+procedure TfrmSQLiteDBases.SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
+var
+   strTitle, SourceFilename, DestinationFileName, DateAttributes, SourceFileHash, DestinationFileHash : string;
+  i, NoOfRowsInGrid : integer;
+  sl                : TStringList;
+  fs                : TFileStreamUTF8;
+
+  const
+    strHTMLHeader      = '<HTML>'  ;
+    strTITLEHeader     = '<TITLE>QuickHash HTML Output' ;
+    strBODYHeader      = '<BODY>'  ;
+    strTABLEHeader     = '<table>' ;
+    strTABLEROWStart   = '<TR>'    ;
+    strTABLEDATAStart  = '<TD>'    ;
+    strTABLEDataEnd    = '</TD>'   ;
+    strTABLEROWEnd     = '</TR>'   ;
+    strTABLEFooter     = '</TABLE>';
+    strBODYFooter      = '</BODY>' ;
+    strTITLEFooter     = '</TITLE>';
+    strHTMLFooter      = '</HTML>' ;
+
+begin
+  NoOfRowsInGrid := -1;
+  // If database volume not too big, use memory and stringlists. Otherwise, use file writes
+  NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
+  if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
+  try
+    MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+    Application.ProcessMessages;
+    // Write the grid to a stringlist
+    sl := TStringList.Create;
+    sl.add('<HTML>');
+    sl.add('<TITLE>QuickHash HTML Output</TITLE>');
+    sl.add('<BODY>');
+    sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
+    sl.add('<table border=1>');
+    while not DBGrid.DataSource.DataSet.EOF do
+      begin
+        for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
+        begin
+          sl.add('<tr>');
+          // Get the data from the source filename cell
+          SourceFilename := DBGrid.DataSource.DataSet.Fields[1].Value;
+          sl.add('<td>'+SourceFilename+'</td>');
+          // Get the data from the source file hash cell
+          SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+          sl.add('<td>'+SourceFileHash+'</td>');
+          // Get the data from the destination name
+          DestinationFilename := DBGrid.DataSource.DataSet.Fields[3].Value;
+          sl.add('<td>'+DestinationFilename+'</td>');
+          // Get the data from the source file hash cell
+          DestinationFileHash := DBGrid.DataSource.DataSet.Fields[4].Value;
+          sl.add('<td>'+DestinationFileHash+'</td>');
+          // Get the data from the source file hash cell
+          DateAttributes := DBGrid.DataSource.DataSet.Fields[5].Value;
+          sl.add('<td>'+DateAttributes+'</td>');
+          sl.add('</tr>');
+          DBGrid.DataSource.DataSet.Next;
+        end;
+      end;
+    sl.add('</TABLE>');
+    sl.add('</BODY> ');
+    sl.add('</HTML> ');
+    sl.SaveToFile(Filename);
+  finally
+    sl.free;
+    MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
+    Application.ProcessMessages;
+  end
+  else // Use filestream method because there's more than 10K rows. Too many to add HTML tags and store in memory
+    try
+    if not FileExists(filename) then
+      begin
+        fs := TFileStreamUTF8.Create(Filename, fmCreate);
+      end
+    else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
+
+    MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+    strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
+    Application.ProcessMessages;
+
+    fs.Write(strHTMLHeader[1], Length(strHTMLHeader));
+    fs.Write(#13#10, 2);
+    fs.Write(strTITLEHeader[1], Length(strTITLEHeader));
+    fs.Write(strTITLEFooter[1], Length(strTITLEFooter));
+    fs.Write(#13#10, 2);
+    fs.Write(strBODYHeader[1], Length(strBODYHeader));
+    fs.Write(strTitle[1], Length(strTitle));
+    fs.Write(#13#10, 2);
+    fs.Write('<table border=1>', 16);
+
+    { strTABLEROWStart   = '<TR>'      = 4 bytes
+      strTABLEDATAStart  = '<TD>'      = 4 bytes
+      strTABLEDataEnd    = '</TD>'     = 5 bytes
+      strTABLEROWEnd     = '</TR>'     = 5 bytes
+      strTABLEFooter     = '</TABLE>'  = 8 bytes
+      strBODYFooter      = '</BODY>'   = 7 bytes
+      strTITLEFooter     = '</TITLE>'  = 8 bytes
+      strHTMLFooter      = '</HTML>'   = 7 bytes}
+    while not DBGrid.DataSource.DataSet.EOF do
+    begin
+      for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
+      begin
+        // Start new row
+        fs.Write(strTABLEROWStart[1], 4);
+        // Get the source filename cell
+        SourceFilename := DBGrid.DataSource.DataSet.Fields[1].Value;
+        // Write source filename to new row
+        fs.Write(strTABLEDATAStart[1], 4);
+        fs.Write(SourceFilename[1], Length(SourceFilename));
+        fs.Write(strTABLEDataEnd[1], 5);
+
+        // Get the source hash value
+        SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+        // Write the source hash value
+        fs.Write(strTABLEDATAStart[1], 4);
+        fs.Write(SourceFileHash[1], Length(SourceFileHash));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // Get the destination filename
+        DestinationFileName := DBGrid.DataSource.DataSet.Fields[3].Value;
+        // Write the destination hash
+        fs.Write(strTABLEDATAStart[1], 4) ;
+        fs.Write(DestinationFileName[1], Length(Trim(DestinationFileName)));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // Get the destination hash
+        DestinationFileHash := DBGrid.DataSource.DataSet.Fields[3].Value;
+        // Write the destination hash
+        fs.Write(strTABLEDATAStart[1], 4) ;
+        fs.Write(DestinationFileHash[1], Length(Trim(DestinationFileHash)));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // Get the destination filename
+        DateAttributes := DBGrid.DataSource.DataSet.Fields[3].Value;
+        // Write the destination hash
+        fs.Write(strTABLEDATAStart[1], 4) ;
+        fs.Write(DateAttributes[1], Length(Trim(DateAttributes)));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // End the row
+        fs.Write(strTABLEROWEnd[1], 5);
+        fs.Write(#13#10, 2);
+        DBGrid.DataSource.DataSet.Next;
+      end;
+    end;
+    fs.Write(strTABLEFooter, 8);
+    fs.Write(#13#10, 2);
+    fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
+    fs.Write(strBODYFooter, 7);
+    fs.Write(#13#10, 2);
+    fs.Write(strHTMLFooter, 7);
+    fs.Write(#13#10, 2);
+    finally
+      fs.free;
+      MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
+      Application.ProcessMessages;
+    end;
 end;
 
 // There is an UpdateGridXXX routine for each tab where a DBGrid is used.

@@ -20,9 +20,10 @@ type
   TfrmDisplayGrid1 = class(TForm)
     btnClipboardResultsCOPYTAB: TButton;
     CopyTabDBNavigator: TDBNavigator;
+    MenuItem_SaveDBToCSV: TMenuItem;
     MenuItem_CopySelectedRowCOPYGRID: TMenuItem;
     MenuItem_CopyToClipboard: TMenuItem;
-    MenuItem_SaveDBToCSV: TMenuItem;
+    MenuItem_SaveDBToHTML: TMenuItem;
     MenuItem_ShowAllCOPYGRID: TMenuItem;
     MenuItem_SortByDestinationNameCOPYGRID: TMenuItem;
     MenuItem_SortBySourceNameCOPYGRID: TMenuItem;
@@ -34,9 +35,10 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure btnClipboardResultsCOPYTABClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure MenuItem_SaveDBToCSVClick(Sender: TObject);
     procedure MenuItem_CopySelectedRowCOPYGRIDClick(Sender: TObject);
     procedure MenuItem_CopyToClipboardClick(Sender: TObject);
-    procedure MenuItem_SaveDBToCSVClick(Sender: TObject);
+    procedure MenuItem_SaveDBToHTMLClick(Sender: TObject);
     procedure MenuItem_ShowAllCOPYGRIDClick(Sender: TObject);
     procedure MenuItem_SortByDestinationHashCOPYGRIDClick(Sender: TObject);
     procedure MenuItem_SortByDestinationNameCOPYGRIDClick(Sender: TObject);
@@ -87,6 +89,25 @@ begin
   frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid_COPY);
 end;
 
+// Save the COPY Window results pane to HTML File
+procedure TfrmDisplayGrid1.MenuItem_SaveDBToHTMLClick(Sender: TObject);
+var
+  ExportFilename : string;
+begin
+  ExportFilename := '';
+  frmDisplayGridSaveDialog1.Title := 'Save results as...';
+  frmDisplayGridSaveDialog1.InitialDir := GetCurrentDir;
+  frmDisplayGridSaveDialog1.Filter := 'Web Page|*.html';
+  frmDisplayGridSaveDialog1.DefaultExt := 'HTML';
+
+  if frmDisplayGridSaveDialog1.Execute then
+  begin
+    ExportFilename := frmDisplayGridSaveDialog1.FileName;
+    frmSQLiteDBases.SaveCOPYWindowToHTML(RecursiveDisplayGrid_COPY, ExportFilename);
+  end;
+end;
+
+ // Save the COPY Window results pane to CSV File
 procedure TfrmDisplayGrid1.MenuItem_SaveDBToCSVClick(Sender: TObject);
 var
   ExportFilename : string;

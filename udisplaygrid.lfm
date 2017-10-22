@@ -1,7 +1,7 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 648
+  Left = 860
   Height = 687
-  Top = 513
+  Top = 506
   Width = 903
   Caption = 'QuickHash - Copy Results'
   ClientHeight = 687
@@ -79,8 +79,12 @@ object frmDisplayGrid1: TfrmDisplayGrid1
       Caption = 'Show All'
       OnClick = MenuItem_ShowAllCOPYGRIDClick
     end
+    object MenuItem_SaveDBToHTML: TMenuItem
+      Caption = 'Save to HTML file...'
+      OnClick = MenuItem_SaveDBToHTMLClick
+    end
     object MenuItem_SaveDBToCSV: TMenuItem
-      Caption = 'Save to CSV file...'
+      Caption = 'Save to CSV File...'
       OnClick = MenuItem_SaveDBToCSVClick
     end
     object MenuItem_CopyToClipboard: TMenuItem

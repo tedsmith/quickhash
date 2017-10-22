@@ -13,6 +13,9 @@ Some helpful interface hints added to the check boxes in the FileS tab,which see
 Following a feature request, added a "case switcher" to the Text and File tabs. This allows the user to toggle the output hash between upper or lower case. Useful for users who need to compute hashes of hashes, instead of just hashes of some data. For users who may need to compute the hash of a hash value, the case sensitivity is 
 important obviously. Upper case is still the default output as it is easier for humans to read.   
 
+Files of zero bytes were skipped (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash
+for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, but still recorded as a zero byte file and not hashed. Instead 'zero byte file' will appear where the hash value would.
+
 V2.8.4
 ------
 The "Expected Hash Value" field had been broke a little in the 2.8.3 release meaning that when the user first pasted a value, it would report a mis-match even when it matched. But if the user re-pasted the value, it would match as intended (https://quickhash-gui.org/bugs/expected-hash-value-report-wrongly-on-single-file-hashing/). That fault was fixed. 
