@@ -2256,6 +2256,7 @@ begin
       memFolderCompareSummary.Lines.Add('Currently searching for files in ' + FolderA);
       slFileListA := TStringList.Create;
       slFileListA.Sorted := true;
+      // TODO next : Add LongPathOveride to both FolderA and Folderb stringlists
       slFileListA := RetrieveFileList(FolderA);
       FolderAFileCount := slFileListA.Count;
       lblTotalFileCountNumberA.Caption := IntToStr(FolderAFileCount);
@@ -2266,7 +2267,7 @@ begin
         // Hashing the files in FolderA
         for i := 0 to slFileListA.Count -1 do
         begin
-          HashVal := CalcTheHashFile(slFileListA.Strings[i]); //SHA1Print(SHA1File(slFileListA.Strings[i]));
+          HashVal := CalcTheHashFile(slFileListA.Strings[i]);
           HashListA.Add(HashVal, Pointer(HashVal));
           inc(FilesProcessedA, 1);
           pbCompareDirA.Position := ((FilesProcessedA * 100) DIV FolderAFileCount);
@@ -2288,7 +2289,7 @@ begin
             HashListB := TFPHashList.Create;
             for i := 0 to slFileListB.Count -1 do
             begin
-              HashVal := CalcTheHashFile(slFileListB.Strings[i]); // SHA1Print(SHA1File(slFileListB.Strings[i]));
+              HashVal := CalcTheHashFile(slFileListB.Strings[i]);
               HashListB.Add(HashVal, Pointer(HashVal));
               inc(FilesProcessedB, 1);
               pbCompareDirB.Position := ((FilesProcessedB * 100) DIV FolderBFileCount);
