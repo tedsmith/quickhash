@@ -6,6 +6,9 @@ Now with SQLite!! The reason why the development numbering has moved to v3.0...t
 SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and 
 copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
 
+The "Compare Two Directories" tab has been entirely re-written to determine if both directories match or not. The coding is much enhanced and more efficient, utilising TFPHashLists 
+amongst other things. Instead of having two display grids, the interface has two treelists which are then hashed as TFPHashlists for greater performance as well as easier for the user to use.
+
 The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed. 
 
 Some helpful interface hints added to the check boxes in the FileS tab,which seemed to have been left out of earlier versions
@@ -13,8 +16,11 @@ Some helpful interface hints added to the check boxes in the FileS tab,which see
 Following a feature request, added a "case switcher" to the Text and File tabs. This allows the user to toggle the output hash between upper or lower case. Useful for users who need to compute hashes of hashes, instead of just hashes of some data. For users who may need to compute the hash of a hash value, the case sensitivity is 
 important obviously. Upper case is still the default output as it is easier for humans to read.   
 
-Files of zero bytes were skipped (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash
-for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, but still recorded as a zero byte file and not hashed. Instead 'zero byte file' will appear where the hash value would.
+Files of zero bytes were skipped in the 'Copy' tab (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash
+for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, and still recorded as a zero byte file but not hashed. Instead 'zero byte file' will appear where the hash value would.
+The same fix has been applied to the "Compare Two Files" tab, where a zero byte file will not be hashed (because doing so just returns the default initilisation hash which is misleading). And also to the "Compare Two Directories"; zero byte files are flagged as zero bytes. So still used for the 
+comparison but not actually hashed. 
+
 
 V2.8.4
 ------
