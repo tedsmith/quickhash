@@ -6,8 +6,9 @@ Now with SQLite!! The reason why the development numbering has moved to v3.0...t
 SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and 
 copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
 
-The "Compare Two Directories" tab has been entirely re-written to determine if both directories match or not. The coding is much enhanced and more efficient, utilising TFPHashLists 
-amongst other things. Instead of having two display grids, the interface has two treelists which are then hashed as TFPHashlists for greater performance as well as easier for the user to use.
+The "Compare Two Directories" tab has been entirely re-written to determine if both directories match or not. Recent updates to this tab had got so confusing it was difficult to read and debug, and in v2.8.4, if the user selected to thos wall results instead of just errors, it went really slow again
+because I must have got something wrong in one of the loops. So I ditched it all and started from scratch. The coding is much enhanced now, more efficient, and with less (no?) memory leaks. It utilises TFPHashLists amongst other things to improve perfomance. 
+And instead of having two display grids (which also slow things down and were not that useable in fact), the interface now has two treelists for the user to select FolderA and FolderB which are then hashed as TFPHashlists and compared. 
 
 The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed. 
 
