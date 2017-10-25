@@ -2285,7 +2285,7 @@ begin
   end;
   {$else}
    // If we are running on Linix or OSX just blank the long path overide to nothing
-    LongPathOverride = '';
+    LongPathOverride := '';
   {$endif}
 
 
@@ -3977,10 +3977,10 @@ begin
                 Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
                   {$else}
                      {$IFDEF Darwin}
-                       Col1Filename := FilesFoundToCopy.Strings[i];
+                       Col1SourceFilePathAndName := FilesFoundToCopy.Strings[i];
                      {$else}
                        {$IFDEF UNIX and !$ifdef Darwin}
-                         Col1Filename := FilesFoundToCopy.Strings[i];
+                         Col1SourceFilePathAndName := FilesFoundToCopy.Strings[i];
                        {$ENDIF}
                      {$ENDIF}
                   {$ENDIF}
@@ -4006,10 +4006,10 @@ begin
                 Col1SourceFilePathAndName := RemoveLongPathOverrideChars(FilesFoundToCopy.Strings[i], LongPathOverride);
                   {$else}
                      {$IFDEF Darwin}
-                       Col1Filename := FilesFoundToCopy.Strings[i];
+                       Col1SourceFilePathAndName := FilesFoundToCopy.Strings[i];
                      {$else}
                        {$IFDEF UNIX and !$ifdef Darwin}
-                         Col1Filename := FilesFoundToCopy.Strings[i];
+                         Col1SourceFilePathAndName := FilesFoundToCopy.Strings[i];
                        {$ENDIF}
                      {$ENDIF}
                   {$ENDIF}
