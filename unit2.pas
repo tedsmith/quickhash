@@ -153,6 +153,7 @@ type
     b64ProgressFileS: TEdit;
     cbFlipCaseTEXT: TCheckBox;
     cbUNCModeCompFolders: TCheckBox;
+    cbSaveComparisons: TCheckBox;
     edtUNCPathCompareA: TEdit;
     edtUNCPathCompareB: TEdit;
     FileSDBNavigator: TDBNavigator;
@@ -352,6 +353,8 @@ type
     procedure cbFlipCaseTEXTChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure cbUNCModeCompFoldersChange(Sender: TObject);
+    procedure edtUNCPathCompareAChange(Sender: TObject);
+    procedure edtUNCPathCompareBChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure lblDonateClick(Sender: TObject);
     procedure lbleExpectedHashChange(Sender: TObject);
@@ -387,6 +390,7 @@ type
     procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode);
+    procedure ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode);
     procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
@@ -427,6 +431,8 @@ type
     procedure CompareTwoHashes(FileAHash, FileBHash : string);
     procedure HashText(Sender: TObject);
     procedure ClearText(Sender: TObject);
+    procedure TabSheet6ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
     function  ValidateTextWithHash(strToBeHashed:ansistring): string;
     function  CalcTheHashString(strToBeHashed:ansistring):string;
     function  CalcTheHashFile(FileToBeHashed:string):string;
@@ -481,9 +487,8 @@ type
    // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
    // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes. LongPathOverride
    // will always either be '\\?\' or '\\?\UNC\'
-   // A and B below are for the Directory Comparison tab only
 
-   LongPathOverride, LongPathOverrideA, LongPathOverrideB : string;
+   LongPathOverride : string;
 
    {$else}
     {$IFDEF Darwin}
@@ -558,9 +563,7 @@ begin
   // NTFS filename length over the 260 MAX_PATH. Where the user opts for UNC paths
   // as well, it becomes '\\?\UNC\'
   LongPathOverride := '\\?\';
-  // A and B below are for the Directory Comparison tab only
-  LongPathOverrideA := '\\?\';
-  LongPathOverrideB := '\\?\';
+
   {$endif}
   // In Lazarus versions  < 1.4.4, the 'FileSortType' property of ShellTreeViews
   // would cause the listing to be doubled if anything other than fstNone was chosen
@@ -656,10 +659,12 @@ begin
    chkCopyHidden.Hint     := 'In Linux, tick this to ensure hidden directories and hidden files in them are detected, if you want them';
 
    // UNC mode is for Windows only so disable in Linux
-   chkUNCMode.Enabled        := false;
-   chkUNCMode.Visible        := false;
-   Edit2SourcePath.Text      := 'Source directory selection';
-   Edit3DestinationPath.Text := 'Destination directory selection';
+   chkUNCMode.Enabled            := false;
+   chkUNCMode.Visible            := false;
+   cbUNCModeCompFolders.Enabled  := false;
+   cbUNCModeCompFolders.Visible  := false;
+   Edit2SourcePath.Text          := 'Source directory selection';
+   Edit3DestinationPath.Text     := 'Destination directory selection';
 
    // RAM status stuff needs to be disabled on Linux
    sysRAMTimer.enabled       := false;
@@ -679,10 +684,12 @@ begin
       chkCopyHidden.Hint     := 'In Apple Mac, tick this to ensure hidden directories and hidden files in them are detected, if you want them';
 
       // UNC mode is for Windows only so disable in Apple Mac
-      chkUNCMode.Enabled        := false;
-      chkUNCMode.Visible        := false;
-      Edit2SourcePath.Text      := 'Source directory selection';
-      Edit3DestinationPath.Text := 'Destination directory selection';
+      chkUNCMode.Enabled             := false;
+      chkUNCMode.Visible             := false;
+      cbUNCModeCompFolders.Enabled   := false;
+      cbUNCModeCompFolders.Visible   := false;
+      Edit2SourcePath.Text           := 'Source directory selection';
+      Edit3DestinationPath.Text      := 'Destination directory selection';
     {$ENDIF}
  {$ENDIF}
 end;
@@ -1164,6 +1171,7 @@ begin
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
 end;
 
+// Behaviours for the UNC tick box in "Compare Two Directories" tab
 procedure TMainForm.cbUNCModeCompFoldersChange(Sender: TObject);
 begin
   if cbUNCModeCompFolders.Checked then
@@ -1172,6 +1180,8 @@ begin
     ShellTreeView_FolderB.Visible := false;
     edtUNCPathCompareA.Visible:= true;
     edtUNCPathCompareB.Visible:= true;
+    lblFolderAName.Caption:= '';
+    lblFolderBName.Caption:= '';
     end
   else
   begin
@@ -1179,7 +1189,21 @@ begin
     ShellTreeView_FolderB.Visible := true;
     edtUNCPathCompareA.Visible:= false;
     edtUNCPathCompareB.Visible:= false;
+    lblFolderAName.Caption:= '';
+    lblFolderBName.Caption:= '';
   end;
+end;
+
+// Ensure the UNC path of FolderA is echoed in the path label
+procedure TMainForm.edtUNCPathCompareAChange(Sender: TObject);
+begin
+  lblFolderAName.Caption := edtUNCPathCompareA.Text;
+end;
+
+// Ensure the UNC path of FolderB is echoed in the path label
+procedure TMainForm.edtUNCPathCompareBChange(Sender: TObject);
+begin
+  lblFolderBName.Caption := edtUNCPathCompareB.Text;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -1893,7 +1917,13 @@ end;
 procedure TMainForm.ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode
   );
 begin
+  lblFolderAName.Caption := ShellTreeView_FolderA.GetSelectedNodePath;
+end;
 
+procedure TMainForm.ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode
+  );
+begin
+  lblFolderBName.Caption := ShellTreeView_FolderB.GetSelectedNodePath;
 end;
 
 
@@ -2138,7 +2168,7 @@ begin
   end
 end;
 
-// Get the list of files from a folder
+// Get the list of all files from a folder, including hidden ones
 function TMainForm.RetrieveFileList(FolderName : string) : TStringList;
 begin
    result := FindAllFilesEx(FolderName, '*', true, true);
@@ -2163,18 +2193,35 @@ end;
 procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
-  FolderA, FolderB, HashVal : string;
+  FolderA, FolderB, LongPathOveride, HashVal, StringToWrite : string;
 
-  slFileListA, slFileListB          : TStringList;
+  slFileListA, slFileListB  : TStringList;
 
   HashListA, HashListB      : TFPHashList;
 
-  i, FolderAFileCount, FolderBFileCount, FilesProcessedA, FilesProcessedB: integer;
+  fsSaveLog : TFileStream;
+
+  NeedToSave : Boolean;
+
+  i, j, FolderAFileCount, FolderBFileCount, FilesProcessedA, FilesProcessedB,
+    FileCountDifference, StringLength: integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
 
 begin
+  // Initialise vars and display captions, to ensure any previous runs are cleared
+  i                      := -1;
+  j                      := -1;
+  FilesProcessedA        := 0;
+  FilesProcessedB        := 0;
+  pbCompareDirA.Position := 0;
+  pbCompareDirB.Position := 0;
+  FolderA                := '';
+  FolderB                := '';
+  FileCountDifference    := -1;
+  NeedToSave             := false;
+
   if cbUNCModeCompFolders.Checked then
   begin
     if edtUNCPathCompareA.Text = 'Enter UNC path (e.g.\\DATASTORE\FOLDERA)' then
@@ -2190,13 +2237,8 @@ begin
     end;
   end;
 
-  // Initialise vars and display captions, to ensure any previous runs are cleared
-  i                                := 0;
-  FilesProcessedA                  := 0;
-  FilesProcessedB                  := 0;
-
-  // If UNC mode is not enabled, get FolderA and FolderB paths from list view
-  if cbUNCModeCompFolders.Checked = false then
+  // If UNC mode is DISabled, get FolderA and FolderB paths from list view
+  if not cbUNCModeCompFolders.Checked then
   begin
     FolderA := ShellTreeView_FolderA.GetSelectedNodePath;
     lblFolderAName.Caption:= FolderA;
@@ -2205,8 +2247,8 @@ begin
     lblFolderBName.Caption:= FolderB;
   end;
 
-  // If UNC mode is enabled, get FolderA and FolderB paths from UNC text fields
-  if cbUNCModeCompFolders.Checked = true then
+  // If UNC mode is ENabled, get FolderA and FolderB paths from UNC text fields
+  if cbUNCModeCompFolders.Checked then
   begin
     FolderA := edtUNCPathCompareA.Text;
     lblFolderAName.Caption:= FolderA;
@@ -2215,28 +2257,39 @@ begin
     lblFolderBName.Caption:= FolderB;
   end;
 
-  pbCompareDirA.Position := 0;
-  pbCompareDirB.Position := 0;
-
   {$ifdef Windows}
-  // Check if a UNC server path is given for either DirA or DirB.
-  // If so, adjust LongPathOverride and append the UNC prefix to ensure that both
-  // the 32K path length limit and the UNC rules are adhered to
+  // Check if a UNC server path has been passed for either FolderA or FolderB.
+  // If so, adjust LongPathOverride for UNC mode and append the UNC prefix to
+  // ensure that the 32K path length limit and the UNC rules are adhered to
 
-  if (Pos('\\', DirA) > 0) then
+  LongPathOveride := '\\?\';
+
+  if (Pos('\\', FolderA) > 0) or (Pos('\\', FolderB) > 0) then
   begin
-    LongPathOverrideA := '\\?\UNC\';
-    Delete(DirA, 1, 2); // Delete the \\ from the DirA path
+    LongPathOverride := '\\?\UNC\';
   end;
 
-  if (Pos('\\', DirB) > 0) then
+  if LongPathOverride = '\\?\UNC\' then
   begin
-    LongPathOverrideB := '\\?\UNC\';
-    Delete(DirB, 1, 2); // Delete the \\ from the DirB path
+    FolderA := LongPathOverride+FolderA;
+    FolderB := LongPathOverride+FolderB;
+    // Delete the two \\ from the UNC path so that \\Data becomes \\?\UNC\Data
+    Delete(FolderA, 9, 2);
+    Delete(FolderB, 9, 2);
+  end
+  else
+  begin
+    // So non-UNC path is in force, e.g. \\?\C:\MyData
+    FolderA := LongPathOverride+FolderA;
+    FolderB := LongPathOverride+FolderB;
   end;
+  {$else}
+   // If we are running on Linix or OSX just blank the long path overide to nothing
+    LongPathOverride = '';
   {$endif}
 
-  If DirectoryExists(FolderA) and DirectoryExists(FolderB) then
+
+  If DirectoryExistsUTF8(lblFolderAName.Caption) and DirectoryExistsUTF8(lblFolderBName.Caption) then
     begin
     // Check if a scheduler has been set for the comparison to start in the future
     if lblschedulertickboxCompareDirsTab.Checked then
@@ -2250,85 +2303,129 @@ begin
     lblTotalFileCountNumberB.Caption := '...';
     memFolderCompareSummary.Lines.Add('Time started: ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', StartTime));
 
-    // Process FolderA first. Find all the files initially, and then hash them
-    try
-      StatusBar6.SimpleText:= 'Currently searching for files in ' + FolderA;
-      memFolderCompareSummary.Lines.Add('Currently searching for files in ' + FolderA);
-      slFileListA := TStringList.Create;
-      slFileListA.Sorted := true;
-      // TODO next : Add LongPathOveride to both FolderA and Folderb stringlists
-      slFileListA := RetrieveFileList(FolderA);
-      FolderAFileCount := slFileListA.Count;
-      lblTotalFileCountNumberA.Caption := IntToStr(FolderAFileCount);
+    if cbSaveComparisons.Checked then
+    begin
+      fsSaveLog := TFileStream.Create('results.csv', fmCreate or fmOpenRead);
+      NeedToSave := true;
+    end;
+      // Process FolderA first. Find all the files initially
       try
-        StatusBar6.SimpleText:= 'Now hashing files in ' + FolderA;
-        memFolderCompareSummary.Lines.Add('Now hashing files in ' + FolderA);
-        HashListA := TFPHashList.Create;
-        // Hashing the files in FolderA
-        for i := 0 to slFileListA.Count -1 do
-        begin
-          HashVal := CalcTheHashFile(slFileListA.Strings[i]);
-          HashListA.Add(HashVal, Pointer(HashVal));
-          inc(FilesProcessedA, 1);
-          pbCompareDirA.Position := ((FilesProcessedA * 100) DIV FolderAFileCount);
-        end;
+        StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
+        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
+        slFileListA := TStringList.Create;
+        slFileListA.Sorted := true;
+        slFileListA := RetrieveFileList(FolderA);
+        FolderAFileCount := slFileListA.Count;
+        lblTotalFileCountNumberA.Caption := IntToStr(FolderAFileCount);
 
-        // So FolderA has been done. So now lets move onto FolderB
+        // Now move to FolderB. Find all the files initially
         try
-          StatusBar6.SimpleText:= 'Currently searching for files in ' + FolderB;
-          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + FolderB);
+          StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
+          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
           slFileListB := TStringList.Create;
           slFileListB.Sorted := true;
           slFileListB := RetrieveFileList(FolderB);
           FolderBFileCount := slFileListB.Count;
           lblTotalFileCountNumberB.Caption := IntToStr(FolderBFileCount);
-          try
-            StatusBar6.SimpleText:= 'Now hashing files in ' + FolderB;
-            memFolderCompareSummary.Lines.Add('Now hashing files in ' + FolderB);
-            // Hash the files in FolderB
-            HashListB := TFPHashList.Create;
-            for i := 0 to slFileListB.Count -1 do
-            begin
-              HashVal := CalcTheHashFile(slFileListB.Strings[i]);
-              HashListB.Add(HashVal, Pointer(HashVal));
-              inc(FilesProcessedB, 1);
-              pbCompareDirB.Position := ((FilesProcessedB * 100) DIV FolderBFileCount);
-            end;
 
-            // All done. Compare the result.
-            StatusBar6.SimpleText:= 'Hashing complete. Now comparing files in both folders...';
-            if CompareHashLists(HashListA, HashListB) then
+          // Only proceed to hashing if the file counts match in both Folders
+          if FolderAFileCount = FolderBFileCount then
+          begin
+            FileCountDifference := 0;
+            StatusBar6.SimpleText:= 'File counts match. Moving onto file hashing... ';
+            memFolderCompareSummary.Lines.Add('File counts match. Moving onto file hashing... ');
+
+            // Now hash the files in FolderA
+            try
+              StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
+              memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
+              HashListA := TFPHashList.Create;
+              for i := 0 to slFileListA.Count -1 do
               begin
-                memFolderCompareSummary.Lines.Add('Result : MATCH!');
-                StatusBar6.SimpleText := 'The files of both folders are the same. MATCH!';
-              end
-            else
-            begin
-              memFolderCompareSummary.Lines.Add('Result : MIS-MATCH!');
-              StatusBar6.SimpleText := 'The files of both folders are NOT the same. MIS-MATCH!';
+                HashVal := CalcTheHashFile(slFileListA.Strings[i]);
+                HashListA.Add(HashVal, Pointer(HashVal));
+                if NeedToSave then
+                begin
+                  StringLength := -1;
+                  StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+                  StringLength := Length(StringToWrite);
+                  fsSaveLog.Write(StringToWrite[1], StringLength);
+                end;
+                inc(FilesProcessedA, 1);
+                pbCompareDirA.Position := ((FilesProcessedA * 100) DIV FolderAFileCount);
+              end;
+
+              // Now hash the files in FolderB
+              try
+                StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
+                memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
+                HashListB := TFPHashList.Create;
+                for j := 0 to slFileListB.Count -1 do
+                begin
+                  HashVal := CalcTheHashFile(slFileListB.Strings[j]);
+                  HashListB.Add(HashVal, Pointer(HashVal));
+                  if NeedToSave then
+                  begin
+                    StringLength := -1;
+                    StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[i], LongPathOverride)) + #13#10;
+                    StringLength := Length(StringToWrite);
+                    fsSaveLog.Write(StringToWrite[1], StringLength);
+                  end;
+                  inc(FilesProcessedB, 1);
+                  pbCompareDirB.Position := ((FilesProcessedB * 100) DIV FolderBFileCount);
+                end;
+
+                  // All done. Compare the result.
+                  StatusBar6.SimpleText:= 'Hashing complete. Now comparing files in both folders...';
+                  if CompareHashLists(HashListA, HashListB) then
+                    begin
+                      memFolderCompareSummary.Lines.Add('Result : MATCH!');
+                      StatusBar6.SimpleText := 'The files of both folders are the same. MATCH!';
+                    end
+                  else
+                  begin
+                    memFolderCompareSummary.Lines.Add('Result : MIS-MATCH!');
+                    StatusBar6.SimpleText := 'The files of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!';
+                  end;
+              // Now free all the resources in the correct order
+              finally
+                HashListB.free;           // Release HashListB
+              end;
+            finally
+              HashListA.Free;             // Release HashListA
             end;
-          // Now free all the resources in the correct order
-          finally
-            HashListB.free;           // Release HashListB
+          end                             // End of if FileCounts match
+          else
+          begin
+           // As the file counts differ, work out what the difference is
+            if FolderAFileCount < FolderBFileCount then
+              begin
+                FileCountDifference := FolderBFileCount-FolderAFileCount;
+              end
+            else FileCountDifference := FolderAFileCount-FolderBFileCount;
           end;
         finally
-          slFileListB.Free;           // Release FileListB
+          slFileListB.Free;             // Release FileListB
         end;
       finally
-        HashListA.Free;               // Release HashListA
+        slFileListA.free;               // Release FileListA
       end;
-    finally
-      slFileListA.free;               // Release FileListA
-    end;
 
     // Compute timings and display them
     EndTime := Now;
     TimeTaken := EndTime-StartTime;
-    memFolderCompareSummary.Lines.Add('Ended at : ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', EndTime));
-    memFolderCompareSummary.Lines.Add('Time taken : ' + FormatDateTime('HH:MM:SS', TimeTaken));
-    memFolderCompareSummary.Lines.Add('Files in Folder A : ' + IntToStr(FolderAFileCount));
-    memFolderCompareSummary.Lines.Add('Files in Folder B : ' + IntToStr(FolderBFileCount));
-    memFolderCompareSummary.Lines.Add('File count difference : ' + IntToStr(FolderBFileCount-FolderAFileCount));
+    memFolderCompareSummary.Lines.Add('Ended at : '               + FormatDateTime('YYYY/MM/DD HH:MM:SS', EndTime));
+    memFolderCompareSummary.Lines.Add('Time taken : '             + FormatDateTime('HH:MM:SS', TimeTaken));
+    memFolderCompareSummary.Lines.Add('Files in Folder A : '      + IntToStr(FolderAFileCount));
+    memFolderCompareSummary.Lines.Add('Files in Folder B : '      + IntToStr(FolderBFileCount));
+    memFolderCompareSummary.Lines.Add('File count differs by : '  + IntToStr(FileCountDifference));
+
+    if cbSaveComparisons.Checked then
+      begin
+        memFolderCompareSummary.Lines.Add('Results saved to ' + IncludeTrailingPathDelimiter(GetCurrentDir) + fsSaveLog.FileName);
+        if assigned(fsSaveLog) then fsSaveLog.Free;
+      end;
+
     Application.ProcessMessages;
   end // End of If DirectoryExists...
   else
@@ -2348,6 +2445,12 @@ end;
 procedure TMainForm.ClearText(Sender: TObject);
 begin
   if memoHashText.Lines[0] = 'Type or paste text here - hash will update as you type' then memoHashText.Clear;
+end;
+
+procedure TMainForm.TabSheet6ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+
 end;
 
 
