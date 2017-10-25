@@ -18,6 +18,8 @@ begin
   Application.Title:='QuickHash';
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TfrmSQLiteDBases, frmSQLiteDBases);
+  Application.CreateForm(TfrmAbout, frmAbout);
   Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);
   {$IFDEF Windows}
   Application.CreateForm(TfrmDiskHashingModule, frmDiskHashingModule);
@@ -33,8 +35,6 @@ begin
   Application.CreateForm(TfrmTechSpecs, frmTechSpecs);
   {$ENDIF}
   {$ENDIF}
-  Application.CreateForm(TfrmAbout, frmAbout);
-  Application.CreateForm(TfrmSQLiteDBases, frmSQLiteDBases);
   Application.Run;
 end.
 
