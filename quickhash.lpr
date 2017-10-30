@@ -15,19 +15,19 @@ uses
 {$R *.res}
 
 begin
-  Application.Title:='QuickHash';
+  Application.Title:='Quick Hash';
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TfrmSQLiteDBases, frmSQLiteDBases);
-  Application.CreateForm(TfrmAbout, frmAbout);
   Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);
+  Application.CreateForm(TfrmAbout, frmAbout);
+  Application.CreateForm(TfrmSQLiteDBases, frmSQLiteDBases);
   {$IFDEF Windows}
   Application.CreateForm(TfrmDiskHashingModule, frmDiskHashingModule);
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmTechSpecs, frmTechSpecs);
   {$ENDIF}
   {$IFDEF Darwin}
-  // not availabkle for Mac
+   // nothing
   {$else}
   {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
   Application.CreateForm(TfrmDiskHashingModule, frmDiskHashingModule);

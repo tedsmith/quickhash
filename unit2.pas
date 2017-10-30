@@ -941,6 +941,7 @@ var
   start, stop, elapsed, scheduleStartTime : TDateTime;
   LoopCounter : integer;
 begin
+  PageControl1.ActivePage := Tabsheet2;  // Ensure File tab activated if triggered via menu
   filename := '';
   StatusBar1.SimpleText := '';
   LoopCounter := 0;
@@ -1972,6 +1973,7 @@ var
   j, i, LoopCounter, DuplicatesDeleted            : integer;
 
   begin
+  PageControl1.ActivePage := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
   FileCounter                   := 1;
   TotalBytesRead                := 0;
   DuplicatesDeleted             := 0;
@@ -2305,7 +2307,7 @@ begin
 
     if cbSaveComparisons.Checked then
     begin
-      fsSaveLog := TFileStream.Create('results.csv', fmCreate or fmOpenRead);
+      fsSaveLog := TFileStream.Create('results.csv', fmCreate or fmOpenWrite);
       NeedToSave := true;
     end;
       // Process FolderA first. Find all the files initially
@@ -2397,12 +2399,25 @@ begin
           end                             // End of if FileCounts match
           else
           begin
-           // As the file counts differ, work out what the difference is
+           // As the file counts differ, work out what the difference is between the two
+           // We do this little computation to avoid a figure like "file counts differ by -50000"
+           // So, if FolderB Count is less then FolderA Count
             if FolderAFileCount < FolderBFileCount then
               begin
-                FileCountDifference := FolderBFileCount-FolderAFileCount;
+                FileCountDifference    := FolderBFileCount-FolderAFileCount;
+                StatusBar6.SimpleText  := 'The files of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files. Different number of files!';
+                pbCompareDirA.Position := 100;
+                pbCompareDirB.Position := 100;
               end
-            else FileCountDifference := FolderAFileCount-FolderBFileCount;
+            else
+            // Well they are not equal to, and FolderB Count was not less then FolderA Count.
+            // Therefore, by virtue, FolderB Count must be less then FolderA Count
+            begin
+              FileCountDifference      := FolderAFileCount-FolderBFileCount;
+              StatusBar6.SimpleText    := 'The files of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files. Different number of files!';
+              pbCompareDirA.Position   := 100;
+              pbCompareDirB.Position   := 100;
+            end;
           end;
         finally
           slFileListB.Free;             // Release FileListB
@@ -2419,13 +2434,23 @@ begin
     memFolderCompareSummary.Lines.Add('Files in Folder A : '      + IntToStr(FolderAFileCount));
     memFolderCompareSummary.Lines.Add('Files in Folder B : '      + IntToStr(FolderBFileCount));
     memFolderCompareSummary.Lines.Add('File count differs by : '  + IntToStr(FileCountDifference));
+    memFolderCompareSummary.Lines.Add('Finished analysis');
 
     if cbSaveComparisons.Checked then
       begin
         memFolderCompareSummary.Lines.Add('Results saved to ' + IncludeTrailingPathDelimiter(GetCurrentDir) + fsSaveLog.FileName);
+        // Save the memo data to the file too. Useful regardless of whether files were
+        // just counted and found to be different by file count, or whether they were
+        // hashed and found to be the same or different
+        if NeedToSave then
+          begin
+            for i := 0 to memFolderCompareSummary.Lines.Count -1 do
+            begin
+              fsSaveLog.Write(memFolderCompareSummary.Lines[i][1], Length(memFolderCompareSummary.Lines[i]));
+            end;
+          end;
         if assigned(fsSaveLog) then fsSaveLog.Free;
       end;
-
     Application.ProcessMessages;
   end // End of If DirectoryExists...
   else
