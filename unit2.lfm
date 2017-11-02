@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 302
+  Left = 347
   Height = 738
-  Top = 82
+  Top = 109
   Width = 1016
   AllowDropFiles = True
   Caption = 'QuickHash v3.0.0 - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -29,7 +29,7 @@ object MainForm: TMainForm
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
       Caption = 'Te&xt'
-      ClientHeight = 652
+      ClientHeight = 655
       ClientWidth = 976
       OnContextPopup = TabSheet1ContextPopup
       ParentShowHint = False
@@ -85,7 +85,7 @@ object MainForm: TMainForm
         end
         object lbleExpectedHashText: TLabeledEdit
           Left = 8
-          Height = 25
+          Height = 24
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated hash matches the computed.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3 dots only)'
           Top = 304
           Width = 815
@@ -95,8 +95,8 @@ object MainForm: TMainForm
           EditLabel.AnchorSideRight.Side = asrBottom
           EditLabel.AnchorSideBottom.Control = lbleExpectedHashText
           EditLabel.Left = 8
-          EditLabel.Height = 17
-          EditLabel.Top = 284
+          EditLabel.Height = 16
+          EditLabel.Top = 285
           EditLabel.Width = 815
           EditLabel.Caption = 'Expected Hash Value (clear, then paste value from other utility)'
           EditLabel.ParentColor = False
@@ -149,10 +149,10 @@ object MainForm: TMainForm
           end
           object cbToggleInputDataToOutputFile: TCheckBox
             Left = 352
-            Height = 21
+            Height = 20
             Hint = 'If left unticked, the source '#13#10'text including corresponding hashes '#13#10'will be output. If ticked, only the'#13#10'hashes will be output on their own.'
             Top = 13
-            Width = 194
+            Width = 190
             Caption = 'Source text included in output'
             OnChange = cbToggleInputDataToOutputFileChange
             ParentShowHint = False
@@ -162,9 +162,9 @@ object MainForm: TMainForm
         end
         object cbFlipCaseTEXT: TCheckBox
           Left = 8
-          Height = 21
+          Height = 20
           Top = 408
-          Width = 86
+          Width = 88
           Caption = 'Switch case'
           OnChange = cbFlipCaseTEXTChange
           TabOrder = 4
@@ -217,9 +217,9 @@ object MainForm: TMainForm
         TabOrder = 2
         object lblRAM: TLabel
           Left = 8
-          Height = 17
+          Height = 16
           Top = 8
-          Width = 9
+          Width = 12
           Caption = '...'
           ParentColor = False
         end
@@ -1527,7 +1527,7 @@ object MainForm: TMainForm
           Left = 347
           Height = 24
           Hint = 'Enter date and time (hours and minutes) '
-          Top = 168
+          Top = 200
           Width = 138
           CenturyFrom = 1941
           MaxDate = 2958465
@@ -1551,8 +1551,8 @@ object MainForm: TMainForm
         object lblschedulertickboxCompareDirsTab: TCheckBox
           Left = 347
           Height = 20
-          Hint = 'After choosing FileA and FileB, tick and set a date and time ahead of current time'#13#10'and then click Compare Now.'
-          Top = 136
+          Hint = 'After choosing FolderA and FolderB, set a date and '#13#10'time ahead of current time and then click Compare Now.'
+          Top = 168
           Width = 108
           Caption = 'Start at a time:'
           OnChange = lblschedulertickboxCompareTwoDirectoriesTabChange
@@ -1661,10 +1661,13 @@ object MainForm: TMainForm
         object cbUNCModeCompFolders: TCheckBox
           Left = 347
           Height = 20
+          Hint = 'For Windows users, if ticked, two UNC path'#13#10'fields will allow the user to compare two '#13#10'network paths'
           Top = 72
           Width = 85
           Caption = 'UNC Mode?'
           OnChange = cbUNCModeCompFoldersChange
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 8
         end
         object edtUNCPathCompareA: TEdit
@@ -1690,12 +1693,28 @@ object MainForm: TMainForm
         object cbSaveComparisons: TCheckBox
           Left = 347
           Height = 20
+          Hint = 'Save the results of the comparison.'#13#10'Filenames, hash values etc will be '#13#10'auto-saved to a CSV file in the location'#13#10'of where QuickHash is running from.'
           Top = 102
           Width = 151
           Caption = 'Save Results? (slower)'
           Checked = True
+          OnChange = cbSaveComparisonsChange
+          ParentShowHint = False
+          ShowHint = True
           State = cbChecked
           TabOrder = 11
+        end
+        object cbOverrideFileCountDiffer: TCheckBox
+          Left = 347
+          Height = 20
+          Hint = 'If the file count of both folders are different'#13#10'proceed anyway to hash all the files in both'#13#10'(''Save Results?'' must be enabled for this feature)'
+          Top = 136
+          Width = 142
+          Caption = 'Cont. if count differs?'
+          OnChange = cbOverrideFileCountDifferChange
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 12
         end
       end
     end

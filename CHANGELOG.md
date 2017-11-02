@@ -6,9 +6,11 @@ Now with SQLite!! The reason why the development numbering has moved to v3.0...t
 SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and 
 copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
 
-The "Compare Two Directories" tab has been entirely re-written to determine if both directories match or not. Recent updates to this tab had got so confusing it was difficult to read and debug, and in v2.8.4, if the user selected to thos wall results instead of just errors, it went really slow again
+The "Compare Two Directories" tab has been entirely re-written (and renamed) to determine if both directories match or not. Recent updates to this tab had got so confusing it was difficult to read and debug, and in v2.8.4, if the user selected to thos wall results instead of just errors, it went really slow again
 because I must have got something wrong in one of the loops. So I ditched it all and started from scratch. The coding is much enhanced now, more efficient, and with less (no?) memory leaks. It utilises TFPHashLists amongst other things to improve perfomance. 
 And instead of having two display grids (which also slow things down and were not that useable in fact), the interface now has two treelists for the user to select FolderA and FolderB which are then hashed as TFPHashlists and compared. 
+
+Renamed the "Compare Directories" tab to "Compare Two Folders". It marries up better with the previous tab ("Compare Two Files") and it makes more sense to most modern computer users who have been raised on such wholesome terminologies (that's sarcasm).  
 
 The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed. 
 
@@ -19,9 +21,10 @@ important obviously. Upper case is still the default output as it is easier for 
 
 Files of zero bytes were skipped in the 'Copy' tab (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash
 for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, and still recorded as a zero byte file but not hashed. Instead 'zero byte file' will appear where the hash value would.
-The same fix has been applied to the "Compare Two Files" tab, where a zero byte file will not be hashed (because doing so just returns the default initilisation hash which is misleading). And also to the "Compare Two Directories"; zero byte files are flagged as zero bytes. So still used for the 
+The same fix has been applied to the "Compare Two Files" tab, where a zero byte file will not be hashed (because doing so just returns the default initialisation hash which is misleading). And also to the "Compare Two Directories"; zero byte files are flagged as zero bytes. So still used for the 
 comparison but not actually hashed. 
 
+Fixed the time scheduler. It now checks every 1/3 of second if the current time equals the scheduled start time. 
 
 V2.8.4
 ------

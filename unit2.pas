@@ -154,6 +154,7 @@ type
     cbFlipCaseTEXT: TCheckBox;
     cbUNCModeCompFolders: TCheckBox;
     cbSaveComparisons: TCheckBox;
+    cbOverrideFileCountDiffer: TCheckBox;
     edtUNCPathCompareA: TEdit;
     edtUNCPathCompareB: TEdit;
     FileSDBNavigator: TDBNavigator;
@@ -351,6 +352,8 @@ type
     procedure Button1Click(Sender: TObject);
     procedure cbFlipCaseFILEChange(Sender: TObject);
     procedure cbFlipCaseTEXTChange(Sender: TObject);
+    procedure cbOverrideFileCountDifferChange(Sender: TObject);
+    procedure cbSaveComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure cbUNCModeCompFoldersChange(Sender: TObject);
     procedure edtUNCPathCompareAChange(Sender: TObject);
@@ -442,9 +445,14 @@ type
     procedure EmptyDisplayGrid(Grid : TStringGrid);
     procedure CheckSchedule(DesiredStartTime : TDateTime);
     procedure InvokeScheduler(Sender : TObject);
+    function RoundToNearest(TheDateTime,TheRoundStep:TDateTime):TdateTime;
     procedure CommitCount(Sender : TObject);
     function RetrieveFileList(FolderName : string) : TStringList;
+    function HashFolderAList(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
+    function HashFolderBList(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
     function CompareHashLists(aHashList1, aHashlist2: TFPHashList): Boolean;
+    function ComputeWhatHashesAreMissing(aHashList1, aHashList2 : TFPHashList) : TStringList;
+
     // function FileSizeWithLongPath(strFileName : string) : Int64;
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
@@ -481,6 +489,8 @@ type
    sValue1 : string; // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
 
    slMultipleDirNames : TStringList;
+   fsSaveFolderComparisonsLogFile : TFileStream;
+
    MultipleDirsChosen, StartHashing : boolean;
 
    {$IFDEF WINDOWS}
@@ -697,16 +707,38 @@ end;
 // Checks if the desired start date and time has arrived yet by starting timer
 // If it has, disable timer. Otherwise, keep it going.
 procedure TMainForm.CheckSchedule(DesiredStartTime : TDateTime);
+var
+  t : TDateTime;
 begin
-  if Now = DesiredStartTime then
+  t := Now;
+  // Round the chosen time and the current time to the nearest second
+  // https://stackoverflow.com/questions/4122218/in-delphi-how-do-i-round-a-tdatetime-to-closest-second-minute-five-minute-etc
+  t := RoundToNearest(t, EncodeTime(0,0,1,0));
+  DesiredStartTime := RoundToNearest(DesiredStartTime, EncodeTime(0,0,1,0));
+  if t = DesiredStartTime then
     begin
       SchedulerTimer.Enabled := false;
       StartHashing := true;
     end
   else
   begin
+    // and to avoid 100% CPU usage, sleep every 1/3 of a second
+    sleep(300);
     SchedulerTimer.Enabled := true;
     StartHashing := false;
+  end;
+end;
+
+function TMainForm.RoundToNearest(TheDateTime,TheRoundStep:TDateTime):TdateTime;
+  begin
+  if 0=TheRoundStep
+  then
+    begin // If round step is zero there is no round at all
+      RoundToNearest:=TheDateTime;
+    end
+  else
+  begin // Just round to nearest multiple of TheRoundStep
+    RoundToNearest:=Round(TheDateTime/TheRoundStep)*TheRoundStep;
   end;
 end;
 
@@ -806,7 +838,7 @@ begin
         until (StartHashing = true);
       end;
     end
-  else if PageControl1.ActivePage = TabSheet6 then  // Compare Two Directories tab
+  else if PageControl1.ActivePage = TabSheet6 then  // Compare Two Folders tab
     begin
     if ZVDateTimePickerCompareDirsTab.DateTime < Now then
       begin
@@ -1904,6 +1936,21 @@ begin
   end;
 end;
 
+procedure TMainForm.cbOverrideFileCountDifferChange(Sender: TObject);
+begin
+  if cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := true;
+  if not cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := false;
+end;
+
+// Whenever the cbSaveComparisons checkbox is changed, check if the cbOverrideFileCountDiffer
+// checkbox is also checked. If it is, prevent the user from making cbSaveComparison unchecked
+// Because the program has to be able to save the results if the user wishes to
+// override the file count check and hash the files even if there is mis-count
+procedure TMainForm.cbSaveComparisonsChange(Sender: TObject);
+begin
+  if cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := true;
+end;
+
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
 begin
@@ -2189,40 +2236,67 @@ begin
   Result := True;
 end;
 
+function TMainForm.ComputeWhatHashesAreMissing(aHashList1, aHashList2 : TFPHashList) : TStringList;
+var
+  i, j : integer;
+  sl : TStringList;
+begin
+  sl := TStringList.create;
+  sl.Sorted:=true;
+
+  if aHashList1.Count > aHashList2.Count then
+  for i := 0 to aHashList1.Count-1 do
+    begin
+      if (aHashlist2.FindIndexOf(aHashList1.NameOfIndex(i)) < 0) then
+      begin
+        sl.Add(aHashList1.NameOfIndex(i));
+      end;
+    end
+  else
+    begin
+    if aHashList2.Count > aHashList1.Count then
+    for j := 0 to aHashList2.Count-1 do
+      if (aHashlist1.FindIndexOf(aHashList2.NameOfIndex(j)) < 0) then
+      begin
+        sl.Add(aHashList2.NameOfIndex(j));
+      end;
+    end;
+  result := sl;
+end;
+
  // btnCompareClick : Will compare the listings of two directories, inc hidden files
  // The user is not presented with a choice for hiddne files because a comparison
  // of directories must be an exacting process.
 procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
-  FolderA, FolderB, LongPathOveride, HashVal, StringToWrite : string;
+  FolderA, FolderB, LongPathOveride, HashVal, StringToWrite, RogueHash : string;
 
-  slFileListA, slFileListB  : TStringList;
+  slFileListA, slFileListB, slMissingHashes  : TStringList;
 
-  HashListA, HashListB      : TFPHashList;
-
-  fsSaveLog : TFileStream;
+  HashListA, HashListB : TFPHashList;
 
   NeedToSave : Boolean;
 
-  i, j, FolderAFileCount, FolderBFileCount, FilesProcessedA, FilesProcessedB,
-    FileCountDifference, StringLength: integer;
+  i, lenRogueHash : integer;
+
+  FolderAFileCount, FolderBFileCount, FileCountDifference, StringLength: integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
 
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
-  i                      := -1;
-  j                      := -1;
-  FilesProcessedA        := 0;
-  FilesProcessedB        := 0;
+
   pbCompareDirA.Position := 0;
   pbCompareDirB.Position := 0;
   FolderA                := '';
   FolderB                := '';
   FileCountDifference    := -1;
   NeedToSave             := false;
+  FileCountDifference := 0;
+  lblTotalFileCountNumberA.Caption := '';
+  lblTotalFileCountNumberB.Caption := '';
 
   if cbUNCModeCompFolders.Checked then
   begin
@@ -2307,150 +2381,144 @@ begin
 
     if cbSaveComparisons.Checked then
     begin
-      fsSaveLog := TFileStream.Create('results.csv', fmCreate or fmOpenWrite);
       NeedToSave := true;
+      // Create the log file if it does not exist already
+      fsSaveFolderComparisonsLogFile := TFileStream.Create('QH_results'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.csv', fmCreate);
     end;
-      // Process FolderA first. Find all the files initially
+
+    // Process FolderA first. Find all the files initially
+    try
+      StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
+      memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
+      slFileListA := TStringList.Create;
+      slFileListA.Sorted := true;
+      slFileListA := RetrieveFileList(FolderA);
+      FolderAFileCount := slFileListA.Count;
+      lblTotalFileCountNumberA.Caption := IntToStr(FolderAFileCount);
+
+      // Now move to FolderB. Find all the files initially
       try
-        StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
-        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
-        slFileListA := TStringList.Create;
-        slFileListA.Sorted := true;
-        slFileListA := RetrieveFileList(FolderA);
-        FolderAFileCount := slFileListA.Count;
-        lblTotalFileCountNumberA.Caption := IntToStr(FolderAFileCount);
+        StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
+        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
+        slFileListB := TStringList.Create;
+        slFileListB.Sorted := true;
+        slFileListB := RetrieveFileList(FolderB);
+        FolderBFileCount := slFileListB.Count;
+        lblTotalFileCountNumberB.Caption := IntToStr(FolderBFileCount);
 
-        // Now move to FolderB. Find all the files initially
-        try
-          StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
-          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
-          slFileListB := TStringList.Create;
-          slFileListB.Sorted := true;
-          slFileListB := RetrieveFileList(FolderB);
-          FolderBFileCount := slFileListB.Count;
-          lblTotalFileCountNumberB.Caption := IntToStr(FolderBFileCount);
+        // If the file counts match in both Folders
 
-          // Only proceed to hashing if the file counts match in both Folders
-          if FolderAFileCount = FolderBFileCount then
-          begin
-            FileCountDifference := 0;
-            StatusBar6.SimpleText:= 'File counts match. Moving onto file hashing... ';
-            memFolderCompareSummary.Lines.Add('File counts match. Moving onto file hashing... ');
+        if FolderAFileCount = FolderBFileCount then
+        begin
+          // Compare the result.
+          StatusBar6.SimpleText:= 'File count matches. Now comparing files in both folders using hashing...';
+          HashListA := HashFolderAList(FolderA, slFileListA, FolderAFileCount, NeedToSave);
+          HashListB := HashFolderBList(FolderB, slFileListB, FolderBFileCount, NeedToSave);
 
-            // Now hash the files in FolderA
-            try
-              StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
-              memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
-              HashListA := TFPHashList.Create;
-              for i := 0 to slFileListA.Count -1 do
-              begin
-                HashVal := CalcTheHashFile(slFileListA.Strings[i]);
-                HashListA.Add(HashVal, Pointer(HashVal));
-                if NeedToSave then
-                begin
-                  StringLength := -1;
-                  StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
-                  StringLength := Length(StringToWrite);
-                  fsSaveLog.Write(StringToWrite[1], StringLength);
-                end;
-                inc(FilesProcessedA, 1);
-                pbCompareDirA.Position := ((FilesProcessedA * 100) DIV FolderAFileCount);
-              end;
-
-              // Now hash the files in FolderB
-              try
-                StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
-                memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
-                HashListB := TFPHashList.Create;
-                for j := 0 to slFileListB.Count -1 do
-                begin
-                  HashVal := CalcTheHashFile(slFileListB.Strings[j]);
-                  HashListB.Add(HashVal, Pointer(HashVal));
-                  if NeedToSave then
-                  begin
-                    StringLength := -1;
-                    StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[i], LongPathOverride)) + #13#10;
-                    StringLength := Length(StringToWrite);
-                    fsSaveLog.Write(StringToWrite[1], StringLength);
-                  end;
-                  inc(FilesProcessedB, 1);
-                  pbCompareDirB.Position := ((FilesProcessedB * 100) DIV FolderBFileCount);
-                end;
-
-                  // All done. Compare the result.
-                  StatusBar6.SimpleText:= 'Hashing complete. Now comparing files in both folders...';
-                  if CompareHashLists(HashListA, HashListB) then
-                    begin
-                      memFolderCompareSummary.Lines.Add('Result : MATCH!');
-                      StatusBar6.SimpleText := 'The files of both folders are the same. MATCH!';
-                    end
-                  else
-                  begin
-                    memFolderCompareSummary.Lines.Add('Result : MIS-MATCH!');
-                    StatusBar6.SimpleText := 'The files of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!';
-                  end;
-              // Now free all the resources in the correct order
-              finally
-                HashListB.free;           // Release HashListB
-              end;
-            finally
-              HashListA.Free;             // Release HashListA
-            end;
-          end                             // End of if FileCounts match
+          if CompareHashLists(HashListA, HashListB) then
+            begin
+              memFolderCompareSummary.Lines.Add('Result : MATCH!');
+              StatusBar6.SimpleText := 'The files of both folders are the same. MATCH!';
+            end
           else
           begin
-           // As the file counts differ, work out what the difference is between the two
-           // We do this little computation to avoid a figure like "file counts differ by -50000"
-           // So, if FolderB Count is less then FolderA Count
-            if FolderAFileCount < FolderBFileCount then
-              begin
-                FileCountDifference    := FolderBFileCount-FolderAFileCount;
-                StatusBar6.SimpleText  := 'The files of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files. Different number of files!';
-                pbCompareDirA.Position := 100;
-                pbCompareDirB.Position := 100;
-              end
+            memFolderCompareSummary.Lines.Add('Result : MIS-MATCH!');
+            StatusBar6.SimpleText := 'The files of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!';
+          end;
+          HashListA.Free;
+          HashListB.Free;
+        end; // End of if FileCounts match
+
+        // If the Folder A has less files than FolderB and user is not interested in proceeding
+        if (FolderAFileCount < FolderBFileCount) AND (cbOverrideFileCountDiffer.Checked = false) then
+          begin
+            FileCountDifference    := FolderBFileCount-FolderAFileCount;
+            StatusBar6.SimpleText  := 'The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.';
+            memFolderCompareSummary.Lines.Add('The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.');
+            memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
+            pbCompareDirA.Position := 100;
+            pbCompareDirB.Position := 100;
+            HashListA.Free;
+            HashListB.Free;
+          end
+        else
+          // If the Folder B has less files than FolderA and user is not interested in proceeding
+          if (FolderAFileCount > FolderBFileCount) AND (cbOverrideFileCountDiffer.Checked = false) then
+          begin
+            FileCountDifference      := FolderAFileCount-FolderBFileCount;
+            StatusBar6.SimpleText    := 'The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.';
+            memFolderCompareSummary.Lines.Add('The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.');
+            memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
+            pbCompareDirA.Position   := 100;
+            pbCompareDirB.Position   := 100;
+            HashListA.Free;
+            HashListB.Free;
+          end
             else
-            // Well they are not equal to, and FolderB Count was not less then FolderA Count.
-            // Therefore, by virtue, FolderB Count must be less then FolderA Count
+            // There is a file count difference, but the user still wants to proceed with the comparison anyway
+            // He has checked the box cbOverrideFileCountDiffer "Cont. if count differs?"
+            if ((FolderAFileCount > FolderBFileCount) OR (FolderBFileCount > FolderAFileCount)) AND (cbOverrideFileCountDiffer.Checked = true) then
             begin
               FileCountDifference      := FolderAFileCount-FolderBFileCount;
-              StatusBar6.SimpleText    := 'The files of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files. Different number of files!';
-              pbCompareDirA.Position   := 100;
-              pbCompareDirB.Position   := 100;
+              StatusBar6.SimpleText:= 'File count mis-matches by ' + IntToStr(FileCountDifference) + ' but you chose to hash anyway. Comparing files in both folders using hashing...';
+              memFolderCompareSummary.Lines.Add('File count mis-matches by ' + IntToStr(FileCountDifference) + ' but you chose to hash anyway.');
+              memFolderCompareSummary.Lines.Add(lblFolderAName.Caption + ' contains ' + lblTotalFileCountNumberA.Caption + ' files, ' + lblFolderAName.Caption + ' contains ' + lblTotalFileCountNumberB.Caption + ' files.');
+              memFolderCompareSummary.Lines.Add('Now hashing files...please wait');
+              HashListA := HashFolderAList(FolderA, slFileListA, FolderAFileCount, NeedToSave);
+              HashListB := HashFolderBList(FolderB, slFileListB, FolderBFileCount, NeedToSave);
+              try
+                slMissingHashes := TStringList.Create;
+                slMissingHashes := ComputeWhatHashesAreMissing(HashListA, HashListB);
+                for i := 0 to slMissingHashes.Count -1 do
+                  begin
+                    RogueHash := 'Missing Hash Value: ' + slMissingHashes.Strings[i] + #13#10;
+                    lenRogueHash := Length(RogueHash);
+                    fsSaveFolderComparisonsLogFile.Write(RogueHash[1], lenRogueHash);
+                  end;
+              finally
+                slMissingHashes.free;
+              end;
+              HashListA.Free;
+              HashListB.Free;
+              StatusBar6.SimpleText := 'Completed but with differences. MIS-MATCH. Check the log file');
             end;
-          end;
-        finally
-          slFileListB.Free;             // Release FileListB
+      finally
+        slFileListB.Free; // Release FileListB
+      end;
+  finally
+    slFileListA.free;  // Release FileListA
+  end;
+
+
+  // Compute timings and display them
+  EndTime := Now;
+  TimeTaken := EndTime-StartTime;
+  memFolderCompareSummary.Lines.Add('Ended at : '               + FormatDateTime('YYYY/MM/DD HH:MM:SS', EndTime));
+  memFolderCompareSummary.Lines.Add('Time taken : '             + FormatDateTime('HH:MM:SS', TimeTaken));
+  memFolderCompareSummary.Lines.Add('Files in Folder A : '      + IntToStr(FolderAFileCount));
+  memFolderCompareSummary.Lines.Add('Files in Folder B : '      + IntToStr(FolderBFileCount));
+  memFolderCompareSummary.Lines.Add('File count differs by : '  + IntToStr(FileCountDifference));
+  if (FileCountDifference > 0) AND (cbOverrideFileCountDiffer.Checked = false) then
+   begin
+     memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
+   end;
+  memFolderCompareSummary.Lines.Add('Finished analysis');
+
+  if cbSaveComparisons.Checked then
+    begin
+      try
+      // Save the memo data to the file too. Useful regardless of whether files were
+      // just counted and found to be different by file count, or whether they were
+      // hashed and found to be the same or different
+      if NeedToSave then
+        begin
+          fsSaveFolderComparisonsLogFile.Write(memFolderCompareSummary.Text[1], Length(memFolderCompareSummary.Text));
         end;
       finally
-        slFileListA.free;               // Release FileListA
+        memFolderCompareSummary.Lines.Add('Results saved to ' + IncludeTrailingPathDelimiter(GetCurrentDir) + fsSaveFolderComparisonsLogFile.FileName);
+        fsSaveFolderComparisonsLogFile.Free;
       end;
-
-    // Compute timings and display them
-    EndTime := Now;
-    TimeTaken := EndTime-StartTime;
-    memFolderCompareSummary.Lines.Add('Ended at : '               + FormatDateTime('YYYY/MM/DD HH:MM:SS', EndTime));
-    memFolderCompareSummary.Lines.Add('Time taken : '             + FormatDateTime('HH:MM:SS', TimeTaken));
-    memFolderCompareSummary.Lines.Add('Files in Folder A : '      + IntToStr(FolderAFileCount));
-    memFolderCompareSummary.Lines.Add('Files in Folder B : '      + IntToStr(FolderBFileCount));
-    memFolderCompareSummary.Lines.Add('File count differs by : '  + IntToStr(FileCountDifference));
-    memFolderCompareSummary.Lines.Add('Finished analysis');
-
-    if cbSaveComparisons.Checked then
-      begin
-        memFolderCompareSummary.Lines.Add('Results saved to ' + IncludeTrailingPathDelimiter(GetCurrentDir) + fsSaveLog.FileName);
-        // Save the memo data to the file too. Useful regardless of whether files were
-        // just counted and found to be different by file count, or whether they were
-        // hashed and found to be the same or different
-        if NeedToSave then
-          begin
-            for i := 0 to memFolderCompareSummary.Lines.Count -1 do
-            begin
-              fsSaveLog.Write(memFolderCompareSummary.Lines[i][1], Length(memFolderCompareSummary.Lines[i]));
-            end;
-          end;
-        if assigned(fsSaveLog) then fsSaveLog.Free;
-      end;
+    end;
     Application.ProcessMessages;
   end // End of If DirectoryExists...
   else
@@ -2460,6 +2528,67 @@ begin
   end;
 end;
 
+function TMainForm.HashFolderAList(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
+var
+  HashListA  : TFPHashList;
+  i, FilesProcessedA, StringLength : integer;
+  HashVal, StringToWrite : string;
+begin
+  FilesProcessedA := 0;
+  // Now hash the files in FolderA
+  try
+    StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
+    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    HashListA := TFPHashList.Create;
+    for i := 0 to slFileListA.Count -1 do
+    begin
+      HashVal := CalcTheHashFile(slFileListA.Strings[i]);
+      HashListA.Add(HashVal, Pointer(HashVal));
+      if SaveData then
+      begin
+        StringLength := -1;
+        StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+        StringLength := Length(StringToWrite);
+        fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+      end;
+      inc(FilesProcessedA, 1);
+      pbCompareDirA.Position := ((FilesProcessedA * 100) DIV intFileCount);
+    end;
+  finally
+    result := HashListA;
+  end;
+end;
+
+function TMainForm.HashFolderBList(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
+var
+  HashListB : TFPHashList;
+  j, FilesProcessedB, StringLength : integer;
+  HashVal, StringToWrite : string;
+begin
+  FilesProcessedB := 0;
+  // Now hash the files in FolderB
+  try
+    StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
+    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    HashListB := TFPHashList.Create;
+    for j := 0 to slFileListB.Count -1 do
+    begin
+      HashVal := CalcTheHashFile(slFileListB.Strings[j]);
+      HashListB.Add(HashVal, Pointer(HashVal));
+      if SaveData then
+      begin
+        StringLength := -1;
+        StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+        StringLength := Length(StringToWrite);
+        fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+      end;
+      inc(FilesProcessedB, 1);
+      pbCompareDirB.Position := ((FilesProcessedB * 100) DIV intFileCount);
+    end;
+  finally
+    result := HashListB;
+  end;
+end;
 // btnClearTextAreaClick : Clears the whole text field if the user requests to do so
 procedure TMainForm.btnClearTextAreaClick(Sender: TObject);
 begin
