@@ -14,15 +14,15 @@ Renamed the "Compare Directories" tab to "Compare Two Folders". It marries up be
 
 The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed. 
 
+Files of zero bytes were skipped in the 'Copy' tab (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash
+for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, and still recorded as a zero byte file but not hashed. Instead 'zero byte file' will appear where the hash value would.
+The same fix has been applied to the "Compare Two Files" tab, where a zero byte file will not be hashed (because doing so just returns the default initialisation hash which is misleading). And also to the "Compare Two Folders" tab; zero byte files are now flagged as zero bytes. So still used for the 
+comparison but not actually hashed. 
+
 Some helpful interface hints added to the check boxes in the FileS tab,which seemed to have been left out of earlier versions
 
 Following a feature request, added a "case switcher" to the Text and File tabs. This allows the user to toggle the output hash between upper or lower case. Useful for users who need to compute hashes of hashes, instead of just hashes of some data. For users who may need to compute the hash of a hash value, the case sensitivity is 
 important obviously. Upper case is still the default output as it is easier for humans to read.   
-
-Files of zero bytes were skipped in the 'Copy' tab (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash
-for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, and still recorded as a zero byte file but not hashed. Instead 'zero byte file' will appear where the hash value would.
-The same fix has been applied to the "Compare Two Files" tab, where a zero byte file will not be hashed (because doing so just returns the default initialisation hash which is misleading). And also to the "Compare Two Directories"; zero byte files are flagged as zero bytes. So still used for the 
-comparison but not actually hashed. 
 
 Fixed the time scheduler. It now checks every 1/3 of second if the current time equals the scheduled start time. 
 

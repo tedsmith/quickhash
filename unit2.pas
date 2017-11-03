@@ -2297,6 +2297,7 @@ begin
   FileCountDifference := 0;
   lblTotalFileCountNumberA.Caption := '';
   lblTotalFileCountNumberB.Caption := '';
+  memFolderCompareSummary.Clear;
 
   if cbUNCModeCompFolders.Checked then
   begin
@@ -2438,8 +2439,6 @@ begin
             memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
             pbCompareDirA.Position := 100;
             pbCompareDirB.Position := 100;
-            HashListA.Free;
-            HashListB.Free;
           end
         else
           // If the Folder B has less files than FolderA and user is not interested in proceeding
@@ -2451,8 +2450,6 @@ begin
             memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
             pbCompareDirA.Position   := 100;
             pbCompareDirB.Position   := 100;
-            HashListA.Free;
-            HashListB.Free;
           end
             else
             // There is a file count difference, but the user still wants to proceed with the comparison anyway
@@ -2477,10 +2474,10 @@ begin
                   end;
               finally
                 slMissingHashes.free;
+                HashListA.Free;
+                HashListB.Free;
               end;
-              HashListA.Free;
-              HashListB.Free;
-              StatusBar6.SimpleText := 'Completed but with differences. MIS-MATCH. Check the log file');
+              StatusBar6.SimpleText := 'Completed but with differences. MIS-MATCH. Check the log file';
             end;
       finally
         slFileListB.Free; // Release FileListB
@@ -2488,7 +2485,6 @@ begin
   finally
     slFileListA.free;  // Release FileListA
   end;
-
 
   // Compute timings and display them
   EndTime := Now;
@@ -2542,17 +2538,34 @@ begin
     HashListA := TFPHashList.Create;
     for i := 0 to slFileListA.Count -1 do
     begin
-      HashVal := CalcTheHashFile(slFileListA.Strings[i]);
-      HashListA.Add(HashVal, Pointer(HashVal));
-      if SaveData then
+      if FileSize(slFileListA.Strings[i]) > 0 then
+        begin
+        HashVal := CalcTheHashFile(slFileListA.Strings[i]);
+        HashListA.Add(HashVal, Pointer(HashVal));
+        if SaveData then
+          begin
+            StringLength := -1;
+            StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+            StringLength := Length(StringToWrite);
+            fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+          end;
+        inc(FilesProcessedA, 1);
+        pbCompareDirA.Position := ((FilesProcessedA * 100) DIV intFileCount);
+        end
+      else
       begin
-        StringLength := -1;
-        StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
-        StringLength := Length(StringToWrite);
-        fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+        HashVal := 'ZERO BYTE FILE';
+        HashListA.Add(HashVal, Pointer(HashVal));
+        if SaveData then
+          begin
+            StringLength := -1;
+            StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+            StringLength := Length(StringToWrite);
+            fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+          end;
+        inc(FilesProcessedA, 1);
+        pbCompareDirA.Position := ((FilesProcessedA * 100) DIV intFileCount);
       end;
-      inc(FilesProcessedA, 1);
-      pbCompareDirA.Position := ((FilesProcessedA * 100) DIV intFileCount);
     end;
   finally
     result := HashListA;
@@ -2573,17 +2586,34 @@ begin
     HashListB := TFPHashList.Create;
     for j := 0 to slFileListB.Count -1 do
     begin
-      HashVal := CalcTheHashFile(slFileListB.Strings[j]);
-      HashListB.Add(HashVal, Pointer(HashVal));
-      if SaveData then
+      if FileSize(slFileListB.Strings[j]) > 0 then
+        begin
+          HashVal := CalcTheHashFile(slFileListB.Strings[j]);
+          HashListB.Add(HashVal, Pointer(HashVal));
+          if SaveData then
+            begin
+              StringLength := -1;
+              StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+              StringLength := Length(StringToWrite);
+              fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+            end;
+          inc(FilesProcessedB, 1);
+          pbCompareDirB.Position := ((FilesProcessedB * 100) DIV intFileCount);
+        end
+      else
       begin
-        StringLength := -1;
-        StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
-        StringLength := Length(StringToWrite);
-        fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+        HashVal := 'ZERO BYTE FILE';
+        HashListB.Add(HashVal, Pointer(HashVal));
+        if SaveData then
+          begin
+            StringLength := -1;
+            StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+            StringLength := Length(StringToWrite);
+            fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+          end;
+        inc(FilesProcessedB, 1);
+        pbCompareDirB.Position := ((FilesProcessedB * 100) DIV intFileCount);
       end;
-      inc(FilesProcessedB, 1);
-      pbCompareDirB.Position := ((FilesProcessedB * 100) DIV intFileCount);
     end;
   finally
     result := HashListB;

@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 681
     Top = 24
     Width = 984
-    ActivePage = TabSheet6
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 5
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
