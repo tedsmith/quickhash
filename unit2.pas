@@ -147,6 +147,8 @@ type
     btnB64FileChooser: TButton;
     btnB64FileSChooser: TButton;
     btnB64JustDecodeFiles: TButton;
+    btnMakeTextUpper: TButton;
+    btnMakeTextLower: TButton;
     Button8CopyAndHash: TButton;
     cbFlipCaseFILE: TCheckBox;
     cbToggleInputDataToOutputFile: TCheckBox;
@@ -349,7 +351,8 @@ type
       Shift: TShiftState);
     procedure btnB64FileChooserClick(Sender: TObject);
     procedure btnB64JustDecodeFilesClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnMakeTextLowerClick(Sender: TObject);
+    procedure btnMakeTextUpperClick(Sender: TObject);
     procedure cbFlipCaseFILEChange(Sender: TObject);
     procedure cbFlipCaseTEXTChange(Sender: TObject);
     procedure cbOverrideFileCountDifferChange(Sender: TObject);
@@ -936,8 +939,11 @@ end;
 
 procedure TMainForm.HashText(Sender: TObject);
 var
-  strHashValueText : string;
+  s : string;
+  strHashValueOfText : string;
 begin
+  // Initialise case sensitivity to the default of no conversion
+
   if memoHashText.Lines[0] = 'Type or paste text here - hash will update as you type' then
   begin
     StrHashValue.Caption := 'Awaiting valid input in text field...';
@@ -949,13 +955,16 @@ begin
       end
       else
         begin
-         strHashValueText := Uppercase(Trim(CalcTheHashString(memoHashText.Text)));
-         StrHashValue.Caption := strHashValueText;
+         s := memoHashText.Text;
+         strHashValueOfText := Trim(CalcTheHashString(s));
+         StrHashValue.Caption := strHashValueOfText;
+
+         // If the user has pasted an expected hash, see if they match
          if (lbleExpectedHash.Text = '') then exit
          else
            if (lbleExpectedHash.Text = '...') then exit
            else
-             if strHashValueText = Trim(Uppercase(lbleExpectedHashText.Text)) then
+             if strHashValueOfText = Trim(Uppercase(lbleExpectedHashText.Text)) then
                begin
                  Showmessage('Expected hash matches the generated text hash, OK');
                end
@@ -1062,6 +1071,7 @@ procedure TMainForm.btnLBLClick(Sender: TObject);
 var
   slLBL : TStringListUTF8;
   i     : Longword;
+  strToHash : string;
 begin
   if memoHashText.Lines.Count = 0 then
     begin
@@ -1075,14 +1085,18 @@ begin
       begin
       for i := 0 to memoHashText.Lines.Count -1 do
         begin
-          slLBL.Add(memoHashText.Lines[i] + ',' + Trim(CalcTheHashString(memoHashText.Lines[i])));
+          strToHash := memoHashText.Lines[i];
+          // Add the source data and the hash to the output
+          slLBL.Add(strToHash + ',' + Trim(CalcTheHashString(strToHash)));
         end;
       end
     else
     begin
       for i := 0 to memoHashText.Lines.Count -1 do
         begin
-          slLBL.Add(Trim(CalcTheHashString(memoHashText.Lines[i])));
+          strToHash := memoHashText.Lines[i];
+          // Add the hash only to the output
+          slLBL.Add(Trim(CalcTheHashString(strToHash)));
         end;
     end;
   finally
@@ -1577,8 +1591,8 @@ begin
 end;
 
 
-// These radio clcik events are to ensure the same hash algorithm is chosen
-// for all the tabs, if the user changes it from the defualt. New to v.2.8.2
+// These radio click events are to ensure the same hash algorithm is chosen
+// for all the tabs, if the user changes it from the default. New to v.2.8.2
 procedure TMainForm.AlgorithmChoiceRadioBox1Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
@@ -1887,10 +1901,40 @@ begin
     end;
 end;
 
-procedure TMainForm.Button1Click(Sender: TObject);
+procedure TMainForm.btnMakeTextLowerClick(Sender: TObject);
+var
+  s : string;
+  i : integer;
 begin
-  frmSQLiteDBases.Show;
+  s := memoHashText.Text;
+    for i := 1 to Length(s) do
+      begin
+        if s[i] in ['A'..'Z'] then
+        begin
+          s := Lowercase(s);
+          memoHashText.Text := s;
+          exit;
+        end;
+      end;
 end;
+
+procedure TMainForm.btnMakeTextUpperClick(Sender: TObject);
+var
+  s : string;
+  i : integer;
+begin
+  s := memoHashText.Text;
+    for i := 1 to Length(s) do
+      begin
+        if s[i] in ['a'..'z'] then
+        begin
+          s := Uppercase(s);
+          memoHashText.Text := s;
+          exit;
+        end;
+      end;
+end;
+
 
 procedure TMainForm.cbFlipCaseFILEChange(Sender: TObject);
 var
@@ -1961,6 +2005,7 @@ procedure TMainForm.Panel1CopyAndHashOptionsClick(Sender: TObject);
 begin
 
 end;
+
 
 procedure TMainForm.ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode
   );
