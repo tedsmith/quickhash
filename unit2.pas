@@ -365,6 +365,7 @@ type
     procedure lblDonateClick(Sender: TObject);
     procedure lbleExpectedHashChange(Sender: TObject);
     procedure lbleExpectedHashEnter(Sender: TObject);
+    procedure lbleExpectedHashTextChange(Sender: TObject);
     procedure lblFileAHashClick(Sender: TObject);
     procedure lblFileBHashClick(Sender: TObject);
     procedure lblschedulertickboxFileSTabChange(Sender: TObject);
@@ -393,7 +394,6 @@ type
     procedure MenuItem_SortByFilenameClick(Sender: TObject);
     procedure MenuItem_SortByFilePathClick(Sender: TObject);
     procedure MenuItem_SortByHashClick(Sender: TObject);
-    procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode);
     procedure ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode);
@@ -1274,6 +1274,7 @@ end;
 // In the event that the user pastes an expected hash value AFTER computing
 // the hash of the file, this onKeyUp event will then see if the pasted value
 // matches the value just computed. New to v2.8.3
+// QH expects the entered hash values to at least be of the proper length
 procedure TMainForm.lbleExpectedHashChange(Sender: TObject);
 begin
    if memFileHashField.Lines[0] = 'Computed hash will appear here...' then
@@ -1300,6 +1301,31 @@ end;
 procedure TMainForm.lbleExpectedHashEnter(Sender: TObject);
 begin
 
+end;
+
+// Checks if the pasted expected hash for the text is the same as the computed hash
+// QH expects the entered hash values to at least be of the proper length
+procedure TMainForm.lbleExpectedHashTextChange(Sender: TObject);
+begin
+  if StrHashValue.Lines[0] = '...hash value' then
+    exit
+   else if (lbleExpectedHashText.Text = '') then
+     exit
+    else if (lbleExpectedHashText.Text = '...') then
+      exit
+     else if (Length(trim(lbleExpectedHashText.Text)) = 32) or (Length(trim(lbleExpectedHashText.Text)) = 40)
+          or (Length(trim(lbleExpectedHashText.Text)) = 64) or (Length(trim(lbleExpectedHashText.Text)) = 128)
+          or (Length(trim(lbleExpectedHashText.Text)) = 8) then
+     begin
+       if Uppercase(StrHashValue.Lines[0]) = Trim(Uppercase(lbleExpectedHashText.Text)) then
+         begin
+           Showmessage('Expected hash matches the computed file hash, OK');
+         end
+     else
+       begin
+         Showmessage('Expected hash DOES NOT match the computed file hash!');
+       end;
+     end;
 end;
 
 
@@ -1906,6 +1932,7 @@ var
   s : string;
   i : integer;
 begin
+  //s := Lowercase(memoHashText.Text);
   s := memoHashText.Text;
     for i := 1 to Length(s) do
       begin
@@ -1995,11 +2022,6 @@ begin
   if cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := true;
 end;
 
-
-procedure TMainForm.PageControl1Change(Sender: TObject);
-begin
-
-end;
 
 procedure TMainForm.Panel1CopyAndHashOptionsClick(Sender: TObject);
 begin

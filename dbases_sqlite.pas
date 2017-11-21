@@ -5,9 +5,9 @@ unit dbases_sqlite;
 interface
 
 uses
-  Classes, SysUtils, db, sqldb, fpcsvexport, sqlite3conn, FileUtil, LResources,
-  Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids, sqlite3dyn,
-  clipbrd, LazUTF8, LazUTF8Classes;
+  Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
+  LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
+  sqlite3dyn, clipbrd, LazUTF8, LazUTF8Classes;
 
 type
 
@@ -18,6 +18,9 @@ type
     DataSource1: TDataSource;
     DataSource2: TDataSource;
     lblConnectionStatus: TLabel;
+    SQLDBLibraryLoaderLinux: TSQLDBLibraryLoader;
+    SQLDBLibraryLoaderOSX: TSQLDBLibraryLoader;
+    SQLDBLibraryLoaderWindows: TSQLDBLibraryLoader;
     SQLite3Connection1: TSQLite3Connection;
     sqlFILES: TSQLQuery;
     sqlCOPY: TSQLQuery;
@@ -79,27 +82,77 @@ implementation
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 begin
   // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
-     {$IFDEF Windows}
-       // Ensure we're using the local sqlite3.dll
-       SQLiteDefaultLibrary := 'sqlite3.dll';
-     {$ENDIF}
-       {$IFDEF Darwin}
-         SQLiteDefaultLibrary := 'sqlite3.o.so';
-       {$else}
-         {$IFDEF UNIX and !$ifdef Darwin}
-           SQLiteDefaultLibrary := 'sqlite3.o.so';
-         {$ENDIF}
-     {$ENDIF}
-
-     if FileExists(SQLiteDefaultLibrary) then
-     begin
-       // Set the filename of the sqlite database
-       SQLite3Connection1.DatabaseName := 'QuickHashDB.sqlite';
+  // but didn't seem to work with Linux.
+  // So SQLDBLibraryLoader instances created for each OS
+  {$ifdef windows}
+    SQLDBLibraryLoaderWindows.ConnectionType:='SQLite3';
+    if FileExists('sqlite3-win.dll') then
+    begin
+      SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win.dll';
+      SQLDBLibraryLoaderWindows.Enabled := true;
+      SQLDBLibraryLoaderWindows.LoadLibrary;
+      // Set the filename of the sqlite database
+      SQLite3Connection1.DatabaseName := 'QuickHashDBWin.sqlite';
+      // Create the database
+      CreateDatabase(SQLite3Connection1.DatabaseName);
+      if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+    end
+    else
+    begin
+      ShowMessage('Cannot create SQLite database. Ensure you extracted the sqlite-win.dll file from the zip file');
+      exit;
+    end;
+  {$else}
+    {$ifdef darwin}
+    SQLDBLibraryLoaderOSX.ConnectionType:='SQLite3';
+    if FileExists('/usr/lib/libsqlite3.dylib') then
+    begin
+      SQLDBLibraryLoaderOSX.LibraryName := '/usr/lib/libsqlite3.dylib';
+      SQLDBLibraryLoaderOSX.Enabled := true;
+      SQLDBLibraryLoaderOSX.LoadLibrary;
+      // Set the filename of the sqlite database
+      SQLite3Connection1.DatabaseName := 'QuickHashDBOSX.sqlite';
+      // Create the database
+      CreateDatabase(SQLite3Connection1.DatabaseName);
+      if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+    end
+    else
+    begin
+      ShowMessage('Cannot create SQLite database. Ensure you extracted the sqlite-osx file from the zip file');
+      exit;
+    end;
+    {$else}
+     // If it's 64-bit Linux, use the 64-bit SQLite3 install
+    if FileExists('/usr/lib/x86_64-linux-gnu/libsqlite3.so.0') then
+      begin
+        SQLDBLibraryLoaderLinux.LibraryName := '/usr/lib/x86_64-linux-gnu/libsqlite3.so.0';
+        SQLDBLibraryLoaderLinux.Enabled := true;
+        SQLDBLibraryLoaderLinux.LoadLibrary;
+        // Set the filename of the sqlite database
+       SQLite3Connection1.DatabaseName := 'QuickHashDBLinux.sqlite';
        // Create the database
        CreateDatabase(SQLite3Connection1.DatabaseName);
        if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-     end
-       else ShowMessage('Cannot create SQLite database. Ensure an SQLite.dll or equivalent file exists');
+      end
+    // If it's 32-bit Linux, use the 32-bit SQLite3 install
+      else if FileExists('/usr/lib/i386-linux-gnu/libsqlite3.so.0') then
+        begin
+          SQLDBLibraryLoaderLinux.LibraryName := '/usr/lib/i386-linux-gnu/libsqlite3.so.0';
+          SQLDBLibraryLoaderLinux.Enabled := true;
+          SQLDBLibraryLoaderLinux.LoadLibrary;
+          // Set the filename of the sqlite database
+         SQLite3Connection1.DatabaseName := 'QuickHashDBLinux.sqlite';
+         // Create the database
+         CreateDatabase(SQLite3Connection1.DatabaseName);
+         if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+        end
+    else
+    begin
+      ShowMessage('Cannot create SQLite database. Ensure SQLite3 is installed in your Linux distribution');
+      exit;
+    end;
+    {$endif}
+  {$endif}
 end;
 
 // Create a fresh SQLite database for each instance of the program

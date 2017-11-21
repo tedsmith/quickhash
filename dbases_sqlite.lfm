@@ -12,9 +12,9 @@ object frmSQLiteDBases: TfrmSQLiteDBases
   LCLVersion = '1.6.4.0'
   object lblConnectionStatus: TLabel
     Left = 32
-    Height = 15
+    Height = 16
     Top = 32
-    Width = 81
+    Width = 94
     Caption = 'Not Connected'
     ParentColor = False
   end
@@ -73,5 +73,26 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Params = <>
     left = 160
     top = 80
+  end
+  object SQLDBLibraryLoaderWindows: TSQLDBLibraryLoader
+    Enabled = False
+    ConnectionType = 'SQLite3'
+    LibraryName = 'sqlite3.dll'
+    left = 160
+    top = 240
+  end
+  object SQLDBLibraryLoaderOSX: TSQLDBLibraryLoader
+    Enabled = False
+    ConnectionType = 'SQLite3'
+    LibraryName = 'libsqlite3.dylib'
+    left = 160
+    top = 312
+  end
+  object SQLDBLibraryLoaderLinux: TSQLDBLibraryLoader
+    Enabled = False
+    ConnectionType = 'SQLite3'
+    LibraryName = 'libsqlite3.so'
+    left = 160
+    top = 376
   end
 end
