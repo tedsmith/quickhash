@@ -80,6 +80,8 @@ implementation
 
 
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
+var
+  strFileNameRandomiser : string;
 begin
   // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
   // but didn't seem to work with Linux.
@@ -92,7 +94,8 @@ begin
       SQLDBLibraryLoaderWindows.Enabled := true;
       SQLDBLibraryLoaderWindows.LoadLibrary;
       // Set the filename of the sqlite database
-      SQLite3Connection1.DatabaseName := 'QuickHashDBWin.sqlite';
+      strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+      SQLite3Connection1.DatabaseName := 'QuickHashDBWin_' + strFileNameRandomiser + '.sqlite';
       // Create the database
       CreateDatabase(SQLite3Connection1.DatabaseName);
       if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
@@ -111,7 +114,8 @@ begin
       SQLDBLibraryLoaderOSX.Enabled := true;
       SQLDBLibraryLoaderOSX.LoadLibrary;
       // Set the filename of the sqlite database
-      SQLite3Connection1.DatabaseName := 'QuickHashDBOSX.sqlite';
+      strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+      SQLite3Connection1.DatabaseName := 'QuickHashDBOSX_' + strFileNameRandomiser + '.sqlite';
       // Create the database
       CreateDatabase(SQLite3Connection1.DatabaseName);
       if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
@@ -123,16 +127,19 @@ begin
     end;
     {$else}
      // If it's 64-bit Linux, use the 64-bit SQLite3 install
+     // Although, the paths below are for Debian based systems only. How do we
+     // take care of non-Debian systems?  https://github.com/tedsmith/quickhash/issues/34
     if FileExists('/usr/lib/x86_64-linux-gnu/libsqlite3.so.0') then
       begin
         SQLDBLibraryLoaderLinux.LibraryName := '/usr/lib/x86_64-linux-gnu/libsqlite3.so.0';
         SQLDBLibraryLoaderLinux.Enabled := true;
         SQLDBLibraryLoaderLinux.LoadLibrary;
         // Set the filename of the sqlite database
-       SQLite3Connection1.DatabaseName := 'QuickHashDBLinux.sqlite';
-       // Create the database
-       CreateDatabase(SQLite3Connection1.DatabaseName);
-       if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+        strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+        SQLite3Connection1.DatabaseName := 'QuickHashDBLinux_' + strFileNameRandomiser + '.sqlite';
+        // Create the database
+        CreateDatabase(SQLite3Connection1.DatabaseName);
+        if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
       end
     // If it's 32-bit Linux, use the 32-bit SQLite3 install
       else if FileExists('/usr/lib/i386-linux-gnu/libsqlite3.so.0') then
@@ -141,7 +148,8 @@ begin
           SQLDBLibraryLoaderLinux.Enabled := true;
           SQLDBLibraryLoaderLinux.LoadLibrary;
           // Set the filename of the sqlite database
-         SQLite3Connection1.DatabaseName := 'QuickHashDBLinux.sqlite';
+          strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+          SQLite3Connection1.DatabaseName := 'QuickHashDBLinux_' + strFileNameRandomiser + '.sqlite';
          // Create the database
          CreateDatabase(SQLite3Connection1.DatabaseName);
          if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
