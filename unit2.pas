@@ -1254,11 +1254,22 @@ begin
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+  DataBasefilename : string;
 begin
+  // Before closing DB connection, get the databasefilename
+  DataBasefilename := frmSQLiteDBases.SQLite3Connection1.DatabaseName;
+  // Now close the Database instances
   try
     frmSQLiteDBases.SQLite3Connection1.Close(true);
   finally
    frmSQLiteDBases.SQLite3Connection1.Free;
+  end;
+  // Now we can delete the database files
+  try
+    SysUtils.DeleteFile(DatabaseFilename);
+  except
+    Showmessage('Could not delete sqlite database ' + DataBasefilename + '. Please delete the manually.');
   end;
 end;
 
@@ -3754,10 +3765,10 @@ begin
   DateTimeToStr(SystemDate);
 
   // Date and time for the user, to be displayed later
-  FormattedSystemDate := FormatDateTime('dd/mm/yy hh:mm:ss', SystemDate);
+  FormattedSystemDate := FormatDateTime('YYYY/MM/DD HH:MM:SS', SystemDate);
 
   // Date and time for the output directory, to be used later with other dir structures
-  OutputDirDateFormatted := FormatDateTime('yy-mm-dd_hhmmss', SystemDate);
+  OutputDirDateFormatted := FormatDateTime('YYYY-MM-DD_HH-MM-SS', SystemDate);
 
   SetCurrentDir(SourceDirName);
 
@@ -4003,7 +4014,7 @@ begin
 
 
     strNoOfFilesToExamine := IntToStr(FilesFoundToCopy.Count);
-    lblTimeTaken6A.Caption := FormatDateTime('dd/mm/yy hh:mm:ss', SystemDate);
+    lblTimeTaken6A.Caption := FormatDateTime('YYYY/MM/DD HH:MM:SS', SystemDate);
     Application.ProcessMessages;
 
     try
@@ -4317,9 +4328,11 @@ begin
       frmDisplayGrid1.RecursiveDisplayGrid_COPY.Visible := true;
       frmDisplayGrid1.Show;
       EndTime := Now;
-      lblTimeTaken6B.Caption  := FormatDateTime('dd/mm/yy hh:mm:ss', EndTime);
+      lblTimeTaken6B.Caption  := FormatDateTime('YYYY/MM/DD HH:MM:SS', EndTime);
       TimeDifference          := EndTime - StartTime;
-      strTimeDifference       := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference);
+      //strTimeDifference       := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference);  // This way doesn't return days elapsed.
+      strTimeDifference := (Format('%d days %s', [trunc(TimeDifference), FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference)]));  // But this way does return days elapsed. Thanks WP in the forum!
+
       lblTimeTaken6C.Caption  := strTimeDifference;
 
       // Now lets save the generated values to a CSV file.
