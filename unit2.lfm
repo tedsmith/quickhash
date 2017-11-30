@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 680
     Top = 24
     Width = 984
-    ActivePage = TabSheet1
+    ActivePage = TabSheet5
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 6
     TabOrder = 0
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
@@ -1750,7 +1750,7 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 655
+      ClientHeight = 652
       ClientWidth = 976
       object btnCallDiskHasherModule: TButton
         Left = 376
@@ -1766,17 +1766,17 @@ object MainForm: TMainForm
       end
       object lblDiskHashingRunAsAdminWarning: TLabel
         Left = 368
-        Height = 13
+        Height = 15
         Top = 72
-        Width = 215
+        Width = 239
         Caption = 'Must be run as administrator for disk hashing'
         ParentColor = False
       end
       object Label8: TLabel
         Left = 344
-        Height = 26
+        Height = 30
         Top = 112
-        Width = 270
+        Width = 295
         Caption = 'LINUX USERS - You may prefer to hash disks using '#10'"File" tab and navigate to /dev/sdX or /dev/sdXX as root'
         ParentColor = False
       end

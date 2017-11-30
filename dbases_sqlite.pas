@@ -1012,47 +1012,46 @@ begin
       begin
         // Start new row
         fs.Write(strTABLEROWStart[1], 4);
-        // Get the source filename cell
-        SourceFilename := DBGrid.DataSource.DataSet.Fields[1].Value;
-        // Write source filename to new row
-        fs.Write(strTABLEDATAStart[1], 4);
-        fs.Write(SourceFilename[1], Length(SourceFilename));
-        fs.Write(strTABLEDataEnd[1], 5);
+          // Get the source filename cell
+          SourceFilename := DBGrid.DataSource.DataSet.Fields[1].Value;
+          // Write source filename to new row
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Write(SourceFilename[1], Length(SourceFilename));
+          fs.Write(strTABLEDataEnd[1], 5);
 
-        // Get the source hash value
-        SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
-        // Write the source hash value
-        fs.Write(strTABLEDATAStart[1], 4);
-        fs.Write(SourceFileHash[1], Length(SourceFileHash));
-        fs.Write(strTABLEDATAEnd[1], 5);
+          // Get the source hash value
+          SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+          // Write the source hash value
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Write(SourceFileHash[1], Length(SourceFileHash));
+          fs.Write(strTABLEDATAEnd[1], 5);
 
-        // Get the destination filename
-        DestinationFileName := DBGrid.DataSource.DataSet.Fields[3].Value;
-        // Write the destination hash
-        fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(DestinationFileName[1], Length(Trim(DestinationFileName)));
-        fs.Write(strTABLEDATAEnd[1], 5);
+          // Get the destination filename
+          DestinationFileName := DBGrid.DataSource.DataSet.Fields[3].Value;
+          // Write the destination hash
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(DestinationFileName[1], Length(Trim(DestinationFileName)));
+          fs.Write(strTABLEDATAEnd[1], 5);
 
-        // Get the destination hash
-        DestinationFileHash := DBGrid.DataSource.DataSet.Fields[3].Value;
-        // Write the destination hash
-        fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(DestinationFileHash[1], Length(Trim(DestinationFileHash)));
-        fs.Write(strTABLEDATAEnd[1], 5);
+          // Get the destination hash
+          DestinationFileHash := DBGrid.DataSource.DataSet.Fields[4].Value;
+          // Write the destination hash
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(DestinationFileHash[1], Length(Trim(DestinationFileHash)));
+          fs.Write(strTABLEDATAEnd[1], 5);
 
-        // Get the destination filename
-        DateAttributes := DBGrid.DataSource.DataSet.Fields[3].Value;
-        // Write the destination hash
-        fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(DateAttributes[1], Length(Trim(DateAttributes)));
-        fs.Write(strTABLEDATAEnd[1], 5);
+          // Get the date attributes from the filesystem
+          DateAttributes := DBGrid.DataSource.DataSet.Fields[5].Value;
+          // Write the date attributes
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(DateAttributes[1], Length(Trim(DateAttributes)));
+          fs.Write(strTABLEDATAEnd[1], 5);
 
         // End the row
         fs.Write(strTABLEROWEnd[1], 5);
         fs.Write(#13#10, 2);
-        DBGrid.DataSource.DataSet.Next;
       end;
-    end;
+    DBGrid.DataSource.DataSet.Next;   // Why does this keep generating extra output I wonder?
     fs.Write(strTABLEFooter, 8);
     fs.Write(#13#10, 2);
     fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
@@ -1060,6 +1059,7 @@ begin
     fs.Write(#13#10, 2);
     fs.Write(strHTMLFooter, 7);
     fs.Write(#13#10, 2);
+    end;
     finally
       fs.free;
       MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
