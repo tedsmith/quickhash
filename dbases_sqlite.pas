@@ -349,9 +349,9 @@ begin
         sl.add('<BODY>');
         sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
         sl.add('<TABLE>');
+        DBGrid.DataSource.DataSet.DisableControls;
+        DBGrid.DataSource.DataSet.First;
         while not DBGrid.DataSource.DataSet.EOF do
-        begin
-          for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
           begin
             sl.add('<tr>');
             // Get the data from the filename cell that the user has selected
@@ -366,10 +366,10 @@ begin
             sl.add('</tr>');
             DBGrid.DataSource.DataSet.Next;
           end;
-        end;
         sl.add('</TABLE>');
         sl.add('</BODY> ');
         sl.add('</HTML> ');
+        DBGrid.DataSource.DataSet.EnableControls;
         sl.SaveToFile(Filename);
       finally
         sl.free;
@@ -406,38 +406,36 @@ begin
           strBODYFooter      = '</BODY>'   = 7 bytes
           strTITLEFooter     = '</TITLE>'  = 8 bytes
           strHTMLFooter      = '</HTML>'   = 7 bytes}
+        DBGrid.DataSource.DataSet.DisableControls;
+        DBGrid.DataSource.DataSet.First;
         while not DBGrid.DataSource.DataSet.EOF do
         begin
-          for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
-          begin
-            // Start new row
-            fs.Write(strTABLEROWStart[1], 4);
-            // Get the data from the filename cell that the user has selected
-            FileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
-            // Write filename to new row
-            fs.Write(strTABLEDATAStart[1], 4);
-            fs.Write(FileNameCell[1], Length(FileNameCell));
-            fs.Write(strTABLEDataEnd[1], 5);
+          // Start new row
+          fs.Write(strTABLEROWStart[1], 4);
+          // Get the data from the filename cell that the user has selected
+          FileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
+          // Write filename to new row
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Write(FileNameCell[1], Length(FileNameCell));
+          fs.Write(strTABLEDataEnd[1], 5);
 
-            // Get the data from the filepath cell that the user has selected
-            FilePathCell := DBGrid.DataSource.DataSet.Fields[2].Value;
-            // Write filepath to new row
-            fs.Write(strTABLEDATAStart[1], 4);
-            fs.Write(FilePathCell[1], Length(FilePathCell));
-            fs.Write(strTABLEDATAEnd[1], 5);
+          // Get the data from the filepath cell that the user has selected
+          FilePathCell := DBGrid.DataSource.DataSet.Fields[2].Value;
+          // Write filepath to new row
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Write(FilePathCell[1], Length(FilePathCell));
+          fs.Write(strTABLEDATAEnd[1], 5);
 
-            // Get the data from the filehash cell that the user has selected
-            FileHashCell := DBGrid.DataSource.DataSet.Fields[3].Value;
-            // Write hash to new row
-            fs.Write(strTABLEDATAStart[1], 4) ;
-            fs.Write(FileHashCell[1], Length(Trim(FileHashCell)));
-            fs.Write(strTABLEDATAEnd[1], 5);
-            // End the row
-            fs.Write(strTABLEROWEnd[1], 5);
-            fs.Write(#13#10, 2);
-            DBGrid.DataSource.DataSet.Next;
-            // TODO : Why does the last entry get repeated 5 times in the HTML output??
-          end;
+          // Get the data from the filehash cell that the user has selected
+          FileHashCell := DBGrid.DataSource.DataSet.Fields[3].Value;
+          // Write hash to new row
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(FileHashCell[1], Length(Trim(FileHashCell)));
+          fs.Write(strTABLEDATAEnd[1], 5);
+          // End the row
+          fs.Write(strTABLEROWEnd[1], 5);
+          fs.Write(#13#10, 2);
+          DBGrid.DataSource.DataSet.Next;
         end;
         fs.Write(strTABLEFooter, 8);
         fs.Write(#13#10, 2);
@@ -446,11 +444,12 @@ begin
         fs.Write(#13#10, 2);
         fs.Write(strHTMLFooter, 7);
         fs.Write(#13#10, 2);
-        finally
-          fs.free;
-          MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
-          Application.ProcessMessages;
-        end;
+        DBGrid.DataSource.DataSet.EnableControls;
+      finally
+        fs.free;
+        MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
+        Application.ProcessMessages;
+      end;
     end
   else
     if DBGrid.Name = 'frmDisplayGrid1' then
@@ -929,7 +928,7 @@ var
     strHTMLFooter      = '</HTML>' ;
 
 begin
-  NoOfRowsInGrid := -1;
+  NoOfRowsInGrid := 0;
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
   NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
   if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
@@ -943,10 +942,10 @@ begin
     sl.add('<BODY>');
     sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
     sl.add('<table border=1>');
+    DBGrid.DataSource.DataSet.DisableControls;
+    DBGrid.DataSource.DataSet.First;
     while not DBGrid.DataSource.DataSet.EOF do
       begin
-        for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
-        begin
           sl.add('<tr>');
           // Get the data from the source filename cell
           SourceFilename := DBGrid.DataSource.DataSet.Fields[1].Value;
@@ -966,10 +965,10 @@ begin
           sl.add('</tr>');
           DBGrid.DataSource.DataSet.Next;
         end;
-      end;
     sl.add('</TABLE>');
     sl.add('</BODY> ');
     sl.add('</HTML> ');
+    DBGrid.DataSource.DataSet.EnableControls;
     sl.SaveToFile(Filename);
   finally
     sl.free;
@@ -1006,9 +1005,9 @@ begin
       strBODYFooter      = '</BODY>'   = 7 bytes
       strTITLEFooter     = '</TITLE>'  = 8 bytes
       strHTMLFooter      = '</HTML>'   = 7 bytes}
+      DBGrid.DataSource.DataSet.DisableControls;
+      DBGrid.DataSource.DataSet.First;
     while not DBGrid.DataSource.DataSet.EOF do
-    begin
-      for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
       begin
         // Start new row
         fs.Write(strTABLEROWStart[1], 4);
@@ -1050,8 +1049,8 @@ begin
         // End the row
         fs.Write(strTABLEROWEnd[1], 5);
         fs.Write(#13#10, 2);
+        DBGrid.DataSource.DataSet.Next;
       end;
-    DBGrid.DataSource.DataSet.Next;   // Why does this keep generating extra output I wonder?
     fs.Write(strTABLEFooter, 8);
     fs.Write(#13#10, 2);
     fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
@@ -1059,12 +1058,12 @@ begin
     fs.Write(#13#10, 2);
     fs.Write(strHTMLFooter, 7);
     fs.Write(#13#10, 2);
-    end;
     finally
       fs.free;
       MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
       Application.ProcessMessages;
     end;
+  DBGrid.DataSource.DataSet.EnableControls;
 end;
 
 // There is an UpdateGridXXX routine for each tab where a DBGrid is used.

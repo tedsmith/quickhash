@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 149
   Width = 1016
   AllowDropFiles = True
-  Caption = 'QuickHash v3.0.0 (Beta 24th Nov 17) - The easy and convenient way to hash data in Linux, OSX and Windows'
+  Caption = 'QuickHash v3.0.0 (Beta 31st Nov 17) - The easy and convenient way to hash data in Linux, OSX and Windows'
   ClientHeight = 718
   ClientWidth = 1016
   Menu = MainMenu1
@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 680
     Top = 24
     Width = 984
-    ActivePage = TabSheet5
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 6
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
