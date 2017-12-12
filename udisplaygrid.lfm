@@ -1,7 +1,7 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 860
+  Left = 766
   Height = 687
-  Top = 506
+  Top = 416
   Width = 903
   Caption = 'QuickHash - Copy Results'
   ClientHeight = 687
@@ -59,11 +59,11 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     left = 584
     top = 376
     object MenuItem_SortBySourceNameCOPYGRID: TMenuItem
-      Caption = 'Sort by Source Name'
+      Caption = 'Sort by Source FileName'
       OnClick = MenuItem_SortBySourceNameCOPYGRIDClick
     end
     object MenuItem_SortByDestinationNameCOPYGRID: TMenuItem
-      Caption = 'Sort by Destination Name'
+      Caption = 'Sort by Destination FileName'
       OnClick = MenuItem_SortByDestinationNameCOPYGRIDClick
     end
     object MenuItem_SortBySourceHashCOPYGRID: TMenuItem
@@ -91,7 +91,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
       OnClick = MenuItem_SaveDBToCSVClick
     end
     object MenuItem_CopyToClipboard: TMenuItem
-      Caption = 'Copy to Clipboard'
+      Caption = 'Copy Grid to Clipboard'
       OnClick = MenuItem_CopyToClipboardClick
     end
   end

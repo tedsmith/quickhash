@@ -39,6 +39,7 @@ type
     procedure DatasetToClipBoard(DBGrid : TDBGrid);
     procedure ShowDuplicates(DBGrid : TDBGrid);
     procedure DeleteDuplicates(DBGrid : TDBGrid);
+    procedure SortByID(DBGrid : TDBGrid);
     procedure SortByFileName(DBGrid : TDBGrid);
     procedure SortByFilePath(DBGrid : TDBGrid);
     procedure SortByHash(DBGrid : TDBGrid);
@@ -102,8 +103,8 @@ begin
     end
     else
     begin
-      ShowMessage('Cannot create SQLite database. Ensure you extracted the sqlite-win.dll file from the zip file');
-      exit;
+      ShowMessage('Cannot create SQLite database. Probably sqlite3-win.dll or SQLite is not installed on your system. Exiting');
+      abort; // Quit
     end;
   {$else}
     {$ifdef darwin}
@@ -122,8 +123,8 @@ begin
     end
     else
     begin
-      ShowMessage('Cannot create SQLite database. Ensure you extracted the sqlite-osx file from the zip file');
-      exit;
+      ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib). Exiting');
+      abort;
     end;
     {$else}
      // If it's 64-bit Linux, use the 64-bit SQLite3 install
@@ -156,8 +157,8 @@ begin
         end
     else
     begin
-      ShowMessage('Cannot create SQLite database. Ensure SQLite3 is installed in your Linux distribution');
-      exit;
+      ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (could not find libsqlite3.so.0). Exiting');
+      abort;
     end;
     {$endif}
   {$endif}
@@ -175,83 +176,64 @@ begin
     begin
       DeleteFile(SQLite3Connection1.DatabaseName);
     end;
+    // Make a new database and add the tables
+    try
+      SQLite3Connection1.Open;
+      SQLTransaction1.Active := true;
 
-      // Make a new database and add the tables
-      try
-        SQLite3Connection1.Open;
-        SQLTransaction1.Active := true;
+      // Periodically sort the database out to ensure it stays in tip top shape
+      // during heavy usage
+      SQLite3Connection1.ExecuteDirect('PRAGMA auto_vacuum = FULL;');
 
-        // Periodically sort the database out to ensure it stays in tip top shape
-        // during heavy usage
-        SQLite3Connection1.ExecuteDirect('PRAGMA auto_vacuum = FULL;');
+      // Per the SQLite Documentation (edited for clarity):
+      // The pragma user_version is used to set or get the value of the user-version.
+      // The user-version is a big-endian 32-bit signed integer stored in the database header at offset 60.
+      // The user-version is not used internally by SQLite. It may be used by applications for any purpose.
+      // http://www.sqlite.org/pragma.html#pragma_schema_version
+      SQLite3Connection1.ExecuteDirect('PRAGMA user_version = ' + IntToStr(user_version) + ';');
 
-        // Per the SQLite Documentation (edited for clarity):
-        // The pragma user_version is used to set or get the value of the user-version.
-        // The user-version is a big-endian 32-bit signed integer stored in the database header at offset 60.
-        // The user-version is not used internally by SQLite. It may be used by applications for any purpose.
-        // http://www.sqlite.org/pragma.html#pragma_schema_version
-        SQLite3Connection1.ExecuteDirect('PRAGMA user_version = ' + IntToStr(user_version) + ';');
+      // Per the SQLite Documentation:
+      // The application_id PRAGMA is used to query or set the 32-bit unsigned big-endian
+      // "Application ID" integer located at offset 68 into the database header.
+      // Applications that use SQLite as their application file-format should set the
+      // Application ID integer to a unique integer so that utilities such as file(1) can
+      // determine the specific file type rather than just reporting "SQLite3 Database".
+      // A list of assigned application IDs can be seen by consulting the magic.txt file
+      // in the SQLite source repository.
+      // http://www.sqlite.org/pragma.html#pragma_application_id
+      SQLite3Connection1.ExecuteDirect('PRAGMA application_id = ' + IntToStr(application_id) + ';');
 
-        // Per the SQLite Documentation:
-        // The application_id PRAGMA is used to query or set the 32-bit unsigned big-endian
-        // "Application ID" integer located at offset 68 into the database header.
-        // Applications that use SQLite as their application file-format should set the
-        // Application ID integer to a unique integer so that utilities such as file(1) can
-        // determine the specific file type rather than just reporting "SQLite3 Database".
-        // A list of assigned application IDs can be seen by consulting the magic.txt file
-        // in the SQLite source repository.
-        // http://www.sqlite.org/pragma.html#pragma_application_id
-        SQLite3Connection1.ExecuteDirect('PRAGMA application_id = ' + IntToStr(application_id) + ';');
+      // Here we're setting up a table named "TBL_FILES" in the new database
+      // Note AUTOINCREMENT is NOT used! If it is, it causes problems with RowIDs etc after multiple selections
+      // Besides, SQLite advice is not to use it unless entirely necessary (http://sqlite.org/autoinc.html)
+      SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_FILES"('+
+                  ' "id" Integer NOT NULL PRIMARY KEY,'+
+                  ' "FileName" Char(128) NOT NULL,'+
+                  ' "FilePath" Char(128) NOT NULL,'+
+                  ' "HashValue" Char(128) NOT NULL,'+
+                  ' "FileSize" Char(128) NOT NULL);');
+      // Creating an index based upon id in the TBL_FILES Table
+      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FILES_id_idx" ON "TBL_FILES"( "id" );');
 
-        // Here we're setting up a table named "TBL_FILES" in the new database
-        // Note AUTOINCREMENT is NOT used! If it is, it causes problems with RowIDs etc after multiple selections
-        // Besides, SQLite advice is not to use it unless entirely necessary (http://sqlite.org/autoinc.html)
-        SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_FILES"('+
-                    ' "id" Integer NOT NULL PRIMARY KEY,'+
-                    ' "FileName" Char(128) NOT NULL,'+
-                    ' "FilePath" Char(128) NOT NULL,'+
-                    ' "HashValue" Char(128) NOT NULL,'+
-                    ' "FileSize" Char(128) NOT NULL);');
-        // Creating an index based upon id in the TBL_FILES Table
-        SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FILES_id_idx" ON "TBL_FILES"( "id" );');
+      // Here we're setting up a table named "TBL_COPY" in the new database
+      SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COPY"('+
+                  ' "id" Integer NOT NULL PRIMARY KEY,'+
+                  ' "SourceFilename" Char(128) NOT NULL,'+
+                  ' "SourceHash" Char(128) NOT NULL,'+
+                  ' "DestinationFilename" Char(128) NOT NULL,'+
+                  ' "DestinationHash" Char(128) NOT NULL,'+
+                  ' "DateAttributes" Char(128) NOT NULL);');
+      // Creating an index based upon id in the TBL_COPY Table
+      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COPIED_FILES_id_idx" ON "TBL_COPY"( "id" );');
 
-        // Here we're setting up a table named "TBL_COPY" in the new database
-        SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COPY"('+
-                    ' "id" Integer NOT NULL PRIMARY KEY,'+
-                    ' "SourceFilename" Char(128) NOT NULL,'+
-                    ' "SourceHash" Char(128) NOT NULL,'+
-                    ' "DestinationFilename" Char(128) NOT NULL,'+
-                    ' "DestinationHash" Char(128) NOT NULL,'+
-                    ' "DateAttributes" Char(128) NOT NULL);');
-        // Creating an index based upon id in the TBL_COPY Table
-        SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COPIED_FILES_id_idx" ON "TBL_COPY"( "id" );');
-
-        // Here we're setting up a table named "TBL_COMPAREFOLDERSA" in the new database
-        // for the FolderA of Compare Two Directories
-        SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COMPAREFOLDERSA"('+
-                    ' "id" Integer NOT NULL PRIMARY KEY,'+
-                    ' "SrcFileAndPath" Char(128) NOT NULL,'+
-                    ' "SrcHash" Char(128) NOT NULL);');
-        // Creating an index based upon id in the COMPAREFOLDERSA Table
-        SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FOLDERA_FILES_id_idx" ON "TBL_COMPAREFOLDERSA"( "id" );');
-
-        // Here we're setting up a table named "TBL_COMPAREFOLDERSB" in the new database
-        // for the FolderB of Compare Two Directories
-        SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COMPAREFOLDERSB"('+
-                    ' "id" Integer NOT NULL PRIMARY KEY,'+
-                    ' "SrcFileAndPath" Char(128) NOT NULL,'+
-                    ' "SrcHash" Char(128) NOT NULL);');
-        // Creating an index based upon id in the COMPAREFOLDERSB Table
-        SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FOLDERB_FILES_id_idx" ON "TBL_COMPAREFOLDERSB"( "id" );');
-
-        // Now write to the new database
-        SQLTransaction1.CommitRetaining;
-      except
-        ShowMessage('Unable to create a new SQLite Database');
-      end;
+      // Now write to the new database
+      SQLTransaction1.CommitRetaining;
     except
-      ShowMessage('Unable to check if database file exists');
+      ShowMessage('SQLite detected but unable to create a new SQLite Database');
     end;
+  except
+    ShowMessage('SQLite detected but could not check if a database file exists');
+  end;
 end;
 
 // I've spent what seems like half my life working out how to copy the entire selected
@@ -298,7 +280,9 @@ function TfrmSQLiteDBases.CountGridRows(DBGrid : TDBGrid) : integer;
 var
   NoOfRows : integer;
 begin
+  result := -1;
   NoOfRows := -1;
+  DBGrid.DataSource.DataSet.First;
   while not DBGrid.DataSource.DataSet.EOF do
   begin
     inc(NoOfRows, 1);
@@ -307,14 +291,14 @@ begin
   // Got to top of grid.
   DBGrid.DataSource.DataSet.First;
   // Return count
-  result := NoOfRows;
+  If NoOfRows > -1 then result := NoOfRows;
 end;
 // Saves the grid in FILES tab to HTML. If small volume of records, uses a stringlist.
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : string);
 var
    strTitle, FileNameCell, FilePathCell, FileHashCell, AllRowCells : string;
-  i, NoOfRowsInGrid : integer;
+  NoOfRowsInGrid : integer;
   sl                : TStringList;
   fs                : TFileStreamUTF8;
 
@@ -494,6 +478,9 @@ var
   Exporter : TCSVExporter;
   ExportSettings: TCSVFormatSettings;
 begin
+  // Go to start of grid
+  DBGrid.DataSource.DataSet.First;
+  // And export it
   Exporter := TCSVExporter.Create(nil);
   ExportSettings := TCSVFormatSettings.Create(true);
   Exporter.FormatSettings := ExportSettings;
@@ -517,6 +504,9 @@ var
 begin
     Filename := 'QH_TmpFile.tmp';
     DeletedOK := false;
+    // Go to start of grid
+    DBGrid.DataSource.DataSet.First;
+    // and export it...
     try
       Exporter := TCSVExporter.Create(nil);
       try
@@ -662,6 +652,25 @@ begin
       MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
     end;
   end;
+end;
+
+// Used by the FILES tab to sort entries by ID in order
+procedure TfrmSQLiteDBases.SortByID(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+                          'FROM TBL_FILES ORDER BY Id';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
 end;
 
 // Used by the FILES tab to sort entries by filename alphabetically

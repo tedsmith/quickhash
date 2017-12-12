@@ -168,6 +168,7 @@ type
     lblTotalFileCountB: TLabel;
     lblTotalFileCountNumberB: TLabel;
     memFolderCompareSummary: TMemo;
+    MenuItem_SortByID: TMenuItem;
     MenuItem_DeleteDups: TMenuItem;
     MenuItem_SaveFILESTabToHTML: TMenuItem;
     MenuItem_CopyGridToClipboardFILES: TMenuItem;
@@ -394,6 +395,7 @@ type
     procedure MenuItem_SortByFilenameClick(Sender: TObject);
     procedure MenuItem_SortByFilePathClick(Sender: TObject);
     procedure MenuItem_SortByHashClick(Sender: TObject);
+    procedure MenuItem_SortByIDClick(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode);
     procedure ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode);
@@ -1625,6 +1627,12 @@ procedure TMainForm.MenuItem_SortByHashClick(Sender: TObject);
 begin
   RecursiveDisplayGrid1.Clear;
   frmSQLiteDBases.SortByHash(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_SortByIDClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.SortByID(RecursiveDisplayGrid1);
 end;
 
 
