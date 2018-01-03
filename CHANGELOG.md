@@ -6,6 +6,11 @@ Now with SQLite!! The reason why the development numbering has moved to v3.0...t
 SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and 
 copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
 
+Added the often requested feature of hash lookup from existing hash set. Available only in the FileS tab by way of a checkbox called 'Load hashlist' and a button to select the hash list file.
+So if the user has a list of existing hashes in a text file, he can import that into QuickHash and then compute hashes of files in a folder using the FileS tab. Any hashes that are in the hash 
+list but are not computed of files in the selected folder will be saved to a text file of the users choosing. He can then look those hashes up against his original data set to see which are missing (using Excel, Notepad++ etc). 
+If, by chance, all the hashes in the list match all the hashes computed in the folder, the user will be told that they match. 
+
 The "Compare Two Directories" tab has been entirely re-written (and renamed) to determine if both directories match or not. Recent updates to this tab had got so confusing it was difficult to read and debug, and in v2.8.4, if the user selected to thos wall results instead of just errors, it went really slow again
 because I must have got something wrong in one of the loops. So I ditched it all and started from scratch. The coding is much enhanced now, more efficient, and with less (no?) memory leaks. It utilises TFPHashLists amongst other things to improve perfomance. 
 And instead of having two display grids (which also slow things down and were not that useable in fact), the interface now has two treelists for the user to select FolderA and FolderB which are then hashed as TFPHashlists and compared. 

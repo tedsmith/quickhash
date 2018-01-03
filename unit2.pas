@@ -14,7 +14,7 @@
     Contributions from members at the Lazarus forums, Stackoverflow and other
     StackExchnage groups are welcomed and acknowledged.
 
-    Copyright (C) 2011-2017  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2018  Ted Smith www.quickhash-gui.org
 
     NOTE: Date and time values, as computed in recursive directory hashing, are not
     daylight saving time adjusted. Source file date and time values are recorded.
@@ -48,34 +48,18 @@ unit Unit2; // Unit 1 was superseeded with v2.0.0
 interface
 
 uses
-{ Deprecated uses clauses, discarded as a result of migrating to HashLib4Pascal
-   with QuickHash v2.8.0 in Feb 2017.
 
-// previously we had to use a customised MD5 & SHA-1 library to process Unicode on Windows and
-// to run a customised MD5Transform and SHA1Transform function that was converted to assembly.
-// No longer needed but the source code remains in the project because the
-// Assembly transforms that forum user Engkin helped me with rocked!
-
-md5customised,
-sha1customised,
-
-// The DCPCrypt library was used for SHA256 and SHA512 which are not part of FPC
-// but as of v2.80, DCPCrypt was discarded in favour of HashLib4Pascal
-
-DCPsha512, DCPsha256, DCPsha1, DCPmd5,
-}
-
-{$IFDEF UNIX}
+  {$IFDEF UNIX}
     {$IFDEF UseCThreads}
       cthreads,
     {$ENDIF}
   {$ENDIF}
 
-    Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
-    Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
-    LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
-    XMLPropStorage, uDisplayGrid, diskmodule, clipbrd, DBGrids, DbCtrls,
-    ZVDateTimePicker, frmAboutUnit, base64,
+  Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
+  Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
+  LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
+  XMLPropStorage, uDisplayGrid, diskmodule, clipbrd, DBGrids, DbCtrls,
+  ZVDateTimePicker, frmAboutUnit, base64,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -88,6 +72,8 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
   dbases_sqlite,
   // Also new as of v3.0.0, for creating hash lists for faster comparisons of two folders
   contnrs,
+  // Also new as of v3.0.0, for importing hash lists
+  uKnownHashLists,
 
   // Remaining Uses clauses for specific OS's
   {$IFDEF Windows}
@@ -102,7 +88,22 @@ DCPsha512, DCPsha256, DCPsha1, DCPmd5,
       UNIX;
     {$ENDIF}
   {$ENDIF}
+  { Deprecated uses clauses, discarded as a result of migrating to HashLib4Pascal
+     with QuickHash v2.8.0 in Feb 2017.
 
+  // previously we had to use a customised MD5 & SHA-1 library to process Unicode on Windows and
+  // to run a customised MD5Transform and SHA1Transform function that was converted to assembly.
+  // No longer needed but the source code remains in the project because the
+  // Assembly transforms that forum user Engkin helped me with rocked!
+
+  md5customised,
+  sha1customised,
+
+  // The DCPCrypt library was used for SHA256 and SHA512 which are not part of FPC
+  // but as of v2.80, DCPCrypt was discarded in favour of HashLib4Pascal
+
+  DCPsha512, DCPsha256, DCPsha1, DCPmd5,
+  }
 type
 
   { TMainForm }
@@ -149,6 +150,7 @@ type
     btnB64JustDecodeFiles: TButton;
     btnMakeTextUpper: TButton;
     btnMakeTextLower: TButton;
+    btnLoadHashList: TButton;
     Button8CopyAndHash: TButton;
     cbFlipCaseFILE: TCheckBox;
     cbToggleInputDataToOutputFile: TCheckBox;
@@ -157,6 +159,7 @@ type
     cbUNCModeCompFolders: TCheckBox;
     cbSaveComparisons: TCheckBox;
     cbOverrideFileCountDiffer: TCheckBox;
+    cbLoadHashList: TCheckBox;
     edtUNCPathCompareA: TEdit;
     edtUNCPathCompareB: TEdit;
     FileSDBNavigator: TDBNavigator;
@@ -174,6 +177,7 @@ type
     MenuItem_CopyGridToClipboardFILES: TMenuItem;
     MenuItem_CopySelectedRow: TMenuItem;
     MenuItem_SaveToHTML: TMenuItem;
+    HashListChooserDialog: TOpenDialog;
     pbCompareDirA: TProgressBar;
     pbCompareDirB: TProgressBar;
     RecursiveDisplayGrid1: TDBGrid;
@@ -243,6 +247,7 @@ type
     pbFile: TProgressBar;
     FilesDBGrid_SaveCSVDialog: TSaveDialog;
     FilesSaveAsHTMLDialog: TSaveDialog;
+    sdHashListLookupResults: TSaveDialog;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     b64FileSChooserDialog: TSelectDirectoryDialog;
     b64FileSSourceDecoderDialog: TSelectDirectoryDialog;
@@ -352,10 +357,12 @@ type
       Shift: TShiftState);
     procedure btnB64FileChooserClick(Sender: TObject);
     procedure btnB64JustDecodeFilesClick(Sender: TObject);
+    procedure btnLoadHashListClick(Sender: TObject);
     procedure btnMakeTextLowerClick(Sender: TObject);
     procedure btnMakeTextUpperClick(Sender: TObject);
     procedure cbFlipCaseFILEChange(Sender: TObject);
     procedure cbFlipCaseTEXTChange(Sender: TObject);
+    procedure cbLoadHashListChange(Sender: TObject);
     procedure cbOverrideFileCountDifferChange(Sender: TObject);
     procedure cbSaveComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
@@ -1946,6 +1953,34 @@ begin
     end;
 end;
 
+// Import an existinf text file of hashes
+// If successfull, known hashes can be accessed via uKnownHashLists.HashListSourceList
+procedure TMainForm.btnLoadHashListClick(Sender: TObject);
+var
+  HashListFilename : string;
+
+begin
+  HashListFilename := '';
+  HashListChooserDialog.Title := 'Choose exisiting text hash set...';
+  HashListChooserDialog.InitialDir := GetCurrentDir;
+  HashListChooserDialog.Filter := 'Text|*.txt';
+  HashListChooserDialog.DefaultExt:= 'txt';
+  HashListChooserDialog.Options:= [ofReadOnly];
+  if HashListChooserDialog.Execute then
+  begin
+    // Create to memory addresses for the source hash list, and also for the
+    // generated hashes to be stored for comparison
+    uKnownHashLists.CreateMemResidentHashLists();
+
+    // Now load existing hashlist to memory, accessible as uKnownHashLists.HashListSourceList
+    HashListFilename := HashListChooserDialog.FileName;
+    uKnownHashLists.ImportHashList(HashListFilename);
+
+    // Newly generated hashes are added to the second list via the HashFile function
+    // as each file is found and hashed; see uKnownHashLists.AddToNewHashList
+  end;
+end;
+
 procedure TMainForm.btnMakeTextLowerClick(Sender: TObject);
 var
   s : string;
@@ -2026,6 +2061,20 @@ begin
   end;
 end;
 
+procedure TMainForm.cbLoadHashListChange(Sender: TObject);
+begin
+  if cbLoadHashList.Checked then
+  begin
+    btnLoadHashList.Enabled:= true;
+    btnLoadHashList.Visible:= true;
+  end
+  else
+  begin
+    btnLoadHashList.Enabled:= false;
+    btnLoadHashList.Visible:= false;
+  end;
+end;
+
 procedure TMainForm.cbOverrideFileCountDifferChange(Sender: TObject);
 begin
   if cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := true;
@@ -2103,20 +2152,19 @@ var
   FS                                              : TFileSearcher;
   TotalFilesToExamine, slDuplicates               : TStringList;
   start, stop, elapsed, scheduleStartTime         : TDateTime;
-  j, i, LoopCounter, DuplicatesDeleted            : integer;
+  DifferenceCount                                 : integer;
 
   begin
   PageControl1.ActivePage := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
   FileCounter                   := 1;
   TotalBytesRead                := 0;
-  DuplicatesDeleted             := 0;
   lblTimeTaken3.Caption         := '...';
   lblTimeTaken4.Caption         := '...';
   lblFilesExamined.Caption      := '...';
   lblPercentageComplete.Caption := '...';
   lblTotalBytesExamined.Caption := '...';
   pbFileS.Position              := 0;
-  LoopCounter                   := 0;
+  DifferenceCount               := -1;
   Label5.Caption                := 'This area will be populated once the scan is complete...please wait!';
 
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
@@ -2246,6 +2294,23 @@ var
        lblTimeTaken4.Caption := 'Time taken : '+ FormatDateTime('HH:MM:SS', elapsed);
        StatusBar2.SimpleText := ' DONE! ';
        btnClipboardResults.Enabled := true;
+
+       // If user has imported an existing hash list, check new results against it
+       if cbLoadHashList.Checked then
+       begin
+         StatusBar2.Caption:= 'Comparing the imported hash list against newly computed hashes...please wait';
+         if uKnownHashLists.CompareHashLists() then
+           begin
+             StatusBar2.Caption:= 'Finished. Newly computed hashes match the imported hash list';
+           end
+         else
+           begin
+             StatusBar2.Caption:=('Newly computed hashes DO NOT match the imported hash list. Computing differences...please wait');
+             DifferenceCount := uKnownHashLists.ComputeWhatHashesAreMissing();
+           end;
+         // Free hash list resources
+         uKnownHashLists.Free;
+       end;
     end; // end of SelectDirectoryDialog1.Execute
 end;
 
@@ -3485,161 +3550,7 @@ begin
     fsFileToBeHashed.free;
   end;
 end;
-{DEPRECATED AS OF V2.8.0 in favour of HashLib4Pascal library instead of DCPCrypt
-function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
-  var
-    {MD5 and SHA1 utilise the LCL functions, whereas SHA256 and SHA512 utilise
-    the DCPCrypt library. MD5 and SHA1 from LCL seem to be much faster for large
-    files and disks than the DCPCrypt ones, so DCPCrypt only used for SHA256\512
-    on the grounds that there is no other LCL utilisation to choose from, yet.
-    Also, FileStreams are used for SHA256/512.
-    Streams are not necessary for MD5 and SHA1.}
-    TabRadioGroup2: TRadioGroup;
-    varSHA256Hash: TDCP_SHA256;
-    varSHA512Hash: TDCP_SHA512;
 
-    DigestSHA256: array[0..31] of byte;  // SHA256 produces a 256 bit digest (32 byte output)
-    DigestSHA512: array[0..63] of byte;  // SHA512 produces a 512 bit digest (64 byte output)
-
-    i : integer;
-    SourceDataSHA256, SourceDataSHA512: TFileStreamUTF8;
-    GeneratedHash: string;
-
-  begin
-    SourceDataSHA256 := nil;
-    SourceDataSHA512 := nil;
-    GeneratedHash    := '';
-
-    case PageControl1.TabIndex of
-      0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
-      1: TabRadioGroup2 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
-      2: TabRadioGroup2 := AlgorithmChoiceRadioBox3;  //RadioGroup for FileS.
-      3: TabRadioGroup2 := AlgorithmChoiceRadioBox4;  //RadioGroup for Copy.
-      4: TabRadioGroup2 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
-      5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Direcories.
-    end;
-
-    case TabRadioGroup2.ItemIndex of
-      0: begin
-           if FileSize(FileToBeHashed) > 1048576 then    // if file > 1Mb
-             begin
-              GeneratedHash := MD5Print(MD5File(FileToBeHashed, 2097152));    //2Mb buffer
-             end
-           else
-           if FileSize(FileToBeHashed) = 0 then
-             begin
-               {$ifdef UNIX}
-               // On Linux, block devices like disks often report 0 byte size but need to be accessed still
-               if Pos('/dev/', FileToBeHashed) > 0 then
-                 GeneratedHash := MD5Print(MD5File(FileToBeHashed, 2097152));
-               {$else ifdef Windows}
-               GeneratedHash := 'Not computed, zero byte file';
-               {$endif}
-             end
-           else
-           begin
-            GeneratedHash := MD5Print(MD5File(FileToBeHashed));            //1024 bytes buffer
-           end;
-         end;
-      1: begin
-           if FileSize(FileToBeHashed) > 1048576 then
-             begin
-               GeneratedHash := SHA1Print(SHA1File(FileToBeHashed, 2097152));  //2Mb buffer
-             end
-           else
-           if FileSize(FileToBeHashed) = 0 then
-             begin
-               {$ifdef UNIX}
-               // On Linux, block devices like disks often report 0 byte size but need to be accessed still
-               if Pos('/dev/', FileToBeHashed) > 0 then
-                 GeneratedHash := SHA1Print(SHA1File(FileToBeHashed, 2097152));
-               {$else ifdef Windows}
-               GeneratedHash := 'Not computed, zero byte file';
-               {$endif}
-             end
-           else
-             GeneratedHash := SHA1Print(SHA1File(FileToBeHashed))            //1024 bytes buffer
-         end;
-      2: begin
-           // The LCL does not have a SHA256 implementation, so DCPCrypt used instead
-           // Note the use of UTF8 FileStreams, to cope with Unicode on Windows
-           SourceDataSHA256 := TFileStreamUTF8.Create(FileToBeHashed, fmOpenRead);
-           if SourceDataSHA256 <> nil then
-             begin
-             i := 0;
-             varSHA256Hash := TDCP_SHA256.Create(nil);
-             varSHA256Hash.Init;
-             varSHA256Hash.UpdateStream(SourceDataSHA256, SourceDataSHA256.Size);
-             varSHA256Hash.Final(DigestSHA256);
-             varSHA256Hash.Free;
-             for i := 0 to 31 do                        // 64 character output
-               GeneratedHash := GeneratedHash + IntToHex(DigestSHA256[i],2);
-             end;  // End of SHA256 else if
-           // If the file is a zero byte file, override the default zero size hash
-           // with a "not computed" message, rather than a 'fake' hash.
-           if SourceDataSHA256.Size = 0 then
-             begin
-             {$ifdef UNIX}
-              // On Linux, block devices like disks often report 0 byte size but need to be accessed still
-              if Pos('/dev/', SourceDataSHA256.FileName) > 0 then
-                begin
-                   i := 0;
-                   varSHA256Hash := TDCP_SHA256.Create(nil);
-                   varSHA256Hash.Init;
-                   varSHA256Hash.UpdateStream(SourceDataSHA256, SourceDataSHA256.Size);
-                   varSHA256Hash.Final(DigestSHA256);
-                   varSHA256Hash.Free;
-                   for i := 0 to 31 do                        // 64 character output
-                     GeneratedHash := GeneratedHash + IntToHex(DigestSHA256[i],2);
-                   end;
-             {$else ifdef Windows}
-             GeneratedHash := 'Not computed, zero byte file';
-             {$endif}
-             end;
-         SourceDataSHA256.Free;
-         end;
-       3: begin
-            // The LCL does not have a SHA512 implementation, so DCPCrypt used instead
-            // Note the use of UTF8 FileStreams, to cope with Unicode on Windows
-            SourceDataSHA512 := TFileStreamUTF8.Create(FileToBeHashed, fmOpenRead);
-            if SourceDataSHA512 <> nil then
-              begin
-              i := 0;
-              varSHA512Hash := TDCP_SHA512.Create(nil);
-              varSHA512Hash.Init;
-              varSHA512Hash.UpdateStream(SourceDataSHA512, SourceDataSHA512.Size);
-              varSHA512Hash.Final(DigestSHA512);
-              varSHA512Hash.Free;
-              for i := 0 to 63 do                        // 128 character output
-               GeneratedHash := GeneratedHash + IntToHex(DigestSHA512[i],2);
-              end;
-            // If the file is a zero byte file, override the default zero size hash
-            // with a "not computed" message, rather than a 'fake' hash.
-            if SourceDataSHA512.Size = 0 then
-              begin
-              {$ifdef UNIX}
-              // On Linux, block devices like disks often report 0 byte size but need to be accessed still
-              if Pos('/dev/', SourceDataSHA512.FileName) > 0 then
-                begin
-                   i := 0;
-                   varSHA512Hash := TDCP_SHA512.Create(nil);
-                   varSHA512Hash.Init;
-                   varSHA512Hash.UpdateStream(SourceDataSHA512, SourceDataSHA512.Size);
-                   varSHA512Hash.Final(DigestSHA512);
-                   varSHA512Hash.Free;
-                   for i := 0 to 31 do                        // 64 character output
-                     GeneratedHash := GeneratedHash + IntToHex(DigestSHA512[i],2);
-                   end;
-               {$else ifdef Windows}
-               GeneratedHash := 'Not computed, zero byte file';
-               {$endif}
-              end;
-          SourceDataSHA512.Free;
-          end;
-    end;
-  result := GeneratedHash;  // return the resultant hash digest, if successfully computed
-  end;
-}
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
 var
   SizeOfFile : int64;
@@ -3673,8 +3584,12 @@ begin
         end;
 
     // Now generate the hash value using a custom function and convert the result to uppercase
-
-    FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
+    if cbLoadHashList.Checked then
+    begin
+      FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
+      uKnownHashLists.AddToNewHashList(FileHashValue);
+    end
+      else FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
     {$IFDEF Windows}
       PathOnly := RemoveLongPathOverrideChars(PathOnly, LongPathOverride); // Remove the \\?\ for display purposes
     {$ENDIF}
