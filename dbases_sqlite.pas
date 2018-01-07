@@ -43,6 +43,9 @@ type
     procedure SortByFileName(DBGrid : TDBGrid);
     procedure SortByFilePath(DBGrid : TDBGrid);
     procedure SortByHash(DBGrid : TDBGrid);
+    procedure SoryByHashList(DBGrid : TDBGrid);
+    procedure FilterOutHashListNO(DBGrid : TDBGrid);
+    procedure FilterOutHashListYES(DBGrid : TDBGrid);
     procedure ShowAll(DBGrid : TDBGrid);
     procedure ShowAllCOPYGRID(DBGrid : TDBGrid);
     procedure CopyFileNameOfSelectedCell(DBGrid : TDBGrid);
@@ -91,6 +94,9 @@ begin
     SQLDBLibraryLoaderWindows.ConnectionType:='SQLite3';
     if FileExists('sqlite3-win.dll') then
     begin
+      // On 32 bit Windows, the dll should be in C:\Windows\System32
+      // On 64 bit Windows, the dll should be in C:\Windows\SysWOW64
+      // For now, just ship the DLL with the program
       SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win.dll';
       SQLDBLibraryLoaderWindows.Enabled := true;
       SQLDBLibraryLoaderWindows.LoadLibrary;
@@ -748,6 +754,70 @@ begin
    DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
+    begin
+      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+    end;
+  end;
+end;
+
+// Used by the FILES tab display grid to sort by the Yes\No values of Known Hash import
+procedure TfrmSQLiteDBases.SoryByHashList(DBGrid : TDBGrid);
+begin
+ try
+   DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+                        'FROM TBL_FILES ORDER BY KnownHashFlag';
+   SQLite3Connection1.Connected := True;
+   SQLTransaction1.Active := True;
+   MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+   DBGrid.DataSource.Dataset.Open;
+  except
+    on E: EDatabaseError do
+    begin
+      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+    end;
+  end;
+end;
+
+// Used by the FILES tab display grid to filter out values unknown to imported hash list
+// i.e. Filter out all the rows that are No in Known to hash import
+procedure TfrmSQLiteDBases.FilterOutHashListNO(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.Dataset.Close;
+    // This SQL query may not scale to large data sets as it uses the LIKE word
+    // But it should be OK for many thousands of rows, but perhas not millions.
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text :=  'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+                                                      'FROM TBL_FILES WHERE KnownHashFlag LIKE ''No''';
+
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+  except
+    on E: EDatabaseError do
+    begin
+      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+    end;
+  end;
+end;
+
+// Used by the FILES tab display grid to filter out values known to imported hash list
+// i.e. Filter out all the rows that are Yes in Known to hash import
+procedure TfrmSQLiteDBases.FilterOutHashListYES(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.Dataset.Close;
+    // This SQL query may not scale to large data sets as it uses the LIKE word
+    // But it should be OK for many thousands of rows, but perhas not millions.
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text :=  'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+                                                      'FROM TBL_FILES WHERE KnownHashFlag LIKE ''Yes''';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+  except
+  on E: EDatabaseError do
     begin
       MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
     end;

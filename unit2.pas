@@ -171,6 +171,9 @@ type
     lblTotalFileCountB: TLabel;
     lblTotalFileCountNumberB: TLabel;
     memFolderCompareSummary: TMemo;
+    MenuItem_FilterOutYes: TMenuItem;
+    MenuItem_FilterOutNo: TMenuItem;
+    MenuItem_SortByHashList: TMenuItem;
     MenuItem_SortByID: TMenuItem;
     MenuItem_DeleteDups: TMenuItem;
     MenuItem_SaveFILESTabToHTML: TMenuItem;
@@ -395,6 +398,8 @@ type
     procedure MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopyFileNameOfSelectedCellClick(Sender: TObject);
     procedure MenuItem_CopySelectedRowFILESTABClick(Sender: TObject);
+    procedure MenuItem_FilterOutNoClick(Sender: TObject);
+    procedure MenuItem_FilterOutYesClick(Sender: TObject);
     procedure MenuItem_RestoreListFILESClick(Sender: TObject);
     procedure MenuItem_SaveToCSVClick(Sender: TObject);
     procedure MenuItem_SaveToHTMLClick(Sender: TObject);
@@ -402,8 +407,10 @@ type
     procedure MenuItem_SortByFilenameClick(Sender: TObject);
     procedure MenuItem_SortByFilePathClick(Sender: TObject);
     procedure MenuItem_SortByHashClick(Sender: TObject);
+    procedure MenuItem_SortByHashListClick(Sender: TObject);
     procedure MenuItem_SortByIDClick(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
+    procedure popmenuDBGrid_FilesPopup(Sender: TObject);
     procedure ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode);
     procedure ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode);
     procedure sysRAMTimerTimer(Sender: TObject);
@@ -1576,7 +1583,6 @@ begin
   frmSQLiteDBases.CopySelectedRowFILESTAB(RecursiveDisplayGrid1);
 end;
 
-
 // Copy hash value of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
 var
@@ -1638,6 +1644,25 @@ begin
   RecursiveDisplayGrid1.Clear;
   frmSQLiteDBases.SortByHash(RecursiveDisplayGrid1);
 end;
+
+procedure TMainForm.MenuItem_SortByHashListClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.SoryByHashList(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_FilterOutNoClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.FilterOutHashListNO(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.MenuItem_FilterOutYesClick(Sender: TObject);
+begin
+  RecursiveDisplayGrid1.Clear;
+  frmSQLiteDBases.FilterOutHashListYES(RecursiveDisplayGrid1);
+end;
+
 
 procedure TMainForm.MenuItem_SortByIDClick(Sender: TObject);
 begin
@@ -2102,6 +2127,22 @@ end;
 procedure TMainForm.Panel1CopyAndHashOptionsClick(Sender: TObject);
 begin
 
+end;
+
+// When user right clicks grid, if Hash List import unchecked, do not allow sorting by hash lookup column
+procedure TMainForm.popmenuDBGrid_FilesPopup(Sender: TObject);
+begin
+  if cbLoadHashList.Checked then
+  begin
+    MenuItem_FilterOutYes.Enabled   := true;
+    MenuItem_FilterOutNo.Enabled    := true;
+    MenuItem_SortByHashList.Enabled := true;
+  end else
+  begin
+    MenuItem_FilterOutYes.Enabled   := false;
+    MenuItem_FilterOutNo.Enabled    := false;
+    MenuItem_SortByHashList.Enabled := false;
+  end;
 end;
 
 
