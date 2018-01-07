@@ -505,6 +505,8 @@ type
 
    MultipleDirsChosen, StartHashing : boolean;
 
+   tmp : integer;
+
    {$IFDEF WINDOWS}
    // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
    // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes. LongPathOverride
@@ -563,6 +565,7 @@ var
 begin
   x := screen.Width;
   y := screen.Height;
+  tmp := 1;
 
   if x < MainForm.Width then
     begin
@@ -1953,14 +1956,19 @@ begin
     end;
 end;
 
-// Import an existinf text file of hashes
-// If successfull, known hashes can be accessed via uKnownHashLists.HashListSourceList
+// New to v3.0.0 Beta2 upwards
+// Import an existing text file of hashes
+// If successfull, known hashes can be accessed via uKnownHashLists.HashListSourceList.HL1
 procedure TMainForm.btnLoadHashListClick(Sender: TObject);
 var
   HashListFilename : string;
-
 begin
   HashListFilename := '';
+  ShowMessage('Ensure your hash list contains JUST hash values. ' + #13#10 +
+              'No other columns and no row heading(s) please.'    + #13#10 +
+              '(and ensure you choose the correct hash to match ' + #13#10 +
+              'your imported list (e.g. MD5, SHA-1...)');
+
   HashListChooserDialog.Title := 'Choose exisiting text hash set...';
   HashListChooserDialog.InitialDir := GetCurrentDir;
   HashListChooserDialog.Filter := 'Text|*.txt';
@@ -1972,12 +1980,12 @@ begin
     // generated hashes to be stored for comparison
     uKnownHashLists.CreateMemResidentHashLists();
 
-    // Now load existing hashlist to memory, accessible as uKnownHashLists.HashListSourceList
+    // Now load existing hashlist to memory, accessible as uKnownHashLists.HL1
     HashListFilename := HashListChooserDialog.FileName;
     uKnownHashLists.ImportHashList(HashListFilename);
 
-    // Newly generated hashes are added to the second list via the HashFile function
-    // as each file is found and hashed; see uKnownHashLists.AddToNewHashList
+    // Summarise the import process for the user
+    StatusBar2.SimpleText := IntToStr(uKnownHashLists.CountHashesInKnownList()) + ' unique hashes imported OK. Awaiting user to select folder for hashing...';
   end;
 end;
 
@@ -1986,7 +1994,6 @@ var
   s : string;
   i : integer;
 begin
-  //s := Lowercase(memoHashText.Text);
   s := memoHashText.Text;
     for i := 1 to Length(s) do
       begin
@@ -2061,6 +2068,7 @@ begin
   end;
 end;
 
+// New to v3.0.0 Beta2 upwards
 procedure TMainForm.cbLoadHashListChange(Sender: TObject);
 begin
   if cbLoadHashList.Checked then
@@ -2149,10 +2157,9 @@ procedure TMainForm.btnRecursiveDirectoryHashingClick(Sender: TObject);
 
 var
   DirToHash, SearchMask : string;
-  FS                                              : TFileSearcher;
-  TotalFilesToExamine, slDuplicates               : TStringList;
-  start, stop, elapsed, scheduleStartTime         : TDateTime;
-  DifferenceCount                                 : integer;
+  FS                           : TFileSearcher;
+  TotalFilesToExamine          : TStringList;
+  start, stop, elapsed         : TDateTime;
 
   begin
   PageControl1.ActivePage := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
@@ -2164,7 +2171,6 @@ var
   lblPercentageComplete.Caption := '...';
   lblTotalBytesExamined.Caption := '...';
   pbFileS.Position              := 0;
-  DifferenceCount               := -1;
   Label5.Caption                := 'This area will be populated once the scan is complete...please wait!';
 
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
@@ -2200,6 +2206,7 @@ var
        lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
        StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
        Label5.Visible        := true;
+
        Application.ProcessMessages;
 
        // By default, the recursive dir hashing will hash all files of all sub-dirs
@@ -2270,7 +2277,7 @@ var
            begin
              if FileTypeMaskCheckBox2.Checked then
                begin
-               SearchMask := FileMaskField2.Text;
+                 SearchMask := FileMaskField2.Text;
                end
                else SearchMask := '';
              FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
@@ -2298,18 +2305,12 @@ var
        // If user has imported an existing hash list, check new results against it
        if cbLoadHashList.Checked then
        begin
-         StatusBar2.Caption:= 'Comparing the imported hash list against newly computed hashes...please wait';
-         if uKnownHashLists.CompareHashLists() then
-           begin
-             StatusBar2.Caption:= 'Finished. Newly computed hashes match the imported hash list';
-           end
-         else
-           begin
-             StatusBar2.Caption:=('Newly computed hashes DO NOT match the imported hash list. Computing differences...please wait');
-             DifferenceCount := uKnownHashLists.ComputeWhatHashesAreMissing();
-           end;
-         // Free hash list resources
+         try
+         StatusBar2.SimpleText:= 'See rightmost column for hashset correlations. ' + IntToStr(CountHashesInKnownList) + ' unique hashes are in the imported hash list';
          uKnownHashLists.Free;
+         except
+           ShowMessage('Could not free the imported hash list from memory. Try restarting.')
+         end;
        end;
     end; // end of SelectDirectoryDialog1.Execute
 end;
@@ -3557,11 +3558,12 @@ var
   NameOfFileToHashFull, PathOnly, NameOnly, PercentageProgress : string;
   fileHashValue : ansistring;
   SG : TStringGrid;
-
+  DoesHashExistAlready : Boolean;
 begin
   SG            := TStringGrid.Create(self);
   SizeOfFile    := 0;
   fileHashValue := '';
+  DoesHashExistAlready := false;
 
   if StopScan1 = FALSE then    // If Stop button NOT clicked, work
     begin
@@ -3572,22 +3574,22 @@ begin
 
       if PageControl1.ActivePage = TabSheet2 then  // File tab
         begin
-          StatusBar1.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
+          StatusBar1.SimpleText := 'Currently Hashing: ' + RemoveLongPathOverrideChars(NameOfFileToHashFull, '\\?\');
         end else
       if PageControl1.ActivePage = TabSheet3 then  // FileS tab
         begin
-          StatusBar2.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
+          StatusBar2.SimpleText := 'Currently Hashing: ' + RemoveLongPathOverrideChars(NameOfFileToHashFull, '\\?\');
         end else
       if PageControl1.ActivePage = TabSheet4 then  // Copy tab
         begin
-          StatusBar3.SimpleText := 'Currently Hashing: ' + NameOfFileToHashFull;
+          StatusBar3.SimpleText := 'Currently Hashing: ' + RemoveLongPathOverrideChars(NameOfFileToHashFull, '\\?\');
         end;
 
     // Now generate the hash value using a custom function and convert the result to uppercase
     if cbLoadHashList.Checked then
     begin
       FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
-      uKnownHashLists.AddToNewHashList(FileHashValue);
+      DoesHashExistAlready := IsHashInTheKnownList(FileHashValue); // We pass this as a flag to SQLIte later
     end
       else FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
     {$IFDEF Windows}
@@ -3595,7 +3597,7 @@ begin
     {$ENDIF}
 
     // Save to database
-    frmSQLiteDBases.WriteFILESValuesToDatabase(NameOnly, PathOnly, FileHashValue, FormatByteSize(SizeOfFile));
+    frmSQLiteDBases.WriteFILESValuesToDatabase(NameOnly, PathOnly, FileHashValue, FormatByteSize(SizeOfFile), DoesHashExistAlready);
     // Periodically commit database changes. If too often, slows it down
     CommitCount(nil);
     // Progress Status Elements:

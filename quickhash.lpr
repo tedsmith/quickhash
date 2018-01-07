@@ -9,7 +9,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, lazdbexport, Unit2, FindAllFilesEnhanced, diskmodule, uDisplayGrid,
   diskspecification, uProgress, frmAboutUnit, zvdatetimectrls, dbases_sqlite,
-  uLoadhashlist;
+  uKnownHashLists;
 
 //{$IFDEF WINDOWS}{$R project1.rc}{$ENDIF}
 

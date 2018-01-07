@@ -1,6 +1,9 @@
-// New to v3.0.0 - provided for capability of users importing a known list of hashes
+// New to Jan 4th 2018 beta of v3.0.0 - provided for capability of users importing a known list of hashes
 // from a text file and checking if they appear when the user selects a folder
-// in the FileS tab
+// in the FileS tab.
+// In future, I will add a duplication option for the user,
+// i.e. add only unique hashes or all hashes.
+
 unit uKnownHashLists;
 
 {$mode objfpc}
@@ -11,130 +14,80 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, contnrs;
 
 var
-  HL1, HL2 : TFPHashList;   // global hash lists of known files (HL1) and added hashes (HL2)
+  HL1 : TFPHashList; // global hash list to store imported known hashes of files (HL1)
 
 procedure CreateMemResidentHashLists();
-procedure ImportHashList(Filename : string);
-procedure AddToNewHashList(hashval : string);
-function CompareHashLists(): Boolean;
-function ComputeWhatHashesAreMissing() : integer;
+procedure ImportHashList(Filename      : string);
 procedure Free;
 
+function IsHashInTheKnownList(hashval  : string) : boolean;
+function CountHashesInKnownList()      : integer;
 
 implementation
 
-Uses
-  Unit2;
-
 procedure CreateMemResidentHashLists();
 begin
-   try
+  try
    HL1 := TFPHashList.Create;
-   HL2 := TFPHashList.Create;
-   except
-     ShowMessage('Could not allocate memory for hash lists');
-   end;
+  except
+   ShowMessage('Could not allocate memory for hash lists');
+  end;
 end;
 
-// Read in existing hashes from hash file and add to HL1
+// Read in existing hashes from hash file and add to HL1, inserting unique values only
 procedure ImportHashList(Filename : string);
 var
  InFile     : textfile;
  SourceData : string;
+ LineCounter, NoOfDuplicates : integer;
 begin
-   AssignFile(InFile, Filename);
+  LineCounter := 0;
+  NoOfDuplicates := 0;
+  AssignFile(InFile, Filename);
    try
      reset(InFile);
      while not EOF(InFile) do
      begin
        readln(InFile, SourceData);
-       HL1.Add(SourceData, @SourceData);
-       // To show hash itself, use : ShowMessage(HashListA.NameOfIndex(i));
+       inc(LineCounter, 1);
+       // Add the hash value if not already in the list
+       if HL1.FindIndexOf(SourceData) < 0 then
+       begin
+         HL1.Add(SourceData, @SourceData);
+       end;
      end;
    finally
      CloseFile(InFile);
-     ShowMessage('Hash list imported into memory OK. Now select folder to examine');
+     NoOfDuplicates := LineCounter - HL1.Count;
+     ShowMessage(IntToStr(HL1.Count) +      ' unique hashes imported into memory.' + #13#10 +
+                 IntToStr(LineCounter) +    ' lines read from input file.'         + #13#10 +
+                 IntToStr(NoOfDuplicates) + ' duplicates detected and ignored.'    + #13#10 +
+                                            'Now select a folder to hash...');
    end;
  end;
 
-// Read in a newly computed hash and add to HL2
-procedure AddToNewHashList(hashval : string);
+// Is the current hash value existing in the imported hash list? If it is, returns true, false otherwise
+function IsHashInTheKnownList(hashval : string) : boolean;
 begin
-  HL2.Add(HashVal, @HashVal);
+  if HL1.FindIndexOf(hashval) < 0 then // If it's there, the result will be greater than -1
+  begin
+    result := false;
+  end
+  else result := true;
 end;
 
-// Compare HL1 agains HL2. Returns true if matching, false otherwise
-function CompareHashLists(): Boolean;
-var
-  i: Integer;
+// Returns the count of newly imported UNIQUE hash values into the known hash list
+// -1 otherwise
+function CountHashesInKnownList() : integer;
 begin
-  Result := False;
-  if (HL1.Count <> HL2.Count) then
-    Exit;
-  for i := 0 to HL1.Count-1 do
-    if (HL2.FindIndexOf(HL1.NameOfIndex(i)) < 0) then
-      Exit;
-  Result := True;
+  result := HL1.Count;
 end;
 
-// Compute what hashes are missing from HL2 that were found in HL1
-function ComputeWhatHashesAreMissing() : integer;
-var
-  i, j : integer;
-  sl : TStringList;
-begin
-  i := -1;
-  j := -1;
-  sl := TStringList.create;
-  sl.Sorted:=true;
-
-  if HL1.Count > HL2.Count then
-  for i := 0 to HL1.Count-1 do
-    begin
-      if (HL2.FindIndexOf(HL1.NameOfIndex(i)) < 0) then
-      begin
-        sl.Add(HL1.NameOfIndex(i));
-      end;
-    end
-  else
-    begin
-    if HL2.Count > HL1.Count then
-    for j := 0 to HL2.Count-1 do
-      if (HL1.FindIndexOf(HL2.NameOfIndex(j)) < 0) then
-      begin
-        sl.Add(HL2.NameOfIndex(j));
-      end;
-    end;
-
-    // Save results of the hash lookup, saving those hashes not found
-    try
-      MainForm.sdHashListLookupResults.Title:= 'Save hash lookup results as...';
-      MainForm.sdHashListLookupResults.InitialDir := GetCurrentDir;
-      MainForm.sdHashListLookupResults.Filter := 'Text|*.txt';
-      MainForm.sdHashListLookupResults.DefaultExt := 'txt';
-      if MainForm.sdHashListLookupResults.Execute then
-      begin
-        SL.SaveToFile(MainForm.sdHashListLookupResults.FileName);
-      end;
-    finally
-      SL.Free;
-    end;
-
-    if i > -1 then result := i
-      else if j > -1 then result := j
-        else result := -1;
-end;
-
-// Close hadh lists HL1 and HL2
+// Close hash lists HL1 in case the user chooses another hashlist.
 procedure Free;
 begin
   try
-  HL1.Free;
-    try
-      HL2.Free;
-      except
-        ShowMessage('The hash list of newly computed files stored in memory could not be freed.');
-      end;
+    HL1.Free;
   except
     ShowMessage('The hash list of existing files stored in memory could not be freed.');
   end;

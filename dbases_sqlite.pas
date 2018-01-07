@@ -28,7 +28,7 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure CreateDatabase(DBaseName : string);
-    procedure WriteFILESValuesToDatabase(Filename, Filepath, HashValue, FileSize : string);
+    procedure WriteFILESValuesToDatabase(Filename, Filepath, HashValue, FileSize : string; KnownHash : boolean);
     procedure WriteCOPYValuesToDatabase(Col1, Col2, Col3, Col4, Col5 : string);
     procedure EmptyDBTable(TableName : string; DBGrid : TDBGrid);
     procedure UpdateGridFILES(Sender: TObject);
@@ -211,7 +211,8 @@ begin
                   ' "FileName" Char(128) NOT NULL,'+
                   ' "FilePath" Char(128) NOT NULL,'+
                   ' "HashValue" Char(128) NOT NULL,'+
-                  ' "FileSize" Char(128) NOT NULL);');
+                  ' "FileSize" Char(128) NULL,'+
+                  ' "KnownHashFlag" Char(128) NULL);');
       // Creating an index based upon id in the TBL_FILES Table
       SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FILES_id_idx" ON "TBL_FILES"( "id" );');
 
@@ -633,18 +634,39 @@ end;
 // *** Start of FILES tab related database routines ***
 
 // Write computed values from the FILES tab to the database table TBL_FILES
-procedure TfrmSQLiteDBases.WriteFILESValuesToDatabase(Filename, Filepath, HashValue, FileSize : string);
+procedure TfrmSQLiteDBases.WriteFILESValuesToDatabase(Filename, Filepath, HashValue, FileSize : string; KnownHash : boolean);
+var
+  KnownHashFlag : string;
 begin
   try
     sqlFILES.Close;
     // Insert the values into the database. We're using ParamByName which prevents SQL Injection
     // http://wiki.freepascal.org/Working_With_TSQLQuery#Parameters_in_TSQLQuery.SQL
-    sqlFILES.SQL.Text := 'INSERT into TBL_FILES (Filename, FilePath, HashValue, FileSize) values (:Filename,:FilePath,:HashValue,:FileSize)';
+
+    if MainForm.cbLoadHashList.Checked then
+      begin
+        if KnownHash = false then
+          begin
+            KnownHashFlag := 'No';
+            sqlFILES.SQL.Text := 'INSERT into TBL_FILES (Filename, FilePath, HashValue, FileSize, KnownHashFlag) values (:Filename,:FilePath,:HashValue,:FileSize,:KnownHashFlag)';
+          end
+        else
+        begin
+          KnownHashFlag := 'Yes';
+          sqlFILES.SQL.Text := 'INSERT into TBL_FILES (Filename, FilePath, HashValue, FileSize, KnownHashFlag) values (:Filename,:FilePath,:HashValue,:FileSize,:KnownHashFlag)';
+        end;
+      end
+    else sqlFILES.SQL.Text := 'INSERT into TBL_FILES (Filename, FilePath, HashValue, FileSize) values (:Filename,:FilePath,:HashValue,:FileSize)';
+
     SQLTransaction1.Active := True;
     sqlFILES.Params.ParamByName('Filename').AsString := Filename;
     sqlFILES.Params.ParamByName('FilePath').AsString := FilePath;
     sqlFILES.Params.ParamByName('HashValue').AsString := hashvalue;
     sqlFILES.Params.ParamByName('FileSize').AsString := FileSize;
+    if MainForm.cbLoadHashList.Checked then
+      begin
+        sqlFILES.Params.ParamByName('KnownHashFlag').AsString := KnownHashFlag;
+      end;
     sqlFILES.ExecSQL;
   except
     on E: EDatabaseError do
