@@ -122,17 +122,24 @@ begin
       SQLDBLibraryLoaderOSX.LoadLibrary;
       // Set the filename of the sqlite database
       strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-      // Determine a safe place to write the SQLite database file to; returns /Users/Username/ on OSX
-      SafePlaceForDB := GetUserDir;
-      SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBOSX_' + strFileNameRandomiser + '.sqlite';
-      // Create the database
-      CreateDatabase(SQLite3Connection1.DatabaseName);
-      if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+      // Determine a safe place to write the SQLite database file to;
+      SafePlaceForDB := GetAppConfigDir(false); //GetUserDir returns /Users/Username/ on OSX but GetAppConfigDir safer I think;
+      if ForceDirectories(SafePlaceForDB) then
+      begin
+        SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBOSX_' + strFileNameRandomiser + '.sqlite';
+        // Create the database
+        CreateDatabase(SQLite3Connection1.DatabaseName);
+        if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+      end
+      else
+        begin
+          Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
+        end;
     end
     else
-    begin
-      ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib)');
-    end;
+      begin
+        ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib)');
+      end;
     {$else}
      // If it's 64-bit Linux, use the 64-bit SQLite3 install
      // Although, the paths below are for Debian based systems only. How do we
