@@ -85,7 +85,7 @@ implementation
 
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 var
-  strFileNameRandomiser : string;
+  strFileNameRandomiser, SafePlaceForDB : string;
 begin
   // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
   // but didn't seem to work with Linux.
@@ -122,15 +122,16 @@ begin
       SQLDBLibraryLoaderOSX.LoadLibrary;
       // Set the filename of the sqlite database
       strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-      SQLite3Connection1.DatabaseName := 'QuickHashDBOSX_' + strFileNameRandomiser + '.sqlite';
+      // Determine a safe place to write the SQLite database file to; returns /Users/Username/ on OSX
+      SafePlaceForDB := GetUserDir;
+      SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBOSX_' + strFileNameRandomiser + '.sqlite';
       // Create the database
       CreateDatabase(SQLite3Connection1.DatabaseName);
       if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
     end
     else
     begin
-      ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib). Exiting');
-      abort;
+      ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib)');
     end;
     {$else}
      // If it's 64-bit Linux, use the 64-bit SQLite3 install

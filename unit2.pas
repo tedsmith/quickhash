@@ -1276,20 +1276,23 @@ procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   DataBasefilename : string;
 begin
-  // Before closing DB connection, get the databasefilename
-  DataBasefilename := frmSQLiteDBases.SQLite3Connection1.DatabaseName;
-  // Now close the Database instances
-  try
-    frmSQLiteDBases.SQLite3Connection1.Close(true);
-  finally
-   frmSQLiteDBases.SQLite3Connection1.Free;
-  end;
-  // Now we can delete the database files
-  try
-    SysUtils.DeleteFile(DatabaseFilename);
-  except
-    Showmessage('Could not delete sqlite database ' + DataBasefilename + '. Please delete the manually.');
-  end;
+  if assigned(frmSQLiteDBases.SQLite3Connection1) then
+    begin
+      // Before closing DB connection, get the databasefilename
+      DataBasefilename := frmSQLiteDBases.SQLite3Connection1.DatabaseName;
+      // Now close the Database instances
+      try
+        frmSQLiteDBases.SQLite3Connection1.Close(true);
+      finally
+       frmSQLiteDBases.SQLite3Connection1.Free;
+      end;
+      // Now we can delete the database files
+      try
+        SysUtils.DeleteFile(DatabaseFilename);
+      except
+        Showmessage('Could not delete sqlite database ' + DataBasefilename + '. Please delete the manually.');
+      end;
+    end;
 end;
 
 procedure TMainForm.lblDonateClick(Sender: TObject);
