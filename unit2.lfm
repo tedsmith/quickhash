@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 700
     Top = 24
     Width = 984
-    ActivePage = TabSheet1
+    ActivePage = TabSheet6
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 5
     TabOrder = 0
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
@@ -57,6 +57,7 @@ object MainForm: TMainForm
             'Type or paste text here - hash will update as you type'
             ''
             ''
+            ''
           )
           MaxLength = 500000000
           OnChange = HashText
@@ -77,6 +78,7 @@ object MainForm: TMainForm
           Font.Height = -13
           Lines.Strings = (
             '...hash value'
+            ''
             ''
             ''
           )
@@ -353,6 +355,7 @@ object MainForm: TMainForm
           Color = clSilver
           Lines.Strings = (
             'Computed hash will appear here...'
+            ''
             ''
             ''
           )
@@ -1461,8 +1464,8 @@ object MainForm: TMainForm
     end
     object TabSheet6: TTabSheet
       Caption = 'Compare Two Folders'
-      ClientHeight = 652
-      ClientWidth = 976
+      ClientHeight = 661
+      ClientWidth = 978
       OnContextPopup = TabSheet6ContextPopup
       ParentShowHint = False
       object GroupBox2: TGroupBox
@@ -1471,12 +1474,12 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 128
         Height = 177
-        Top = 448
-        Width = 828
+        Top = 457
+        Width = 830
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Summary'
         ClientHeight = 154
-        ClientWidth = 820
+        ClientWidth = 822
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
@@ -1521,22 +1524,22 @@ object MainForm: TMainForm
       end
       object GroupBox1: TGroupBox
         Left = 128
-        Height = 416
+        Height = 425
         Top = 16
-        Width = 828
+        Width = 830
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Compare two directories'
-        ClientHeight = 393
-        ClientWidth = 820
+        ClientHeight = 402
+        ClientWidth = 822
         DragMode = dmAutomatic
         Font.Height = -13
         ParentFont = False
         TabOrder = 0
         object lblStatusA: TLabel
           Left = 8
-          Height = 15
+          Height = 16
           Top = 336
-          Width = 41
+          Width = 49
           Caption = 'Status: '
           Font.Style = [fsBold]
           ParentColor = False
@@ -1544,18 +1547,18 @@ object MainForm: TMainForm
         end
         object lblFolderAName: TLabel
           Left = 8
-          Height = 17
+          Height = 16
           Top = 248
-          Width = 9
+          Width = 12
           Caption = '...'
           ParentColor = False
           WordWrap = True
         end
         object lblFolderBName: TLabel
           Left = 496
-          Height = 17
+          Height = 16
           Top = 248
-          Width = 9
+          Width = 12
           Caption = '...'
           ParentColor = False
           WordWrap = True
@@ -1575,10 +1578,10 @@ object MainForm: TMainForm
         end
         object ZVDateTimePickerCompareDirsTab: TZVDateTimePicker
           Left = 347
-          Height = 25
+          Height = 20
           Hint = 'Enter date and time (hours and minutes) '
           Top = 200
-          Width = 136
+          Width = 151
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = 42736
@@ -1600,10 +1603,10 @@ object MainForm: TMainForm
         end
         object lblschedulertickboxCompareDirsTab: TCheckBox
           Left = 347
-          Height = 21
+          Height = 18
           Hint = 'After choosing FolderA and FolderB, set a date and '#13#10'time ahead of current time and then click Compare Now.'
           Top = 168
-          Width = 105
+          Width = 113
           Caption = 'Start at a time:'
           OnChange = lblschedulertickboxCompareTwoDirectoriesTabChange
           TabOrder = 2
@@ -1611,8 +1614,8 @@ object MainForm: TMainForm
         object StatusBar6: TStatusBar
           Left = 8
           Height = 23
-          Top = 358
-          Width = 816
+          Top = 366
+          Width = 818
           Align = alNone
           Anchors = [akLeft, akRight]
           AutoSize = False
@@ -1643,25 +1646,25 @@ object MainForm: TMainForm
         end
         object lblCompareTwoFoldersInstruction1: TLabel
           Left = 104
-          Height = 17
+          Height = 16
           Top = 5
-          Width = 87
+          Width = 93
           Caption = 'Select Folder A'
           ParentColor = False
         end
         object lblCompareTwoFoldersInstruction2: TLabel
           Left = 608
-          Height = 17
+          Height = 16
           Top = 5
-          Width = 86
+          Width = 92
           Caption = 'Select Folder B'
           ParentColor = False
         end
         object lblTotalFileCountB: TLabel
           Left = 496
-          Height = 17
+          Height = 16
           Top = 275
-          Width = 86
+          Width = 95
           BorderSpacing.Left = 5
           Caption = '# Files in Fol B:'
           ParentColor = False
@@ -1671,9 +1674,9 @@ object MainForm: TMainForm
           AnchorSideRight.Control = GroupBox2
           AnchorSideRight.Side = asrBottom
           Left = 617
-          Height = 17
+          Height = 16
           Top = 275
-          Width = 17
+          Width = 21
           Caption = '  ...'
           ParentColor = False
         end
@@ -1694,23 +1697,23 @@ object MainForm: TMainForm
         end
         object lblTotalFileCountA: TLabel
           Left = 8
-          Height = 17
+          Height = 16
           Top = 275
-          Width = 87
+          Width = 97
           Caption = '# Files in Fol A:'
           ParentColor = False
         end
         object lblTotalFileCountNumberA: TLabel
           Left = 112
-          Height = 17
+          Height = 16
           Top = 275
-          Width = 9
+          Width = 12
           Caption = '...'
           ParentColor = False
         end
         object cbUNCModeCompFolders: TCheckBox
           Left = 347
-          Height = 21
+          Height = 18
           Hint = 'For Windows users, if ticked, two UNC path'#13#10'fields will allow the user to compare two '#13#10'network paths'
           Top = 72
           Width = 92
@@ -1722,7 +1725,7 @@ object MainForm: TMainForm
         end
         object edtUNCPathCompareA: TEdit
           Left = 24
-          Height = 25
+          Height = 22
           Top = 32
           Width = 300
           OnChange = edtUNCPathCompareAChange
@@ -1732,7 +1735,7 @@ object MainForm: TMainForm
         end
         object edtUNCPathCompareB: TEdit
           Left = 520
-          Height = 25
+          Height = 22
           Top = 32
           Width = 300
           OnChange = edtUNCPathCompareBChange
@@ -1742,10 +1745,10 @@ object MainForm: TMainForm
         end
         object cbSaveComparisons: TCheckBox
           Left = 347
-          Height = 21
+          Height = 18
           Hint = 'Save the results of the comparison.'#13#10'Filenames, hash values etc will be '#13#10'auto-saved to a CSV file in the location'#13#10'of where QuickHash is running from.'
           Top = 102
-          Width = 148
+          Width = 157
           Caption = 'Save Results? (slower)'
           Checked = True
           OnChange = cbSaveComparisonsChange
@@ -1756,10 +1759,10 @@ object MainForm: TMainForm
         end
         object cbOverrideFileCountDiffer: TCheckBox
           Left = 347
-          Height = 21
+          Height = 18
           Hint = 'If the file count of both folders are different'#13#10'proceed anyway to hash all the files in both'#13#10'(''Save Results?'' must be enabled for this feature)'
           Top = 136
-          Width = 144
+          Width = 157
           Caption = 'Cont. if count differs?'
           OnChange = cbOverrideFileCountDifferChange
           ParentShowHint = False

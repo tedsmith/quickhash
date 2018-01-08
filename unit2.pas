@@ -2580,13 +2580,20 @@ begin
     begin
       NeedToSave := true;
       // Create the log file if it does not exist already
-      fsSaveFolderComparisonsLogFile := TFileStream.Create('QH_results'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.csv', fmCreate);
+      fsSaveFolderComparisonsLogFile := TFileStream.Create(GetAppConfigDir(false) +'QH_results'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.csv', fmCreate);
     end;
 
     // Process FolderA first. Find all the files initially
     try
-      StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
-      memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
+      {$ifdef Windows}
+        StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
+        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
+        {$else}
+        {$ifdef Darwin}
+        StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderA);
+        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderA));
+        {$endif}
+      {$endif}
       slFileListA := TStringList.Create;
       slFileListA.Sorted := true;
       slFileListA := RetrieveFileList(FolderA);
@@ -2595,8 +2602,16 @@ begin
 
       // Now move to FolderB. Find all the files initially
       try
-        StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
-        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
+        {$ifdef Windows}
+          StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
+          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
+          {$else}
+          {$ifdef Darwin}
+          StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderB);
+          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderB));
+          {$endif}
+        {$endif}
+
         slFileListB := TStringList.Create;
         slFileListB.Sorted := true;
         slFileListB := RetrieveFileList(FolderB);
@@ -2707,7 +2722,7 @@ begin
           fsSaveFolderComparisonsLogFile.Write(memFolderCompareSummary.Text[1], Length(memFolderCompareSummary.Text));
         end;
       finally
-        memFolderCompareSummary.Lines.Add('Results saved to ' + IncludeTrailingPathDelimiter(GetCurrentDir) + fsSaveFolderComparisonsLogFile.FileName);
+        memFolderCompareSummary.Lines.Add('Results saved to ' + fsSaveFolderComparisonsLogFile.FileName);
         fsSaveFolderComparisonsLogFile.Free;
       end;
     end;
@@ -2730,7 +2745,13 @@ begin
   // Now hash the files in FolderA
   try
     StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
-    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    {$ifdef Windows}
+      memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    {$else}
+      {$ifdef Darwin}
+         memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
+      {$endif}
+    {$endif}
     HashListA := TFPHashList.Create;
     for i := 0 to slFileListA.Count -1 do
     begin
@@ -2778,7 +2799,14 @@ begin
   // Now hash the files in FolderB
   try
     StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
-    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    {$ifdef Windows}
+      memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    {$else}
+      {$ifdef Darwin}
+         memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
+      {$endif}
+    {$endif}
+
     HashListB := TFPHashList.Create;
     for j := 0 to slFileListB.Count -1 do
     begin
