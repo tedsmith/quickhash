@@ -105,7 +105,12 @@ implementation
 
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 var
+  i : integer;
   strFileNameRandomiser, SafePlaceForDB : string;
+  {$ifdef Linux}
+    SQLiteLibraryPath : string;
+    slSQLitePaths  : TStringList;
+  {$endif}
 begin
   // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
   // but didn't seem to work with Linux.
@@ -161,41 +166,66 @@ begin
         ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib)');
       end;
     {$else}
-     // If it's 64-bit Linux, use the 64-bit SQLite3 install
-     // Although, the paths below are for Debian based systems only. How do we
-     // take care of non-Debian systems?  https://github.com/tedsmith/quickhash/issues/34
-    if FileExists('/usr/lib/x86_64-linux-gnu/libsqlite3.so.0') then
+     // If it's 64-bit Debian based Linux, use the 64-bit Debian SQLite3 SO file
+
+    try
+      slSQLitePaths :=  TStringList.Create;
+      // Most common on a 64-bit Debian based system
+      slSQLitePaths.Add('/usr/lib/x86_64-linux-gnu/libsqlite3.so.0');
+      // Most 32-bit based distributions might have it in these paths:
+      slSQLitePaths.Add('/usr/lib/libsqlite3.so.0');
+      slSQLitePaths.Add('/usr/lib/i386-linux-gnu/libsqlite3.so.0');
+      slSQLitePaths.Add('/usr/lib32/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib32/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib/i386-linux-gnu/libsqlite3.so.0');
+      // Most 64-bit based distributions might have it in these paths, if not in the first one
+      slSQLitePaths.Add('/usr/lib64/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib/x86_64-linux-gnu/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib64/libsqlite3.so.0');
+    finally
+      SQLiteLibraryPath := ''; // just empty this for now
+    end;
+
+    // Now search each entry to see which one contains the SQLite SO file for the distribution in use
+    // and assign it to SQLiteLibraryPath.
+    for i := 0 to slSQLitePaths.Count -1 do
+    begin
+       if FileExists(slSQLitePaths.Strings[i]) then
+       begin
+         SQLiteLibraryPath := Trim(slSQLitePaths.Strings[i]);
+         break;  // No need to itterate any further
+       end;
+    end;
+
+    if Length(SQLiteLibraryPath) < 1 then
       begin
-        SQLDBLibraryLoaderLinux.LibraryName := '/usr/lib/x86_64-linux-gnu/libsqlite3.so.0';
-        SQLDBLibraryLoaderLinux.Enabled := true;
-        SQLDBLibraryLoaderLinux.LoadLibrary;
-        // Set the filename of the sqlite database
-        strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-        SQLite3Connection1.DatabaseName := 'QuickHashDBLinux_' + strFileNameRandomiser + '.sqlite';
-        // Create the database
-        CreateDatabase(SQLite3Connection1.DatabaseName);
-        if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+        ShowMessage('SQLite was not found on this Linux distribution.');
       end
-    // If it's 32-bit Linux, use the 32-bit SQLite3 install
-      else if FileExists('/usr/lib/i386-linux-gnu/libsqlite3.so.0') then
-        begin
-          SQLDBLibraryLoaderLinux.LibraryName := '/usr/lib/i386-linux-gnu/libsqlite3.so.0';
-          SQLDBLibraryLoaderLinux.Enabled := true;
-          SQLDBLibraryLoaderLinux.LoadLibrary;
-          // Set the filename of the sqlite database
-          strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-          SQLite3Connection1.DatabaseName := 'QuickHashDBLinux_' + strFileNameRandomiser + '.sqlite';
-         // Create the database
-         CreateDatabase(SQLite3Connection1.DatabaseName);
-         if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-        end
     else
     begin
-      ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (could not find libsqlite3.so.0). Exiting');
-      abort;
-    end;
+      SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath; // '/usr/lib/x86_64-linux-gnu/libsqlite3.so.0';
+      SQLDBLibraryLoaderLinux.Enabled := true;
+      SQLDBLibraryLoaderLinux.LoadLibrary;
+      // Set the filename of the sqlite database
+      strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+      SQLite3Connection1.DatabaseName := 'QuickHashDBLinux_' + strFileNameRandomiser + '.sqlite';
+      // Create the database and connect to it
+      CreateDatabase(SQLite3Connection1.DatabaseName);
+
+      if SQLIte3Connection1.Connected then
+      begin
+        // None of this is visibile to the user. We just need to alert him if connection fails
+        lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+      end
+        else
+        begin
+          ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (could not find libsqlite3.so.0). Exiting');
+          abort;
+        end;
+      {$endif}
     {$endif}
-  {$endif}
+    end;
 end;
 
 // Create a fresh SQLite database for each instance of the program
