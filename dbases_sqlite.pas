@@ -194,7 +194,8 @@ begin
        if FileExists(slSQLitePaths.Strings[i]) then
        begin
          SQLiteLibraryPath := Trim(slSQLitePaths.Strings[i]);
-         break;  // No need to itterate any further
+         slSQLitePaths.Free; // No need for this anymore
+         break;  // No need to itterate any further. We have our path to SQLite.
        end;
     end;
 
