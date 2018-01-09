@@ -1,7 +1,7 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 766
+  Left = 691
   Height = 687
-  Top = 416
+  Top = 161
   Width = 903
   Caption = 'QuickHash - Copy Results'
   ClientHeight = 687

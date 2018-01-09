@@ -2,34 +2,31 @@ Version History
 ===============
 
 v3.0.0
-Now with SQLite!! The reason why the development numbering has moved to v3.0...the first whole number release since v2.0 in 2013, is due to the move to SQLIte. This has been a massive re-write and a total overhaul of large parts of the program. 
-SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and 
-copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
+Now with SQLite!! The reason why the development numbering has moved to v3.0...the first whole number release since v2.0 in 2013, is due to the move to SQLIte. This has been a massive re-write and a total overhaul of large parts of the program. SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 
 
-Added the often requested feature of hash lookup from existing hash set. Available only in the FileS tab by way of a checkbox called 'Load hashlist' and a button to select the hash list file.
-So if the user has a list of existing hashes in a text file, he can import that into QuickHash and then compute hashes of files in a folder using the FileS tab. Any hashes that are in the hash 
-list but are not computed of files in the selected folder will be saved to a text file of the users choosing. He can then look those hashes up against his original data set to see which are missing (using Excel, Notepad++ etc). 
-If, by chance, all the hashes in the list match all the hashes computed in the folder, the user will be told that they match. 
+Added the often requested feature of hash lookup from existing hash set (arrived with Beta2 ofr v3.0.0). Available only in the FileS tab by way of a checkbox called 'Load hashlist' and a button to select the hash list file. So if the user has a list of existing hashes in a text file, he can import that into QuickHash and then compute hashes of files in a folder using the FileS tab. Any hashes that are in the hash list but are not computed of files in the selected folder will be output with 'Yes' or 'No' respectively in the display grid. The user can then sort and filter by those values. In tests, several hundred existing hashes are imported in less than one second using only a dozen or so additional Mb of RAM.
 
-The "Compare Two Directories" tab has been entirely re-written (and renamed) to determine if both directories match or not. Recent updates to this tab had got so confusing it was difficult to read and debug, and in v2.8.4, if the user selected to thos wall results instead of just errors, it went really slow again
-because I must have got something wrong in one of the loops. So I ditched it all and started from scratch. The coding is much enhanced now, more efficient, and with less (no?) memory leaks. It utilises TFPHashLists amongst other things to improve perfomance. 
-And instead of having two display grids (which also slow things down and were not that useable in fact), the interface now has two treelists for the user to select FolderA and FolderB which are then hashed as TFPHashlists and compared. 
+The "Compare Two Directories" tab has been entirely re-written (and renamed) to better determine if both directories match or not. Recent updates to this tab had got so confusing it was difficult to read and debug, and in v2.8.4, if the user selected to thos wall results instead of just errors, it went really slow again because I must have got something wrong in one of the loops. So I ditched it all and started from scratch. The coding is much enhanced now, more efficient, and with less (no?) memory leaks. It utilises TFPHashLists amongst other things to improve perfomance. And instead of having two display grids (which also slow things down and were not that useable in fact), the interface now has two treelists for the user to select FolderA and FolderB which are sorted alphabetically and then hashed upon selection as TFPHashlists and compared. 
 
-Renamed the "Compare Directories" tab to "Compare Two Folders". It marries up better with the previous tab ("Compare Two Files") and it makes more sense to most modern computer users who have been raised on such wholesome terminologies (that's sarcasm).  
+Also renamed the "Compare Directories" tab to "Compare Two Folders" tab. It marries up better with the previous tab ("Compare Two Files") and it makes more sense to most modern computer users who have been raised on such terminologies. Fixed some cross platform issues with this tab too, but better enable it to perform across Windows, Linux and OSX.  
 
 The "File" tab did not have a filesize check for zero byte files. So if the user happened to navigate to an existing but zero byte file, the user would get a "Division by zero" error. That was fixed. 
 
-Files of zero bytes were skipped in the 'Copy' tab (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash
-for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, and still recorded as a zero byte file but not hashed. Instead 'zero byte file' will appear where the hash value would.
-The same fix has been applied to the "Compare Two Files" tab, where a zero byte file will not be hashed (because doing so just returns the default initialisation hash which is misleading). And also to the "Compare Two Folders" tab; zero byte files are now flagged as zero bytes. So still used for the 
-comparison but not actually hashed. 
+Files of zero bytes were skipped in the 'Copy' tab (recorded and counted, but not hashed) in earlier versions by design to avoid the default initialisation hashes returned when hash algorithms are pointed at zero byte data streams. However, some users report using QuickHash for backup and restore purposes, where zero byte files are often still necessary despite being empty. So v3.0.0 has adjusted how zero byte files are treated. They are now copied, and still recorded as a zero byte file but not hashed. Instead 'zero byte file' will appear where the hash value would.
+The same fix has been applied to the "Compare Two Files" tab, where a zero byte file will not be hashed (because doing so just returns the default initialisation hash which is misleading). And also to the "Compare Two Folders" tab; zero byte files are now flagged as zero bytes. So still used for the comparison but not actually hashed. 
 
 Some helpful interface hints added to the check boxes in the FileS tab,which seemed to have been left out of earlier versions
 
 Following a feature request, added a "case switcher" to the Text and File tabs. This allows the user to toggle the output hash between upper or lower case. Useful for users who need to compute hashes of hashes, instead of just hashes of some data. For users who may need to compute the hash of a hash value, the case sensitivity is 
 important obviously. Upper case is still the default output as it is easier for humans to read.   
 
-Fixed the time scheduler. It now checks every 1/3 of second if the current time equals the scheduled start time. 
+Fixed the time scheduler. It now checks every 1/3 of second if the current time equals the scheduled start time.
+
+Removed (deleted) an old unused progress bar that had been hidden by other elements
+
+Ensured the GNU license delcaration and open source nature of the tool, as well as the copyright and home URL notice are in every unit file of the project to better protect it and to make the 
+licensing clear. 
+ 
 
 V2.8.4
 ------

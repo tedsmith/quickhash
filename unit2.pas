@@ -2,30 +2,34 @@
     Quick Hash - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
     and generating hash values for them.
 
-    The use of the word 'quick' refers to the ease in which the software operates
-    in both Linux, Apple Mac and Windows (very few options
-    to worry about, no syntax to remember etc) though tests suggest that in most
-    cases the hash values are generated as quick or quicker than most mainstream
-    tools, such as FTK Imager (Windows), 'EnCase' (Windows), md5sum, sha1sum,
-    sha256sum and sha512sum (Linux).
+    Copyright (C) 2011-2018  Ted Smith www.quickhash-gui.org
 
-    Benchmark tests are welcomed to test on across various platforms and architectures.
+    The use of the word 'quick' refers to the ease in which the software operates
+    in both Linux, Apple Mac and Windows (very few options to worry about, no
+    syntax to remember etc) though tests suggest that in most cases the hash
+    values are generated as quick or quicker than most mainstream tools.
+
+    The user should be aware of other data hashing tools and use them to cross-check
+    findings for critical data :
+    md5sum, sha1sum, sha256sum and sha512sum (for Linux),
+    FTK Imager, X-Ways Forensics, WinHex, EnCase, FTK (Windows) and many more
+
+    Benchmark tests are welcomed.
 
     Contributions from members at the Lazarus forums, Stackoverflow and other
-    StackExchnage groups are welcomed and acknowledged.
-
-    Copyright (C) 2011-2018  Ted Smith www.quickhash-gui.org
+    StackExchnage groups are welcomed and acknowledged. Contributions from
+    DaReal Shinji are also welcomed and acknowledged, particularly helping with
+    Debian package creation and ideas
 
     NOTE: Date and time values, as computed in recursive directory hashing, are not
     daylight saving time adjusted. Source file date and time values are recorded.
 
+    Open-Source license:
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    any later version. You are not granted permission to create
-    another disk or file hashing tool based on this code and call it 'QuickHash'.
-
-    This program is distributed in the hope that it will be useful,
+    the Free Software Foundation, either version 2 of the License, or
+    any later version. This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -33,11 +37,34 @@
     You can read a copy of the GNU General Public License at
     http://www.gnu.org/licenses/>. Also, http://www.gnu.org/copyleft/gpl.html
 
+    Use of the name 'QuickHash GUI' must refer to this utility
+    only and must not be re-used in another tool if based upon this code.
+    The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
+
     HashLib4Pascal and xxHash64 libraries are both licensed under the MIT License
     https://opensource.org/licenses/MIT
 
-    HashLib4Pascal : https://github.com/Xor-el/HashLib4Pascal
+    HashLib4Pascal : https://github.com/Xor-el/HashLib4Pascal and developed by
+                     Github user Xor-el (Ugochukwu Stanley). Use of the
+                     library is welcomed and acknowledged and very much appreciated,
+                     as is the help that was offered by the developer of said library
+
     xxHash64       : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/
+                     Github user Cyan4973. Use of the library is also welcomed and acknowledged
+                     and very much appreciated
+
+    QuickHash is created using the Freepascal Compiler and Lazarus-IDE
+    http://www.lazarus-ide.org/ developed by Sourceforge users :
+    mgaertner,
+    mhess,
+    user4martin,
+    vlx,
+    vsnijders
+
+    QuickHash was first registered on sourceforge on 29th May 2011 and was later
+    migrated to the domain www.quickhash-gui.org in December 2016.
+    Read more about it's development history online at :
+    https://quickhash-gui.org/about-quickhash-gui/
 
 }
 
@@ -84,7 +111,7 @@ uses
   {$IFDEF Darwin}
     MacOSAll;
   {$else}
-    {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+    {$IFDEF UNIX and !$ifdef Darwin}
       UNIX;
     {$ENDIF}
   {$ENDIF}
@@ -257,7 +284,6 @@ type
     b64FileSDestinationDecoderDialog: TSelectDirectoryDialog;
     ShellTreeView_FolderA: TShellTreeView;
     ShellTreeView_FolderB: TShellTreeView;
-    StatusBar5: TStatusBar;
     StatusBar6: TStatusBar;
     b64StringGrid1File: TStringGrid;
     SystemRAMGroupBox: TGroupBox;
@@ -667,7 +693,7 @@ begin
     {$IFDEF Darwin}
       btnCallDiskHasherModule.Enabled := false; // disabled for OSX currently
     {$else}
-      {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+      {$IFDEF UNIX and !$ifdef Darwin}
         btnCallDiskHasherModule.Enabled := true; // as of v2.7.0 - disabled for Linux previously
       {$ENDIF}
   {$ENDIF}
@@ -2557,7 +2583,7 @@ begin
     FolderB := LongPathOverride+FolderB;
   end;
   {$else}
-   // If we are running on Linix or OSX just blank the long path overide to nothing
+   // If we are running on Linux or OSX just blank the long path overide to nothing
     LongPathOverride := '';
   {$endif}
 
@@ -2580,20 +2606,25 @@ begin
     begin
       NeedToSave := true;
       // Create the log file if it does not exist already
-      fsSaveFolderComparisonsLogFile := TFileStream.Create(GetAppConfigDir(false) +'QH_results'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.csv', fmCreate);
+      if ForceDirectories(GetAppConfigDir(false)) then // Create .config folder in users home folder
+      fsSaveFolderComparisonsLogFile := TFileStream.Create(GetAppConfigDir(false) +'QH_results'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.txt', fmCreate);
     end;
 
     // Process FolderA first. Find all the files initially
     try
-      {$ifdef Windows}
-        StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
-        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
-        {$else}
-        {$ifdef Darwin}
-        StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderA);
-        memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderA));
+       {$ifdef Windows}
+          StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
+          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
+          {$else}
+            {$ifdef Darwin}
+            StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderA);
+            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderA));
+            {$endif}
+            {$IFDEF UNIX and !$ifdef Darwin}
+            StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderA);
+            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderA));
+            {$ENDIF}
         {$endif}
-      {$endif}
       slFileListA := TStringList.Create;
       slFileListA.Sorted := true;
       slFileListA := RetrieveFileList(FolderA);
@@ -2606,10 +2637,14 @@ begin
           StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
           memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
           {$else}
-          {$ifdef Darwin}
-          StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderB);
-          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderB));
-          {$endif}
+            {$ifdef Darwin}
+            StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderB);
+            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderB));
+            {$endif}
+            {$IFDEF UNIX and !$ifdef Darwin}
+            StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderB);
+            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderB));
+            {$ENDIF}
         {$endif}
 
         slFileListB := TStringList.Create;
@@ -2739,20 +2774,32 @@ function TMainForm.HashFolderAList(Path : string; slFileListA : TStringList; int
 var
   HashListA  : TFPHashList;
   i, FilesProcessedA, StringLength : integer;
-  HashVal, StringToWrite : string;
+  HashVal, StringToWrite, HeaderLineA, HeaderLineB : string;
 begin
   FilesProcessedA := 0;
   // Now hash the files in FolderA
   try
-    StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
     {$ifdef Windows}
-      memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
+    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
     {$else}
       {$ifdef Darwin}
-         memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
+        StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
+        memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
       {$endif}
-    {$endif}
+        {$IFDEF UNIX and !$ifdef Darwin}
+          StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
+          memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
+        {$ENDIF}
+      {$endif}
+
     HashListA := TFPHashList.Create;
+    HeaderLineA := 'Computed hashes from ' + Path + ' : ' + #13#10;
+    HeaderLineB := '=====================' + #13#10;
+
+    fsSaveFolderComparisonsLogFile.Write(HeaderLineA[1], Length(HeaderLineA));
+    fsSaveFolderComparisonsLogFile.Write(HeaderLineB[1], Length(HeaderLineB));
+
     for i := 0 to slFileListA.Count -1 do
     begin
       if FileSize(slFileListA.Strings[i]) > 0 then
@@ -2793,21 +2840,32 @@ function TMainForm.HashFolderBList(Path : string; slFileListB : TStringList; int
 var
   HashListB : TFPHashList;
   j, FilesProcessedB, StringLength : integer;
-  HashVal, StringToWrite : string;
+  HashVal, StringToWrite, HeaderLineA, HeaderLineB : string;
 begin
   FilesProcessedB := 0;
   // Now hash the files in FolderB
   try
-    StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
     {$ifdef Windows}
-      memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
+    StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
+    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
     {$else}
       {$ifdef Darwin}
-         memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
+        StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
+        memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
       {$endif}
-    {$endif}
+        {$IFDEF UNIX and !$ifdef Darwin}
+          StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
+          memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
+        {$ENDIF}
+      {$endif}
 
     HashListB := TFPHashList.Create;
+    HeaderLineA := 'Computed hashes from ' + Path + ' : ' + #13#10;
+    HeaderLineB := '=====================' + #13#10;
+
+    fsSaveFolderComparisonsLogFile.Write(HeaderLineA[1], Length(HeaderLineA));
+    fsSaveFolderComparisonsLogFile.Write(HeaderLineB[1], Length(HeaderLineB));
+
     for j := 0 to slFileListB.Count -1 do
     begin
       if FileSize(slFileListB.Strings[j]) > 0 then
@@ -4589,7 +4647,7 @@ begin
               {$IFDEF Darwin}
                 slMultipleDirNames.Add(DirListA.Selections[i].GetTextPath);
               {$else}
-                {$IFDEF UNIX and !$ifdef Darwin} // because Apple had to 'borrow' Unix for their OS!
+                {$IFDEF UNIX and !$ifdef Darwin}
                   slMultipleDirNames.Add(DirListA.Selections[i].GetTextPath);
                 {$ENDIF}
               {$ENDIF}
