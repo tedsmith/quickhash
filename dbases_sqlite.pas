@@ -117,27 +117,34 @@ begin
   // So SQLDBLibraryLoader instances created for each OS
   {$ifdef windows}
     SQLDBLibraryLoaderWindows.ConnectionType:='SQLite3';
-    if FileExists('sqlite3-win.dll') then
+  {$ifdef CPU32}
+    if FileExists('sqlite3-win32.dll') then
     begin
-      // On 32 bit Windows, the dll should be in C:\Windows\System32
-      // On 64 bit Windows, the dll should be in C:\Windows\SysWOW64
-      // For now, just ship the DLL with the program
-      SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win.dll';
-      SQLDBLibraryLoaderWindows.Enabled := true;
-      SQLDBLibraryLoaderWindows.LoadLibrary;
-      // Set the filename of the sqlite database
-      strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-      SQLite3Connection1.DatabaseName := 'QuickHashDBWin_' + strFileNameRandomiser + '.sqlite';
-      // Create the database
-      CreateDatabase(SQLite3Connection1.DatabaseName);
-      if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+      SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win32.dll';
+    end;
+  {$else ifdef CPU64}
+    if FileExists('sqlite3-win64.dll') then
+    begin
+      SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win64.dll';
+    end;
+  {$endif}
+    SQLDBLibraryLoaderWindows.Enabled := true;
+    SQLDBLibraryLoaderWindows.LoadLibrary;
+    // Set the filename of the sqlite database
+    strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+    SQLite3Connection1.DatabaseName := 'QuickHashDBWin_' + strFileNameRandomiser + '.sqlite';
+    // Create the database
+    CreateDatabase(SQLite3Connection1.DatabaseName);
+    if SQLIte3Connection1.Connected then
+    begin
+      lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
     end
     else
     begin
-      ShowMessage('Cannot create SQLite database. Probably sqlite3-win.dll or SQLite is not installed on your system. Exiting');
+      ShowMessage('Cannot create SQLite database. Missing SQLite DLLs. Functionaliy will be reduced');
       abort; // Quit
     end;
-  {$else}
+    {$endif}
     {$ifdef darwin}
     SQLDBLibraryLoaderOSX.ConnectionType:='SQLite3';
     if FileExists('/usr/lib/libsqlite3.dylib') then
@@ -165,7 +172,8 @@ begin
       begin
         ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib)');
       end;
-    {$else}
+    {$endif}
+    {$ifdef Linux}
      // If it's 64-bit Debian based Linux, use the 64-bit Debian SQLite3 SO file
 
     try
@@ -224,9 +232,8 @@ begin
           ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (could not find libsqlite3.so.0). Exiting');
           abort;
         end;
-      {$endif}
+      end;
     {$endif}
-    end;
 end;
 
 // Create a fresh SQLite database for each instance of the program

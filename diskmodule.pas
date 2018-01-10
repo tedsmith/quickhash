@@ -450,7 +450,7 @@ begin
   // Get all technical specifications about a user selected disk and save it
   DiskInfoProcessUDISKS := TProcess.Create(nil);
   DiskInfoProcessUDISKS.Options := [poWaitOnExit, poUsePipes];
-  DiskInfoProcessUDISKS.CommandLine := 'udisks --show-info /dev/' + cbdisks.Text;
+  DiskInfoProcessUDISKS.CommandLine := 'udisksctl info -b /dev/' + cbdisks.Text;
   DiskInfoProcessUDISKS.Execute;
   diskinfoUDISKS := TStringList.Create;
   diskinfoUDISKS.LoadFromStream(diskinfoProcessUDISKS.Output);
@@ -469,10 +469,12 @@ function ListDrivesLinux : string;
 var
   DisksProcess: TProcess;
   i: Integer;
+  intPhysDiskSize, intLogDiskSize : QWord;
   slDisklist: TSTringList;
   PhyDiskNode, PartitionNoNode, DriveLetterNode           : TTreeNode;
   strPhysDiskSize, strLogDiskSize, DiskDevName, DiskLabels, dmCryptDiscovered   : string;
 begin
+  intPhysDiskSize := 0;
   DisksProcess:=TProcess.Create(nil);
   DisksProcess.Options:=[poWaitOnExit, poUsePipes];
   DisksProcess.CommandLine:='cat /proc/partitions';   //get all disks/partitions list
@@ -497,10 +499,10 @@ begin
       begin
         DiskDevName := '/dev/' + Trim(RightStr(slDisklist.Strings[i], 3));
         DiskLabels := GetDiskLabels(DiskDevName);
-        strPhysDiskSize := FormatByteSize(GetByteCountLinux(DiskDevName));
-        frmDiskHashingModule.TreeView1.Items.AddChild(PhyDiskNode, DiskDevName + ' | ' + strPhysDiskSize + ' ' + DiskLabels);
+        intPhysDiskSize := GetByteCountLinux(DiskDevName);
+        strPhysDiskSize := FormatByteSize(intPhysDiskSize);
+        frmDiskHashingModule.TreeView1.Items.AddChild(PhyDiskNode, DiskDevName + ' | ' + strPhysDiskSize + ' ('+IntToStr(intPhysDiskSize)+' bytes) ' + DiskLabels);
       end;
-    //cbdisks.Items.Add(Copy(slDisklist.Strings[i], 26, Length(slDisklist.Strings[i])-25));
   end;
 
   // List Logical drives (partitions), e.g. sda1, sdb2, hda1, hdb2 etc
@@ -511,12 +513,14 @@ begin
       begin
         DiskDevName := '/dev/' + Trim(RightStr(slDisklist.Strings[i], 4));
         DiskLabels := GetDiskLabels(DiskDevName);
+
         if Pos('/dm', DiskDevName) > 0 then
         begin
           dmCryptDiscovered := '*** mounted dmCrypt drive! ***';
         end;
-        strLogDiskSize := FormatByteSize(GetByteCountLinux(DiskDevName));
-        frmDiskHashingModule.TreeView1.Items.AddChild(DriveLetterNode, DiskDevName + ' | ' + strLogDiskSize + ' ' + dmCryptDiscovered +' ' + DiskLabels);
+        intLogDiskSize := GetByteCountLinux(DiskDevName);
+        strLogDiskSize := FormatByteSize(intLogDiskSize);
+        frmDiskHashingModule.TreeView1.Items.AddChild(DriveLetterNode, DiskDevName + ' | ' + strLogDiskSize + ' ('+IntToStr(intLogDiskSize)+' bytes)' + dmCryptDiscovered +' ' + DiskLabels);
       end;
   end;
   frmDiskHashingModule.Treeview1.AlphaSort;
@@ -556,7 +560,7 @@ begin
   BlockSize := 0;
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
+  DiskProcess.CommandLine:='udisksctl info -b ' + DiskDevName;   //get all disks/partitions list
   DiskProcess.Execute;
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
@@ -571,8 +575,7 @@ begin
   end;
 end;
 
-// Extracts the byte value "Size: " from the output of udisks --show-info /dev/sdX
-//
+// Extracts the byte value "Size: " from the output of udisksctl info -b /dev/sdX
 function GetByteCountLinux(DiskDevName : string) : QWord;
 var
   DiskProcess: TProcess;
@@ -589,7 +592,7 @@ begin
   strByteCount := '';
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
+  DiskProcess.CommandLine:='udisksctl info -b ' + DiskDevName;   //get all disks/partitions list
   DiskProcess.Execute;
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
@@ -598,7 +601,7 @@ begin
   begin
     // Search for 'Size:' in the output, but note there are two values.
     // This function only wants the first value, so abort once it's found
-    if (pos('size:', slDevDisk.Strings[i]) > 0) and (ScanDiskData = false) then
+    if (pos('Size:', slDevDisk.Strings[i]) > 0) and (ScanDiskData = false) then
     begin
       ScanDiskData := true;
       strByteCount := ExtractNumbers(slDevDisk.Strings[i]);
@@ -613,7 +616,7 @@ begin
 end;
 {$endif}
 
-// For extracting the disk size value from the output of UDIsks on Linux
+// For extracting the disk size value from the output of udisksctl (from udisk2 package) on Linux
 function ExtractNumbers(s: string): string;
 var
 i: Integer ;
@@ -1582,7 +1585,7 @@ begin
   end;
   {$endif}
   {$ifdef UNIX}
-  ShowMessage('Not available on Linux. Use uudisks, fdisk, or gparted');
+  ShowMessage('Not available on Linux. Use fdisk, or gparted');
   {$endif}
 end;
 
