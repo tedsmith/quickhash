@@ -25,8 +25,10 @@ Fixed the time scheduler. It now checks every 1/3 of second if the current time 
 Removed (deleted) an old unused progress bar that had been hidden by other elements
 
 Ensured the GNU license delcaration and open source nature of the tool, as well as the copyright and home URL notice are in every unit file of the project to better protect it and to make the 
-licensing clear. 
- 
+licensing clear. Added the GPL2 license, explicitally, to the Github project page. 
+
+Linux specific : The disk hashing module was originally coded with udisk behind the scenes. That was deprecated long ago and is not available in many recent distributions of Ubuntu, Zorin OS etc as UDisks2 is now used, which
+includes udisksctl. So the various technical data (size etc) is now queried and parsed with that instead, enabling users of modern Linux distributions to utilise the functionality. 
 
 V2.8.4
 ------

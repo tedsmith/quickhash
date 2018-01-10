@@ -1021,7 +1021,6 @@ var
   DiskInfoProcessUDISKS    : TProcess;
   diskinfoUDISKS : TStringList;
 begin
-
   // Get all technical specifications about a user selected disk and save it
   DiskInfoProcessUDISKS := TProcess.Create(nil);
   DiskInfoProcessUDISKS.Options := [poWaitOnExit, poUsePipes];
