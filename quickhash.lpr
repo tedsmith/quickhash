@@ -1,8 +1,29 @@
-{
-   Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
-                     and generating hash values for them.
+{   Quick Hash - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
+    and generating hash values for them.
 
     Copyright (C) 2011-2018  Ted Smith www.quickhash-gui.org
+
+    The use of the word 'quick' refers to the ease in which the software operates
+    in both Linux, Apple Mac and Windows (very few options to worry about, no
+    syntax to remember etc) though tests suggest that in most cases the hash
+    values are generated as quick or quicker than most mainstream tools.
+
+    The user should be aware of other data hashing tools and use them to cross-check
+    findings for critical data :
+    md5sum, sha1sum, sha256sum and sha512sum (for Linux),
+    FTK Imager, X-Ways Forensics, WinHex, EnCase, FTK (Windows) and many more
+
+    Benchmark tests are welcomed.
+
+    Contributions from members at the Lazarus forums, Stackoverflow and other
+    StackExchnage groups are welcomed and acknowledged. Contributions from
+    DaReal Shinji are also welcomed and acknowledged, particularly helping with
+    Debian package creation and ideas
+
+    NOTE: Date and time values, as computed in recursive directory hashing, are not
+    daylight saving time adjusted. Source file date and time values are recorded.
+
+    Open-Source license:
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +39,26 @@
     Use of the name 'QuickHash GUI' must refer to this utility
     only and must not be re-used in another tool if based upon this code.
     The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
+
+    HashLib4Pascal and xxHash64 libraries are both licensed under the MIT License
+    https://opensource.org/licenses/MIT
+
+    HashLib4Pascal : https://github.com/Xor-el/HashLib4Pascal and developed by
+                     Github user Xor-el (Ugochukwu Stanley). Use of the
+                     library is welcomed and acknowledged and very much appreciated,
+                     as is the help that was offered by the developer of said library
+
+    xxHash64       : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/
+                     Github user Cyan4973. Use of the library is also welcomed and acknowledged
+                     and very much appreciated
+
+    QuickHash is created using the Freepascal Compiler and Lazarus-IDE
+    http://www.lazarus-ide.org/ developed by Sourceforge users :
+    mgaertner,
+    mhess,
+    user4martin,
+    vlx,
+    vsnijders
 
     QuickHash was first registered on sourceforge on 29th May 2011 and was later
     migrated to the domain www.quickhash-gui.org in December 2016.

@@ -18,7 +18,7 @@
     only and must not be re-used in another tool if based upon this code.
     The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
 }
-unit dbases_sqlite;
+unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
 {$mode objfpc}
 
