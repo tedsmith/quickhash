@@ -1319,6 +1319,14 @@ begin
         Showmessage('Could not delete sqlite database ' + DataBasefilename + '. Please delete the manually.');
       end;
     end;
+
+  // Free the Hashlist if one was imported at any stage
+  if assigned(uKnownHashLists.HL1) then
+  try
+    uKnownHashLists.Free;
+  except
+    Showmessage('Had difficulty releasing hashlist memory while exiting.');
+  end;
 end;
 
 procedure TMainForm.lblDonateClick(Sender: TObject);
@@ -2030,8 +2038,9 @@ begin
   HashListChooserDialog.Options:= [ofReadOnly];
   if HashListChooserDialog.Execute then
   begin
-    // Create to memory addresses for the source hash list, and also for the
-    // generated hashes to be stored for comparison
+    // Create to memory addresses for the source hash list to live in
+    // Only create it if not already created previously. It is freed on FormClose
+    if not assigned(uKnownHashLists.HL1) then
     uKnownHashLists.CreateMemResidentHashLists();
 
     // Now load existing hashlist to memory, accessible as uKnownHashLists.HL1
@@ -2375,12 +2384,7 @@ var
        // If user has imported an existing hash list, check new results against it
        if cbLoadHashList.Checked then
        begin
-         try
          StatusBar2.SimpleText:= 'See rightmost column for hashset correlations. ' + IntToStr(CountHashesInKnownList) + ' unique hashes are in the imported hash list';
-         uKnownHashLists.Free;
-         except
-           ShowMessage('Could not free the imported hash list from memory. Try restarting.')
-         end;
        end;
     end; // end of SelectDirectoryDialog1.Execute
 end;
