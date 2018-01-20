@@ -1,13 +1,14 @@
 object MainForm: TMainForm
-  Left = 342
-  Height = 714
-  Top = 73
-  Width = 1018
+  Left = 291
+  Height = 656
+  Top = 234
+  Width = 1025
   AllowDropFiles = True
-  Caption = 'QuickHash v2.8.4 - The easy and convenient way to hash data in Linux, OSX and Windows'
-  ClientHeight = 695
-  ClientWidth = 1018
+  Caption = 'QuickHash v3.0.0 (Jan 2018) - The easy and convenient way to hash data in Linux, OSX and Windows'
+  ClientHeight = 637
+  ClientWidth = 1025
   Menu = MainMenu1
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDropFiles = FormDropFiles
   Position = poScreenCenter
@@ -15,32 +16,31 @@ object MainForm: TMainForm
   LCLVersion = '1.6.4.0'
   object PageControl1: TPageControl
     Left = 16
-    Height = 657
+    Height = 599
     Top = 24
-    Width = 986
+    Width = 993
     ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
     TabIndex = 0
     TabOrder = 0
-    OnChange = PageControl1Change
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
       Caption = 'Te&xt'
-      ClientHeight = 631
-      ClientWidth = 978
+      ClientHeight = 573
+      ClientWidth = 985
       OnContextPopup = TabSheet1ContextPopup
       ParentShowHint = False
       object TextHashingGroupBox: TGroupBox
         Left = 120
-        Height = 438
+        Height = 534
         Top = 10
-        Width = 842
+        Width = 849
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Text Hashing'
-        ClientHeight = 417
-        ClientWidth = 838
+        ClientHeight = 513
+        ClientWidth = 845
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -51,10 +51,14 @@ object MainForm: TMainForm
           Height = 183
           Hint = 'Type or paste and watch hash value change.'#13#10'For amounts larger than several hundred Kb, save'#13#10'data to a file and use File Hashing instead. '
           Top = 9
-          Width = 816
+          Width = 823
           Anchors = [akTop, akLeft, akRight]
           Lines.Strings = (
             'Type or paste text here - hash will update as you type'
+            ''
+            ''
+            ''
+            ''
           )
           MaxLength = 500000000
           OnChange = HashText
@@ -68,26 +72,31 @@ object MainForm: TMainForm
           Left = 8
           Height = 56
           Hint = 'This is the hash of ALL THE TEXT in the textarea above'#13#10'For line-by-line analysis, use the button'#13#10#13#10'The hash value can be copied from here'#13#10'to clipboard (highlight and press Ctrl + C or right click ''Copy'''
-          Top = 352
-          Width = 816
+          Top = 408
+          Width = 823
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           Font.Height = -13
           Lines.Strings = (
             '...hash value'
+            ''
+            ''
+            ''
+            ''
           )
           ParentFont = False
           ParentShowHint = False
           ScrollBars = ssAutoHorizontal
           ShowHint = True
           TabOrder = 1
+          WordWrap = False
         end
         object lbleExpectedHashText: TLabeledEdit
           Left = 8
           Height = 24
-          Hint = 'Paste an existing hash value here to see if'#13#10'the generated hash matches the computed.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3 dots only)'
-          Top = 304
-          Width = 817
+          Hint = 'Paste an existing hash value here to see if'#13#10'the generated hash matches the computed hash.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3 dots only)'#13#10'It expects you to paste hash values '#13#10'of the correct length'
+          Top = 368
+          Width = 824
           Anchors = [akTop, akLeft, akRight]
           EditLabel.AnchorSideLeft.Control = lbleExpectedHashText
           EditLabel.AnchorSideRight.Control = lbleExpectedHashText
@@ -95,29 +104,30 @@ object MainForm: TMainForm
           EditLabel.AnchorSideBottom.Control = lbleExpectedHashText
           EditLabel.Left = 8
           EditLabel.Height = 16
-          EditLabel.Top = 285
-          EditLabel.Width = 817
+          EditLabel.Top = 349
+          EditLabel.Width = 824
           EditLabel.Caption = 'Expected Hash Value (clear, then paste value from other utility)'
           EditLabel.ParentColor = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 2
           Text = '...'
+          OnChange = lbleExpectedHashTextChange
         end
         object GroupBox5: TGroupBox
           Left = 8
-          Height = 72
+          Height = 120
           Top = 208
-          Width = 752
-          Caption = 'Additional Text Hashing Functions'
-          ClientHeight = 51
-          ClientWidth = 748
+          Width = 448
+          Caption = 'Line-By-Line Hashing Options'
+          ClientHeight = 99
+          ClientWidth = 444
           TabOrder = 3
           object btnFLBL: TButton
-            Left = 176
+            Left = 8
             Height = 25
-            Hint = 'Load a text file, hash the content '#13#10'of it line-by-line, and save the results '#13#10'to a new file.'
-            Top = 8
+            Hint = 'Load a large text file, hash the content '#13#10'of it line-by-line, and save the results '#13#10'to a new text file.'
+            Top = 56
             Width = 144
             Caption = 'Text FILE Line-By-Line'
             OnClick = btnFLBLClick
@@ -128,36 +138,72 @@ object MainForm: TMainForm
           object btnLBL: TButton
             Left = 8
             Height = 25
-            Hint = 'Generate hash values line-by-line'#13#10'of the text pasted or written'#13#10'into the text field above. '#13#10'Results are saved to text file.'
-            Top = 8
-            Width = 128
+            Hint = 'Generate hash values line-by-line'#13#10'of the text pasted or written'#13#10'into the text area above. '#13#10'Results are saved to text file.'
+            Top = 16
+            Width = 144
             Caption = 'TEXT Line-By-Line'
             OnClick = btnLBLClick
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
           end
-          object btnClearTextArea: TButton
-            Left = 616
-            Height = 25
-            Top = 8
-            Width = 115
-            Caption = 'Clear Text Area'
-            OnClick = btnClearTextAreaClick
-            TabOrder = 2
-          end
           object cbToggleInputDataToOutputFile: TCheckBox
-            Left = 352
+            Left = 184
             Height = 20
-            Hint = 'If left unticked, the source '#13#10'text including corresponding hashes '#13#10'will be output. If ticked, only the'#13#10'hashes will be output on their own.'
-            Top = 13
-            Width = 190
-            Caption = 'Source text included in output'
+            Hint = 'If unticked, source text (including '#13#10'hashes) will be output. '#13#10'If ticked, only the computed'#13#10'hashes will be output.'
+            Top = 16
+            Width = 192
+            Caption = 'Source text INcluded in output'
             OnChange = cbToggleInputDataToOutputFileChange
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 3
+            TabOrder = 2
           end
+        end
+        object cbFlipCaseTEXT: TCheckBox
+          Left = 8
+          Height = 20
+          Top = 472
+          Width = 88
+          Caption = 'Switch case'
+          OnChange = cbFlipCaseTEXTChange
+          TabOrder = 4
+        end
+        object btnClearTextArea: TButton
+          Left = 710
+          Height = 25
+          Hint = 'Clear all characters from the text area'
+          Top = 304
+          Width = 112
+          Caption = 'Clear Text Area'
+          OnClick = btnClearTextAreaClick
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 5
+        end
+        object btnMakeTextUpper: TButton
+          Left = 710
+          Height = 25
+          Hint = 'Convert all characters in text area to UPPERCASE'
+          Top = 216
+          Width = 112
+          Caption = 'Make UPPER'
+          OnClick = btnMakeTextUpperClick
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 6
+        end
+        object btnMakeTextLower: TButton
+          Left = 710
+          Height = 25
+          Hint = 'Convert all characters in text area to lowercase'
+          Top = 256
+          Width = 112
+          Caption = 'Make lower'
+          OnClick = btnMakeTextLowerClick
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 7
         end
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
@@ -218,18 +264,18 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Hint = 'Hash a single file (useful for hashing disks in Linux)'
       Caption = 'F&ile'
-      ClientHeight = 631
-      ClientWidth = 978
+      ClientHeight = 573
+      ClientWidth = 985
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 120
-        Height = 358
+        Height = 398
         Top = 10
-        Width = 844
+        Width = 850
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Single File Hashing'
-        ClientHeight = 337
-        ClientWidth = 840
+        ClientHeight = 377
+        ClientWidth = 846
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -265,7 +311,7 @@ object MainForm: TMainForm
           Left = 6
           Height = 24
           Top = 96
-          Width = 828
+          Width = 826
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           ReadOnly = True
@@ -291,8 +337,8 @@ object MainForm: TMainForm
         object StatusBar1: TStatusBar
           Left = 0
           Height = 20
-          Top = 317
-          Width = 840
+          Top = 357
+          Width = 846
           Panels = <>
         end
         object lblDragAndDropNudge: TLabel
@@ -312,25 +358,29 @@ object MainForm: TMainForm
           Color = clSilver
           Lines.Strings = (
             'Computed hash will appear here...'
+            ''
+            ''
+            ''
+            ''
           )
           TabOrder = 3
           WordWrap = False
         end
         object lbleExpectedHash: TLabeledEdit
-          Left = 6
+          Left = 8
           Height = 24
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated file hash matches it, or not. '
-          Top = 224
-          Width = 828
+          Top = 264
+          Width = 824
           Anchors = [akTop, akLeft, akRight]
           EditLabel.AnchorSideLeft.Control = lbleExpectedHash
           EditLabel.AnchorSideRight.Control = lbleExpectedHash
           EditLabel.AnchorSideRight.Side = asrBottom
           EditLabel.AnchorSideBottom.Control = lbleExpectedHash
-          EditLabel.Left = 6
+          EditLabel.Left = 8
           EditLabel.Height = 16
-          EditLabel.Top = 205
-          EditLabel.Width = 828
+          EditLabel.Top = 245
+          EditLabel.Width = 824
           EditLabel.Caption = 'Expected Hash Value (paste from other utility before or after file hashing)'
           EditLabel.ParentColor = False
           MaxLength = 128
@@ -386,9 +436,9 @@ object MainForm: TMainForm
           TabOrder = 6
         end
         object btnClearHashField: TButton
-          Left = 8
+          Left = 6
           Height = 25
-          Top = 256
+          Top = 304
           Width = 144
           Caption = 'Clear Hash Field'
           OnClick = btnClearHashFieldClick
@@ -396,9 +446,9 @@ object MainForm: TMainForm
           TabOrder = 7
         end
         object pbFile: TProgressBar
-          Left = 192
+          Left = 190
           Height = 20
-          Top = 261
+          Top = 304
           Width = 640
           TabOrder = 8
           BarShowText = True
@@ -408,10 +458,19 @@ object MainForm: TMainForm
           AnchorSideTop.Side = asrBottom
           Left = 456
           Height = 16
-          Top = 281
+          Top = 324
           Width = 12
           Caption = '...'
           ParentColor = False
+        end
+        object cbFlipCaseFILE: TCheckBox
+          Left = 8
+          Height = 20
+          Top = 208
+          Width = 88
+          Caption = 'Switch case'
+          OnChange = cbFlipCaseFILEChange
+          TabOrder = 9
         end
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup
@@ -449,19 +508,19 @@ object MainForm: TMainForm
     object TabSheet3: TTabSheet
       Hint = 'Compute hashes for multiple files in a directory'#13#10'recursively, or just those in the root of the directory'
       Caption = 'FileS'
-      ClientHeight = 631
-      ClientWidth = 978
+      ClientHeight = 573
+      ClientWidth = 985
       ParentShowHint = False
       ShowHint = True
       object DirectoryHashingGroupBox: TGroupBox
         Left = 120
-        Height = 627
+        Height = 547
         Top = 10
-        Width = 840
+        Width = 855
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Hash all files in chosen directory - recursive by default'
-        ClientHeight = 606
-        ClientWidth = 836
+        ClientHeight = 526
+        ClientWidth = 851
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -483,17 +542,17 @@ object MainForm: TMainForm
           Left = 8
           Height = 23
           Hint = 'All files and subdirectories below the chosen '#10'directory will be hashed, subject to selected'#10'options. Recursive by default.'
-          Top = 93
-          Width = 117
+          Top = 96
+          Width = 99
           AutoSize = True
-          Caption = 'Select &Directory'
+          Caption = 'Select &Folder'
           Color = 8454016
           Font.Style = [fsBold]
           OnClick = btnRecursiveDirectoryHashingClick
           ParentFont = False
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 5
+          TabOrder = 2
         end
         object DirSelectedField: TEdit
           Left = 8
@@ -520,37 +579,16 @@ object MainForm: TMainForm
           Left = 520
           Height = 16
           Top = 56
-          Width = 84
+          Width = 97
           Anchors = [akTop, akLeft, akRight]
           Caption = '% Complete:'
           ParentColor = False
-        end
-        object SaveToCSVCheckBox1: TCheckBox
-          Left = 6
-          Height = 20
-          Hint = 'Tick to choose a filename and location for the log file'
-          Top = 6
-          Width = 97
-          Caption = 'Save to CSV?'
-          Checked = True
-          ParentShowHint = False
-          ShowHint = True
-          State = cbChecked
-          TabOrder = 1
-        end
-        object SaveToHTMLCheckBox1: TCheckBox
-          Left = 6
-          Height = 20
-          Top = 28
-          Width = 105
-          Caption = 'Save to HTML?'
-          TabOrder = 2
         end
         object btnClipboardResults: TButton
           Left = 224
           Height = 26
           Hint = 'Press this to copy entire grid content to RAM'
-          Top = 93
+          Top = 96
           Width = 80
           AutoSize = True
           Caption = 'Clipboard'
@@ -558,36 +596,28 @@ object MainForm: TMainForm
           OnClick = btnClipboardResultsClick
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 7
+          TabOrder = 4
         end
         object btnStopScan1: TButton
           Left = 152
           Height = 23
           Hint = 'Click to abort the hash as soon as the'#10'current file hashing action completes. '
-          Top = 93
+          Top = 96
           Width = 48
           AutoSize = True
           Caption = 'S&top'
           OnClick = btnStopScan1Click
           ParentFont = False
-          TabOrder = 6
-        end
-        object chkRecursiveDirOverride: TCheckBox
-          Left = 152
-          Height = 20
-          Top = 32
-          Width = 162
-          Caption = 'Ignoring sub-directories?'
           TabOrder = 3
         end
-        object chkFlagDuplicates: TCheckBox
-          Left = 152
+        object chkRecursiveDirOverride: TCheckBox
+          Left = 8
           Height = 20
-          Hint = 'Have duplicate files (by hash value) identified'
-          Top = 6
-          Width = 112
-          Caption = 'Flag Duplicates?'
-          TabOrder = 4
+          Hint = 'Hash files just in the root of the chosen folder'#13#10'Sub-folders will be ignored. '
+          Top = 8
+          Width = 162
+          Caption = 'Ignoring sub-directories?'
+          TabOrder = 1
         end
         object Label5: TLabel
           Left = 110
@@ -601,60 +631,16 @@ object MainForm: TMainForm
           Visible = False
           WordWrap = True
         end
-        object RecursiveDisplayGrid1: TStringGrid
-          Left = 6
-          Height = 392
-          Hint = 'Select single or multiple cells then ''Ctrl + C''  to copy content to clipboard. Click headers to sort by column header,auto-expand and re-arrange by dragging'
-          Top = 176
-          Width = 824
-          Anchors = [akTop, akLeft, akRight, akBottom]
-          Color = clDefault
-          ColCount = 6
-          ColumnClickSorts = True
-          Columns = <          
-            item
-              MinSize = 40
-              MaxSize = 10000
-              ReadOnly = True
-              Title.Alignment = taCenter
-              Title.Caption = 'File Name'
-              Width = 250
-            end          
-            item
-              Title.Caption = 'Path'
-              Width = 250
-            end          
-            item
-              ReadOnly = True
-              Title.Alignment = taCenter
-              Title.Caption = 'Hash Value'
-              Width = 300
-            end          
-            item
-              Title.Caption = 'File Size (on Disk)'
-              Width = 200
-            end          
-            item
-              Title.Caption = 'Duplicate?'
-            end>
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goColSizing, goColMoving, goColSpanning, goDblClickAutoSize, goSmoothScroll, goScrollKeepVisible, goDontScrollPartCell]
-          ParentShowHint = False
-          RowCount = 2
-          ShowHint = True
-          TabOrder = 8
-          TitleFont.Height = -13
-          TitleStyle = tsStandard
-          Visible = False
-        end
         object StatusBar2: TStatusBar
           AnchorSideRight.Control = DirectoryHashingGroupBox
           AnchorSideRight.Side = asrBottom
           Left = 8
-          Height = 20
-          Top = 560
-          Width = 828
+          Height = 23
+          Top = 496
+          Width = 843
           Align = alCustom
-          Anchors = [akTop, akLeft, akRight]
+          Anchors = [akLeft, akRight]
+          AutoSize = False
           Panels = <>
         end
         object lblTimeTaken3: TLabel
@@ -663,8 +649,7 @@ object MainForm: TMainForm
           Left = 686
           Height = 17
           Top = 6
-          Width = 150
-          Anchors = [akTop, akLeft, akRight]
+          Width = 156
           AutoSize = False
           Caption = '...'
           ParentColor = False
@@ -675,7 +660,7 @@ object MainForm: TMainForm
           Left = 686
           Height = 16
           Top = 56
-          Width = 150
+          Width = 165
           Anchors = [akTop, akLeft, akRight]
           Caption = '...'
           ParentColor = False
@@ -716,50 +701,50 @@ object MainForm: TMainForm
           Left = 686
           Height = 16
           Top = 28
-          Width = 150
-          Anchors = [akTop, akLeft, akRight]
+          Width = 12
           Caption = '...'
           ParentColor = False
         end
         object chkHiddenFiles: TCheckBox
-          Left = 336
+          Left = 8
           Height = 20
           Hint = 'Tick to have files in hidden folders hashed. '#13#10'Hidden files are hashed by default anyway '#13#10'but hidden folders, ergo their contents, are not found by default.'
-          Top = 6
+          Top = 64
           Width = 130
           Caption = 'Hidden folders too?'
-          TabOrder = 10
+          TabOrder = 6
         end
         object FileMaskField2: TEdit
-          Left = 312
+          Left = 288
           Height = 24
           Hint = 'Use an asterix, full stop and the file type '#10'extension, seperated by a semi-colon.'#10'NO space characters'
-          Top = 56
+          Top = 36
           Width = 200
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 11
+          TabOrder = 7
           Text = '*.doc;*.docx;*.xls;*.xlsx;*.pdf;'
           Visible = False
         end
         object FileTypeMaskCheckBox2: TCheckBox
-          Left = 336
+          Left = 288
           Height = 20
-          Top = 32
+          Hint = 'Select file type masks (e.g. *.doc;*.pdf)'#13#10'Remember that JPG and jpg are different'#13#10'file names on Linux and OSX!!'
+          Top = 8
           Width = 123
           Caption = 'Choose file types?'
           OnChange = FileTypeMaskCheckBox2Change
-          TabOrder = 12
+          TabOrder = 8
         end
         object ZVDateTimePickerFileSTab: TZVDateTimePicker
-          Left = 152
+          Left = 128
           Height = 24
-          Top = 56
+          Top = 36
           Width = 138
           CenturyFrom = 1941
           MaxDate = 72686
           MinDate = 42736
-          TabOrder = 13
+          TabOrder = 9
           Enabled = False
           TrailingSeparator = False
           TextForNullDate = 'Choose date & time'
@@ -776,14 +761,68 @@ object MainForm: TMainForm
           MonthNames = 'Long'
         end
         object lblschedulertickboxFileSTab: TCheckBox
-          Left = 6
+          Left = 8
           Height = 20
           Hint = 'Tick and set a date and time ahead of current time'#13#10'and then select the directory to hash.'
-          Top = 56
+          Top = 36
           Width = 108
           Caption = 'Start at a time:'
           OnChange = lblschedulertickboxFileSTabChange
+          TabOrder = 10
+        end
+        object RecursiveDisplayGrid1: TDBGrid
+          Left = 8
+          Height = 302
+          Top = 176
+          Width = 845
+          Anchors = [akTop, akLeft, akRight, akBottom]
+          Color = clWindow
+          Columns = <>
+          DataSource = frmSQLiteDBases.DataSource1
+          Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
+          PopupMenu = popmenuDBGrid_Files
+          TabOrder = 11
+          TitleFont.Height = -13
+        end
+        object FileSDBNavigator: TDBNavigator
+          Left = 336
+          Height = 25
+          Hint = 'This can help navigate the data grid'
+          Top = 96
+          Width = 177
+          BevelOuter = bvNone
+          ChildSizing.EnlargeHorizontal = crsScaleChilds
+          ChildSizing.EnlargeVertical = crsScaleChilds
+          ChildSizing.ShrinkHorizontal = crsScaleChilds
+          ChildSizing.ShrinkVertical = crsScaleChilds
+          ChildSizing.Layout = cclLeftToRightThenTopToBottom
+          ChildSizing.ControlsPerLine = 100
+          ClientHeight = 25
+          ClientWidth = 177
+          DataSource = frmSQLiteDBases.DataSource1
+          Options = []
+          TabOrder = 12
+          VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast]
+        end
+        object cbLoadHashList: TCheckBox
+          Left = 288
+          Height = 20
+          Top = 64
+          Width = 98
+          Caption = 'Load HashList'
+          OnChange = cbLoadHashListChange
+          TabOrder = 13
+        end
+        object btnLoadHashList: TButton
+          Left = 400
+          Height = 25
+          Top = 64
+          Width = 75
+          Caption = 'Select File'
+          Enabled = False
+          OnClick = btnLoadHashListClick
           TabOrder = 14
+          Visible = False
         end
       end
       object AlgorithmChoiceRadioBox3: TRadioGroup
@@ -827,19 +866,19 @@ object MainForm: TMainForm
     object TabSheet4: TTabSheet
       Hint = 'Choose a directory, have its content hashed, files are copied to destination, and re-hashed.'
       Caption = '&Copy'
-      ClientHeight = 631
-      ClientWidth = 978
+      ClientHeight = 573
+      ClientWidth = 985
       ParentShowHint = False
       ShowHint = True
       object CopyFilesHashingGroupBox: TGroupBox
         Left = 120
         Height = 596
         Top = 8
-        Width = 838
+        Width = 843
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Hash files in chosen directory, copy them, and re-hash the copied files (recursive by default) '
         ClientHeight = 575
-        ClientWidth = 834
+        ClientWidth = 839
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -849,10 +888,10 @@ object MainForm: TMainForm
           Left = 8
           Height = 184
           Top = 8
-          Width = 817
+          Width = 828
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 184
-          ClientWidth = 817
+          ClientWidth = 828
           TabOrder = 3
           OnClick = Panel1CopyAndHashOptionsClick
           object CheckBoxListOfDirsOnly: TCheckBox
@@ -876,26 +915,16 @@ object MainForm: TMainForm
             OnChange = CheckBoxListOfDirsAndFilesOnlyChange
             TabOrder = 1
           end
-          object SaveToHTMLCheckBox2: TCheckBox
-            Left = 256
-            Height = 20
-            Hint = 'Save results as HTML web page'
-            Top = 0
-            Width = 142
-            Anchors = [akLeft]
-            Caption = 'Save results (HTML)?'
-            TabOrder = 2
-          end
           object SaveToCSVCheckBox2: TCheckBox
             Left = 256
             Height = 20
             Hint = 'Save results as CSV data (spreadsheet format)'
-            Top = 32
+            Top = 0
             Width = 134
             Caption = 'Save results (CSV)?'
             Checked = True
             State = cbChecked
-            TabOrder = 3
+            TabOrder = 2
           end
           object FileTypeMaskCheckBox1: TCheckBox
             Left = 448
@@ -905,7 +934,7 @@ object MainForm: TMainForm
             Width = 123
             Caption = 'Choose file types?'
             OnChange = FileTypeMaskCheckBox1Change
-            TabOrder = 5
+            TabOrder = 4
           end
           object FileMaskField: TEdit
             Left = 464
@@ -915,7 +944,7 @@ object MainForm: TMainForm
             Width = 248
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 6
+            TabOrder = 5
             Text = '*.doc;*.docx;*.xls;*.xlsx;*.pdf;'
             Visible = False
           end
@@ -927,7 +956,7 @@ object MainForm: TMainForm
             Width = 152
             Anchors = [akLeft]
             Caption = 'Ignore sub-directories?'
-            TabOrder = 4
+            TabOrder = 3
           end
           object Label11: TLabel
             Left = 14
@@ -1023,7 +1052,7 @@ object MainForm: TMainForm
             AnchorSideTop.Control = pbCopy
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = pbCopy
-            Left = 374
+            Left = 379
             Height = 16
             Top = 139
             Width = 12
@@ -1039,7 +1068,7 @@ object MainForm: TMainForm
             Width = 127
             Anchors = [akLeft]
             Caption = 'Don''t rebuild path?'
-            TabOrder = 7
+            TabOrder = 6
           end
           object chkCopyHidden: TCheckBox
             Left = 624
@@ -1048,7 +1077,7 @@ object MainForm: TMainForm
             Top = 32
             Width = 123
             Caption = 'Copy hidden files?'
-            TabOrder = 8
+            TabOrder = 7
           end
           object pbCopy: TProgressBar
             AnchorSideRight.Control = lblFilesCopiedPercentage
@@ -1056,28 +1085,28 @@ object MainForm: TMainForm
             Height = 20
             Top = 136
             Width = 216
-            TabOrder = 9
+            TabOrder = 8
           end
           object lblschedulertickboxCopyTab: TCheckBox
             Left = 256
             Height = 20
             Hint = 'Tick and set a date and time ahead of current time'#13#10'and then select the source and destination folders.'#13#10'Hash, copy and hash will start at the specified time'
-            Top = 64
+            Top = 32
             Width = 108
             Caption = 'Start at a time:'
             OnChange = lblschedulertickboxCopyTabChange
-            TabOrder = 10
+            TabOrder = 9
           end
           object ZVDateTimePickerCopyTab: TZVDateTimePicker
             Left = 272
             Height = 24
             Hint = 'Enter date and time (hours and minutes) '
-            Top = 96
+            Top = 64
             Width = 138
             CenturyFrom = 1941
             MaxDate = 73050
             MinDate = 42736
-            TabOrder = 11
+            TabOrder = 10
             Enabled = False
             TrailingSeparator = False
             TextForNullDate = 'Choose date & time'
@@ -1148,7 +1177,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 20
           Top = 555
-          Width = 834
+          Width = 839
           Panels = <>
           ParentShowHint = False
         end
@@ -1156,7 +1185,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 272
           Hint = 'Single click where to copy files FROM'
-          Top = 259
+          Top = 264
           Width = 365
           Anchors = [akLeft, akBottom]
           AutoExpand = True
@@ -1174,7 +1203,7 @@ object MainForm: TMainForm
           Left = 480
           Height = 272
           Hint = 'Single click where to copy files TO'
-          Top = 259
+          Top = 264
           Width = 357
           Anchors = [akLeft, akBottom]
           AutoExpand = True
@@ -1239,8 +1268,8 @@ object MainForm: TMainForm
     end
     object TabSheet7: TTabSheet
       Caption = 'Compare Two Files'
-      ClientHeight = 631
-      ClientWidth = 978
+      ClientHeight = 573
+      ClientWidth = 985
       object AlgorithmChoiceRadioBox5: TRadioGroup
         Left = 16
         Height = 129
@@ -1277,11 +1306,11 @@ object MainForm: TMainForm
         Left = 120
         Height = 296
         Top = 10
-        Width = 838
+        Width = 843
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Choose two files and click ''Compare Files'''
         ClientHeight = 275
-        ClientWidth = 834
+        ClientWidth = 839
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
@@ -1373,7 +1402,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 20
           Top = 255
-          Width = 834
+          Width = 839
           Panels = <>
         end
         object edtFileAName: TEdit
@@ -1381,7 +1410,7 @@ object MainForm: TMainForm
           Height = 24
           Hint = 'Path to the file you wish to analyse. '#13#10'Type or paste path here directly, '#13#10'or use the button to the left to select it'
           Top = 9
-          Width = 646
+          Width = 657
           Anchors = [akTop, akLeft, akRight]
           ParentShowHint = False
           ShowHint = True
@@ -1393,7 +1422,7 @@ object MainForm: TMainForm
           Height = 24
           Hint = 'Path to the second file you wish to analyse. '#13#10'Type or paste path here directly, '#13#10'or use the button to the left to select it'
           Top = 72
-          Width = 646
+          Width = 657
           Anchors = [akTop, akLeft, akRight]
           ParentShowHint = False
           ShowHint = True
@@ -1438,391 +1467,34 @@ object MainForm: TMainForm
       end
     end
     object TabSheet6: TTabSheet
-      Caption = 'Compare Directories'
-      ClientHeight = 631
-      ClientWidth = 978
+      Caption = 'Compare Two Folders'
+      ClientHeight = 573
+      ClientWidth = 985
+      OnContextPopup = TabSheet6ContextPopup
       ParentShowHint = False
-      object GroupBox1: TGroupBox
-        Left = 120
-        Height = 479
-        Top = 10
-        Width = 840
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        Caption = 'Compare two directories'
-        ClientHeight = 458
-        ClientWidth = 836
-        DragMode = dmAutomatic
-        Font.Height = -13
-        ParentFont = False
-        TabOrder = 0
-        object sgDirA: TStringGrid
-          AnchorSideLeft.Control = GroupBox1
-          AnchorSideRight.Control = GroupBox1
-          AnchorSideRight.Side = asrBottom
-          AnchorSideBottom.Control = sgDirB
-          Left = 0
-          Height = 128
-          Hint = 'Single left click to find corresponding '#13#10'value in other grid'
-          Top = 160
-          Width = 836
-          Anchors = [akTop, akLeft, akRight, akBottom]
-          ColCount = 3
-          ColumnClickSorts = True
-          Columns = <          
-            item
-              Title.Caption = 'File Path and Name (Dir A)'
-              Width = 440
-            end          
-            item
-              Title.Caption = 'Hash Value'
-              Width = 300
-            end>
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goRowSelect, goDblClickAutoSize, goSmoothScroll]
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 0
-          TitleFont.Height = -13
-          OnClick = sgDirAClick
-        end
-        object sgDirB: TStringGrid
-          AnchorSideLeft.Control = GroupBox1
-          AnchorSideRight.Control = GroupBox1
-          AnchorSideRight.Side = asrBottom
-          Left = 0
-          Height = 131
-          Hint = 'Single left click to find corresponding '#13#10'value in other grid'
-          Top = 288
-          Width = 836
-          Anchors = [akTop, akLeft, akRight, akBottom]
-          ColCount = 3
-          ColumnClickSorts = True
-          Columns = <          
-            item
-              Title.Caption = 'File Path and Name (Dir B)'
-              Width = 440
-            end          
-            item
-              Title.Caption = 'Hash Value'
-              Width = 300
-            end>
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goRowSelect, goDblClickAutoSize, goSmoothScroll]
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 1
-          TitleFont.Height = -13
-          OnClick = sgDirBClick
-        end
-        object lblStatusA: TLabel
-          Left = 16
-          Height = 13
-          Top = 96
-          Width = 43
-          Caption = 'Status: '
-          Font.Style = [fsBold]
-          ParentColor = False
-          ParentFont = False
-        end
-        object lblDirAName: TLabel
-          Left = 176
-          Height = 16
-          Top = 0
-          Width = 12
-          Caption = '...'
-          ParentColor = False
-          WordWrap = True
-        end
-        object lblDirBName: TLabel
-          Left = 176
-          Height = 16
-          Top = 32
-          Width = 12
-          Caption = '...'
-          ParentColor = False
-          WordWrap = True
-        end
-        object btnDirA: TButton
-          Left = 0
-          Height = 25
-          Hint = 'Select first folder to compare against'
-          Top = 0
-          Width = 139
-          Caption = 'Select Directory A'
-          OnClick = btnDirAClick
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 2
-        end
-        object btnDirB: TButton
-          Left = 0
-          Height = 25
-          Hint = 'Select second folder to compare against'
-          Top = 32
-          Width = 139
-          Caption = 'Select Directory B'
-          OnClick = btnDirBClick
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 3
-        end
-        object btnCompare: TButton
-          Left = 0
-          Height = 25
-          Hint = 'Click to start comparisons of Folder A and B'
-          Top = 64
-          Width = 139
-          Caption = 'Compare Now'
-          Color = 8454016
-          OnClick = btnCompareClick
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 4
-        end
-        object cbShowDetailsOfAllComparisons: TCheckBox
-          Left = 176
-          Height = 20
-          Top = 64
-          Width = 368
-          Caption = 'Tabulate only encountered errors instead of all files (faster)?'
-          Checked = True
-          OnChange = cbShowDetailsOfAllComparisonsChange
-          State = cbChecked
-          TabOrder = 5
-        end
-        object ZVDateTimePickerCompareDirsTab: TZVDateTimePicker
-          Left = 688
-          Height = 24
-          Hint = 'Enter date and time (hours and minutes) '
-          Top = 64
-          Width = 138
-          CenturyFrom = 1941
-          MaxDate = 2958465
-          MinDate = 42736
-          TabOrder = 6
-          Enabled = False
-          TrailingSeparator = False
-          TextForNullDate = 'Choose date & time'
-          LeadingZeros = True
-          Visible = False
-          Kind = dtkDateTime
-          TimeFormat = tf24
-          TimeDisplay = tdHM
-          DateMode = dmComboBox
-          Date = 1.7E308
-          Time = 1.7E308
-          UseDefaultSeparators = True
-          HideDateTimeParts = []
-          MonthNames = 'Long'
-        end
-        object lblschedulertickboxCompareDirsTab: TCheckBox
-          Left = 568
-          Height = 20
-          Hint = 'After choosing FileA and FileB, tick and set a date and time ahead of current time'#13#10'and then click Compare Now.'
-          Top = 64
-          Width = 108
-          Caption = 'Start at a time:'
-          OnChange = lblschedulertickboxCompareTwoDirectoriesTabChange
-          TabOrder = 7
-        end
-        object StatusBar6: TStatusBar
-          Left = 8
-          Height = 23
-          Top = 123
-          Width = 815
-          Align = alNone
-          Anchors = [akLeft, akRight]
-          AutoSize = False
-          Panels = <>
-        end
-      end
       object GroupBox2: TGroupBox
         AnchorSideLeft.Control = GroupBox1
+        AnchorSideTop.Side = asrBottom
         AnchorSideRight.Control = GroupBox1
         AnchorSideRight.Side = asrBottom
-        Left = 120
-        Height = 161
-        Top = 449
-        Width = 840
+        Left = 128
+        Height = 177
+        Top = 369
+        Width = 837
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Summary'
-        ClientHeight = 140
-        ClientWidth = 836
+        ClientHeight = 156
+        ClientWidth = 833
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
-        object lblFileCountDiffA: TLabel
-          Left = 8
-          Height = 16
-          Top = 8
-          Width = 128
-          Caption = 'File Count Difference: '
-          ParentColor = False
-        end
-        object lblFileCountDiffB: TLabel
-          AnchorSideLeft.Control = lblFileCountDiffA
-          AnchorSideLeft.Side = asrBottom
-          Left = 136
-          Height = 16
-          Top = 8
-          Width = 20
-          Caption = '  ...'
-          ParentColor = False
-        end
-        object lblHashMatchA: TLabel
-          Left = 8
-          Height = 16
-          Top = 36
-          Width = 84
-          Caption = 'Hash Match?   '
-          ParentColor = False
-        end
-        object lblHashMatchB: TLabel
-          AnchorSideLeft.Control = lblHashMatchA
-          AnchorSideLeft.Side = asrBottom
-          Left = 92
-          Height = 16
-          Top = 36
-          Width = 20
-          Caption = '  ...'
-          Constraints.MaxWidth = 190
-          ParentColor = False
-          WordWrap = True
-        end
-        object lblTimeStartA: TLabel
-          Left = 518
-          Height = 16
-          Top = 8
-          Width = 80
-          Caption = 'Time Started:'
-          ParentColor = False
-        end
-        object lblTimeFinishedA: TLabel
-          Left = 518
-          Height = 16
-          Top = 36
-          Width = 85
-          Caption = 'Time Finished:'
-          ParentColor = False
-        end
-        object lblTimeTakenA: TLabel
-          Left = 518
-          Height = 16
-          Top = 64
-          Width = 73
-          Caption = 'Time Taken:'
-          ParentColor = False
-        end
-        object lblTimeStartB: TLabel
-          Left = 617
-          Height = 16
-          Top = 8
-          Width = 12
-          Caption = '...'
-          ParentColor = False
-        end
-        object lblTimeFinishedB: TLabel
-          Left = 617
-          Height = 16
-          Top = 36
-          Width = 12
-          Caption = '...'
-          ParentColor = False
-        end
-        object lblTimeTakenB: TLabel
-          Left = 617
-          Height = 16
-          Top = 64
-          Width = 12
-          Caption = '...'
-          ParentColor = False
-        end
-        object lblTotalFileCountA: TLabel
-          AnchorSideRight.Control = lblTotalFileCountNumberA
-          Left = 517
-          Height = 16
-          Top = 95
-          Width = 102
-          BorderSpacing.Left = 5
-          Caption = '# Files in Dir A :  '
-          ParentColor = False
-        end
-        object lblTotalFileCountNumberA: TLabel
-          AnchorSideLeft.Control = lblTotalFileCountA
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideRight.Control = GroupBox2
-          AnchorSideRight.Side = asrBottom
-          Left = 619
-          Height = 16
-          Top = 95
-          Width = 20
-          Caption = '  ...'
-          ParentColor = False
-        end
-        object lblTotalFileCountB: TLabel
-          AnchorSideRight.Control = lblTotalFileCountNumberB
-          Left = 517
-          Height = 16
-          Top = 120
-          Width = 101
-          BorderSpacing.Left = 5
-          Caption = '# Files in Dir B :  '
-          ParentColor = False
-        end
-        object lblTotalFileCountNumberB: TLabel
-          AnchorSideLeft.Control = lblTotalFileCountB
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideRight.Control = GroupBox2
-          AnchorSideRight.Side = asrBottom
-          Left = 618
-          Height = 16
-          Top = 120
-          Width = 20
-          Caption = '  ...'
-          ParentColor = False
-        end
-        object btnCopyToClipboardA: TButton
-          Left = 320
-          Height = 25
-          Top = 8
-          Width = 172
-          Caption = 'Copy to Clipboard (Grid A)'
-          Enabled = False
-          OnClick = btnCopyToClipboardAClick
+        object memFolderCompareSummary: TMemo
+          Left = 16
+          Height = 120
+          Top = 16
+          Width = 784
+          ScrollBars = ssAutoBoth
           TabOrder = 0
-        end
-        object btnCopyToClipboardB: TButton
-          Left = 320
-          Height = 25
-          Top = 40
-          Width = 172
-          Caption = 'Copy to Clipboard (Grid B)'
-          Enabled = False
-          OnClick = btnCopyToClipboardBClick
-          TabOrder = 1
-        end
-        object btnSaveComparisons: TButton
-          Left = 320
-          Height = 25
-          Top = 72
-          Width = 172
-          Caption = 'Save to File'
-          Enabled = False
-          OnClick = btnSaveComparisonsClick
-          TabOrder = 2
-        end
-        object pbCompareDirA: TProgressBar
-          Left = 696
-          Height = 20
-          Top = 92
-          Width = 129
-          TabOrder = 3
-          BarShowText = True
-        end
-        object pbCompareDirB: TProgressBar
-          Left = 696
-          Height = 20
-          Top = 120
-          Width = 129
-          TabOrder = 4
         end
       end
       object AlgorithmChoiceRadioBox6: TRadioGroup
@@ -1855,12 +1527,270 @@ object MainForm: TMainForm
         ParentFont = False
         TabOrder = 2
       end
+      object GroupBox1: TGroupBox
+        Left = 128
+        Height = 337
+        Top = 16
+        Width = 837
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        Caption = 'Compare two folders'
+        ClientHeight = 316
+        ClientWidth = 833
+        DragMode = dmAutomatic
+        Font.Height = -13
+        ParentFont = False
+        TabOrder = 0
+        object lblStatusA: TLabel
+          Left = 8
+          Height = 13
+          Top = 336
+          Width = 43
+          Caption = 'Status: '
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+        object lblFolderAName: TLabel
+          Left = 8
+          Height = 16
+          Top = 248
+          Width = 12
+          Caption = '...'
+          ParentColor = False
+          WordWrap = True
+        end
+        object lblFolderBName: TLabel
+          Left = 520
+          Height = 16
+          Top = 248
+          Width = 12
+          Caption = '...'
+          ParentColor = False
+          WordWrap = True
+        end
+        object btnCompare: TButton
+          Left = 344
+          Height = 25
+          Hint = 'Click to start comparisons of Folder A and B'
+          Top = 32
+          Width = 139
+          Caption = 'Compare Now'
+          Color = 8454016
+          OnClick = btnCompareClick
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+        end
+        object ZVDateTimePickerCompareDirsTab: TZVDateTimePicker
+          Left = 347
+          Height = 24
+          Hint = 'Enter date and time (hours and minutes) '
+          Top = 200
+          Width = 138
+          CenturyFrom = 1941
+          MaxDate = 2958465
+          MinDate = 42736
+          TabOrder = 1
+          Enabled = False
+          TrailingSeparator = False
+          TextForNullDate = 'Choose date & time'
+          LeadingZeros = True
+          Visible = False
+          Kind = dtkDateTime
+          TimeFormat = tf24
+          TimeDisplay = tdHM
+          DateMode = dmComboBox
+          Date = 1.7E308
+          Time = 1.7E308
+          UseDefaultSeparators = True
+          HideDateTimeParts = []
+          MonthNames = 'Long'
+        end
+        object lblschedulertickboxCompareDirsTab: TCheckBox
+          Left = 347
+          Height = 20
+          Hint = 'After choosing FolderA and FolderB, set a date and '#13#10'time ahead of current time and then click Compare Now.'
+          Top = 168
+          Width = 108
+          Caption = 'Start at a time:'
+          OnChange = lblschedulertickboxCompareTwoDirectoriesTabChange
+          TabOrder = 2
+        end
+        object StatusBar6: TStatusBar
+          Left = 8
+          Height = 23
+          Top = 292
+          Width = 807
+          Align = alNone
+          Anchors = [akLeft, akRight]
+          AutoSize = False
+          BorderWidth = 3
+          Panels = <>
+        end
+        object ShellTreeView_FolderA: TShellTreeView
+          Left = 8
+          Height = 193
+          Hint = 'Single click to choose FolderA'
+          Top = 32
+          Width = 304
+          AutoExpand = True
+          FileSortType = fstAlphabet
+          ParentShowHint = False
+          ScrollBars = ssAutoBoth
+          ShowHint = True
+          TabOrder = 4
+          OnChange = ShellTreeView_FolderAChange
+          Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+          ObjectTypes = [otFolders]
+        end
+        object ShellTreeView_FolderB: TShellTreeView
+          Left = 520
+          Height = 193
+          Hint = 'Single click to choose FolderB'
+          Top = 32
+          Width = 304
+          AutoExpand = True
+          FileSortType = fstAlphabet
+          ParentShowHint = False
+          ScrollBars = ssAutoBoth
+          ShowHint = True
+          TabOrder = 5
+          OnChange = ShellTreeView_FolderBChange
+          Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+          ObjectTypes = [otFolders]
+        end
+        object lblCompareTwoFoldersInstruction1: TLabel
+          Left = 104
+          Height = 16
+          Top = 5
+          Width = 87
+          Caption = 'Select Folder A'
+          ParentColor = False
+        end
+        object lblCompareTwoFoldersInstruction2: TLabel
+          Left = 608
+          Height = 16
+          Top = 5
+          Width = 86
+          Caption = 'Select Folder B'
+          ParentColor = False
+        end
+        object lblTotalFileCountB: TLabel
+          Left = 520
+          Height = 16
+          Top = 275
+          Width = 90
+          BorderSpacing.Left = 5
+          Caption = '# Files in Fol B:'
+          ParentColor = False
+        end
+        object lblTotalFileCountNumberB: TLabel
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideRight.Control = GroupBox2
+          AnchorSideRight.Side = asrBottom
+          Left = 648
+          Height = 16
+          Top = 275
+          Width = 20
+          Caption = '  ...'
+          ParentColor = False
+        end
+        object pbCompareDirB: TProgressBar
+          Left = 520
+          Height = 20
+          Top = 304
+          Width = 304
+          TabOrder = 6
+        end
+        object pbCompareDirA: TProgressBar
+          Left = 8
+          Height = 20
+          Top = 304
+          Width = 304
+          TabOrder = 7
+          BarShowText = True
+        end
+        object lblTotalFileCountA: TLabel
+          Left = 8
+          Height = 16
+          Top = 275
+          Width = 91
+          Caption = '# Files in Fol A:'
+          ParentColor = False
+        end
+        object lblTotalFileCountNumberA: TLabel
+          Left = 112
+          Height = 16
+          Top = 275
+          Width = 12
+          Caption = '...'
+          ParentColor = False
+        end
+        object cbUNCModeCompFolders: TCheckBox
+          Left = 347
+          Height = 20
+          Hint = 'For Windows users, if ticked, two UNC path'#13#10'fields will allow the user to compare two '#13#10'network paths'
+          Top = 72
+          Width = 85
+          Caption = 'UNC Mode?'
+          OnChange = cbUNCModeCompFoldersChange
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 8
+        end
+        object edtUNCPathCompareA: TEdit
+          Left = 8
+          Height = 24
+          Top = 32
+          Width = 300
+          OnChange = edtUNCPathCompareAChange
+          TabOrder = 9
+          Text = 'Enter UNC path (e.g.\\DATASTORE\FOLDERA)'
+          Visible = False
+        end
+        object edtUNCPathCompareB: TEdit
+          Left = 520
+          Height = 24
+          Top = 32
+          Width = 300
+          OnChange = edtUNCPathCompareBChange
+          TabOrder = 10
+          Text = 'Enter UNC path (e.g.\\DATASTORE\FOLDERB)'
+          Visible = False
+        end
+        object cbSaveComparisons: TCheckBox
+          Left = 347
+          Height = 20
+          Hint = 'Save the results of the comparison.'#13#10'Filenames, hash values etc will be '#13#10'auto-saved to a CSV file in the location'#13#10'of where QuickHash is running from.'
+          Top = 102
+          Width = 91
+          Caption = 'Log Results?'
+          Checked = True
+          OnChange = cbSaveComparisonsChange
+          ParentShowHint = False
+          ShowHint = True
+          State = cbChecked
+          TabOrder = 11
+        end
+        object cbOverrideFileCountDiffer: TCheckBox
+          Left = 347
+          Height = 20
+          Hint = 'If the file count of both folders are different'#13#10'proceed anyway to hash all the files in both'#13#10'(''Save Results?'' must be enabled for this feature)'
+          Top = 136
+          Width = 142
+          Caption = 'Cont. if count differs?'
+          OnChange = cbOverrideFileCountDifferChange
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 12
+        end
+      end
     end
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 628
-      ClientWidth = 978
+      ClientHeight = 573
+      ClientWidth = 985
       object btnCallDiskHasherModule: TButton
         Left = 376
         Height = 25
@@ -1875,25 +1805,25 @@ object MainForm: TMainForm
       end
       object lblDiskHashingRunAsAdminWarning: TLabel
         Left = 368
-        Height = 15
+        Height = 13
         Top = 72
-        Width = 239
+        Width = 215
         Caption = 'Must be run as administrator for disk hashing'
         ParentColor = False
       end
       object Label8: TLabel
         Left = 344
-        Height = 30
+        Height = 26
         Top = 112
-        Width = 295
+        Width = 270
         Caption = 'LINUX USERS - You may prefer to hash disks using '#10'"File" tab and navigate to /dev/sdX or /dev/sdXX as root'
         ParentColor = False
       end
     end
     object TabSheet8: TTabSheet
       Caption = 'Base64 Data'
-      ClientHeight = 628
-      ClientWidth = 978
+      ClientHeight = 573
+      ClientWidth = 985
       object AlgorithmChoiceRadioBox7: TRadioGroup
         Left = 16
         Height = 129
@@ -1928,11 +1858,11 @@ object MainForm: TMainForm
         Left = 120
         Height = 574
         Top = 10
-        Width = 844
+        Width = 847
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Base64 Decoder and Hasher'
         ClientHeight = 553
-        ClientWidth = 840
+        ClientWidth = 843
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -1972,7 +1902,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 96
           Top = 56
-          Width = 816
+          Width = 823
           Anchors = [akTop, akLeft, akRight]
           ColCount = 4
           Columns = <          
@@ -1998,7 +1928,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 224
           Top = 216
-          Width = 816
+          Width = 823
           Anchors = [akTop, akLeft, akRight]
           AutoAdvance = aaDown
           ColCount = 4
@@ -2025,38 +1955,38 @@ object MainForm: TMainForm
         end
         object b64ProgressFileS: TEdit
           Left = 192
-          Height = 25
+          Height = 24
           Hint = 'Progress of Base64 decoding of FileS will show here'
           Top = 168
-          Width = 628
+          Width = 635
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           TabOrder = 5
         end
         object b64DecoderProgress: TEdit
           Left = 192
-          Height = 25
+          Height = 24
           Hint = 'Progress of Base64 decoding of FileS will show here'
           Top = 464
-          Width = 628
+          Width = 635
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           TabOrder = 6
         end
         object lblB64DecoderWarning: TLabel
           Left = 56
-          Height = 34
+          Height = 32
           Top = 504
-          Width = 235
+          Width = 228
           Caption = '(Simply for creating decoded copies of '#13#10'encoded Base64 files. No hashing done)'
           ParentColor = False
           WordWrap = True
         end
         object lblB64Warning: TLabel
           Left = 200
-          Height = 34
+          Height = 32
           Top = 7
-          Width = 454
+          Width = 442
           Caption = 'Only minimal checks are conducted to check supplied data is Base64 encoded'#13#10'Ideally, ensure your source data is Base64 encoded to start with'
           ParentColor = False
         end
@@ -2064,13 +1994,13 @@ object MainForm: TMainForm
     end
   end
   object Label15: TLabel
-    Left = 200
+    Left = 136
     Height = 15
     Top = 1
     Width = 248
     AutoSize = False
-    Caption = 'Copyright © 2011-2017  Ted Smith'
-    Font.Height = 16
+    Caption = 'Copyright © 2011-2018  Ted Smith'
+    Font.Height = 12
     Font.Style = [fsBold]
     ParentColor = False
     ParentFont = False
@@ -2080,10 +2010,10 @@ object MainForm: TMainForm
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Cursor = crHandPoint
-    Left = 456
+    Left = 736
     Height = 13
     Hint = 'Click to open URL in browser'
-    Top = 0
+    Top = 1
     Width = 170
     BorderSpacing.Right = 10
     Caption = 'http://www.quickhash-gui.org'
@@ -2094,13 +2024,6 @@ object MainForm: TMainForm
     ParentShowHint = False
     ShowHint = True
     OnClick = lblURLBannerClick
-  end
-  object StatusBar5: TStatusBar
-    Left = 0
-    Height = 20
-    Top = 675
-    Width = 1018
-    Panels = <>
   end
   object OpenDialog1: TOpenDialog
     left = 352
@@ -2146,16 +2069,16 @@ object MainForm: TMainForm
     Title = 'Save comparison results as...'
     DefaultExt = '.txt'
     Filter = 'Text|txt|Comma Seperated|csv'
-    left = 808
-    top = 696
+    left = 72
+    top = 584
   end
   object SaveDialog6: TSaveDialog
-    left = 56
-    top = 416
+    left = 32
+    top = 440
   end
   object ImageList1: TImageList
-    left = 56
-    top = 528
+    left = 32
+    top = 640
     Bitmap = {
       4C69010000001000000010000000000000000000000000000000000000000000
       0000000000000000000000000000F6F6F630F6F6F6EFF6F6F6FFF6F6F6FFF6F6
@@ -2193,26 +2116,26 @@ object MainForm: TMainForm
     }
   end
   object SaveDialog7: TSaveDialog
-    left = 56
-    top = 472
+    left = 32
+    top = 480
   end
   object FLBLDialog: TOpenDialog
-    left = 56
-    top = 360
+    left = 72
+    top = 440
   end
   object sysRAMTimer: TTimer
     Interval = 5000
     OnTimer = sysRAMTimerTimer
-    left = 56
-    top = 304
+    left = 32
+    top = 352
   end
   object QH_MainFormXMLPropStorage: TXMLPropStorage
     StoredValues = <>
-    left = 56
+    left = 32
     top = 584
   end
   object SaveErrorsCompareDirsSaveDialog8: TSaveDialog
-    left = 56
+    left = 72
     top = 640
   end
   object MainMenu1: TMainMenu
@@ -2243,20 +2166,20 @@ object MainForm: TMainForm
     end
   end
   object SchedulerTimer: TTimer
-    left = 56
-    top = 248
+    left = 104
+    top = 352
   end
   object b64FileChooserDialog: TOpenDialog
-    left = 904
-    top = 200
+    left = 32
+    top = 400
   end
   object b64FileSChooserDialog: TSelectDirectoryDialog
-    left = 904
-    top = 248
+    left = 72
+    top = 400
   end
   object b64FilesGridPopupMenu: TPopupMenu
-    left = 904
-    top = 360
+    left = 72
+    top = 528
     object MenuItem4: TMenuItem
       Caption = 'Copy row(s) to clipboard'
       OnClick = MenuItem4Click
@@ -2271,23 +2194,112 @@ object MainForm: TMainForm
     end
   end
   object b64FileGridPopupMenu: TPopupMenu
-    left = 904
-    top = 160
+    left = 32
+    top = 528
     object MenuItem6: TMenuItem
       Caption = 'Copy Row to Clipboard'
       OnClick = MenuItem6Click
     end
   end
   object b64FileSSourceDecoderDialog: TSelectDirectoryDialog
-    left = 568
-    top = 576
+    left = 104
+    top = 440
   end
   object b64SaveDialog: TSaveDialog
-    left = 904
-    top = 424
+    left = 112
+    top = 584
   end
   object b64FileSDestinationDecoderDialog: TSelectDirectoryDialog
-    left = 824
-    top = 576
+    left = 104
+    top = 400
+  end
+  object popmenuDBGrid_Files: TPopupMenu
+    OnPopup = popmenuDBGrid_FilesPopup
+    left = 104
+    top = 528
+    object MenuItem_SortByID: TMenuItem
+      Caption = 'Sort by ID'
+      OnClick = MenuItem_SortByIDClick
+    end
+    object MenuItem_SortByFilename: TMenuItem
+      Caption = 'Sort all by Filename'
+      OnClick = MenuItem_SortByFilenameClick
+    end
+    object MenuItem_SortByFilePath: TMenuItem
+      Caption = 'Sort all by Filepath'
+      OnClick = MenuItem_SortByFilePathClick
+    end
+    object MenuItem_SortByHash: TMenuItem
+      Caption = 'Sort all by Hash'
+      OnClick = MenuItem_SortByHashClick
+    end
+    object MenuItem_SortByHashList: TMenuItem
+      Caption = 'Sort all by Hash List'
+      OnClick = MenuItem_SortByHashListClick
+    end
+    object MenuItem_FilterOutNo: TMenuItem
+      Caption = 'Filter out Hash list - No'
+      OnClick = MenuItem_FilterOutNoClick
+    end
+    object MenuItem_FilterOutYes: TMenuItem
+      Caption = 'Filter out Hash list - Yes'
+      OnClick = MenuItem_FilterOutYesClick
+    end
+    object MenuItem_CopySelectedRow: TMenuItem
+      Caption = 'Copy selected row'
+      OnClick = MenuItem_CopySelectedRowFILESTABClick
+    end
+    object MenuItem_CopyFileNameOfSelectedCell: TMenuItem
+      Caption = 'Copy filename of selected row'
+      OnClick = MenuItem_CopyFileNameOfSelectedCellClick
+    end
+    object MenuItem_CopyFilepathOfSelectedCell: TMenuItem
+      Caption = 'Copy filepath of selected cell'
+      OnClick = MenuItem_CopyFilepathOfSelectedCellClick
+    end
+    object MenuItem_CopyHashOfSelectedCell: TMenuItem
+      Caption = 'Copy hash of selected file'
+      OnClick = MenuItem_CopyHashOfSelectedCellClick
+    end
+    object MenuItem_CopyGridToClipboardFILES: TMenuItem
+      Caption = 'Copy entire grid to clipboard'
+      OnClick = MenuItem_CopyGridToClipboardFILESClick
+    end
+    object MenuItem_ShowDuplicates: TMenuItem
+      Caption = 'Show only duplicates'
+      OnClick = MenuItem_ShowDuplicatesClick
+    end
+    object MenuItem_DeleteDups: TMenuItem
+      Caption = 'Delete Duplicates'
+      OnClick = MenuItem_DeleteDupsClick
+    end
+    object MenuItem_RestoreListFILES: TMenuItem
+      Caption = 'Restore Initial List'
+      OnClick = MenuItem_RestoreListFILESClick
+    end
+    object MenuItem_SaveToHTML: TMenuItem
+      Caption = 'Save to HTML'
+      OnClick = MenuItem_SaveToHTMLClick
+    end
+    object MenuItem_SaveToCSV: TMenuItem
+      Caption = 'Save to CSV file'
+      OnClick = MenuItem_SaveToCSVClick
+    end
+  end
+  object FilesDBGrid_SaveCSVDialog: TSaveDialog
+    left = 104
+    top = 480
+  end
+  object FilesSaveAsHTMLDialog: TSaveDialog
+    left = 72
+    top = 480
+  end
+  object HashListChooserDialog: TOpenDialog
+    left = 640
+    top = 128
+  end
+  object sdHashListLookupResults: TSaveDialog
+    left = 640
+    top = 182
   end
 end

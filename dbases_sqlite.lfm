@@ -1,0 +1,98 @@
+object frmSQLiteDBases: TfrmSQLiteDBases
+  Left = 1213
+  Height = 506
+  Top = 258
+  Width = 252
+  Caption = 'frmSQLiteDBases'
+  ClientHeight = 506
+  ClientWidth = 252
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '1.6.4.0'
+  object lblConnectionStatus: TLabel
+    Left = 32
+    Height = 13
+    Top = 32
+    Width = 72
+    Caption = 'Not Connected'
+    ParentColor = False
+  end
+  object DataSource1: TDataSource
+    DataSet = sqlFILES
+    left = 48
+    top = 144
+  end
+  object sqlFILES: TSQLQuery
+    FieldDefs = <>
+    Database = SQLite3Connection1
+    Transaction = SQLTransaction1
+    Options = []
+    Params = <>
+    left = 48
+    top = 80
+  end
+  object SQLTransaction1: TSQLTransaction
+    Active = False
+    Database = SQLite3Connection1
+    Options = []
+    left = 48
+    top = 224
+  end
+  object SQLite3Connection1: TSQLite3Connection
+    Connected = False
+    LoginPrompt = False
+    KeepConnection = False
+    Transaction = SQLTransaction1
+    Options = []
+    left = 48
+    top = 296
+  end
+  object CSVExporter1: TCSVExporter
+    ExportFields = <>
+    RestorePosition = False
+    FormatSettings.DecimalSeparator = #0
+    FormatSettings.CurrencyDigits = 0
+    FormatSettings.FieldDelimiter = ','
+    FormatSettings.IgnoreOuterWhitespace = False
+    FormatSettings.RowDelimiter = #13#10
+    FormatSettings.QuoteChar = '"'
+    left = 48
+    top = 376
+  end
+  object DataSource2: TDataSource
+    DataSet = sqlCOPY
+    left = 160
+    top = 144
+  end
+  object sqlCOPY: TSQLQuery
+    FieldDefs = <>
+    Database = SQLite3Connection1
+    Transaction = SQLTransaction1
+    Options = []
+    Params = <>
+    left = 160
+    top = 80
+  end
+  object SQLDBLibraryLoaderWindows: TSQLDBLibraryLoader
+    Enabled = False
+    ConnectionType = 'SQLite3'
+    LibraryName = 'sqlite3.dll'
+    left = 160
+    top = 240
+  end
+  object SQLDBLibraryLoaderOSX: TSQLDBLibraryLoader
+    Enabled = False
+    ConnectionType = 'SQLite3'
+    LibraryName = 'libsqlite3.dylib'
+    left = 160
+    top = 312
+  end
+  object SQLDBLibraryLoaderLinux: TSQLDBLibraryLoader
+    Enabled = False
+    ConnectionType = 'SQLite3'
+    LibraryName = 'libsqlite3.so'
+    left = 160
+    top = 376
+  end
+end

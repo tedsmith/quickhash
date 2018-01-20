@@ -1,17 +1,17 @@
 object frmProgress: TfrmProgress
-  Left = 675
-  Height = 322
+  Left = 619
+  Height = 348
   Hint = 'Close this window if you wish to abort.'
-  Top = 231
+  Top = 500
   Width = 421
   Caption = 'QuickHash - Disk Hashing Module'
-  ClientHeight = 322
+  ClientHeight = 348
   ClientWidth = 421
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
-  Position = poDesktopCenter
+  Position = poScreenCenter
   ShowHint = True
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.6.4.0'
   object GroupBox1: TGroupBox
     Left = 8
     Height = 304

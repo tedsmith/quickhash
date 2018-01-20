@@ -1,5 +1,27 @@
 unit diskmodule;
-// Based on my disk imager, YAFFI https://github.com/tedsmith/yaffi.
+{  Based on my disk imager 'YAFFI' (https://github.com/tedsmith/yaffi),
+   this unit enables QuickHash to hash disk drives.
+
+   Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
+                     and generating hash values for them.
+
+   Copyright (C) 2011-2018  Ted Smith www.quickhash-gui.org
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    any later version. This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You can read a copy of the GNU General Public License at
+    http://www.gnu.org/licenses/>. Also, http://www.gnu.org/copyleft/gpl.html
+
+    Use of the name 'QuickHash GUI' must refer to this utility
+    only and must not be re-used in another tool if based upon this code.
+    The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
+}
 {$mode objfpc}{$H+}
 
 interface
@@ -428,7 +450,7 @@ begin
   // Get all technical specifications about a user selected disk and save it
   DiskInfoProcessUDISKS := TProcess.Create(nil);
   DiskInfoProcessUDISKS.Options := [poWaitOnExit, poUsePipes];
-  DiskInfoProcessUDISKS.CommandLine := 'udisks --show-info /dev/' + cbdisks.Text;
+  DiskInfoProcessUDISKS.CommandLine := 'udisksctl info -b /dev/' + cbdisks.Text;
   DiskInfoProcessUDISKS.Execute;
   diskinfoUDISKS := TStringList.Create;
   diskinfoUDISKS.LoadFromStream(diskinfoProcessUDISKS.Output);
@@ -447,10 +469,12 @@ function ListDrivesLinux : string;
 var
   DisksProcess: TProcess;
   i: Integer;
+  intPhysDiskSize, intLogDiskSize : QWord;
   slDisklist: TSTringList;
   PhyDiskNode, PartitionNoNode, DriveLetterNode           : TTreeNode;
   strPhysDiskSize, strLogDiskSize, DiskDevName, DiskLabels, dmCryptDiscovered   : string;
 begin
+  intPhysDiskSize := 0;
   DisksProcess:=TProcess.Create(nil);
   DisksProcess.Options:=[poWaitOnExit, poUsePipes];
   DisksProcess.CommandLine:='cat /proc/partitions';   //get all disks/partitions list
@@ -475,10 +499,10 @@ begin
       begin
         DiskDevName := '/dev/' + Trim(RightStr(slDisklist.Strings[i], 3));
         DiskLabels := GetDiskLabels(DiskDevName);
-        strPhysDiskSize := FormatByteSize(GetByteCountLinux(DiskDevName));
-        frmDiskHashingModule.TreeView1.Items.AddChild(PhyDiskNode, DiskDevName + ' | ' + strPhysDiskSize + ' ' + DiskLabels);
+        intPhysDiskSize := GetByteCountLinux(DiskDevName);
+        strPhysDiskSize := FormatByteSize(intPhysDiskSize);
+        frmDiskHashingModule.TreeView1.Items.AddChild(PhyDiskNode, DiskDevName + ' | ' + strPhysDiskSize + ' ('+IntToStr(intPhysDiskSize)+' bytes) ' + DiskLabels);
       end;
-    //cbdisks.Items.Add(Copy(slDisklist.Strings[i], 26, Length(slDisklist.Strings[i])-25));
   end;
 
   // List Logical drives (partitions), e.g. sda1, sdb2, hda1, hdb2 etc
@@ -489,12 +513,14 @@ begin
       begin
         DiskDevName := '/dev/' + Trim(RightStr(slDisklist.Strings[i], 4));
         DiskLabels := GetDiskLabels(DiskDevName);
+
         if Pos('/dm', DiskDevName) > 0 then
         begin
           dmCryptDiscovered := '*** mounted dmCrypt drive! ***';
         end;
-        strLogDiskSize := FormatByteSize(GetByteCountLinux(DiskDevName));
-        frmDiskHashingModule.TreeView1.Items.AddChild(DriveLetterNode, DiskDevName + ' | ' + strLogDiskSize + ' ' + dmCryptDiscovered +' ' + DiskLabels);
+        intLogDiskSize := GetByteCountLinux(DiskDevName);
+        strLogDiskSize := FormatByteSize(intLogDiskSize);
+        frmDiskHashingModule.TreeView1.Items.AddChild(DriveLetterNode, DiskDevName + ' | ' + strLogDiskSize + ' ('+IntToStr(intLogDiskSize)+' bytes)' + dmCryptDiscovered +' ' + DiskLabels);
       end;
   end;
   frmDiskHashingModule.Treeview1.AlphaSort;
@@ -534,7 +560,7 @@ begin
   BlockSize := 0;
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
+  DiskProcess.CommandLine:='udisksctl info -b ' + DiskDevName;   //get all disks/partitions list
   DiskProcess.Execute;
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
@@ -549,8 +575,7 @@ begin
   end;
 end;
 
-// Extracts the byte value "Size: " from the output of udisks --show-info /dev/sdX
-//
+// Extracts the byte value "Size: " from the output of udisksctl info -b /dev/sdX
 function GetByteCountLinux(DiskDevName : string) : QWord;
 var
   DiskProcess: TProcess;
@@ -567,7 +592,7 @@ begin
   strByteCount := '';
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskProcess.CommandLine:='udisks --show-info ' + DiskDevName;   //get all disks/partitions list
+  DiskProcess.CommandLine:='udisksctl info -b ' + DiskDevName;   //get all disks/partitions list
   DiskProcess.Execute;
   slDevDisk := TStringList.Create;
   slDevDisk.LoadFromStream(DiskProcess.Output);
@@ -576,7 +601,7 @@ begin
   begin
     // Search for 'Size:' in the output, but note there are two values.
     // This function only wants the first value, so abort once it's found
-    if (pos('size:', slDevDisk.Strings[i]) > 0) and (ScanDiskData = false) then
+    if (pos('Size:', slDevDisk.Strings[i]) > 0) and (ScanDiskData = false) then
     begin
       ScanDiskData := true;
       strByteCount := ExtractNumbers(slDevDisk.Strings[i]);
@@ -591,7 +616,7 @@ begin
 end;
 {$endif}
 
-// For extracting the disk size value from the output of UDIsks on Linux
+// For extracting the disk size value from the output of udisksctl (from udisk2 package) on Linux
 function ExtractNumbers(s: string): string;
 var
 i: Integer ;
@@ -996,11 +1021,10 @@ var
   DiskInfoProcessUDISKS    : TProcess;
   diskinfoUDISKS : TStringList;
 begin
-
   // Get all technical specifications about a user selected disk and save it
   DiskInfoProcessUDISKS := TProcess.Create(nil);
   DiskInfoProcessUDISKS.Options := [poWaitOnExit, poUsePipes];
-  DiskInfoProcessUDISKS.CommandLine := 'udisks --show-info ' + Treeview1.Selected.Text;
+  DiskInfoProcessUDISKS.CommandLine := 'udisksctl info -b ' + Treeview1.Selected.Text;
   DiskInfoProcessUDISKS.Execute;
 
   diskinfoUDISKS := TStringList.Create;
@@ -1560,7 +1584,7 @@ begin
   end;
   {$endif}
   {$ifdef UNIX}
-  ShowMessage('Not available on Linux. Use uudisks, fdisk, or gparted');
+  ShowMessage('Not available on Linux. Use fdisk, or gparted');
   {$endif}
 end;
 

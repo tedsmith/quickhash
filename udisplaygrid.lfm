@@ -1,79 +1,102 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 583
-  Height = 430
-  Top = 406
-  Width = 980
+  Left = 691
+  Height = 687
+  Top = 161
+  Width = 903
   Caption = 'QuickHash - Copy Results'
-  ClientHeight = 430
-  ClientWidth = 980
+  ClientHeight = 687
+  ClientWidth = 903
   OnClose = FormClose
-  Position = poDesktopCenter
+  OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '1.6.4.0'
-  object CopyAndHashGrid: TStringGrid
-    Left = 16
-    Height = 336
-    Top = 16
-    Width = 947
-    Anchors = [akTop, akLeft, akRight]
-    Color = clDefault
-    ColCount = 6
-    ColumnClickSorts = True
-    Columns = <    
-      item
-        Title.Caption = 'Source File and Path'
-        Width = 200
-      end    
-      item
-        Title.Caption = 'Source Hash'
-        Width = 200
-      end    
-      item
-        Title.Caption = 'Destination Path and File Name'
-        Width = 200
-      end    
-      item
-        Title.Caption = 'Destination Hash'
-        Width = 200
-      end    
-      item
-        Title.Caption = 'Created, Last Modified, Last Accessed Dates'
-        Width = 300
-      end>
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goColMoving, goRowSelect, goDblClickAutoSize, goSmoothScroll, goScrollKeepVisible]
-    PopupMenu = frmDisplayGridPopupMenu
-    RowCount = 2
-    TabOrder = 0
-    Visible = False
-  end
-  object btnClipboardResults2: TButton
-    Left = 456
+  object btnClipboardResultsCOPYTAB: TButton
+    Left = 280
     Height = 23
-    Hint = 'Click to have the display grid content copied '#10'to clipboard. You can then paste into spreadsheet'
-    Top = 376
+    Hint = 'Click to have the display grid content copied '#13#10'to clipboard. To have ENTIRE grid copied, '#13#10'ensure top left cell is selected using mouse. '#13#10'Otherwise it copies from active position in the grid. '
+    Top = 640
     Width = 80
+    Anchors = [akLeft, akBottom]
     Caption = 'Clipboard'
     Enabled = False
-    OnClick = btnClipboardResults2Click
+    OnClick = btnClipboardResultsCOPYTABClick
+    TabOrder = 0
+  end
+  object RecursiveDisplayGrid_COPY: TDBGrid
+    Left = 16
+    Height = 592
+    Top = 24
+    Width = 864
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Color = clWindow
+    Columns = <>
+    DataSource = frmSQLiteDBases.DataSource2
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
+    PopupMenu = frmDisplayGridPopupMenu
     TabOrder = 1
   end
+  object CopyTabDBNavigator: TDBNavigator
+    Left = 16
+    Height = 25
+    Top = 640
+    Width = 241
+    Anchors = [akLeft, akBottom]
+    BevelOuter = bvNone
+    ChildSizing.EnlargeHorizontal = crsScaleChilds
+    ChildSizing.EnlargeVertical = crsScaleChilds
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 100
+    ClientHeight = 25
+    ClientWidth = 241
+    DataSource = frmSQLiteDBases.DataSource2
+    Options = []
+    TabOrder = 2
+    VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast]
+  end
   object frmDisplayGridPopupMenu: TPopupMenu
-    left = 405
-    top = 142
-    object MenuItem1: TMenuItem
-      Caption = 'Copy row(s) to clipboard'
-      OnClick = MenuItem1Click
+    left = 584
+    top = 376
+    object MenuItem_SortBySourceNameCOPYGRID: TMenuItem
+      Caption = 'Sort by Source FileName'
+      OnClick = MenuItem_SortBySourceNameCOPYGRIDClick
     end
-    object MenuItem2: TMenuItem
-      Caption = 'Copy grid to clipboard'
-      OnClick = MenuItem2Click
+    object MenuItem_SortByDestinationNameCOPYGRID: TMenuItem
+      Caption = 'Sort by Destination FileName'
+      OnClick = MenuItem_SortByDestinationNameCOPYGRIDClick
     end
-    object MenuItem3: TMenuItem
-      Caption = 'Save grid to file...'
-      OnClick = MenuItem3Click
+    object MenuItem_SortBySourceHashCOPYGRID: TMenuItem
+      Caption = 'Sort by Source Hash'
+      OnClick = MenuItem_SortBySourceHashCOPYGRIDClick
+    end
+    object MenuItem_SortByDestinationHashCOPYGRID: TMenuItem
+      Caption = 'Sort by Destination Hash'
+      OnClick = MenuItem_SortByDestinationHashCOPYGRIDClick
+    end
+    object MenuItem_CopySelectedRowCOPYGRID: TMenuItem
+      Caption = 'Copy selected row'
+      OnClick = MenuItem_CopySelectedRowCOPYGRIDClick
+    end
+    object MenuItem_ShowAllCOPYGRID: TMenuItem
+      Caption = 'Show All'
+      OnClick = MenuItem_ShowAllCOPYGRIDClick
+    end
+    object MenuItem_SaveDBToHTML: TMenuItem
+      Caption = 'Save to HTML file...'
+      OnClick = MenuItem_SaveDBToHTMLClick
+    end
+    object MenuItem_SaveDBToCSV: TMenuItem
+      Caption = 'Save to CSV File...'
+      OnClick = MenuItem_SaveDBToCSVClick
+    end
+    object MenuItem_CopyToClipboard: TMenuItem
+      Caption = 'Copy Grid to Clipboard'
+      OnClick = MenuItem_CopyToClipboardClick
     end
   end
   object frmDisplayGridSaveDialog1: TSaveDialog
-    left = 405
-    top = 224
+    left = 736
+    top = 376
   end
 end
