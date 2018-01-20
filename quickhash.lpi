@@ -14,7 +14,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="3"/>
-      <BuildNr Value="17"/>
+      <BuildNr Value="18"/>
       <Language Value="0809"/>
       <Attributes pvaPreRelease="True"/>
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software" CompanyName="Ted Smith (Ted Technology on Sourceforge)" FileDescription="File hashing GUI for Linux &amp; Windows" LegalCopyright="2011 - 2017 (c) Ted Smith" ProductName="QuickHash (www.quickhash-gui.org)" ProductVersion=""/>
@@ -59,9 +59,10 @@
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="52"/>
-        <CursorPos X="16" Y="68"/>
+        <TopLine Value="84"/>
+        <CursorPos Y="95"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -99,7 +100,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="1301"/>
         <CursorPos X="7" Y="1329"/>
         <UsageCount Value="201"/>
@@ -593,7 +593,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="53" Y="16"/>
-        <UsageCount Value="76"/>
+        <UsageCount Value="77"/>
       </Unit70>
       <Unit71>
         <Filename Value="uloadhashlist.pas"/>
@@ -601,7 +601,7 @@
         <UnitName Value="uLoadhashlist"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="21"/>
-        <UsageCount Value="74"/>
+        <UsageCount Value="75"/>
       </Unit71>
       <Unit72>
         <Filename Value="uKnownHashLists.pas"/>
@@ -643,123 +643,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="453" Column="46" TopLine="430"/>
+        <Caret Line="455" Column="16" TopLine="432"/>
       </Position1>
       <Position2>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="454" Column="23" TopLine="431"/>
+        <Caret Line="456" Column="53" TopLine="433"/>
       </Position2>
       <Position3>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="455" Column="16" TopLine="432"/>
+        <Caret Line="457" Column="16" TopLine="434"/>
       </Position3>
       <Position4>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="456" Column="53" TopLine="433"/>
+        <Caret Line="461" Column="16" TopLine="438"/>
       </Position4>
       <Position5>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="457" Column="16" TopLine="434"/>
+        <Caret Line="463" Column="23" TopLine="440"/>
       </Position5>
       <Position6>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="461" Column="16" TopLine="438"/>
+        <Caret Line="563" Column="34" TopLine="539"/>
       </Position6>
       <Position7>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="463" Column="23" TopLine="440"/>
+        <Caret Line="578" Column="61" TopLine="554"/>
       </Position7>
       <Position8>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="563" Column="34" TopLine="539"/>
+        <Caret Line="595" Column="34" TopLine="571"/>
       </Position8>
       <Position9>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="578" Column="61" TopLine="554"/>
+        <Caret Line="619" Column="79" TopLine="595"/>
       </Position9>
       <Position10>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="595" Column="34" TopLine="571"/>
+        <Caret Line="1021" Column="23" TopLine="997"/>
       </Position10>
       <Position11>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="619" Column="79" TopLine="595"/>
+        <Caret Line="1022" Column="16" TopLine="998"/>
       </Position11>
       <Position12>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1021" Column="23" TopLine="997"/>
+        <Caret Line="1025" Column="23" TopLine="1001"/>
       </Position12>
       <Position13>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1022" Column="16" TopLine="998"/>
+        <Caret Line="1026" Column="23" TopLine="1002"/>
       </Position13>
       <Position14>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1025" Column="23" TopLine="1001"/>
+        <Caret Line="1027" Column="46" TopLine="1003"/>
       </Position14>
       <Position15>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1026" Column="23" TopLine="1002"/>
+        <Caret Line="1028" Column="23" TopLine="1004"/>
       </Position15>
       <Position16>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1027" Column="46" TopLine="1003"/>
+        <Caret Line="1030" Column="16" TopLine="1006"/>
       </Position16>
       <Position17>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1028" Column="23" TopLine="1004"/>
+        <Caret Line="1031" Column="53" TopLine="1007"/>
       </Position17>
       <Position18>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1030" Column="16" TopLine="1006"/>
+        <Caret Line="1033" Column="49" TopLine="1009"/>
       </Position18>
       <Position19>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1031" Column="53" TopLine="1007"/>
+        <Caret Line="1037" Column="16" TopLine="1013"/>
       </Position19>
       <Position20>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="1033" Column="49" TopLine="1009"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="56" Column="39" TopLine="52"/>
       </Position20>
       <Position21>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="1037" Column="16" TopLine="1013"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="2035" Column="16" TopLine="2013"/>
       </Position21>
       <Position22>
         <Filename Value="unit2.pas"/>
-        <Caret Line="56" Column="39" TopLine="52"/>
+        <Caret Line="103" Column="3" TopLine="86"/>
       </Position22>
       <Position23>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2035" Column="16" TopLine="2013"/>
+        <Filename Value="uKnownHashLists.pas"/>
+        <Caret Line="9" Column="27"/>
       </Position23>
       <Position24>
         <Filename Value="unit2.pas"/>
-        <Caret Line="103" Column="3" TopLine="86"/>
+        <Caret Line="1146" Column="20" TopLine="1113"/>
       </Position24>
       <Position25>
-        <Filename Value="uKnownHashLists.pas"/>
-        <Caret Line="9" Column="27"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="2039" Column="5" TopLine="2013"/>
       </Position25>
       <Position26>
         <Filename Value="unit2.pas"/>
-        <Caret Line="1146" Column="20" TopLine="1113"/>
+        <Caret Line="2380" Column="30" TopLine="2352"/>
       </Position26>
       <Position27>
         <Filename Value="unit2.pas"/>
-        <Caret Line="2039" Column="5" TopLine="2013"/>
+        <Caret Line="2372" Column="6" TopLine="2361"/>
       </Position27>
       <Position28>
         <Filename Value="unit2.pas"/>
-        <Caret Line="2380" Column="30" TopLine="2352"/>
+        <Caret Line="2036" Column="53" TopLine="2013"/>
       </Position28>
       <Position29>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2372" Column="6" TopLine="2361"/>
+        <Filename Value="quickhash.lpr"/>
+        <Caret Line="95" TopLine="80"/>
       </Position29>
       <Position30>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2036" Column="53" TopLine="2013"/>
+        <Filename Value="quickhash.lpr"/>
+        <Caret Line="105" TopLine="84"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

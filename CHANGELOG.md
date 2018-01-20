@@ -24,6 +24,8 @@ Fixed the time scheduler. It now checks every 1/3 of second if the current time 
 
 Removed (deleted) an old unused progress bar that had been hidden by other elements
 
+Text hashing SHA512 word wrapped the output so if it was copied and pasted into the expected hash value the carriage return went with it. So output field no longer word wraps. 
+
 Ensured the GNU license delcaration and open source nature of the tool, as well as the copyright and home URL notice are in every unit file of the project to better protect it and to make the 
 licensing clear. Added the GPL2 license, explicitally, to the Github project page. 
 
