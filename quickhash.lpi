@@ -14,7 +14,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="3"/>
-      <BuildNr Value="18"/>
+      <BuildNr Value="19"/>
       <Language Value="0809"/>
       <Attributes pvaPreRelease="True"/>
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software" CompanyName="Ted Smith (Ted Technology on Sourceforge)" FileDescription="File hashing GUI for Linux &amp; Windows" LegalCopyright="2011 - 2017 (c) Ted Smith" ProductName="QuickHash (www.quickhash-gui.org)" ProductVersion=""/>
@@ -59,7 +59,6 @@
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
         <TopLine Value="84"/>
         <CursorPos Y="95"/>
@@ -100,7 +99,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <TopLine Value="1301"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="1300"/>
         <CursorPos X="7" Y="1329"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
@@ -783,6 +783,7 @@
     </CodeGeneration>
     <Linking>
       <Debugging>
+        <GenerateDebugInfo Value="False"/>
         <DebugInfoType Value="dsDwarf2Set"/>
         <StripSymbols Value="True"/>
       </Debugging>
