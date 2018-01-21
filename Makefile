@@ -1,17 +1,18 @@
 # Makefile for Linux
+# https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.6.4/
 
 PREFIX ?= /usr
 BIN = quickhash
-PROJECT = project1
-LAZBUILD := lazbuild
-LAZRES := lazres
-RESFILES = frmaboutunit.lrs udisplaygrid.lrs unit2.lrs
+LAZBUILD := /usr/share/lazarus/1.6.4/lazbuild
+LAZRES := /usr/share/lazarus/1.6.4/tools/lazres
+RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs
 OPTIONS ?=
 # use a local temporary config directory to not register
 # the used package(s) permanently and globally
 OPTIONS += --pcp=lazarus_cfg
 OPTIONS += HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk
 OPTIONS += DateTimePicker/zvdatetimectrls.lpk
+OPTIONS += /usr/share/lazarus/1.6.4/components/dbexport/lazdbexport.lpk
 
 define \n
 
@@ -22,25 +23,20 @@ endef
 all: $(BIN)
 
 clean:
-	rm -rf lib/ lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
-	rm -f $(BIN) $(PROJECT) DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
+	rm -rf lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
+	rm -f $(BIN) quickhash_linux.ico *.o *.or *.ppu *.res *.compiled
+	rm -f DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
 	$(foreach FILE,$(RESFILES),\
 	  test ! -f $(FILE).backup || mv -f $(FILE).backup $(FILE) ; ${\n})
 
 distclean: clean
-	rm -f $(PROJECT).lpi $(PROJECT).ico $(PROJECT).res
 
-$(BIN): $(PROJECT).lpi $(PROJECT).ico
+$(BIN):
 	$(foreach FILE,$(RESFILES),\
 	  test -f $(FILE).backup || cp $(FILE) $(FILE).backup ; ${\n}\
 	  $(LAZRES) $(FILE) $(FILE:.lrs=.lfm) ; ${\n})
-	$(LAZBUILD) $(OPTIONS) $<
-
-$(PROJECT).lpi: $(PROJECT)_linux.lpi
-	cp $< $@
-
-$(PROJECT).ico: misc/QuickHash.ico
-	cp $< $@
+	cp -f quickhash.ico quickhash_linux.ico
+	$(LAZBUILD) $(OPTIONS) quickhash_linux.lpi
 
 install:
 	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
