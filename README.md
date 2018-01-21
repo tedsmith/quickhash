@@ -7,7 +7,7 @@ Compiling the Project
 Binaries for Windows, Linux and Apple macOS are available from http://quickhash-gui.org.
 But if you need or want to compile yourself, then first clone the source code: `git clone https://github.com/tedsmith/quickhash.git`
 
-There is an LPR file that is the Lazarus Project File. So you need the Lazarus IDE and Freepascal Compiler (v3.0 or above) for your chosen platform, available from www.lazarus-ide.org. 
+There is an LPR file that is the Lazarus Project File. So you need the Lazarus IDE and Freepascal Compiler (fpc v3.0.2 and Lazarus v1.6.4, not any version above) for your chosen platform, available from www.lazarus-ide.org. 
 
 After installation of Lazarus and Freepascal, you need to set some things up.
 
