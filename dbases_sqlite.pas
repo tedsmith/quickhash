@@ -132,17 +132,21 @@ begin
     SQLDBLibraryLoaderWindows.LoadLibrary;
     // Set the filename of the sqlite database
     strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-    SQLite3Connection1.DatabaseName := 'QuickHashDBWin_' + strFileNameRandomiser + '.sqlite';
-    // Create the database
-    CreateDatabase(SQLite3Connection1.DatabaseName);
-    if SQLIte3Connection1.Connected then
+    SafePlaceForDB := GetTempDir;
+    if ForceDirectories(SafePlaceForDB) then
     begin
-      lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-    end
-    else
-    begin
-      ShowMessage('Cannot create SQLite database. Missing SQLite DLLs. Functionaliy will be reduced');
-      abort; // Quit
+      SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBWin_' + strFileNameRandomiser + '.sqlite';
+      // Create the database
+      CreateDatabase(SQLite3Connection1.DatabaseName);
+      if SQLIte3Connection1.Connected then
+      begin
+        lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+      end
+      else
+        begin
+          ShowMessage('Cannot create SQLite database. Missing SQLite DLLs. Functionaliy will be reduced');
+          abort; // Quit
+        end;
     end;
     {$endif}
     {$ifdef darwin}
@@ -154,8 +158,8 @@ begin
       SQLDBLibraryLoaderOSX.LoadLibrary;
       // Set the filename of the sqlite database
       strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-      //  write the SQLite database file to /tmp;
-      SafePlaceForDB := '/tmp/';
+      //  write the SQLite database file to system temp;
+      SafePlaceForDB := GetTempDir;
       if ForceDirectories(SafePlaceForDB) then
       begin
         SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBOSX_' + strFileNameRandomiser + '.sqlite';
@@ -218,8 +222,8 @@ begin
       SQLDBLibraryLoaderLinux.LoadLibrary;
       // Set the filename of the sqlite database
       strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
-      //  write the SQLite database file to /tmp
-      SafePlaceForDB := '/tmp/';
+      //  write the SQLite database file to system temp
+      SafePlaceForDB := gettempdir;
       if ForceDirectories(SafePlaceForDB) then
       begin
         SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBLinux_' + strFileNameRandomiser + '.sqlite';

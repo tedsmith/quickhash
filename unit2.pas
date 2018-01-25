@@ -1098,10 +1098,8 @@ begin
        ShowMessage('File size is zero. The file cannot be hashed');
        Abort;
       end;
-    end
-  else
-    ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-  end;
+    end;
+end;
 
 procedure TMainForm.btnLaunchDiskModuleClick(Sender: TObject);
 begin
@@ -1263,7 +1261,7 @@ begin
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
 end;
 
-// Behaviours for the UNC tick box in "Compare Two Directories" tab
+// Behaviours for the UNC tick box in "Compare Two Folders" tab
 procedure TMainForm.cbUNCModeCompFoldersChange(Sender: TObject);
 begin
   if cbUNCModeCompFolders.Checked then
@@ -2611,7 +2609,7 @@ begin
       NeedToSave := true;
       // Create the log file if it does not exist already
       if ForceDirectories(GetAppConfigDir(false)) then // Create .config folder in users home folder
-      fsSaveFolderComparisonsLogFile := TFileStream.Create(GetAppConfigDir(false) +'QH_results'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.txt', fmCreate);
+      fsSaveFolderComparisonsLogFile := TFileStream.Create(GetAppConfigDir(false) +'QH_CompareResults'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.txt', fmCreate);
     end;
 
     // Process FolderA first. Find all the files initially
@@ -3488,7 +3486,7 @@ begin
         2: TabRadioGroup2 := AlgorithmChoiceRadioBox3;  //RadioGroup for FileS.
         3: TabRadioGroup2 := AlgorithmChoiceRadioBox4;  //RadioGroup for Copy.
         4: TabRadioGroup2 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
-        5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Direcories.
+        5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Two Folders.
         7: TabRadioGroup2 := AlgorithmChoiceRadioBox7;  //RadioGroup for Base64
   end;
 
@@ -3499,6 +3497,15 @@ begin
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
     strFileSize      := FormatByteSize(fsFileToBeHashed.Size);
     IntFileSize      := fsFileToBeHashed.Size;
+  except
+    on E:Exception do
+      result := (FileToBeHashed + ' could not be accessed because: ' + E.Message);
+  end;
+
+  // Only continue if valid file handle
+  if fsFileToBeHashed.Handle > -1 then
+  begin
+
     pbFile.Position  := 0;
     pbFile.Max       := 100;
 
@@ -3669,8 +3676,8 @@ begin
         {$endif}
         end;  // End of xxHash
     end; // end of case statement
-  finally
-   if PageControl1.ActivePage = TabSheet2 then
+
+  if PageControl1.ActivePage = TabSheet2 then
      begin
        // Last sweep to catch data that fell outside the loop counter
        // i.e. if the loop counter is 40, then the last 40 reads won't be in the
@@ -3681,8 +3688,8 @@ begin
        LoopCounter := 0;
      end;
     Application.ProcessMessages;
-    // Free the source file
-    fsFileToBeHashed.free;
+    // Free the source file if it was successfully opened for read access
+    if fsFileToBeHashed.Handle > -1 then fsFileToBeHashed.free;
   end;
 end;
 
