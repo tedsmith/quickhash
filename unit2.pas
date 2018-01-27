@@ -520,6 +520,9 @@ type
       var Handled: Boolean);
 
   private
+   // Global handle exception controller, courtesy of GetMem from the forums
+   // http://forum.lazarus.freepascal.org/index.php/topic,39842.0.html
+   procedure HandleExceptions(Sender: TObject; E: Exception);
     { private declarations }
   public
     { public declarations }
@@ -573,6 +576,11 @@ var
 // to avoid unnecessary database commits, which slow it down
 
 implementation
+
+procedure TMainForm.HandleExceptions(Sender: TObject; E: Exception);
+begin
+// see http://forum.lazarus.freepascal.org/index.php/topic,39842.0.html
+end;
 
 procedure TMainForm.CommitCount(Sender : TObject);
 begin
@@ -3480,6 +3488,8 @@ begin
   strFileSize      := '';
   LoopCounter      := 0; // Used for periodic interface refresh, to avoid slowing things down.
 
+  result := '';
+
   case PageControl1.TabIndex of
         0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
         1: TabRadioGroup2 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
@@ -3493,19 +3503,29 @@ begin
   { For each hash instance, it has to be created, then initialised, populated,
     and finally converted to a string result.
   }
+
+  Application.OnException := @HandleExceptions;
   try
+    fsFileToBeHashed := nil;
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
-    strFileSize      := FormatByteSize(fsFileToBeHashed.Size);
-    IntFileSize      := fsFileToBeHashed.Size;
   except
-    on E:Exception do
-      result := (FileToBeHashed + ' could not be accessed because: ' + E.Message);
   end;
+  Application.OnException := nil;
+
+  {  try
+    fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
+    except
+    On E :Exception do
+      begin
+        result := (FileToBeHashed + ' could not be accessed' + E.Message);
+      end;
+    end;
+   }
 
   // Only continue if valid file handle
-  if fsFileToBeHashed.Handle > -1 then
+  if assigned(fsFileToBeHashed) then
   begin
-
+    IntFileSize      := fsFileToBeHashed.Size;
     pbFile.Position  := 0;
     pbFile.Max       := 100;
 
@@ -3690,7 +3710,8 @@ begin
     Application.ProcessMessages;
     // Free the source file if it was successfully opened for read access
     if fsFileToBeHashed.Handle > -1 then fsFileToBeHashed.free;
-  end;
+  end
+  else result := 'File could not be accessed.'
 end;
 
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
