@@ -2960,6 +2960,7 @@ begin
   pbCopy.Position                  := 0;
   LoopCounter                      := 0;
   Button8CopyAndHash.Enabled       := false; // disable the go button until finished
+  StopScan2                        := false;
 
   // Empty database table TBL_COPY from any earlier runs, otherwise entries from
   // previous runs will be listed with this new run
