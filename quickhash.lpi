@@ -12,9 +12,8 @@
     </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="3"/>
-      <BuildNr Value="1"/>
+      <RevisionNr Value="1"/>
       <Language Value="0809"/>
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software" CompanyName="Ted Smith (Ted Technology on Sourceforge)" FileDescription="File hashing GUI for Linux &amp; Windows" LegalCopyright="2011 - 2018 (c) Ted Smith" ProductName="QuickHash (www.quickhash-gui.org)" ProductVersion=""/>
     </VersionInfo>
