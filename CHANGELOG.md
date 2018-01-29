@@ -4,6 +4,7 @@ v3.0.1 (Feb 2018)
 The "Select File" in File tab generated an unnecessary error if the user cancelled the selection. Now it just cancels as expected
 If QuickHash cannot get a handle to a file becuase it is open without share permissions by the OS, QuickHash should now silently proceed and simply report that the file could not be accessed in the hash column
 The SQLite database is now located in the systems temporary directory and deleted afterwards rather than appearing in the root of the launch path.
+In the FileS tab, if the user aborted a scan using Stop button and selected a new folder, nothing would happen because a boolean flag was not being reset properly. That was fixed. Date formatting also adjusted to YY/MM/DD (e.g. 18/01/31)
 
 v3.0.0 (Jan 2018)
 Now with SQLite!! The reason why the development numbering has moved to v3.0...the first whole number release since v2.0 in 2013, is due to the move to SQLIte. This has been a massive re-write and a total overhaul of large parts of the program. SQLite adds many areas of functionality that was not possible before, so some tick box options have been removed in exchange for right click menu options. As a result of using SQLite, once the hashing has been conducted the user can still save and copy data to clipboard as he could before, but in addition Quickhash can now list duplicate files, match filenames, match file paths, and copy individual cells, and it will list the data in the blink of an eye. 

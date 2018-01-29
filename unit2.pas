@@ -2250,6 +2250,7 @@ var
   PageControl1.ActivePage := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
   FileCounter                   := 1;
   TotalBytesRead                := 0;
+  lblNoFilesInDir.Caption       := '...';
   lblTimeTaken3.Caption         := '...';
   lblTimeTaken4.Caption         := '...';
   lblFilesExamined.Caption      := '...';
@@ -2257,7 +2258,11 @@ var
   lblTotalBytesExamined.Caption := '...';
   pbFileS.Position              := 0;
   Label5.Caption                := 'This area will be populated once the scan is complete...please wait!';
+  StopScan1 := false;
 
+  // In case user pressed stop prior to just selecting a folder, free the resources
+  TotalFilesToExamine := nil;
+  FS := nil;
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
   frmSQLiteDBases.EmptyDBTable('TBL_FILES', RecursiveDisplayGrid1);
@@ -2288,7 +2293,7 @@ var
 
        // Now lets recursively count each file,
        start := Now;
-       lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
+       lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('YY/MM/DD HH:MM:SS', Start);
        StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
        Label5.Visible        := true;
 
