@@ -1106,13 +1106,13 @@ const
                  nil, 0, BytesReturned, nil) then
                    raise Exception.Create('Unable to initiate FSCTL_ALLOW_EXTENDED_DASD_IO.');
           end;
-         {$endif}
+
         // Source disk handle is OK. So attempt reading it and adjust display to
         // the friendly version, i.e. '\\?\F:' becomes 'F:'
         ledtSelectedItem.Text := RemoveLogicalVolPrefix(ledtSelectedItem.Text, '\\?\');
 
         // First, compute the exact disk size of the disk or volume
-        {$ifdef Windows}
+
         ExactDiskSize   := GetDiskLengthInBytes(hSelectedDisk);
         {$endif}
         {$ifdef UNIX}
