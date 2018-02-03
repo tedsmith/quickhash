@@ -1,7 +1,7 @@
 object frmDiskHashingModule: TfrmDiskHashingModule
-  Left = 435
+  Left = 436
   Height = 529
-  Top = 166
+  Top = 0
   Width = 787
   Caption = 'QuickHash v3.0.1 - Disk Hashing Module'
   ClientHeight = 529

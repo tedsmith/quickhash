@@ -170,7 +170,6 @@ var
   MissingFileCount : integer;
 begin
   Stop := false;
-  NullStrictConvert := False;
   MissingFileCount := 0;
   ExecutionCount := 0;
   ledtComputedHashA.Enabled := false;
@@ -231,6 +230,7 @@ end;
 
 procedure TfrmDiskHashingModule.btnRefreshDiskListClick(Sender: TObject);
 begin
+  NullStrictConvert := False; // Hopefully avoid "could not convert variant of type (Null) into type Int64" errors
   {$ifdef Windows}
   try
     TreeView1.Items.Clear;
@@ -1758,10 +1758,19 @@ begin
               begin
                 DriveLetter    := GetJustDriveLetter(Val3);
                 DriveLetterID  := GetDriveIDFromLetter(DriveLetter);
+
                 intDriveSize   := DiskSize(DriveLetterID);
-                strDiskSize    := FormatByteSize(intDriveSize);
+                if intDriveSize > 0 then
+                 begin
+                   strDiskSize := FormatByteSize(intDriveSize);
+                 end else strDiskSize := '0';
+
                 intFreeSpace   := DiskFree(DriveLetterID);
-                strFreeSpace   := FormatByteSize(intFreeSpace);
+                if intFreeSpace > 0 then
+                begin
+                   strFreeSpace   := FormatByteSize(intFreeSpace);
+                end else strFreeSpace := '0';
+
                 strVolumeName  := GetVolumeName(DriveLetter[1]);
                 frmDiskHashingModule.TreeView1.Items.AddChild(DriveLetterNode, Val3 + ' (' + strVolumeName + ', Size: ' + strDiskSize + ', Free Space: ' + strFreeSpace + ')');
               end;
