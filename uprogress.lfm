@@ -1,8 +1,8 @@
 object frmProgress: TfrmProgress
-  Left = 619
+  Left = 627
   Height = 348
   Hint = 'Close this window if you wish to abort.'
-  Top = 500
+  Top = 317
   Width = 421
   Caption = 'QuickHash - Disk Hashing Module'
   ClientHeight = 348

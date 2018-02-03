@@ -112,6 +112,7 @@ type
   public
     BytesPerSector : integer;
     StartHashing : boolean;
+    NullStrictConvert : boolean;
     { public declarations }
   end;
 
@@ -131,6 +132,7 @@ var
   function VarStrNull(const V:OleVariant):string;
   function GetWMIObject(const objectName: String): IDispatch;
   function VarArrayToStr(const vArray: variant): string;
+  function RemoveLogicalVolPrefix(strPath : string; LongPathOverrideVal : string) : string;
 
   // Formatting functions
   function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
@@ -228,6 +230,7 @@ end;
 
 procedure TfrmDiskHashingModule.btnRefreshDiskListClick(Sender: TObject);
 begin
+  NullStrictConvert := False; // Hopefully avoid "could not convert variant of type (Null) into type Int64" errors
   {$ifdef Windows}
   try
     TreeView1.Items.Clear;
@@ -1104,7 +1107,9 @@ const
                    raise Exception.Create('Unable to initiate FSCTL_ALLOW_EXTENDED_DASD_IO.');
           end;
          {$endif}
-        // Source disk handle is OK. So attempt reading it
+        // Source disk handle is OK. So attempt reading it and adjust display to
+        // the friendly version, i.e. '\\?\F:' becomes 'F:'
+        ledtSelectedItem.Text := RemoveLogicalVolPrefix(ledtSelectedItem.Text, '\\?\');
 
         // First, compute the exact disk size of the disk or volume
         {$ifdef Windows}
@@ -1132,7 +1137,7 @@ const
         // hash selection and Image name.
         StartedAt := Now;
         frmProgress.lblResult.Caption := 'Hashing ' + ledtSelectedItem.Text;
-        frmProgress.lblProgressStartTime.Caption := 'Started At: ' + FormatDateTime('dd/mm/yy HH:MM:SS', StartedAt);
+        frmProgress.lblProgressStartTime.Caption := 'Started At: ' + FormatDateTime('YY/MM/DD HH:MM:SS', StartedAt);
         // Start the disk hashing...
         HashResult := HashDisk(hSelectedDisk, ExactDiskSize, HashChoice);
         // Disk hashing completed
@@ -1142,7 +1147,7 @@ const
           frmProgress.lblResult.Caption := 'Finished hashing ' + ledtSelectedItem.Text;
           EndedAt := Now;
           TimeTakenToHash := EndedAt - StartedAt;
-          frmProgress.lblProgressEndedAt.Caption := 'Ended At: '     + FormatDateTime('dd/mm/yy HH:MM:SS', EndedAt);
+          frmProgress.lblProgressEndedAt.Caption := 'Ended At: '     + FormatDateTime('YY/MM/DD HH:MM:SS', EndedAt);
           frmProgress.lblProgressTimeTaken.Caption := 'Time Taken: ' + FormatDateTime('HHH:MM:SS', TimeTakenToHash);
           end
         else
@@ -1177,9 +1182,9 @@ const
           slHashLog.Add('Device ID: '                 + SourceDevice);
           slHashLog.Add('Chosen Hash Algorithm: '     + comboHashChoice.Text);
           slHashLog.Add('=======================');
-          slHashLog.Add('Hashing Started At: '        + FormatDateTime('dd/mm/yy HH:MM:SS', StartedAt));
-          slHashLog.Add('Hashing Ended At:   '        + FormatDateTime('dd/mm/yy HH:MM:SS', EndedAt));
-          slHashLog.Add('Time Taken to hash: '       + FormatDateTime('HHH:MM:SS', TimeTakenToHash));
+          slHashLog.Add('Hashing Started At: '        + FormatDateTime('YY/MM/DD HH:MM:SS', StartedAt));
+          slHashLog.Add('Hashing Ended At:   '        + FormatDateTime('YY/MM/DD HH:MM:SS', EndedAt));
+          slHashLog.Add('Time Taken to hash: '        + FormatDateTime('HHH:MM:SS', TimeTakenToHash));
           slHashLog.Add('Hash(es) of disk : '                + #13#10 +
                         ' MD5:    ' + ledtComputedHashA.Text + #13#10 +
                         ' SHA-1:  ' + ledtComputedHashB.Text + #13#10 +
@@ -1209,6 +1214,19 @@ const
       end; // end of the 'else' statement relating to the disk handle being initiated OK
     Application.ProcessMessages;
   end;
+
+
+// RemoveLogicalVolPrefix : Converts '\\?\F:' to 'F:'
+// For display purposes only
+function RemoveLogicalVolPrefix(strPath : string; LongPathOverrideVal : string) : string;
+begin
+  result := '';
+  if LongPathOverrideVal = '\\?\' then
+  begin
+    // Delete the UNC API prefix of '\\?\' from the display
+    result := Copy(strPath, 5, (Length(strPath) - 3));
+  end;
+end;
 
 // Hash the selected disk. Returns the number of bytes successfully hashed
 function HashDisk(hDiskHandle : THandle; DiskSize : Int64; HashChoice : Integer) : Int64;
@@ -1678,7 +1696,7 @@ var
   DriveLetterID  : Byte;
   intDriveSize, intFreeSpace : Int64;
 
-begin;
+begin
   Result       := '';
   intDriveSize := 0;
   intFreeSpace := 0;
@@ -1740,10 +1758,19 @@ begin;
               begin
                 DriveLetter    := GetJustDriveLetter(Val3);
                 DriveLetterID  := GetDriveIDFromLetter(DriveLetter);
+
                 intDriveSize   := DiskSize(DriveLetterID);
-                strDiskSize    := FormatByteSize(intDriveSize);
+                if intDriveSize > 0 then
+                 begin
+                   strDiskSize := FormatByteSize(intDriveSize);
+                 end else strDiskSize := '0';
+
                 intFreeSpace   := DiskFree(DriveLetterID);
-                strFreeSpace   := FormatByteSize(intFreeSpace);
+                if intFreeSpace > 0 then
+                begin
+                   strFreeSpace   := FormatByteSize(intFreeSpace);
+                end else strFreeSpace := '0';
+
                 strVolumeName  := GetVolumeName(DriveLetter[1]);
                 frmDiskHashingModule.TreeView1.Items.AddChild(DriveLetterNode, Val3 + ' (' + strVolumeName + ', Size: ' + strDiskSize + ', Free Space: ' + strFreeSpace + ')');
               end;

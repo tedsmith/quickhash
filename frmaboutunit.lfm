@@ -1,7 +1,7 @@
 object frmAbout: TfrmAbout
-  Left = 533
+  Left = 540
   Height = 435
-  Top = 238
+  Top = 165
   Width = 514
   Caption = 'About QuickHash-GUI'
   ClientHeight = 435
@@ -17,22 +17,31 @@ object frmAbout: TfrmAbout
     Lines.Strings = (
       'Developed by Ted Smith (c) 2011-2018 '
       ''
-      'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
+      'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at '
+      'http://sourceforge.net/projects/quickhash)'
       ''
-      'Donations are welcomed! The website is hosted using AWS which is actually quite expensive! If you have found QuickHash useful to you or your business, please consider donating using PayPal at https://paypal.me/quickhash'
+      'Donations are welcomed! The website is hosted using AWS which is actually quite expensive! If '
+      'you have found QuickHash useful to you or your business, please consider donating using '
+      'PayPal at https://paypal.me/quickhash'
       ''
       'The development Github Page is : https://github.com/tedsmith/quickhash'
       ''
-      'Contributions made by DaReal Shinji (http://www.github.com/darealshinji), especially regarding repository maintenance and Debian packaging are both welcomed and acknowledged, in '
+      'Contributions made by DaReal Shinji (http://www.github.com/darealshinji), especially '
+      'regarding repository maintenance and Debian packaging are both welcomed and '
+      'acknowledged, in '
       'addition to the Lazarus forum members, who are always so helpful. '
       ''
-      'Bug Tracker is available at http://www.quickhash-gui.org/bug-tracker/ where bugs and feature requests can be submitted, reviewed and tracked. '
+      'Bug Tracker is available at http://www.quickhash-gui.org/bug-tracker/ where bugs and feature '
+      'requests can be submitted, reviewed and tracked. '
       ''
-      'For a private communication or technical help which the website does not answer, you can e-mail me at tedsmith@quickhash-gui.org, however, this should not be used as the means to ask '
+      'For a private communication or technical help which the website does not answer, you can e-'
+      'mail me at tedsmith@quickhash-gui.org, however, this should not be used as the means to ask '
       'about bugs or problems. Please use the bug tracker for that so that other users can benefit. '
       ''
-      'Created using the Lazarus IDE and the Freepascal Compiler. QuickHash is open-source and released under the GPL2 license. '
-      'The HashLib4Pascal library is licensed under MIT and developed by the talented Ugochukwu Mmaduekwe Stanley (aka Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'
+      'Created using the Lazarus IDE and the Freepascal Compiler. QuickHash is open-source and '
+      'released under the GPL2 license. '
+      'The HashLib4Pascal library is licensed under MIT and developed by the talented Ugochukwu '
+      'Mmaduekwe Stanley (aka Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'
     )
     ReadOnly = True
     ScrollBars = ssAutoBoth

@@ -520,6 +520,9 @@ type
       var Handled: Boolean);
 
   private
+   // Global handle exception controller, courtesy of GetMem from the forums
+   // http://forum.lazarus.freepascal.org/index.php/topic,39842.0.html
+   procedure HandleExceptions(Sender: TObject; E: Exception);
     { private declarations }
   public
     { public declarations }
@@ -573,6 +576,11 @@ var
 // to avoid unnecessary database commits, which slow it down
 
 implementation
+
+procedure TMainForm.HandleExceptions(Sender: TObject; E: Exception);
+begin
+// see http://forum.lazarus.freepascal.org/index.php/topic,39842.0.html
+end;
 
 procedure TMainForm.CommitCount(Sender : TObject);
 begin
@@ -1098,10 +1106,8 @@ begin
        ShowMessage('File size is zero. The file cannot be hashed');
        Abort;
       end;
-    end
-  else
-    ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
-  end;
+    end;
+end;
 
 procedure TMainForm.btnLaunchDiskModuleClick(Sender: TObject);
 begin
@@ -1263,7 +1269,7 @@ begin
   else cbToggleInputDataToOutputFile.Caption := 'Source text INcluded in output';
 end;
 
-// Behaviours for the UNC tick box in "Compare Two Directories" tab
+// Behaviours for the UNC tick box in "Compare Two Folders" tab
 procedure TMainForm.cbUNCModeCompFoldersChange(Sender: TObject);
 begin
   if cbUNCModeCompFolders.Checked then
@@ -2244,6 +2250,7 @@ var
   PageControl1.ActivePage := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
   FileCounter                   := 1;
   TotalBytesRead                := 0;
+  lblNoFilesInDir.Caption       := '...';
   lblTimeTaken3.Caption         := '...';
   lblTimeTaken4.Caption         := '...';
   lblFilesExamined.Caption      := '...';
@@ -2251,7 +2258,11 @@ var
   lblTotalBytesExamined.Caption := '...';
   pbFileS.Position              := 0;
   Label5.Caption                := 'This area will be populated once the scan is complete...please wait!';
+  StopScan1 := false;
 
+  // In case user pressed stop prior to just selecting a folder, free the resources
+  TotalFilesToExamine := nil;
+  FS := nil;
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
   frmSQLiteDBases.EmptyDBTable('TBL_FILES', RecursiveDisplayGrid1);
@@ -2282,7 +2293,7 @@ var
 
        // Now lets recursively count each file,
        start := Now;
-       lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('dd/mm/yy hh:mm:ss', Start);
+       lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('YY/MM/DD HH:MM:SS', Start);
        StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
        Label5.Visible        := true;
 
@@ -2611,7 +2622,7 @@ begin
       NeedToSave := true;
       // Create the log file if it does not exist already
       if ForceDirectories(GetAppConfigDir(false)) then // Create .config folder in users home folder
-      fsSaveFolderComparisonsLogFile := TFileStream.Create(GetAppConfigDir(false) +'QH_results'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.txt', fmCreate);
+      fsSaveFolderComparisonsLogFile := TFileStream.Create(GetAppConfigDir(false) +'QH_CompareResults'+FormatDateTime('_YYYY_MM_DD_HH_MM_SS', StartTime)+'.txt', fmCreate);
     end;
 
     // Process FolderA first. Find all the files initially
@@ -2949,6 +2960,7 @@ begin
   pbCopy.Position                  := 0;
   LoopCounter                      := 0;
   Button8CopyAndHash.Enabled       := false; // disable the go button until finished
+  StopScan2                        := false;
 
   // Empty database table TBL_COPY from any earlier runs, otherwise entries from
   // previous runs will be listed with this new run
@@ -3482,22 +3494,43 @@ begin
   strFileSize      := '';
   LoopCounter      := 0; // Used for periodic interface refresh, to avoid slowing things down.
 
+  result := '';
+
   case PageControl1.TabIndex of
         0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
         1: TabRadioGroup2 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
         2: TabRadioGroup2 := AlgorithmChoiceRadioBox3;  //RadioGroup for FileS.
         3: TabRadioGroup2 := AlgorithmChoiceRadioBox4;  //RadioGroup for Copy.
         4: TabRadioGroup2 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
-        5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Direcories.
+        5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Two Folders.
         7: TabRadioGroup2 := AlgorithmChoiceRadioBox7;  //RadioGroup for Base64
   end;
 
   { For each hash instance, it has to be created, then initialised, populated,
     and finally converted to a string result.
   }
+
+  Application.OnException := @HandleExceptions;
   try
+    fsFileToBeHashed := nil;
     fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
-    strFileSize      := FormatByteSize(fsFileToBeHashed.Size);
+  except
+  end;
+  Application.OnException := nil;
+
+  {  try
+    fsFileToBeHashed := TFileStream.Create(FileToBeHashed, fmOpenRead or fmShareDenyNone);
+    except
+    On E :Exception do
+      begin
+        result := (FileToBeHashed + ' could not be accessed' + E.Message);
+      end;
+    end;
+   }
+
+  // Only continue if valid file handle
+  if assigned(fsFileToBeHashed) then
+  begin
     IntFileSize      := fsFileToBeHashed.Size;
     pbFile.Position  := 0;
     pbFile.Max       := 100;
@@ -3669,8 +3702,8 @@ begin
         {$endif}
         end;  // End of xxHash
     end; // end of case statement
-  finally
-   if PageControl1.ActivePage = TabSheet2 then
+
+  if PageControl1.ActivePage = TabSheet2 then
      begin
        // Last sweep to catch data that fell outside the loop counter
        // i.e. if the loop counter is 40, then the last 40 reads won't be in the
@@ -3681,9 +3714,10 @@ begin
        LoopCounter := 0;
      end;
     Application.ProcessMessages;
-    // Free the source file
-    fsFileToBeHashed.free;
-  end;
+    // Free the source file if it was successfully opened for read access
+    if fsFileToBeHashed.Handle > -1 then fsFileToBeHashed.free;
+  end
+  else result := 'File could not be accessed.'
 end;
 
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
