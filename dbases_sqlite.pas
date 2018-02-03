@@ -578,7 +578,7 @@ var
   ExportSettings: TCSVFormatSettings;
   FileName : string;
 begin
-    Filename := 'QH_TmpFile.tmp';
+    Filename := GetTempDir + 'QH_TmpFile.tmp';
     DeletedOK := false;
     // Go to start of grid
     DBGrid.DataSource.DataSet.First;
@@ -598,12 +598,12 @@ begin
             if assigned(exporter) then freeandnil(exporter);
             // Now load the text file into clipboard
             vStringList := TStringList.Create;
-            vStringList.LoadFromFile('QH_TmpFile.tmp');
+            vStringList.LoadFromFile(filename);
             // Write file to clipboard
             Clipboard.AsText := vStringList.Text;
           finally
             DeletedOK := DeleteFile(Filename);
-            if DeletedOK = false then Showmessage('Could not delete temporary file QH_TmpFile.tmp');
+            if DeletedOK = false then Showmessage('Could not delete temporary file ' + filename);
             if assigned(vStringList) then freeandnil(vStringList);
             ShowMessage('Grid content now in clipboard.');
           end;
