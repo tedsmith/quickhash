@@ -277,6 +277,7 @@ type
     pbFile: TProgressBar;
     FilesDBGrid_SaveCSVDialog: TSaveDialog;
     FilesSaveAsHTMLDialog: TSaveDialog;
+    sdFileAndFolderListOnly: TSaveDialog;
     sdHashListLookupResults: TSaveDialog;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
     b64FileSChooserDialog: TSelectDirectoryDialog;
@@ -497,7 +498,8 @@ type
     function HashFolderBList(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
     function CompareHashLists(aHashList1, aHashlist2: TFPHashList): Boolean;
     function ComputeWhatHashesAreMissing(aHashList1, aHashList2 : TFPHashList) : TStringList;
-
+    function GetSubDirListing(FolderName : string) : TStringList;
+    function GetSubDirAndFileListing(FolderName : string) : TStringList;
     // function FileSizeWithLongPath(strFileName : string) : Int64;
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
@@ -2070,9 +2072,10 @@ begin
         begin
           s := Lowercase(s);
           memoHashText.Text := s;
-          exit;
         end;
       end;
+    HashText(memoHashText);
+    application.ProcessMessages;
 end;
 
 procedure TMainForm.btnMakeTextUpperClick(Sender: TObject);
@@ -2087,9 +2090,10 @@ begin
         begin
           s := Uppercase(s);
           memoHashText.Text := s;
-          exit;
         end;
       end;
+    HashText(memoHashText);
+    application.ProcessMessages;
 end;
 
 
@@ -2241,7 +2245,7 @@ end;
 procedure TMainForm.btnRecursiveDirectoryHashingClick(Sender: TObject);
 
 var
-  DirToHash, SearchMask : string;
+  DirToHash, FileMask, SearchMask : string;
   FS                           : TFileSearcher;
   TotalFilesToExamine          : TStringList;
   start, stop, elapsed         : TDateTime;
@@ -2299,6 +2303,15 @@ var
 
        Application.ProcessMessages;
 
+       // If the user has a filemask enabled, we need to ensure our filecount figures
+       // take account of only files that match the mask.
+
+       if FileTypeMaskCheckBox2.Checked then
+       begin
+         FileMask := FileMaskField2.Text;
+       end
+       else FileMask := '*';
+
        // By default, the recursive dir hashing will hash all files of all sub-dirs
        // from the root of the chosen dir. If the box is ticked, the user just wants
        // to hash the files in the root of the chosen dir.
@@ -2307,22 +2320,22 @@ var
          begin
            if chkHiddenFiles.Checked then        // ...but does want hidden files
              begin
-               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, '*', False, True);
+               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, FileMask, False, True);
              end
            else                                  // User does not want hidden
              begin
-               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', False);
+               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, FileMask, False);
              end;
          end
        else
          begin                                  // User DOES want recursive
            if chkHiddenFiles.Checked then         // ...and he wants hidden
              begin
-               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, '*', true, true);
+               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, FileMask, true, true);
              end
            else                                  // ...but not want hidden
              begin
-               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, '*', true);
+               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, FileMask, true);
              end;
          end;
 
@@ -2358,7 +2371,7 @@ var
            begin
              if FileTypeMaskCheckBox2.Checked then
                begin
-                 SearchMask := FileMaskField2.Text;
+                 SearchMask := FileMask;
                end
                else SearchMask := '';
              FS.Search(LongPathOverride+DirToHash, SearchMask, False, False);
@@ -2367,7 +2380,7 @@ var
            begin
              if FileTypeMaskCheckBox2.Checked then
                begin
-                 SearchMask := FileMaskField2.Text;
+                 SearchMask := FileMask;
                end
                else SearchMask := '';
              FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
@@ -2445,12 +2458,12 @@ begin
   if LongPathOverrideVal = '\\?\' then
   begin
     // Delete the UNC API prefix of '\\?\' from the display
-    result := Copy(strPath, 5, (Length(strPath) - 3));
+    result := Copy(strPath, 5, (Length(strPath)));
   end
   else if LongPathOverrideVal = '\\?\UNC\' then
   begin
     // Delete the UNC API prefix and restore the UNC path chars of '\\'
-    result := '\' + Copy(strPath, 8, (Length(strPath) - 7));
+    result := '\' + Copy(strPath, 8, (Length(strPath)));
   end
 end;
 
@@ -2920,6 +2933,7 @@ end;
 procedure TMainForm.btnClearTextAreaClick(Sender: TObject);
 begin
   memoHashText.Clear;
+  StrHashValue.Text:='...hash value';
 end;
 
 // ClearText : Invoked OnEnter of the text field only if the standing text exists
@@ -2944,10 +2958,31 @@ begin
     Grid.Cols[i].Clear;
 end;
 
+// Generates a text file of folder names only
+function TMainForm.GetSubDirListing(FolderName : string) : TStringList;
+var
+  sl : TStringList;
+begin
+  sl := TStringList.Create;
+  sl := FindAllDirectories(FolderName, True);
+  result := sl;
+end;
+
+// Generates a text file of folder names and files only
+function TMainForm.GetSubDirAndFileListing(FolderName : string) : TStringList;
+var
+  sl : TStringList;
+begin
+  sl := TStringList.Create;
+  sl := FindAllFiles(FolderName, '*', True);
+  result := sl;
+end;
+
 procedure TMainForm.Button8CopyAndHashClick(Sender: TObject);
 var
   scheduleStartTime : TDateTime;
   LoopCounter       : Integer;
+  slSubDirListing, slSubDirAndFilesListing     : TStringList;
 begin
   frmDisplayGrid1.RecursiveDisplayGrid_COPY.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
@@ -2962,115 +2997,154 @@ begin
   Button8CopyAndHash.Enabled       := false; // disable the go button until finished
   StopScan2                        := false;
 
-  // Empty database table TBL_COPY from any earlier runs, otherwise entries from
-  // previous runs will be listed with this new run
-  frmSQLiteDBases.EmptyDBTable('TBL_COPY', frmDisplayGrid1.RecursiveDisplayGrid_COPY);
-
-  Application.ProcessMessages;
-
-  // First, wait for the scheduler time to arrive, if set by the user
-  if lblschedulertickboxCopyTab.Checked then
-    begin
-      if ZVDateTimePickerCopyTab.DateTime < Now then
-      begin
-        ShowMessage('Scheduled start time is in the past. Correct it.');
-        Button8CopyAndHash.Enabled       := true;
-        exit;
-      end
-      else
-      scheduleStartTime     := ZVDateTimePickerCopyTab.DateTime;
-      StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
-      repeat
-        // This sleep loop avoids straining the CPU too much but also ensures the
-        // interface stays responsive to button clicks etc.
-        // So every 1K itteration, refresh the interface until the scheduled start
-        // arrives or the user clicks Abort.
-        inc(LoopCounter,1);
-        if LoopCounter = 1000 then
-          begin
-            Application.ProcessMessages;
-            LoopCounter := 0;
-          end;
-        sleep(0);
-      until (scheduleStartTime = Now) or (StopScan2 = true);
-    end;
-
-  if chkUNCMode.Checked then
-    begin
-      SourceDir := Edit2SourcePath.Text;
-      DestDir   := Edit3DestinationPath.Text;
-
-      if Pos(':', SourceDir) > 0 then
-        begin
-          ShowMessage('Drive letter detected in source path but UNC mode selected');
-          StatusBar3.SimpleText := 'Aborted due drive letter in source UNC path selection';
-        end
-        else if Pos(':', DestDir) > 0 then
-          begin
-            ShowMessage('Drive letter detected in destination path but UNC mode selected');
-            StatusBar3.SimpleText := 'Aborted due to drive letter in destinatination UNC path selection';
-          end
-          else
-            begin
-              Button8CopyAndHash.Enabled       := false;
-              {$ifdef Windows}
-              // If chosen source path is a UNC path, we need to append the UNC prefix to the
-              // Unicode 32K long API call of \\?\
-              if (Pos('\\', SourceDir) > 0) then
-              begin
-                LongPathOverride := '\\?\UNC\';
-                Delete(SourceDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
-              end;
-              // If chosen destination path is a UNC path too, we need to append the UNC prefix
-              if (Pos('\\', DestDir) > 0) then
-              begin
-                LongPathOverride := '\\?\UNC\';
-                Delete(DestDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
-              end;
-              {$endif}
-              // Now process the copy and paste in UNC mode
-              ProcessDir(SourceDir);
-            end;
-    end
-  else
+  // User just wants a sub-folder listing as text
+  if CheckBoxListOfDirsOnly.Checked then
   begin
-    // In case the user changes either the source or destination after already
-    // running a job once, and so without necessarily clicking with the mouse,
-    // get the source and destination paths again
-    DirListAClick(Sender);
-    DirListBClick(Sender);
+    SourceDir := DirListA.GetSelectedNodePath;
 
-    // Now process the selected source and destination folders in non-UNC mode
-    // If the user has chosen multiple folders...
-    if MultipleDirsChosen then
-      try
-        if slMultipleDirNames.Count > 0 then
-        begin
-          // Only show the user a prompt if scheduler was NOT selected
-          If lblschedulertickboxCopyTab.Checked = false then
-          begin
-            ShowMessage('The following multiple directories will be hashed and copied:' + #13#10 + slMultipleDirNames.Text);
-          end;
-          // give ProcessDir function the first folder name in the list for now...
-          // ProcessDir will then do the itterations itself using the same stringlist
-          SourceDir := slMultipleDirNames.Strings[0];
-          Button8CopyAndHash.Enabled       := false;
-          // Now process the chosen folders
-          ProcessDir(SourceDir);
-        end
-      finally
-        if assigned(slMultipleDirNames) then slMultipleDirNames.free;
-      end
-    // or copy single selected folder as normal if only one folder selected
-    else ProcessDir(SourceDir);
+    sdFileAndFolderListOnly.Title := 'Save listing as text file...';
+    sdFileAndFolderListOnly.InitialDir := GetCurrentDir;
+    sdFileAndFolderListOnly.Filter := 'Text|*.txt';
+    sdFileAndFolderListOnly.DefaultExt:= 'txt';
 
-    if SourceDirValid AND DestDirValid = FALSE then
+    try
+      slSubDirListing := TStringList.Create;
+      slSubDirListing := GetSubDirListing(SourceDir);
+      if sdFileAndFolderListOnly.Execute then
       begin
-        // Now disable the 'Go!' button again
-        Button8CopyAndHash.Enabled := false;
+        slSubDirListing.SaveToFile(sdFileAndFolderListOnly.FileName);
       end;
-  end;
-  Application.ProcessMessages;
+    finally
+      slSubDirListing.Free;
+    end;
+  end
+    else   // User just wants a sub-folder and file listing as text
+      if CheckBoxListOfDirsAndFilesOnly.Checked then
+      begin
+        SourceDir := DirListA.GetSelectedNodePath;
+        try
+          slSubDirAndFilesListing := TStringList.Create;
+          slSubDirAndFilesListing := GetSubDirAndFileListing(SourceDir);
+          if sdFileAndFolderListOnly.Execute then
+          begin
+            slSubDirAndFilesListing.SaveToFile(sdFileAndFolderListOnly.FileName);
+          end;
+        finally
+          slSubDirAndFilesListing.Free;
+        end;
+      end
+        else // User wants some actual hashing and copying doing
+          begin
+            // Empty database table TBL_COPY from any earlier runs, otherwise entries from
+            // previous runs will be listed with this new run
+            frmSQLiteDBases.EmptyDBTable('TBL_COPY', frmDisplayGrid1.RecursiveDisplayGrid_COPY);
+
+            Application.ProcessMessages;
+
+            // First, wait for the scheduler time to arrive, if set by the user
+            if lblschedulertickboxCopyTab.Checked then
+              begin
+                if ZVDateTimePickerCopyTab.DateTime < Now then
+                begin
+                  ShowMessage('Scheduled start time is in the past. Correct it.');
+                  Button8CopyAndHash.Enabled       := true;
+                  exit;
+                end
+                else
+                scheduleStartTime     := ZVDateTimePickerCopyTab.DateTime;
+                StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+                repeat
+                  // This sleep loop avoids straining the CPU too much but also ensures the
+                  // interface stays responsive to button clicks etc.
+                  // So every 1K itteration, refresh the interface until the scheduled start
+                  // arrives or the user clicks Abort.
+                  inc(LoopCounter,1);
+                  if LoopCounter = 1000 then
+                    begin
+                      Application.ProcessMessages;
+                      LoopCounter := 0;
+                    end;
+                  sleep(0);
+                until (scheduleStartTime = Now) or (StopScan2 = true);
+              end;
+
+            if chkUNCMode.Checked then
+              begin
+                SourceDir := Edit2SourcePath.Text;
+                DestDir   := Edit3DestinationPath.Text;
+
+                if Pos(':', SourceDir) > 0 then
+                  begin
+                    ShowMessage('Drive letter detected in source path but UNC mode selected');
+                    StatusBar3.SimpleText := 'Aborted due drive letter in source UNC path selection';
+                  end
+                  else if Pos(':', DestDir) > 0 then
+                    begin
+                      ShowMessage('Drive letter detected in destination path but UNC mode selected');
+                      StatusBar3.SimpleText := 'Aborted due to drive letter in destinatination UNC path selection';
+                    end
+                    else
+                      begin
+                        Button8CopyAndHash.Enabled       := false;
+                        {$ifdef Windows}
+                        // If chosen source path is a UNC path, we need to append the UNC prefix to the
+                        // Unicode 32K long API call of \\?\
+                        if (Pos('\\', SourceDir) > 0) then
+                        begin
+                          LongPathOverride := '\\?\UNC\';
+                          Delete(SourceDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
+                        end;
+                        // If chosen destination path is a UNC path too, we need to append the UNC prefix
+                        if (Pos('\\', DestDir) > 0) then
+                        begin
+                          LongPathOverride := '\\?\UNC\';
+                          Delete(DestDir, 1, 2); // Delete the \\ from the UNC path DirToHash (otherwise it becomes '\\?\UNC\\\')
+                        end;
+                        {$endif}
+                        // Now process the copy and paste in UNC mode
+                        ProcessDir(SourceDir);
+                      end;
+              end
+            else
+            begin
+              // In case the user changes either the source or destination after already
+              // running a job once, and so without necessarily clicking with the mouse,
+              // get the source and destination paths again
+              DirListAClick(Sender);
+              DirListBClick(Sender);
+
+              // Now process the selected source and destination folders in non-UNC mode
+              // If the user has chosen multiple folders...
+              if MultipleDirsChosen then
+                try
+                  if slMultipleDirNames.Count > 0 then
+                  begin
+                    // Only show the user a prompt if scheduler was NOT selected
+                    If lblschedulertickboxCopyTab.Checked = false then
+                    begin
+                      ShowMessage('The following multiple directories will be hashed and copied:' + #13#10 + slMultipleDirNames.Text);
+                    end;
+                    // give ProcessDir function the first folder name in the list for now...
+                    // ProcessDir will then do the itterations itself using the same stringlist
+                    SourceDir := slMultipleDirNames.Strings[0];
+                    Button8CopyAndHash.Enabled       := false;
+                    // Now process the chosen folders
+                    ProcessDir(SourceDir);
+                  end
+                finally
+                  if assigned(slMultipleDirNames) then slMultipleDirNames.free;
+                end
+              // or copy single selected folder as normal if only one folder selected
+              else ProcessDir(SourceDir);
+
+              if SourceDirValid AND DestDirValid = FALSE then
+                begin
+                  // Now disable the 'Go!' button again
+                  Button8CopyAndHash.Enabled := false;
+                end;
+            end;
+            Application.ProcessMessages;
+          end;
 end;
 
 procedure TMainForm.FileTypeMaskCheckBox1Change(Sender: TObject);
@@ -3811,12 +3885,14 @@ var
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
     FormattedSystemDate, OutputDirDateFormatted, CrDateModDateAccDate,
     CSVLogFile2, HTMLLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
-    strTimeDifference,
+    strTimeDifference,  FileMask,
     Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute: string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
   FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
+
+  SummaryMessage : TForm;   // This is the summary message that appears at the end
 
   {$IFDEF WINDOWS}
   k : integer;
@@ -3831,6 +3907,7 @@ begin
   SourceFileHasHash       := '';
   DestinationFileHasHash  := '';
   CrDateModDateAccDate    := '';
+  FileMask                := '';
   NoOfFilesCopiedOK       := 0;
   HashMismtachCount       := 0;
   FileCopyErrors          := 0;
@@ -3865,114 +3942,82 @@ begin
 
   SetCurrentDir(SourceDirName);
 
-  {$IFDEF WINDOWS}
-  // FindFilesEx will find hidden files in hidden directories, or hidden files
-  // in unhidden directories.
-  // On Linux, though, we need different behaviour - see IFDEF below
-  if chkNoRecursiveCopy.Checked then          // Does not want recursive
-    begin
-      if FileTypeMaskCheckBox1.Checked then     // ...and does want a file mask
-        begin
-          FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, False, True);
-        end
-      else                                    // but does not want a file mask
-        begin
-          FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, '*', False, True);
-        end;
-    end;
+   // If the user has a filemask enabled, we need to ensure our filecount figures
+   // take account of only files that match the mask.
 
+   if FileTypeMaskCheckBox1.Checked then
+   begin
+     FileMask := FileMaskField.Text;
+   end
+   else FileMask := '*';
+
+  {$IFDEF WINDOWS}
+
+  // First the default behaviour, which is a recurisve copy of one selected folder
   if MultipleDirsChosen = false then              // User has only selected one folder
     begin
-      if not chkNoRecursiveCopy.Checked then        // and does want recursive copy
+      if not chkNoRecursiveCopy.Checked then      // and does want recursive copy
         begin
-          if FileTypeMaskCheckBox1.Checked then       // ...but does want a file mask
-            begin
-              FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
-            end
-          else                                      // ... but does NOT want a file mask
-            begin
-              FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
-            end;
-        end;
-    end
-  else                                            // User has selected multiple folders to copy
-  begin
-    if not chkNoRecursiveCopy.Checked then          // and does want recursive
-     begin
-       if FileTypeMaskCheckBox1.Checked then          // ...but does want a file mask for all selected folders
-         begin
-           try
-           FilesFoundToCopy := TStringListUTF8.Create;
-           FilesFoundToCopy.Sorted := true;
-           for i := 0 to slMultipleDirNames.Count -1 do
-             begin
-               SourceDirName := slMultipleDirNames.Strings[i];
-               try
-                 slTemp        := TStringListUTF8.Create;
-                 slTemp.Sorted := true;
-                 slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMaskField.Text, True, True);
-                 for j := 0 to slTemp.Count -1 do
-                   begin
-                     FilesFoundToCopy.Add(slTemp.Strings[j]);
-                   end;
-               finally
-                 slTemp.Free;
-               end;
-             end;
-           finally
-             //
-           end;
-         end
-       else                                          // ... but does NOT want a file mask for all selected folders
-         begin
-           try
-             FilesFoundToCopy := TStringListUTF8.Create;
-             FilesFoundToCopy.Sorted := true;
-             for i := 0 to slMultipleDirNames.Count -1 do
-               begin
-                 SourceDirName    := slMultipleDirNames.Strings[i];
-                 try
-                   slTemp           := TStringListUTF8.Create;
-                   slTemp.Sorted    := true;
-                   slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', True, True);
-                   for j := 0 to slTemp.Count -1 do
-                     begin
-                       FilesFoundToCopy.Add(slTemp.Strings[j]);
-                     end;
-                 finally
-                   slTemp.Free;
-                 end;
-               end;
-           finally
-             //
-           end;
-         end;
-     end
-    else // User does not want recursive but does want a multiple selection. i.e sub directories of multiple dirs are to be ignored.
-    begin
-      try
-      FilesFoundToCopy := TStringListUTF8.Create;
-      FilesFoundToCopy.Sorted := true;
-      for i := 0 to slMultipleDirNames.Count -1 do
-       begin
-         SourceDirName    := slMultipleDirNames.Strings[i];
-         try
-           slTemp           := TStringListUTF8.Create;
-           slTemp.Sorted    := true;
-           slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, '*', False, True);
-           for j := 0 to slTemp.Count -1 do
-             begin
-               FilesFoundToCopy.Add(slTemp.Strings[j]);
-             end;
-         finally
-           slTemp.Free;
-         end;
-       end;
-      finally
-        //
+          FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, True, True);
+        end
+      else
+      begin
+        FilesFoundToCopy := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, False, True);
       end;
-    end;
-  end;
+    end
+  else
+  // Now non default. User has chosen multiple folders, but still wants recursive
+  begin
+    if not chkNoRecursiveCopy.Checked then        // and does want recursive
+     begin
+       try
+       FilesFoundToCopy := TStringListUTF8.Create;
+       FilesFoundToCopy.Sorted := true;
+       for i := 0 to slMultipleDirNames.Count -1 do
+         begin
+           SourceDirName := slMultipleDirNames.Strings[i];
+           try
+             slTemp        := TStringListUTF8.Create;
+             slTemp.Sorted := true;
+             slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, True, True);
+             for j := 0 to slTemp.Count -1 do
+               begin
+                 FilesFoundToCopy.Add(slTemp.Strings[j]);
+               end;
+           finally
+             slTemp.Free;
+           end;
+         end;
+       finally
+         //
+       end;
+      end
+      // User has chosen multiple folders, and does NOT want recursive
+      else
+      begin
+        try
+        FilesFoundToCopy := TStringListUTF8.Create;
+        FilesFoundToCopy.Sorted := true;
+        for i := 0 to slMultipleDirNames.Count -1 do
+         begin
+           SourceDirName    := slMultipleDirNames.Strings[i];
+           try
+             slTemp           := TStringListUTF8.Create;
+             slTemp.Sorted    := true;
+             slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, False, True);
+             for j := 0 to slTemp.Count -1 do
+               begin
+                 FilesFoundToCopy.Add(slTemp.Strings[j]);
+               end;
+           finally
+             slTemp.Free;
+           end;
+         end;
+        finally
+          //
+        end;
+      end;
+  end; // End of file list generation. We now know what needs to be examined
   {$ENDIF}
 
   {$IFDEF LINUX}
@@ -3984,25 +4029,25 @@ begin
       if FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
         if chkCopyHidden.Checked then         // ... but does want hidden files
           begin
-            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, False, True);
+            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, True);
           end;
 
       if FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
         if not chkCopyHidden.Checked then         // ... but does want hidden files
           begin
-            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, False, False);
+            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, False);
           end;
 
        if chkCopyHidden.Checked then         // ... but does want hidden files
          if not FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
            begin
-             FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', False, False);
+             FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, False);
            end;
 
        if not FileTypeMaskCheckBox1.Checked then
          if not chkCopyHidden.Checked then
            begin
-             FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', False, False);
+             FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, False);
            end;
     end;
 
@@ -4011,25 +4056,25 @@ begin
       if chkCopyHidden.Checked then         // ... but does want hidden files
         if FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
           begin
-            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, True, True);
+            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, True, True);
           end;
 
       if chkCopyHidden.Checked then         // ... but does want hidden files
         if not FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
           begin
-            FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', True, True);
+            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, True, True);
           end;
 
       if not chkCopyHidden.Checked then         // ... but does want hidden files
         if FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
           begin
-            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, True, False);
+            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, True, False);
           end;
 
       if not chkCopyHidden.Checked then         // ... but does want hidden files
         if not FileTypeMaskCheckBox1.Checked then   // ...but does want a file mask
           begin
-            FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', true, False);
+            FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, true, False);
           end;
      end;
   {$ENDIF}
@@ -4044,25 +4089,25 @@ begin
         if FileTypeMaskCheckBox1.Checked then
           if chkCopyHidden.Checked then
             begin
-              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, False, True);
+              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, True);
             end;
 
         if FileTypeMaskCheckBox1.Checked then
           if not chkCopyHidden.Checked then
             begin
-              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, False, False);
+              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, False);
             end;
 
          if chkCopyHidden.Checked then
            if not FileTypeMaskCheckBox1.Checked then
              begin
-               FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', False, False);
+               FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, False);
              end;
 
          if not FileTypeMaskCheckBox1.Checked then
            if not chkCopyHidden.Checked then
              begin
-               FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', False, False);
+               FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, False, False);
              end;
       end;
 
@@ -4071,25 +4116,25 @@ begin
         if chkCopyHidden.Checked then
           if FileTypeMaskCheckBox1.Checked then
             begin
-              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, True, True);
+              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, True, True);
             end;
 
         if chkCopyHidden.Checked then
           if not FileTypeMaskCheckBox1.Checked then
             begin
-              FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', True, True);
+              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, True, True);
             end;
 
         if not chkCopyHidden.Checked then
           if FileTypeMaskCheckBox1.Checked then
             begin
-              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMaskField.Text, True, False);
+              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, True, False);
             end;
 
         if not chkCopyHidden.Checked then
           if not FileTypeMaskCheckBox1.Checked then
             begin
-              FilesFoundToCopy := FindAllFilesEx(SourceDirName, '*', true, False);
+              FilesFoundToCopy := FindAllFilesEx(SourceDirName, FileMask, true, False);
             end;
        end;
     {$ENDIF}
@@ -4466,12 +4511,17 @@ begin
         frmDisplayGrid1.btnClipboardResultsCOPYTAB.Enabled := true;
       end;
 
-    ShowMessage('Files copied : '   + IntToStr(NoOfFilesCopiedOK) + #13#10 +
-                'Copy errors : '    + IntToStr(FileCopyErrors)       + #13#10 +
-                'Hash mismatches: ' + IntToStr(HashMismtachCount)    + #13#10 +
-                'Zero byte files: ' + IntToStr(ZeroByteFilesCounter));
 
-     Button8CopyAndHash.Enabled := true;
+  SummaryMessage := CreateMessageDialog(
+                    'Files copied : '   + IntToStr(NoOfFilesCopiedOK)    + #13#10 +
+                    'Copy errors : '    + IntToStr(FileCopyErrors)       + #13#10 +
+                    'Hash mismatches: ' + IntToStr(HashMismtachCount)    + #13#10 +
+                    'Zero byte files: ' + IntToStr(ZeroByteFilesCounter), mtCustom, [mbOK]
+                    );
+  SummaryMessage.Position := poOwnerFormCenter;
+  SummaryMessage.ShowModal;
+
+  Button8CopyAndHash.Enabled := true;
 end;
 
 // Returns the size of the file in bytes on success. -1 otherwise.

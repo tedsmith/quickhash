@@ -1,5 +1,16 @@
 Version History
 ===============
+
+v3.0.2 (Mar 2018)
+Filenames and paths were being truncated at 128 characters in length in the display grid, despite still finding and hashing the files. It was merely a display problem, but quite a signfiicant display problem for logging purposes!
+Better string handling in SQLite dbases unit to ensure strings are not truncated
+TCSVExport resources were not being freed when saving data to CSV. Now they are freed. Still need to work on memory management there though and spend some more time to improve it. 
+The file mask field in FileS tab caused the progress stats to be inaccurate, because they did not take account of the fitlered file total and instead would use the folder file count total. That was fixed. 
+The file mask field in Copy tab caused the progress stats to be inaccurate as well. That was fixed. 
+The "List JUST sub-directories" and "List JUST sub-directories and files" had been disabled during the development of v3.0.0 by mistake. That was also fixed and no outputs the result to a text file. 
+The "Make UPPER" and "Make Lower" buttons in Text tab didnt work properly on OSX (as in the has was not auto-recomputed for the new cases text). That was fixed. 
+The "Switch case" tick box was made wider to avoid truncation. 
+
 v3.0.1 (Feb 2018)
 The "Select File" in File tab generated an unnecessary error if the user cancelled the selection. Now it just cancels as expected
 If QuickHash cannot get a handle to a file because it is open without share permissions by the OS, QuickHash should now silently proceed and simply report that the file could not be accessed in the hash column

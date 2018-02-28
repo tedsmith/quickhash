@@ -25,7 +25,7 @@
 
 unit uKnownHashLists;
 
-{$mode objfpc}
+{$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
 
 interface
 

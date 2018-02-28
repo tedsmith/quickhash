@@ -26,7 +26,7 @@ unit uDisplayGrid;
   only and must not be re-used in another tool if based upon this code.
   The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
 }
-{$mode objfpc}
+{$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
 
 interface
 

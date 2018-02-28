@@ -21,7 +21,7 @@ unit uProgress;
     The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
 }
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
 
 interface
 

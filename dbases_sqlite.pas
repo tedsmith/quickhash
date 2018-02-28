@@ -20,14 +20,14 @@
 }
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
-{$mode objfpc}
+{$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
 
 interface
 
 uses
   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
   LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
-  sqlite3dyn, clipbrd, LazUTF8, LazUTF8Classes;
+  sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes;
 
 type
 
@@ -114,19 +114,30 @@ var
 begin
   // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
   // but didn't seem to work with Linux.
-  // So SQLDBLibraryLoader instances created for each OS
+  // So SQLDBLibraryLoader instances created for each OS sepertaely
+  // and the LibraryName adjusted accordingly from the component default value
   {$ifdef windows}
     SQLDBLibraryLoaderWindows.ConnectionType:='SQLite3';
   {$ifdef CPU32}
     if FileExists('sqlite3-win32.dll') then
     begin
       SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win32.dll';
-    end;
+    end
+    else
+      begin
+        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
+      end;
   {$else ifdef CPU64}
     if FileExists('sqlite3-win64.dll') then
     begin
       SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win64.dll';
-    end;
+    end
+    else
+      begin
+        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
+      end;
   {$endif}
     SQLDBLibraryLoaderWindows.Enabled := true;
     SQLDBLibraryLoaderWindows.LoadLibrary;
@@ -141,12 +152,7 @@ begin
       if SQLIte3Connection1.Connected then
       begin
         lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-      end
-      else
-        begin
-          ShowMessage('Cannot create SQLite database. Missing SQLite DLLs. Functionaliy will be reduced');
-          abort; // Quit
-        end;
+      end;
     end;
     {$endif}
     {$ifdef darwin}
@@ -175,6 +181,8 @@ begin
     else
       begin
         ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib)');
+        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
       end;
     {$endif}
     {$ifdef Linux}
@@ -214,6 +222,8 @@ begin
     if Length(SQLiteLibraryPath) < 1 then
       begin
         ShowMessage('SQLite was not found on this Linux distribution.');
+        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
       end
     else
     begin
@@ -239,11 +249,11 @@ begin
     {$endif}
 end;
 
+
 // Create a fresh SQLite database for each instance of the program
 procedure TfrmSQLiteDBases.CreateDatabase(DBaseName : string);
 begin
   SQLite3Connection1.Close; // Ensure the connection is closed when we start
-  //SQLite3Connection1.Password := txtPass.Text;
   try
     // Since we're making this database for the first time,
     // check whether the file already exists
@@ -278,27 +288,29 @@ begin
       // http://www.sqlite.org/pragma.html#pragma_application_id
       SQLite3Connection1.ExecuteDirect('PRAGMA application_id = ' + IntToStr(application_id) + ';');
 
-      // Here we're setting up a table named "TBL_FILES" in the new database
+      // Here we're setting up a table named "TBL_FILES" in the new database for FileS tab
       // Note AUTOINCREMENT is NOT used! If it is, it causes problems with RowIDs etc after multiple selections
       // Besides, SQLite advice is not to use it unless entirely necessary (http://sqlite.org/autoinc.html)
+      // VARCHAR is set as 32767 to ensure max length of NFTS based filename and paths can be utilised
       SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_FILES"('+
                   ' "id" Integer NOT NULL PRIMARY KEY,'+
-                  ' "FileName" Char(128) NOT NULL,'+
-                  ' "FilePath" Char(128) NOT NULL,'+
-                  ' "HashValue" Char(128) NOT NULL,'+
-                  ' "FileSize" Char(128) NULL,'+
-                  ' "KnownHashFlag" Char(128) NULL);');
+                  ' "FileName" VARCHAR(32767) NOT NULL,'+
+                  ' "FilePath" VARCHAR(32767) NOT NULL,'+
+                  ' "HashValue" VARCHAR NOT NULL,'+
+                  ' "FileSize" VARCHAR NULL,'+
+                  ' "KnownHashFlag" VARCHAR NULL);');
       // Creating an index based upon id in the TBL_FILES Table
       SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FILES_id_idx" ON "TBL_FILES"( "id" );');
 
-      // Here we're setting up a table named "TBL_COPY" in the new database
+      // Here we're setting up a table named "TBL_COPY" in the new database for Copy tab
+      // VARCHAR is set as 32767 to ensure max length of NFTS based filename and paths can be utilised
       SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COPY"('+
                   ' "id" Integer NOT NULL PRIMARY KEY,'+
-                  ' "SourceFilename" Char(128) NOT NULL,'+
-                  ' "SourceHash" Char(128) NOT NULL,'+
-                  ' "DestinationFilename" Char(128) NOT NULL,'+
-                  ' "DestinationHash" Char(128) NOT NULL,'+
-                  ' "DateAttributes" Char(128) NOT NULL);');
+                  ' "SourceFilename" VARCHAR(32767) NOT NULL,'+
+                  ' "SourceHash" VARCHAR NULL,'+
+                  ' "DestinationFilename" VARCHAR(32767) NOT NULL,'+
+                  ' "DestinationHash" VARCHAR NULL,'+
+                  ' "DateAttributes" VARCHAR NULL);');
       // Creating an index based upon id in the TBL_COPY Table
       SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COPIED_FILES_id_idx" ON "TBL_COPY"( "id" );');
 
@@ -557,16 +569,21 @@ begin
   // Go to start of grid
   DBGrid.DataSource.DataSet.First;
   // And export it
-  Exporter := TCSVExporter.Create(nil);
-  ExportSettings := TCSVFormatSettings.Create(true);
-  Exporter.FormatSettings := ExportSettings;
-  Exporter.Dataset := DBGrid.DataSource.DataSet;
-  Exporter.FileName := FileName;
-  if Exporter.Execute > 0 then
-    begin
-      ShowMessage('CSV saved as ' + Filename);
-    end
-  else Showmessage('Could not save to CSV file ' + Filename);
+  try
+    Exporter := TCSVExporter.Create(nil);
+    ExportSettings := TCSVFormatSettings.Create(true);
+    Exporter.FormatSettings := ExportSettings;
+    Exporter.Dataset := DBGrid.DataSource.DataSet;
+    Exporter.FileName := FileName;
+    if Exporter.Execute > 0 then
+      begin
+        ShowMessage('CSV saved as ' + Filename);
+      end
+    else Showmessage('Could not save to CSV file ' + Filename);
+  finally
+    Exporter.Free;
+    ExportSettings.Free;
+  end;
 end;
 
 // Copies a DBGrid content to a temp text file then reads it into clipboard
@@ -608,10 +625,10 @@ begin
             ShowMessage('Grid content now in clipboard.');
           end;
       finally
-        // Nothing to do
+        ExportSettings.Free;
       end;
     finally
-      // Nothing to do
+      Exporter.Free;
     end;
 end;
 
