@@ -106,6 +106,7 @@ implementation
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 var
   i : integer;
+  guid : TGuid;
   strFileNameRandomiser, SafePlaceForDB : string;
   {$ifdef Linux}
     SQLiteLibraryPath : string;
@@ -141,8 +142,14 @@ begin
   {$endif}
     SQLDBLibraryLoaderWindows.Enabled := true;
     SQLDBLibraryLoaderWindows.LoadLibrary;
-    // Set the filename of the sqlite database
-    strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+    if CreateGUID(guid) = 0 then
+    begin
+      strFileNameRandomiser := GUIDToString(guid);
+    end
+    else
+      begin
+        strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
+      end;
     SafePlaceForDB := GetTempDir;
     if ForceDirectories(SafePlaceForDB) then
     begin
@@ -162,8 +169,14 @@ begin
       SQLDBLibraryLoaderOSX.LibraryName := '/usr/lib/libsqlite3.dylib';
       SQLDBLibraryLoaderOSX.Enabled := true;
       SQLDBLibraryLoaderOSX.LoadLibrary;
-      // Set the filename of the sqlite database
-      strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+      if CreateGUID(guid) = 0 then
+      begin
+        strFileNameRandomiser := GUIDToString(guid);
+      end
+      else
+        begin
+          strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
+        end;
       //  write the SQLite database file to system temp;
       SafePlaceForDB := GetTempDir;
       if ForceDirectories(SafePlaceForDB) then
@@ -230,8 +243,14 @@ begin
       SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath; // '/usr/lib/x86_64-linux-gnu/libsqlite3.so.0';
       SQLDBLibraryLoaderLinux.Enabled := true;
       SQLDBLibraryLoaderLinux.LoadLibrary;
-      // Set the filename of the sqlite database
-      strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS', Now); // use a randomised filename suffix to enable multiple instances
+      if CreateGUID(guid) = 0 then
+      begin
+        strFileNameRandomiser := GUIDToString(guid);
+      end
+      else
+        begin
+          strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
+        end;
       //  write the SQLite database file to system temp
       SafePlaceForDB := gettempdir;
       if ForceDirectories(SafePlaceForDB) then
