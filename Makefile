@@ -3,16 +3,20 @@
 
 PREFIX ?= /usr
 BIN = quickhash
-LAZBUILD := /usr/share/lazarus/1.6.4/lazbuild
-LAZRES := /usr/share/lazarus/1.6.4/tools/lazres
+
+LAZARUSDIR ?= /usr/share/lazarus/1.6.4/
+LAZBUILD := $(LAZARUSDIR)lazbuild
+LAZRES := $(LAZARUSDIR)tools/lazres
+
 RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs
-OPTIONS ?=
+
+PACKAGES := HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk \
+ DateTimePicker/zvdatetimectrls.lpk \
+ $(LAZARUSDIR)components/dbexport/lazdbexport.lpk
+
 # use a local temporary config directory to not register
 # the used package(s) permanently and globally
-OPTIONS += --pcp=lazarus_cfg
-OPTIONS += HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk
-OPTIONS += DateTimePicker/zvdatetimectrls.lpk
-OPTIONS += /usr/share/lazarus/1.6.4/components/dbexport/lazdbexport.lpk
+OPTIONS ?= --pcp=lazarus_cfg --lazarusdir=$(LAZARUSDIR)
 
 define \n
 
@@ -36,7 +40,7 @@ $(BIN):
 	  test -f $(FILE).backup || cp $(FILE) $(FILE).backup ; ${\n}\
 	  $(LAZRES) $(FILE) $(FILE:.lrs=.lfm) ; ${\n})
 	cp -f quickhash.ico quickhash_linux.ico
-	$(LAZBUILD) $(OPTIONS) quickhash_linux.lpi
+	$(LAZBUILD) $(OPTIONS) $(PACKAGES) quickhash_linux.lpi
 
 install:
 	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
