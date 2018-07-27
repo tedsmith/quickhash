@@ -9,6 +9,7 @@
 *.dbg
 *.ppu
 *.o
+*.obj
 *.or
 *.a
 
@@ -41,7 +42,9 @@ ppas.bat
 *.lrs.backup
 
 # QuickHash settings
-project1.xml
+/project1.xml
+/quickhash.xml
+/QuickHash.xml
 
 # Application bundle for Mac OS
 *.app/
