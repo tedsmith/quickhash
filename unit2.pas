@@ -2197,13 +2197,13 @@ end;
 procedure TMainForm.ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode
   );
 begin
-  lblFolderAName.Caption := ShellTreeView_FolderA.GetSelectedNodePath;
+  lblFolderAName.Caption := ShellTreeView_FolderA.Path;
 end;
 
 procedure TMainForm.ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode
   );
 begin
-  lblFolderBName.Caption := ShellTreeView_FolderB.GetSelectedNodePath;
+  lblFolderBName.Caption := ShellTreeView_FolderB.Path;
 end;
 
 
@@ -2567,10 +2567,10 @@ begin
   // If UNC mode is DISabled, get FolderA and FolderB paths from list view
   if not cbUNCModeCompFolders.Checked then
   begin
-    FolderA := ShellTreeView_FolderA.GetSelectedNodePath;
+    FolderA := ShellTreeView_FolderA.Path;
     lblFolderAName.Caption:= FolderA;
 
-    FolderB := ShellTreeView_FolderB.GetSelectedNodePath;
+    FolderB := ShellTreeView_FolderB.Path;
     lblFolderBName.Caption:= FolderB;
   end;
 
@@ -3000,7 +3000,7 @@ begin
   // User just wants a sub-folder listing as text
   if CheckBoxListOfDirsOnly.Checked then
   begin
-    SourceDir := DirListA.GetSelectedNodePath;
+    SourceDir := DirListA.Path;
 
     sdFileAndFolderListOnly.Title := 'Save listing as text file...';
     sdFileAndFolderListOnly.InitialDir := GetCurrentDir;
@@ -3021,7 +3021,7 @@ begin
     else   // User just wants a sub-folder and file listing as text
       if CheckBoxListOfDirsAndFilesOnly.Checked then
       begin
-        SourceDir := DirListA.GetSelectedNodePath;
+        SourceDir := DirListA.Path;
         try
           slSubDirAndFilesListing := TStringList.Create;
           slSubDirAndFilesListing := GetSubDirAndFileListing(SourceDir);
