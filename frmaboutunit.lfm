@@ -1,7 +1,7 @@
 object frmAbout: TfrmAbout
-  Left = 540
+  Left = 518
   Height = 435
-  Top = 165
+  Top = 138
   Width = 514
   Caption = 'About QuickHash-GUI'
   ClientHeight = 435
