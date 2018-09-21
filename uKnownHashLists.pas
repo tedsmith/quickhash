@@ -68,6 +68,7 @@ begin
      while not EOF(InFile) do
      begin
        readln(InFile, SourceData);
+       SourceData := Uppercase(SourceData);
        inc(LineCounter, 1);
        // Add the hash value if not already in the list
        if HL1.FindIndexOf(SourceData) < 0 then
