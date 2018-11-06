@@ -3609,6 +3609,9 @@ begin
     pbFile.Position  := 0;
     pbFile.Max       := 100;
 
+    If intFileSize > 0 then
+    begin
+
     case TabRadioGroup2.ItemIndex of
       0: begin
         // MD5
@@ -3776,7 +3779,11 @@ begin
         {$endif}
         end;  // End of xxHash
     end; // end of case statement
-
+  end // end of FileSize greater than zero byte check
+  else
+  begin
+    result := 'ZERO BYTE FILE';
+  end;
   if PageControl1.ActivePage = TabSheet2 then
      begin
        // Last sweep to catch data that fell outside the loop counter
@@ -4805,7 +4812,10 @@ begin
         if bytes > KB then
           result := FormatFloat('#.## KiB', bytes / KB)
         else
-          result := FormatFloat('#.## bytes', bytes) ;
+          if bytes > B then
+          result := FormatFloat('#.## bytes', bytes)
+        else
+          result := '0 bytes';
 end;
 
 

@@ -67,10 +67,13 @@ begin
      reset(InFile);
      while not EOF(InFile) do
      begin
+       // Read input hash list line
        readln(InFile, SourceData);
-       SourceData := Uppercase(SourceData);
+       // Convert input line to uppercase to safeguard against any lowercase conflicts
+       SourceData := Uppercase(Trim(SourceData));
+       // Increment the line counter
        inc(LineCounter, 1);
-       // Add the hash value if not already in the list
+       // Add the hash value, only if not already in the list, avoiding duplicates
        if HL1.FindIndexOf(SourceData) < 0 then
        begin
          HL1.Add(SourceData, @SourceData);

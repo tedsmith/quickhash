@@ -1,6 +1,12 @@
 Version History
 ===============
 
+v3.0.3 (Nov 2018)
+The 'Load Hashlist' functionality in the 'FileS' tab would accept all values but then compare them against computer uppercase hashes strings, meaning any lowercase imported values were not matched. 
+Now all input is converted to uppercase first. 
+The 'FileS' tab was computing file hashes of zero bytes returning the default initialisation hash for the chosen algorithm. I thought I had corrected that a long time ago but I may only have done 
+so for the 'File' tab according to the release notes. That was fixed returning instead 'ZERO BYTE FILE'. 
+
 v3.0.2 (Mar 2018)
 Filenames and paths were being truncated at 128 characters in length in the display grid, despite still finding and hashing the files. It was merely a display problem, but quite a signfiicant display problem for logging purposes!
 Better string handling in SQLite dbases unit to ensure strings are not truncated
