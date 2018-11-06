@@ -1,7 +1,7 @@
 object frmDiskHashingModule: TfrmDiskHashingModule
-  Left = 506
+  Left = 528
   Height = 647
-  Top = 88
+  Top = 105
   Width = 787
   Caption = 'QuickHash v3.0.3 - Disk Hashing Module'
   ClientHeight = 647
@@ -11,7 +11,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   OnCreate = FormCreate
   OnShow = btnRefreshDiskListClick
   Position = poDesktopCenter
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.4.0'
   object Label2: TLabel
     Left = 16
     Height = 13
@@ -96,7 +96,6 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       Top = 48
       Width = 735
       Anchors = [akTop, akLeft, akRight]
-      DefaultItemHeight = 16
       HotTrack = True
       ParentShowHint = False
       PopupMenu = PopupMenu1

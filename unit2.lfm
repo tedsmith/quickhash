@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 318
+  Left = 374
   Height = 733
-  Top = 142
+  Top = 176
   Width = 1023
   AllowDropFiles = True
   Caption = 'QuickHash v3.0.3 (Nov 2018) - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 676
     Top = 24
     Width = 991
-    ActivePage = TabSheet6
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 5
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
@@ -277,18 +277,18 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Hint = 'Hash a single file (useful for hashing disks in Linux)'
       Caption = 'F&ile'
-      ClientHeight = 641
-      ClientWidth = 985
+      ClientHeight = 650
+      ClientWidth = 983
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 120
         Height = 398
         Top = 10
-        Width = 850
+        Width = 848
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Single File Hashing'
         ClientHeight = 377
-        ClientWidth = 846
+        ClientWidth = 844
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -299,7 +299,7 @@ object MainForm: TMainForm
           Left = 552
           Height = 32
           Top = 47
-          Width = 294
+          Width = 264
           Caption = 'As root, this section can be used to hash disks'#10'e.g. /dev/sdX or /dev/sdaX, or /dev/hdX'
           ParentColor = False
           WordWrap = True
@@ -322,9 +322,9 @@ object MainForm: TMainForm
         end
         object edtFileNameToBeHashed: TEdit
           Left = 6
-          Height = 22
+          Height = 24
           Top = 96
-          Width = 824
+          Width = 822
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           ReadOnly = True
@@ -333,10 +333,10 @@ object MainForm: TMainForm
         end
         object btnHashFile: TButton
           Left = 6
-          Height = 20
+          Height = 23
           Hint = 'Choose a single file to hash (or Linux physical device e.g. /dev/sda)'
           Top = 64
-          Width = 91
+          Width = 83
           AutoSize = True
           Caption = 'Select &File'
           Color = 8454016
@@ -349,16 +349,16 @@ object MainForm: TMainForm
         end
         object StatusBar1: TStatusBar
           Left = 0
-          Height = 15
-          Top = 360
-          Width = 842
+          Height = 20
+          Top = 357
+          Width = 844
           Panels = <>
         end
         object lblDragAndDropNudge: TLabel
           Left = 112
           Height = 16
           Top = 64
-          Width = 127
+          Width = 115
           Caption = 'or drag n drop a file'
           ParentColor = False
         end
@@ -366,7 +366,7 @@ object MainForm: TMainForm
           Left = 6
           Height = 58
           Top = 136
-          Width = 824
+          Width = 822
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           Lines.Strings = (
@@ -387,10 +387,10 @@ object MainForm: TMainForm
         end
         object lbleExpectedHash: TLabeledEdit
           Left = 8
-          Height = 22
+          Height = 24
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated file hash matches it, or not. '
           Top = 264
-          Width = 822
+          Width = 820
           Anchors = [akTop, akLeft, akRight]
           EditLabel.AnchorSideLeft.Control = lbleExpectedHash
           EditLabel.AnchorSideRight.Control = lbleExpectedHash
@@ -399,7 +399,7 @@ object MainForm: TMainForm
           EditLabel.Left = 8
           EditLabel.Height = 16
           EditLabel.Top = 245
-          EditLabel.Width = 822
+          EditLabel.Width = 820
           EditLabel.Caption = 'Expected Hash Value (paste from other utility before or after file hashing)'
           EditLabel.ParentColor = False
           MaxLength = 128
@@ -417,10 +417,10 @@ object MainForm: TMainForm
         end
         object ZVDateTimePickerFileTab: TZVDateTimePicker
           Left = 8
-          Height = 20
+          Height = 24
           Hint = 'Enter date and time (hours and minutes) '#13#10'to start the process. Must be in the future!'
           Top = 32
-          Width = 151
+          Width = 138
           CenturyFrom = 1941
           MaxDate = 72686
           MinDate = 42736
@@ -444,10 +444,10 @@ object MainForm: TMainForm
         end
         object lblschedulertickboxFileTab: TCheckBox
           Left = 8
-          Height = 18
+          Height = 20
           Hint = 'Tick and set a date and time ahead of current time'#13#10'and then select the file to hash.'
           Top = 8
-          Width = 113
+          Width = 108
           Caption = 'Start at a time:'
           OnChange = lblschedulertickboxFileTabChange
           ParentShowHint = False
@@ -484,9 +484,9 @@ object MainForm: TMainForm
         end
         object cbFlipCaseFILE: TCheckBox
           Left = 8
-          Height = 18
+          Height = 20
           Top = 208
-          Width = 93
+          Width = 88
           Caption = 'Switch case'
           OnChange = cbFlipCaseFILEChange
           TabOrder = 9

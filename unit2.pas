@@ -972,6 +972,7 @@ begin
       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
       Application.ProcessMessages;
 
+
       // If the user has ane existing hash to check, compare it here
       if (lbleExpectedHash.Text = '') then exit
       else
@@ -979,11 +980,25 @@ begin
         begin
           if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
             begin
-              Showmessage('Expected hash matches the computed file hash, OK');
+             // Showmessage('Expected hash matches the computed file hash, OK');
+              case QuestionDlg('HASHES MATCH - SUCCESS','Do you understand the hashes match OK?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
+              of
+                 mrYes : ShowMessage('The hash computation succeeded. The computed hash equals your expected hash');
+                 mrNo : ShowMessage('The hash you expected is what has been computed. All looks OK.');
+              else
+                ShowMessage('You cancelled the dialog.');
+              end;
             end
         else
           begin
-            Showmessage('Expected hash DOES NOT match the computed file hash!');
+           // Showmessage('Expected hash DOES NOT match the computed file hash!');
+            case QuestionDlg('HASHES MIS-MATCH - FAILURE','Do you understand the hashes do NOT match?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
+              of
+                 mrYes : ShowMessage('The hash you expected has not been computed.');
+                 mrNo : ShowMessage('The hash you expected is not what has been computed. The file is possibly corrupt or you have input the expected hash incorrectly');
+              else
+                ShowMessage('You cancelled the dialog.');
+              end;
           end;
         end;
      end
@@ -1363,13 +1378,26 @@ begin
           or (Length(trim(lbleExpectedHash.Text)) = 8) then
      begin
        if Uppercase(memFileHashField.Lines[0]) = Trim(Uppercase(lbleExpectedHash.Text)) then
-         begin
-           Showmessage('Expected hash matches the computed file hash, OK');
-         end
-     else
        begin
-         Showmessage('Expected hash DOES NOT match the computed file hash!');
-       end;
+         case QuestionDlg('HASHES MATCH - SUCCESS','Do you understand the hashes match OK?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
+         of
+            mrYes : ShowMessage('The hash computation succeeded. The computed hash equals your expected hash');
+            mrNo : ShowMessage('The hash you expected is what has been computed. All looks OK.');
+         else
+           ShowMessage('You cancelled the dialog.');
+         end;
+       end
+        else
+          begin
+           // Showmessage('Expected hash DOES NOT match the computed file hash!');
+            case QuestionDlg('HASHES MIS-MATCH - FAILURE','Do you understand the hashes do NOT match?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
+            of
+              mrYes : ShowMessage('The hash you expected has not been computed.');
+              mrNo : ShowMessage('The hash you expected is not what has been computed. The file is possibly corrupt or you have input the expected hash incorrectly');
+            else
+              ShowMessage('You cancelled the dialog.');
+            end;
+          end;
      end;
 end;
 
