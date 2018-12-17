@@ -49,7 +49,7 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_DIRECTORY
 ; A Start menu folder selection is a nice to have
 ;Var StartMenuFolder
-; !insertmacro MUI_PAGE_STARTMENU "Application" $StartMenuFolder
+;!insertmacro MUI_PAGE_STARTMENU "Application" $StartMenuFolder
 !insertmacro MUI_PAGE_INSTFILES
 ;!insertmacro MUI_PAGE_FINISH ; A finish page is superfluous
 
@@ -119,6 +119,8 @@ Section "Uninstall"
   Delete "$INSTDIR\sqlite3-win64.dll"
   Delete "$INSTDIR\QuickHash-Windows-x64.exe"
   Delete "$INSTDIR\QuickHash-Windows-x86.exe"
+  Delete "$INSTDIR\QuickHash-Windows-x64.xml"
+  Delete "$INSTDIR\QuickHash-Windows-x86.xml"
   RMDir "$INSTDIR"
 
   ; Files to remove from start menu  
