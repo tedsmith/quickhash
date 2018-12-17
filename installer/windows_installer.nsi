@@ -20,13 +20,13 @@ OutFile "QuickHash_GUI_v3.0.2_Windows.exe"
 !define APPNAME "QuickHash"
 
 ; Default installation folder
-InstallDir "$PROGRAMFILES\${APPNAME}"
+InstallDir "$LOCALAPPDATA\${APPNAME}"
   
 ; Get installation folder from registry if available
-InstallDirRegKey HKLM "Software\${APPNAME}" ""
+InstallDirRegKey HKCU "Software\${APPNAME}" ""
 
 ; Request application privileges to write programs folder (for Windows Vista and above)
-RequestExecutionLevel admin
+RequestExecutionLevel user
 
 ;--------------------------------
 ; Interface Settings
@@ -49,7 +49,7 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_DIRECTORY
 ; A Start menu folder selection is a nice to have
 ;Var StartMenuFolder
-; !insertmacro MUI_PAGE_STARTMENU "Application" $StartMenuFolder
+;!insertmacro MUI_PAGE_STARTMENU "Application" $StartMenuFolder
 !insertmacro MUI_PAGE_INSTFILES
 ;!insertmacro MUI_PAGE_FINISH ; A finish page is superfluous
 
@@ -86,7 +86,7 @@ Section "-QuickHash GUI" SecMainApplication
   createShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
   ; Store installation folder in Registry
-  WriteRegStr HKLM "Software\${APPNAME}" "" $INSTDIR
+  WriteRegStr HKCU "Software\${APPNAME}" "" $INSTDIR
   
   ; Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -119,6 +119,8 @@ Section "Uninstall"
   Delete "$INSTDIR\sqlite3-win64.dll"
   Delete "$INSTDIR\QuickHash-Windows-x64.exe"
   Delete "$INSTDIR\QuickHash-Windows-x86.exe"
+  Delete "$INSTDIR\QuickHash-Windows-x64.xml"
+  Delete "$INSTDIR\QuickHash-Windows-x86.xml"
   RMDir "$INSTDIR"
 
   ; Files to remove from start menu  
@@ -128,6 +130,6 @@ Section "Uninstall"
   RMDir "$SMPROGRAMS\${APPNAME}"
 
   ; Delete from registry key
-  DeleteRegKey /ifempty HKLM "Software\${APPNAME}"
+  DeleteRegKey /ifempty HKCU "Software\${APPNAME}"
 
 SectionEnd
