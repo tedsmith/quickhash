@@ -3826,7 +3826,10 @@ begin
      end;
     Application.ProcessMessages;
     // Free the source file if it was successfully opened for read access
-    if fsFileToBeHashed.Handle > -1 then fsFileToBeHashed.free;
+    // v3.0.2 I added this :
+    // if fsFileToBeHashed.Handle > -1 then fsFileToBeHashed.free;
+    // but it was not freeing the handle. So changed to this:
+    if assigned(fsFileToBeHashed) then fsFileToBeHashed.free;
   end
   else result := 'File could not be accessed.'
 end;
