@@ -13,6 +13,12 @@ A feature request was made asking for a clearer message when computed hashes do 
 by the user. So a new message dialog is now shown that tries to make it very clear the hashes do or do not match for
 single file hashing in the 'File' tab or when using 'drag and drop'. 
 
+The exe version has been updated to the correct numbering for the version (forgot to update in the project file last time). 
+
+The program will now show either "64-bit" or "32-bit" in the title if its 64 or 32 bit accordingly. 
+
+The 'About' menu updated and re-aligned for word-wrap, to try and make it look neater. 
+
 
 v3.0.2 (Mar 2018)
 Filenames and paths were being truncated at 128 characters in length in the display grid, despite still finding and hashing the files. It was merely a display problem, but quite a signfiicant display problem for logging purposes!

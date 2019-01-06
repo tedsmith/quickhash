@@ -650,6 +650,7 @@ begin
   AlgorithmChoiceRadioBox4.Items.Strings[4] := 'xxHash64';
   AlgorithmChoiceRadioBox5.Items.Strings[4] := 'xxHash64';
   AlgorithmChoiceRadioBox6.Items.Strings[4] := 'xxHash64';
+  MainForm.Caption := MainForm.Caption + ', 64-bit';
   {$else if CPU32}
   AlgorithmChoiceRadioBox1.Items.Strings[4] := 'xxHash32';
   AlgorithmChoiceRadioBox2.Items.Strings[4] := 'xxHash32';
@@ -657,6 +658,7 @@ begin
   AlgorithmChoiceRadioBox4.Items.Strings[4] := 'xxHash32';
   AlgorithmChoiceRadioBox5.Items.Strings[4] := 'xxHash32';
   AlgorithmChoiceRadioBox6.Items.Strings[4] := 'xxHash32';
+  MainForm.Caption := MainForm.Caption + ', 32-bit';
   {$endif}
 
   // Better to have some folder icons for each node of the tree but

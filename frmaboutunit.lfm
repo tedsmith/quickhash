@@ -1,47 +1,39 @@
 object frmAbout: TfrmAbout
   Left = 518
-  Height = 435
+  Height = 554
   Top = 138
   Width = 514
   Caption = 'About QuickHash-GUI'
-  ClientHeight = 435
+  ClientHeight = 554
   ClientWidth = 514
   Position = poMainFormCenter
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.4.0'
   object memAbout: TMemo
     Left = 16
-    Height = 370
+    Height = 489
     Top = 24
     Width = 484
     Anchors = [akTop, akLeft, akRight, akBottom]
     Lines.Strings = (
-      'Developed by Ted Smith (c) 2011-2018 '
+      'Developed by Ted Smith (c) 2011-2019'
       ''
-      'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at '
-      'http://sourceforge.net/projects/quickhash)'
+      'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''
-      'Donations are welcomed! The website is hosted using AWS which is actually quite expensive! If '
-      'you have found QuickHash useful to you or your business, please consider donating using '
-      'PayPal at https://paypal.me/quickhash'
+      'Donations are welcomed! The website is hosted using AWS which is actually quite expensive! If you have found QuickHash useful to you or your business, please consider donating using PayPal at https://paypal.me/quickhash'
       ''
       'The development Github Page is : https://github.com/tedsmith/quickhash'
       ''
-      'Contributions made by DaReal Shinji (http://www.github.com/darealshinji), especially '
-      'regarding repository maintenance and Debian packaging are both welcomed and '
-      'acknowledged, in '
-      'addition to the Lazarus forum members, who are always so helpful. '
+      'Bug Tracker is available at http://www.quickhash-gui.org/bug-tracker/ where bugs and feature requests can be submitted, reviewed and tracked. '
       ''
-      'Bug Tracker is available at http://www.quickhash-gui.org/bug-tracker/ where bugs and feature '
-      'requests can be submitted, reviewed and tracked. '
+      'Contributions made by DaReal Shinji (http://www.github.com/darealshinji), especially regarding repository maintenance and Debian packaging are both welcomed and acknowledged, in addition to the Lazarus forum members, who are always so helpful. '
       ''
-      'For a private communication or technical help which the website does not answer, you can e-'
-      'mail me at tedsmith@quickhash-gui.org, however, this should not be used as the means to ask '
-      'about bugs or problems. Please use the bug tracker for that so that other users can benefit. '
+      'For a private communication or technical help which the website does not answer, you can e-mail me at tedsmith@quickhash-gui.org, however, this should not be used as the means to ask about bugs or problems. Please use the bug tracker for that so that other users can benefit. '
       ''
-      'Created using the Lazarus IDE and the Freepascal Compiler. QuickHash is open-source and '
-      'released under the GPL2 license. '
-      'The HashLib4Pascal library is licensed under MIT and developed by the talented Ugochukwu '
-      'Mmaduekwe Stanley (aka Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'
+      'Created using the Lazarus IDE and the Freepascal Compiler (www.lazarus-ide.org). '
+      ''
+      'The HashLib4Pascal library is licensed under MIT and developed by the talented Ugochukwu Mmaduekwe Stanley (aka Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'
+      ''
+      'QuickHash is open-source and released under the GPL2 license. '
     )
     ReadOnly = True
     ScrollBars = ssAutoBoth
@@ -50,9 +42,9 @@ object frmAbout: TfrmAbout
   object Button1: TButton
     AnchorSideTop.Control = memAbout
     AnchorSideTop.Side = asrBottom
-    Left = 304
+    Left = 32
     Height = 25
-    Top = 394
+    Top = 513
     Width = 147
     Caption = 'Close'
     OnClick = Button1Click
