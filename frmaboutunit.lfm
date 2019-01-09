@@ -11,7 +11,7 @@ object frmAbout: TfrmAbout
   object memAbout: TMemo
     Left = 16
     Height = 489
-    Top = 24
+    Top = 16
     Width = 484
     Anchors = [akTop, akLeft, akRight, akBottom]
     Lines.Strings = (
@@ -44,7 +44,7 @@ object frmAbout: TfrmAbout
     AnchorSideTop.Side = asrBottom
     Left = 32
     Height = 25
-    Top = 513
+    Top = 505
     Width = 147
     Caption = 'Close'
     OnClick = Button1Click

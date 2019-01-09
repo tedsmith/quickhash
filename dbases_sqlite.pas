@@ -792,7 +792,7 @@ procedure TfrmSQLiteDBases.SortByID(DBGrid : TDBGrid);
 begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                           'FROM TBL_FILES ORDER BY Id';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
@@ -811,7 +811,7 @@ procedure TfrmSQLiteDBases.SortByFileName(DBGrid : TDBGrid);
 begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                           'FROM TBL_FILES ORDER BY FileName';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
@@ -831,7 +831,7 @@ procedure TfrmSQLiteDBases.SortByFilePath(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                         'FROM TBL_FILES ORDER BY FilePath';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
@@ -851,7 +851,7 @@ procedure TfrmSQLiteDBases.SortByHash(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                         'FROM TBL_FILES ORDER BY HashValue';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;

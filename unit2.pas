@@ -2071,7 +2071,8 @@ begin
 
   HashListChooserDialog.Title := 'Choose exisiting text hash set...';
   HashListChooserDialog.InitialDir := GetCurrentDir;
-  HashListChooserDialog.Filter := 'Text|*.txt';
+  //HashListChooserDialog.Filter := 'Text|*.txt'; 'CSV|*.csv';
+  HashListChooserDialog.Filter := 'Text files|*.txt;*.csv';
   HashListChooserDialog.DefaultExt:= 'txt';
   HashListChooserDialog.Options:= [ofReadOnly];
   if HashListChooserDialog.Execute then

@@ -1,23 +1,31 @@
 ﻿Version History
 ===============
 
-v3.0.3 (Nov 2018)
+v3.0.3 (Jan 2019)
 
 The 'Load Hashlist' functionality in the 'FileS' tab would accept all values but then compare them against computer uppercase hashes strings, meaning any lowercase imported values were not matched. 
 Now all input is converted to uppercase first. 
+
+The 'Load Hashlist' functionality in the 'FileS' tab can now accept CSV saved files (but must still contain only one column of hash values!)
+
+The 'Known Hash Flag' column, where it reports either YES or NO after importing a hash list, was only showing with the default display grid in FileS tab. If the user resorted, the column would vanish. Now it should remain for all sorting. 
+
+The filehandles were not always being released properly, even if hashing completed OK, thus leaving open handles to processed files. A bug I introduced by mistake in v3.0.2. by trying to free handles more gracefully! That was fixed. Report issues with this if still not working properly. 
 
 The 'FileS' tab was computing file hashes of zero bytes returning the default initialisation hash for the chosen algorithm. I thought I had corrected that a long time ago but I may only have done 
 so for the 'File' tab according to the release notes. That was fixed returning instead 'ZERO BYTE FILE'. 
 
 A feature request was made asking for a clearer message when computed hashes do not match expected hash values input
-by the user. So a new message dialog is now shown that tries to make it very clear the hashes do or do not match for
-single file hashing in the 'File' tab or when using 'drag and drop'. 
+by the user. So a new message dialog is now shown that tries to make it very clear the hashes do, or do not, match for
+single file hashing in the 'File' tab or when using 'drag and drop' feature. 
 
 The exe version has been updated to the correct numbering for the version (forgot to update in the project file last time). 
 
-The program will now show either "64-bit" or "32-bit" in the title if its 64 or 32 bit accordingly. 
+The program will now show either "64-bit" or "32-bit" in the main title if its 64 or 32 bit accordingly. 
 
-The 'About' menu updated and re-aligned for word-wrap, to try and make it look neater. 
+The 'About' dialog has been updated and also re-aligned for word-wrap, to try and make it look neater. 
+
+The 'About' dialog was showing an incorrect link to the donations page! Corrected to https://paypal.me/quickhashgui 
 
 
 v3.0.2 (Mar 2018)

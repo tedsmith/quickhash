@@ -9,12 +9,12 @@ object frmSQLiteDBases: TfrmSQLiteDBases
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.4.0'
   object lblConnectionStatus: TLabel
     Left = 32
-    Height = 13
+    Height = 15
     Top = 32
-    Width = 72
+    Width = 81
     Caption = 'Not Connected'
     ParentColor = False
   end
@@ -27,7 +27,6 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     FieldDefs = <>
     Database = SQLite3Connection1
     Transaction = SQLTransaction1
-    Options = []
     Params = <>
     left = 48
     top = 80
@@ -35,7 +34,6 @@ object frmSQLiteDBases: TfrmSQLiteDBases
   object SQLTransaction1: TSQLTransaction
     Active = False
     Database = SQLite3Connection1
-    Options = []
     left = 48
     top = 224
   end
@@ -44,7 +42,6 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     LoginPrompt = False
     KeepConnection = False
     Transaction = SQLTransaction1
-    Options = []
     left = 48
     top = 296
   end
@@ -69,7 +66,6 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     FieldDefs = <>
     Database = SQLite3Connection1
     Transaction = SQLTransaction1
-    Options = []
     Params = <>
     left = 160
     top = 80
