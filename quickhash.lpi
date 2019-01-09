@@ -57,9 +57,10 @@
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="52"/>
-        <CursorPos X="34" Y="85"/>
+        <TopLine Value="84"/>
+        <CursorPos Y="106"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -355,9 +356,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="frmAboutUnit"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="34"/>
+        <TopLine Value="27"/>
         <CursorPos X="8" Y="39"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -452,7 +452,7 @@
         <UsageCount Value="9"/>
       </Unit49>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="unit2.pas"/>
         <Caret Line="1425" Column="23" TopLine="1396"/>
@@ -569,6 +569,10 @@
         <Filename Value="unit2.pas"/>
         <Caret Line="4875" Column="25" TopLine="4870"/>
       </Position29>
+      <Position30>
+        <Filename Value="frmaboutunit.pas"/>
+        <Caret Line="39" Column="8" TopLine="27"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
