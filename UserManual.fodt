@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:creation-date>2014-10-23T21:44:47.490000000</meta:creation-date><meta:editing-duration>PT5H28M1S</meta:editing-duration><meta:editing-cycles>80</meta:editing-cycles><meta:generator>LibreOffice/5.3.4.2$Windows_x86 LibreOffice_project/f82d347ccc0be322489bf7da61d7e4ad13fe2ff3</meta:generator><dc:title>QuickHash GUI User Manual (c) Ted Smith 2011 - 2018</dc:title><dc:date>2019-01-09T11:40:10.973000000</dc:date><meta:document-statistic meta:table-count="1" meta:image-count="13" meta:object-count="0" meta:page-count="26" meta:paragraph-count="209" meta:word-count="7518" meta:character-count="43852" meta:non-whitespace-character-count="36383"/></office:meta>
+ <office:meta><meta:creation-date>2014-10-23T21:44:47.490000000</meta:creation-date><meta:editing-duration>PT5H29M9S</meta:editing-duration><meta:editing-cycles>81</meta:editing-cycles><meta:generator>LibreOffice/5.4.4.2$MacOSX_X86_64 LibreOffice_project/2524958677847fb3bb44820e40380acbe820f960</meta:generator><dc:title>QuickHash GUI User Manual (c) Ted Smith 2011 - 2019</dc:title><dc:date>2019-01-09T17:53:31.071526092</dc:date><meta:document-statistic meta:table-count="1" meta:image-count="13" meta:object-count="0" meta:page-count="27" meta:paragraph-count="209" meta:word-count="7518" meta:character-count="43851" meta:non-whitespace-character-count="36382"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">716194</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">757509</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">38269</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">16358</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">22932</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">10724</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">14847</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">731471</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">5756</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">57916</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">716194</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">38268</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">732550</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">757509</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">22931</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">768232</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -29,90 +29,90 @@
    </config:config-item-map-indexed>
   </config:config-item-set>
   <config:config-item-set config:name="ooo:configuration-settings">
-   <config:config-item config:name="ProtectForm" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrinterName" config:type="string"/>
-   <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="CurrentDatabaseDataSource" config:type="string"/>
-   <config:config-item config:name="LinkUpdateMode" config:type="short">1</config:config-item>
-   <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="FloattableNomargins" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UnbreakableNumberings" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="AddVerticalFrameOffsets" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="BackgroundParaOverDrawings" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AddParaTableSpacing" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="CurrentDatabaseCommand" config:type="string"/>
-   <config:config-item config:name="AlignTabStopPosition" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrinterSetup" config:type="base64Binary"/>
-   <config:config-item config:name="IsKernAsianPunctuation" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CharacterCompressionType" config:type="short">0</config:config-item>
-   <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="SurroundTextWrapSmall" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="SmallCapsPercentage66" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="CurrentDatabaseCommandType" config:type="int">0</config:config-item>
-   <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintSingleJobs" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrinterIndependentLayout" config:type="string">high-resolution</config:config-item>
-   <config:config-item config:name="EmbedSystemFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="DoNotCaptureDrawObjsOnPage" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UseFormerObjectPositioning" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="IsLabelDocument" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AddFrameOffsets" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AllowPaddingWithoutBorders" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AddExternalLeading" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UseOldNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="OutlineLevelYieldsNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="DoNotResetParaAttrsForNumFont" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AllowPrintJobCancel" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UseFormerLineSpacing" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UseFormerTextWrapping" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="RedlineProtectionKey" config:type="base64Binary"/>
-   <config:config-item config:name="ConsiderTextWrapOnObjPos" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="DoNotJustifyLinesWithManualBreak" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="EmbedFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TableRowKeep" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="IgnoreTabsAndBlanksForLineCalculation" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="RsidRoot" config:type="int">532311</config:config-item>
-   <config:config-item config:name="LoadReadonly" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ClipAsCharacterAnchoredWriterFlyFrames" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UnxForceZeroExtLeading" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TabAtLeftIndentForParagraphsInList" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">9334655</config:config-item>
-   <config:config-item config:name="MathBaselineAlignment" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="InvertBorderSpacing" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CollapseEmptyCellPara" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="TabOverflow" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="StylesNoDefault" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ClippedPictures" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TabOverMargin" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TreatSingleColumnBreakAsPageBreak" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ApplyParagraphMarkFormatToNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PropLineSpacingShrinksFirstLine" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="SubtractFlysAnchoredAtFlys" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintAnnotationMode" config:type="short">0</config:config-item>
-   <config:config-item config:name="PrintGraphics" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintBlackFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintProspect" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintLeftPages" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrintControls" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrintPageBackground" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintTextPlaceholder" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintDrawings" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintHiddenText" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintTables" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintReversed" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintAnnotationMode" config:type="short">0</config:config-item>
+   <config:config-item config:name="PrintGraphics" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintLeftPages" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintProspect" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintRightPages" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrintFaxName" config:type="string"/>
    <config:config-item config:name="PrintPaperFromSetup" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintTextPlaceholder" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ApplyParagraphMarkFormatToNumbering" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintReversed" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TabOverMargin" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="EmbedFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="SurroundTextWrapSmall" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="BackgroundParaOverDrawings" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ClippedPictures" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="FloattableNomargins" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UnbreakableNumberings" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="EmbedSystemFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TabOverflow" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintTables" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintSingleJobs" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="SmallCapsPercentage66" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="CollapseEmptyCellPara" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseFormerLineSpacing" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ProtectForm" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrinterSetup" config:type="base64Binary"/>
+   <config:config-item config:name="CurrentDatabaseCommand" config:type="string"/>
+   <config:config-item config:name="ClipAsCharacterAnchoredWriterFlyFrames" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="DoNotCaptureDrawObjsOnPage" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="CurrentDatabaseCommandType" config:type="int">0</config:config-item>
+   <config:config-item config:name="LoadReadonly" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="DoNotResetParaAttrsForNumFont" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="StylesNoDefault" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="AlignTabStopPosition" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="LinkUpdateMode" config:type="short">1</config:config-item>
+   <config:config-item config:name="DoNotJustifyLinesWithManualBreak" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="RsidRoot" config:type="int">532311</config:config-item>
+   <config:config-item config:name="PropLineSpacingShrinksFirstLine" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ConsiderTextWrapOnObjPos" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TabAtLeftIndentForParagraphsInList" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="RedlineProtectionKey" config:type="base64Binary"/>
+   <config:config-item config:name="UnxForceZeroExtLeading" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintDrawings" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseFormerTextWrapping" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="CurrentDatabaseDataSource" config:type="string"/>
+   <config:config-item config:name="AllowPrintJobCancel" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="SubtractFlysAnchoredAtFlys" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddExternalLeading" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddVerticalFrameOffsets" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TreatSingleColumnBreakAsPageBreak" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="MathBaselineAlignment" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="AddFrameOffsets" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="IsLabelDocument" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="MsWordCompTrailingBlanks" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="OutlineLevelYieldsNumbering" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrinterName" config:type="string"/>
+   <config:config-item config:name="IsKernAsianPunctuation" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrinterIndependentLayout" config:type="string">high-resolution</config:config-item>
+   <config:config-item config:name="PrintBlackFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TableRowKeep" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
+   <config:config-item config:name="Rsid" config:type="int">9376631</config:config-item>
+   <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="IgnoreTabsAndBlanksForLineCalculation" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="InvertBorderSpacing" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseOldNumbering" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseFormerObjectPositioning" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintHiddenText" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="CharacterCompressionType" config:type="short">0</config:config-item>
+   <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddParaTableSpacing" config:type="boolean">true</config:config-item>
   </config:config-item-set>
  </office:settings>
  <office:scripts>
@@ -139,7 +139,7 @@
  <office:styles>
   <style:default-style style:family="graphic">
    <style:graphic-properties svg:stroke-color="#000000" draw:fill-color="#99ccff" fo:wrap-option="no-wrap" draw:shadow-offset-x="0.3cm" draw:shadow-offset-y="0.3cm" draw:start-line-spacing-horizontal="0.283cm" draw:start-line-spacing-vertical="0.283cm" draw:end-line-spacing-horizontal="0.283cm" draw:end-line-spacing-vertical="0.283cm" style:flow-with-text="false"/>
-   <style:paragraph-properties style:text-autospace="ideograph-alpha" style:line-break="strict" style:writing-mode="lr-tb" style:font-independent-line-spacing="false">
+   <style:paragraph-properties style:text-autospace="ideograph-alpha" style:line-break="strict" style:font-independent-line-spacing="false">
     <style:tab-stops/>
    </style:paragraph-properties>
    <style:text-properties style:use-window-font-color="true" style:font-name="Times New Roman" fo:font-size="12pt" fo:language="en" fo:country="GB" style:letter-kerning="true" style:font-name-asian="SimSun" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Mangal" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN"/>
@@ -1688,7 +1688,7 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:footer>
-    <text:p text:style-name="P1"><text:span text:style-name="T1"><text:title>QuickHash GUI User Manual (c) Ted Smith 2011 - 2018</text:title></text:span><text:span text:style-name="T1"> <text:s/></text:span><text:s text:c="17"/>Page <text:page-number text:select-page="current" text:page-adjust="-1">24</text:page-number> of <text:page-count>26</text:page-count></text:p>
+    <text:p text:style-name="P1"><text:span text:style-name="T1"><text:title>QuickHash GUI User Manual (c) Ted Smith 2011 - 2019</text:title></text:span><text:span text:style-name="T1"><text:s text:c="2"/></text:span><text:s text:c="17"/>Page <text:page-number text:select-page="current" text:page-adjust="-1">26</text:page-number><text:s/>of <text:page-count>27</text:page-count></text:p>
    </style:footer>
   </style:master-page>
   <style:master-page style:name="First_20_Page" style:display-name="First Page" style:page-layout-name="pm1" style:next-style-name="Standard">
@@ -1711,7 +1711,7 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
    </text:sequence-decls>
-   <text:p text:style-name="P163"/>
+   <text:p text:style-name="P163"><text:soft-page-break/></text:p>
    <text:p text:style-name="P8"/>
    <text:p text:style-name="P3"/>
    <text:p text:style-name="P4">QuickHash <text:span text:style-name="T106">GUI</text:span></text:p>
@@ -1725,14 +1725,14 @@
    <text:p text:style-name="P37"/>
    <text:p text:style-name="P37"/>
    <text:p text:style-name="P37"><text:span text:style-name="T47">User Manual : </text:span><text:span text:style-name="T48">v</text:span><text:span text:style-name="T56">3.0.</text:span><text:span text:style-name="T59">3</text:span></text:p>
-   <text:p text:style-name="P38">Copyright (c) 201<text:span text:style-name="T114">1-2018</text:span> <text:span text:style-name="T62">Ted Smith </text:span></text:p>
+   <text:p text:style-name="P38">Copyright (c) 201<text:span text:style-name="T114">1-2019</text:span> <text:span text:style-name="T62">Ted Smith </text:span></text:p>
    <text:p text:style-name="P38">All rights reserved</text:p>
    <text:p text:style-name="P39"><text:a xlink:type="simple" xlink:href="http://quickhash-gui.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T124">http://www.QuickHash-gui.org</text:span></text:a><text:span text:style-name="T124"> </text:span></text:p>
    <text:p text:style-name="P39"><text:span text:style-name="T124">(and previously </text:span><text:a xlink:type="simple" xlink:href="https://sourceforge.net/projects/quickhash" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T124">https://sourceforge.net/projects/QuickHash</text:span></text:a><text:span text:style-name="T124">)</text:span></text:p>
    <text:p text:style-name="P39"/>
    <text:p text:style-name="P39"/>
    <text:p text:style-name="P39"/>
-   <text:p text:style-name="P40"><text:soft-page-break/><text:toc-mark-start text:id="IMark208301852" text:outline-level="1"/><text:span text:style-name="T1"><text:chapter text:display="number-and-name" text:outline-level="1"/></text:span><text:span text:style-name="T1"><text:chapter text:display="number-and-name" text:outline-level="1"/></text:span><text:span text:style-name="T9">1.0 </text:span><text:span text:style-name="T1">Pre-amble</text:span><text:toc-mark-end text:id="IMark208301852"/></text:p>
+   <text:p text:style-name="P40"><text:soft-page-break/><text:toc-mark-start text:id="IMark5860698544" text:outline-level="1"/><text:span text:style-name="T1"><text:chapter text:display="number-and-name" text:outline-level="1"/></text:span><text:span text:style-name="T1"><text:chapter text:display="number-and-name" text:outline-level="1"/></text:span><text:span text:style-name="T9">1.0 </text:span><text:span text:style-name="T1">Pre-amble</text:span><text:toc-mark-end text:id="IMark5860698544"/></text:p>
    <text:p text:style-name="P40"/>
    <text:p text:style-name="P40">This manual is designed as a user-aid only. It is not an authority on the subject matter <text:span text:style-name="T62">of hashing algorithms</text:span>, <text:span text:style-name="T110">filesystems or anything else, </text:span>neither in part or in full. The software comes without any warranty, <text:span text:style-name="T152">including any future digitally codesigned versions</text:span>. <text:span text:style-name="T110">Use it at your own risk and if you are unsure of any results, please consider cross referencing your findings with other software. There are many free and commercial data hashing tools available to cross-reference your findings.</text:span></text:p>
    <text:p text:style-name="P40"/>
@@ -1770,7 +1770,7 @@
    <text:p text:style-name="P9"/>
    <text:p text:style-name="P9"/>
    <text:p text:style-name="P9"/>
-   <text:p text:style-name="P121"><text:soft-page-break/><text:toc-mark-start text:id="IMark208301852" text:outline-level="1"/><text:span text:style-name="T99">2.0 </text:span>Introduction<text:toc-mark-end text:id="IMark208301852"/></text:p>
+   <text:p text:style-name="P121"><text:soft-page-break/><text:toc-mark-start text:id="IMark5860698544" text:outline-level="1"/><text:span text:style-name="T99">2.0 </text:span>Introduction<text:toc-mark-end text:id="IMark5860698544"/></text:p>
    <text:p text:style-name="P9"/>
    <text:p text:style-name="P53">QuickHash is quite simply a free, open source, cross platform, <text:span text:style-name="T88">fast and easy-to-use</text:span> data hashing tool for M<text:span text:style-name="T110">icrosoft</text:span> Windows, <text:span text:style-name="T110">Desktop GNU/</text:span>Linux <text:span text:style-name="T110">distributions like Mint, Zorin OS, and Ubuntu, and</text:span> Apple Mac <text:span text:style-name="T117">Yosemite, Sierra (and hopefully above)</text:span>. </text:p>
    <text:p text:style-name="P40"/>
@@ -1782,7 +1782,7 @@
    <text:p text:style-name="P152"/>
    <text:p text:style-name="P150"><text:span text:style-name="T82">Text </text:span><text:span text:style-name="T83">| File | FileS | Copy | </text:span><text:span text:style-name="T84">Compare Two Files | </text:span><text:span text:style-name="T83">Compare </text:span><text:span text:style-name="T85">Two Folders </text:span><text:span text:style-name="T83">| Disks </text:span><text:span text:style-name="T86">| Base64 Data</text:span></text:p>
    <text:p text:style-name="P151"/>
-   <text:p text:style-name="P102"><text:alphabetical-index-mark-start text:id="IMark208301852" text:key1="1"/><text:alphabetical-index-mark-start text:id="IMark208301036"/><text:span text:style-name="T9">2.1 </text:span><text:span text:style-name="T1">What is a hash?</text:span><text:alphabetical-index-mark-end text:id="IMark208301036"/><text:alphabetical-index-mark-end text:id="IMark208301852"/></text:p>
+   <text:p text:style-name="P102"><text:alphabetical-index-mark-start text:id="IMark5860698544" text:key1="1"/><text:alphabetical-index-mark-start text:id="IMark5860696912"/><text:span text:style-name="T9">2.1 </text:span><text:span text:style-name="T1">What is a hash?</text:span><text:alphabetical-index-mark-end text:id="IMark5860696912"/><text:alphabetical-index-mark-end text:id="IMark5860698544"/></text:p>
    <text:p text:style-name="P17"/>
    <text:p text:style-name="P54"><text:span text:style-name="T63">The simplest explanation is that it is like a unique fingerprint of digital data. There are many common hash algorithms, but QuickHash is coded to utilise four of the common mainstream ones : </text:span><text:a xlink:type="simple" xlink:href="http://en.wikipedia.org/wiki/MD5" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T63">MD5</text:span></text:a><text:span text:style-name="T63">,</text:span><text:a xlink:type="simple" xlink:href="http://en.wikipedia.org/wiki/SHA-1" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T63"> SHA-1</text:span></text:a><text:span text:style-name="T63">, </text:span><text:a xlink:type="simple" xlink:href="http://en.wikipedia.org/wiki/SHA-2" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T63">SHA256</text:span></text:a><text:span text:style-name="T63"> and </text:span><text:a xlink:type="simple" xlink:href="http://en.wikipedia.org/wiki/SHA-2" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T63">SHA512</text:span></text:a><text:span text:style-name="T63"> with the inclusion of the increasingly popular xxHash from <text:s/>v2.8.0 of the program. Very basically, if you compute the MD5 value of your typed name, the result is theoretically unique to one in <text:s/>3.4028...E38, which, put more simply is a probability of one in 340 billion, billion, billion, billion (1 undecillion), meaning that the chances of any other digital data other than that string of characters generating the same hash are infinitely unlikely (engineered collisions aside). <text:s text:c="2"/></text:span></text:p>
    <text:p text:style-name="P102"/>
@@ -1946,7 +1946,7 @@
    <text:p text:style-name="P139"/>
    <text:p text:style-name="P54"><text:span text:style-name="T63">QuickHash adopts </text:span><text:a xlink:type="simple" xlink:href="http://csrc.nist.gov/groups/ST/hash/documents/Puniya_hashDesign.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T63">Merkle–Damgård constructions</text:span></text:a><text:span text:style-name="T63"> which theoretically enables a method of building collision-resistant cryptographic hash functions. More can be read about that online. </text:span></text:p>
    <text:p text:style-name="P104"/>
-   <text:p text:style-name="P18"><text:alphabetical-index-mark-start text:id="IMark208301852"/><text:span text:style-name="T99">2.2 </text:span>Cross Platform<text:alphabetical-index-mark-end text:id="IMark208301852"/></text:p>
+   <text:p text:style-name="P18"><text:alphabetical-index-mark-start text:id="IMark5860698544"/><text:span text:style-name="T99">2.2 </text:span>Cross Platform<text:alphabetical-index-mark-end text:id="IMark5860698544"/></text:p>
    <text:p text:style-name="P104"/>
    <text:p text:style-name="P105">QuickHash was originally designed for Linux to enable less advanced Linux users to easily “and quickly” <text:span text:style-name="T153">(|thus the name)</text:span> generate a list of hash values for files using a simple graphical interface without having to resort to command line tools like SHA1SUM. It was specifically designed to run with live boot CD&apos;s like DEFT, CAINE, PALLADIN, HELIX, <text:span text:style-name="T124">PARROT SECURITY</text:span> and others. However, over time, the hashing function<text:span text:style-name="T117">ality has</text:span> improved and indeed now become faster at generating hash values than many other tools – both free and commercial <text:span text:style-name="T117">ones</text:span>. So it is now not only a tool that enables the quick selection of files to hash, but it is also a tool that does compute the hashes quickly. So the name “QuickHash” is really rather fitting. <text:s/></text:p>
    <text:p text:style-name="P106"/>
@@ -1972,9 +1972,9 @@
    <text:p text:style-name="P149"/>
    <text:p text:style-name="P149">The database is named based on the <text:span text:style-name="T162">date and </text:span>time of Quickhash execution to allow multiple instances of the program to run (a separate database will be created for each instance) <text:span text:style-name="T162">from the same launch location</text:span>. </text:p>
    <text:p text:style-name="P107"/>
-   <text:p text:style-name="P122"><text:alphabetical-index-mark-start text:id="IMark208301852"/>3.0 Interface<text:alphabetical-index-mark-end text:id="IMark208301852"/></text:p>
+   <text:p text:style-name="P122"><text:alphabetical-index-mark-start text:id="IMark5860698544"/>3.0 Interface<text:alphabetical-index-mark-end text:id="IMark5860698544"/></text:p>
    <text:p text:style-name="P57"><text:alphabetical-index-mark text:string-value=" "/></text:p>
-   <text:p text:style-name="P57"><text:alphabetical-index-mark-start text:id="IMark208301852"/><text:span text:style-name="T4">Tabs Explained –</text:span><text:span text:style-name="T5"> </text:span><text:span text:style-name="T7">Quick Summary</text:span><text:alphabetical-index-mark-end text:id="IMark208301852"/></text:p>
+   <text:p text:style-name="P57"><text:alphabetical-index-mark-start text:id="IMark5860698544"/><text:span text:style-name="T4">Tabs Explained –</text:span><text:span text:style-name="T5"> </text:span><text:span text:style-name="T7">Quick Summary</text:span><text:alphabetical-index-mark-end text:id="IMark5860698544"/></text:p>
    <text:p text:style-name="P17"/>
    <text:p text:style-name="P54"><text:span text:style-name="T4">Text </text:span><text:span text:style-name="T63">: <text:s/></text:span>For hashing chunks of text like paragraphs <text:span text:style-name="T110">from a file, a name, a character string, a list of values (to be hashed line by line) </text:span>or <text:span text:style-name="T153">public </text:span>key data that can be copied from somewhere <text:span text:style-name="T122">else </text:span>to QuickHash</text:p>
    <text:p text:style-name="P102"/>
@@ -1992,7 +1992,7 @@
    <text:p text:style-name="P42"/>
    <text:p text:style-name="P142"><text:span text:style-name="T1">Base64 Data</text:span>: New to v2.8.3, it allows the user to hash an encoded Base64 file AND generate a hash of it’s decoded counterpart without the user having to create the decoded version. <text:span text:style-name="T153">It also allows the decoding of Base64 encoded data, just for convenience.</text:span> </text:p>
    <text:p text:style-name="P42"/>
-   <text:p text:style-name="P47"><text:alphabetical-index-mark-start text:id="IMark208301852"/><text:span text:style-name="T9">3. </text:span><text:span text:style-name="T4">Tabs Explained –</text:span><text:span text:style-name="T5"> Detailed </text:span><text:span text:style-name="T7">Explanation</text:span><text:alphabetical-index-mark-end text:id="IMark208301852"/></text:p>
+   <text:p text:style-name="P47"><text:alphabetical-index-mark-start text:id="IMark5860698544"/><text:span text:style-name="T9">3. </text:span><text:span text:style-name="T4">Tabs Explained –</text:span><text:span text:style-name="T5"> Detailed </text:span><text:span text:style-name="T7">Explanation</text:span><text:alphabetical-index-mark-end text:id="IMark5860698544"/></text:p>
    <text:p text:style-name="P18"/>
    <text:p text:style-name="P58"><text:span text:style-name="T9">3.1.1 </text:span><text:span text:style-name="T5">Text :</text:span><text:span text:style-name="T19"> </text:span><text:span text:style-name="T18">For hashing chunks of text like paragraphs or key data that can be copied from somewhere to QuickHash. </text:span><text:span text:style-name="T19">You can also type in the text box and QuickHash will dynamically recompute the hash value as you type. </text:span><text:span text:style-name="T20">The user can also switch the generated hash to one computed by another algorithm simply by clicking one of the other three radio buttons.</text:span></text:p>
    <text:p text:style-name="P61"/>
@@ -2008,7 +2008,7 @@
    <text:p text:style-name="P63"/>
    <text:p text:style-name="P16"><draw:frame draw:style-name="fr1" draw:name="Frame3" text:anchor-type="paragraph" svg:width="14.799cm" draw:z-index="5">
      <draw:text-box fo:min-height="11.682cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image2" text:anchor-type="paragraph" svg:width="14.799cm" svg:height="10.328cm" draw:z-index="13"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image2" text:anchor-type="paragraph" svg:width="14.799cm" svg:height="10.328cm" draw:z-index="12"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAABAIAAALMCAIAAADxcIccAACGQ0lEQVR4nO3dC3wU5aH//4fz
           O7/z+tkee1ov9UJuQoIthrheIZCEi5RANEraxdSGgFABUVRyahqFtGtaQNN4GqxRClgUCO0B
           0oIigdiUSy4k1FsIAZUEyAW8Q3t6avv/nd/vd/jPMzO7O7s7u9lsLrvLfN7tS3bn8swzM5vN
@@ -2654,7 +2654,7 @@
     </draw:frame></text:p>
    <text:p text:style-name="P16"><draw:frame draw:style-name="fr1" draw:name="Frame13" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="14">
      <draw:text-box fo:min-height="9.393cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image11" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.393cm" style:rel-height="scale" draw:z-index="15"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image11" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.393cm" style:rel-height="scale" draw:z-index="15"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAA/kAAAIyCAIAAAAff52YAAAAAXNSR0IArs4c6QAAAARnQU1B
           AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAHQeSURBVHhe7b15mCVXeaeZf09Pz/Qy
           7nbPeMbTM3a3u3GVy3bb3cbdBmy8tME0aWfaeANMg2xWUUCR7IhNQmIpCaUoCe2AFlCxligk
@@ -3226,7 +3226,7 @@
    <text:p text:style-name="P110"/>
    <text:p text:style-name="P110"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0">
      <draw:text-box fo:min-height="7.064cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image9" text:anchor-type="paragraph" svg:width="17cm" svg:height="7.064cm" style:rel-height="scale" draw:z-index="1"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image9" text:anchor-type="paragraph" svg:width="17cm" svg:height="7.064cm" style:rel-height="scale" draw:z-index="1"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAABAEAAAGqCAIAAAD1AsrFAAAAAXNSR0IArs4c6QAAAARnQU1B
           AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAGbNSURBVHhe7b153CRHeefZf+/s7M6x
           nvHsetc7u/aMZ7Dk9jljPGPAxscYGdN2vzY2NmAM2IBANNA0N+LSBagRekVL6L4l1AJEi0at
@@ -3730,9 +3730,9 @@
    <text:p text:style-name="P55"/>
    <text:p text:style-name="P44"><text:span text:style-name="T9">3.</text:span><text:span text:style-name="T14">1</text:span><text:span text:style-name="T9">.3 </text:span><text:span text:style-name="T3">FileS</text:span><text:span text:style-name="T62"> : For hashing multiple files in a directory (aka &apos;folder&apos;) recursively. Put simply, choose a directory and QuickHash will find all the files below that directory and inside its child directories and compute the hashes for all of the files, outputting the results to screen. If you have many files, choosing ‘</text:span><text:span text:style-name="T76">xxHash</text:span><text:span text:style-name="T62">’ as your chosen hash algorithm will be considerably quicker than any of the others.</text:span></text:p>
    <text:p text:style-name="P44"/>
-   <text:p text:style-name="P44"><text:soft-page-break/></text:p>
-   <text:p text:style-name="P112">There are several options in this tab : </text:p>
-   <text:list xml:id="list2807999698" text:style-name="L1">
+   <text:p text:style-name="P44"/>
+   <text:p text:style-name="P112"><text:soft-page-break/>There are several options in this tab : </text:p>
+   <text:list xml:id="list2039657943" text:style-name="L1">
     <text:list-header>
      <text:p text:style-name="P164"/>
     </text:list-header>
@@ -3757,7 +3757,7 @@
    <text:p text:style-name="P115"><text:s/></text:p>
    <text:p text:style-name="P112"><draw:frame draw:style-name="fr1" draw:name="Frame4" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="21">
      <draw:text-box fo:min-height="12.076cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr5" draw:name="Image7" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="12.076cm" style:rel-height="scale" draw:z-index="23"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr5" draw:name="Image7" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="12.076cm" style:rel-height="scale" draw:z-index="23"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAB74AAAWACAYAAADOB+lkAAixOUlEQVR4nOzdC1xUdf4//hcw
           A4M1GBpqWKGhhSVT4Rp2wRrsItU6bmG1SK3UBqzrF2h3laVNdhf9ylLtCv7Kr9C36JvYbun2
           d9pcXTeh7Ka5Wo6VbkpKrqSSUlAyOAPzP2euZ24wN66+nj4QZuacM5/zOZ/zOZf3+Xw+MpMA
@@ -14316,12 +14316,12 @@
     </draw:frame></text:p>
    <text:p text:style-name="P112"><text:span text:style-name="T111">The “</text:span><text:span text:style-name="T73">Ignoring sub-directories?</text:span><text:span text:style-name="T111">” </text:span>enables the user to compute hashes of files in the <text:span text:style-name="T111">root of the </text:span>chosen directory but not any of the <text:span text:style-name="T111">files located in the </text:span>child sub-directories that may be below <text:span text:style-name="T89">that chosen root directory</text:span>. </text:p>
    <text:p text:style-name="P112"/>
-   <text:p text:style-name="P136"><text:soft-page-break/><text:span text:style-name="T111">The “</text:span><text:span text:style-name="T73">Hidden Folders too?</text:span><text:span text:style-name="T111">”</text:span> <text:span text:style-name="T111">option requires some detailed explanation. </text:span>On Windows, hidden files will be found and hashed by default <text:span text:style-name="T90">but only if they live in </text:span><text:span text:style-name="T94">unhidden</text:span><text:span text:style-name="T90"> folders</text:span>. </text:p>
+   <text:p text:style-name="P136"><text:span text:style-name="T111">The “</text:span><text:span text:style-name="T73">Hidden Folders too?</text:span><text:span text:style-name="T111">”</text:span> <text:span text:style-name="T111">option requires some detailed explanation. </text:span>On Windows, hidden <text:soft-page-break/>files will be found and hashed by default <text:span text:style-name="T90">but only if they live in </text:span><text:span text:style-name="T94">unhidden</text:span><text:span text:style-name="T90"> folders</text:span>. </text:p>
    <text:p text:style-name="P136"/>
    <text:p text:style-name="P136">Files that live in <text:span text:style-name="T105">hidden</text:span> <text:span text:style-name="T105">folders</text:span>, regardless of whether the <text:span text:style-name="T112">files are</text:span> themselves hidden or unhidden, will not be found unless this option is ticked. By ticking the box <text:span text:style-name="T112">however</text:span>, all files, hidden or unhidden, <text:span text:style-name="T111">that live </text:span>in <text:span text:style-name="T105">folders</text:span> that are <text:span text:style-name="T111">either </text:span>hidden or unhidden, will be found. The screenshots below demonstrate. <text:s/></text:p>
    <text:p text:style-name="P136"><draw:frame draw:style-name="fr2" draw:name="Frame5" text:anchor-type="paragraph" svg:x="4.083cm" svg:y="-0.243cm" svg:width="8.834cm" draw:z-index="19">
      <draw:text-box fo:min-height="4.022cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image3" text:anchor-type="paragraph" svg:width="8.834cm" svg:height="4.022cm" style:rel-height="scale" draw:z-index="20"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image3" text:anchor-type="paragraph" svg:width="8.834cm" svg:height="4.022cm" style:rel-height="scale" draw:z-index="20"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAXEAAACoCAIAAACZo0mgAAAW6klEQVR4nO2de2wUR57Hq8cP
           Hn6ATYCsX4DxoMjncD5FQsYDWeUA5cYoUpBYo1MSWdnT2jopJ8MfiD/iUxTJREv4AyNFikyk
           jcjmdIIgxasIO1lFARtwfLtL5AXysk3Aj2AWDI7B2J5Hd1919zx6eno8U3b3TPf4+5FnqK6p
@@ -14438,7 +14438,7 @@
      </draw:text-box>
     </draw:frame><draw:frame draw:style-name="fr2" draw:name="Frame6" text:anchor-type="paragraph" svg:x="2.738cm" svg:y="5.417cm" svg:width="11.525cm" draw:z-index="6">
      <draw:text-box fo:min-height="5.659cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image4" text:anchor-type="paragraph" svg:width="11.525cm" svg:height="5.659cm" style:rel-height="scale" draw:z-index="18"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image4" text:anchor-type="paragraph" svg:width="11.525cm" svg:height="5.659cm" style:rel-height="scale" draw:z-index="18"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAgcAAAEWCAIAAAB9oaPPAAAxE0lEQVR4nO2de0xcV57nTyT+
           m//2r364ijID3lVCSGkUyZRdgO1FzZiEniZbDhqVMSI9gaHDdFJRUG3btKrRYCYlopR7m4wH
           02PLGLQisCEKCW5WXhsDDliKVmVSaa0MHReUs937T//Xf3vPua9zn/V+3arvR5Fz77nn/s7v
@@ -14680,7 +14680,7 @@
     </draw:frame></text:p>
    <text:p text:style-name="P136"><draw:frame draw:style-name="fr2" draw:name="Frame7" text:anchor-type="paragraph" svg:x="3.318cm" svg:y="7.186cm" svg:width="10.365cm" draw:z-index="7">
      <draw:text-box fo:min-height="7.078cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image5" text:anchor-type="paragraph" svg:width="10.365cm" svg:height="6.544cm" style:rel-height="scale" draw:z-index="8"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr4" draw:name="Image5" text:anchor-type="paragraph" svg:width="10.365cm" svg:height="6.544cm" style:rel-height="scale" draw:z-index="8"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAf4AAAFCCAIAAACfBSh8AAA060lEQVR4nO2de0wcV57vjyX/
           t//dv+bhbtpe8L1KCGmtIoU2L9sXDWsSZkO2HbTCGJHZwDJhJ+koqO/YjHrQYjYtorRzh6wX
           e9aWMWhFYEMUEjxIvjYvh44UXbVJZ3QFTAy0c2fuP/vf/O17Tr2f/e6urqrvR5FTdarqd35V
@@ -14939,8 +14939,8 @@
      </draw:text-box>
     </draw:frame></text:p>
    <text:p text:style-name="P136"/>
-   <text:p text:style-name="P138"><text:soft-page-break/></text:p>
-   <text:p text:style-name="P138">The “<text:span text:style-name="T65">Choose file types?</text:span>” feature was added to the “<text:span text:style-name="T65">Files</text:span>” tab in v2.6.4 by user request, meaning the user can recursively hash the content of an entire folder and its sub-folders but only files that have the inputted extension(s) will be analysed. Each value is to be <text:span text:style-name="T150">separated</text:span> by a semi-colon (&apos;<text:span text:style-name="T65">;</text:span>&apos;). Note that file header signature analysis is not conducted. </text:p>
+   <text:p text:style-name="P138"/>
+   <text:p text:style-name="P138"><text:soft-page-break/>The “<text:span text:style-name="T65">Choose file types?</text:span>” feature was added to the “<text:span text:style-name="T65">Files</text:span>” tab in v2.6.4 by user request, meaning the user can recursively hash the content of an entire folder and its sub-folders but only files that have the inputted extension(s) will be analysed. Each value is to be <text:span text:style-name="T150">separated</text:span> by a semi-colon (&apos;<text:span text:style-name="T65">;</text:span>&apos;). Note that file header signature analysis is not conducted. </text:p>
    <text:p text:style-name="P138"/>
    <text:p text:style-name="P138">Since v2.6.4, QuickHash will also find files and folders that exceed the MAX_PATH value of 260 characters imposed by MS Windows. The underlying filesystems of most operating systems, including NTFS, support filenames of much longer than 260 characters, but Windows <text:span text:style-name="T123">itself </text:span>does not currently, <text:span text:style-name="T123">even though the underlying filesystem does</text:span>. It is possible, though, for some software to <text:span text:style-name="T123">deliberately </text:span>exceed this limit, meaning files may exist that the user cannot generally access. With v2.6.4, those files will be found and hashed up to a length of 32K characters for Windows and 4K for Linux. </text:p>
    <text:p text:style-name="P138"/>
@@ -14949,7 +14949,7 @@
    <text:p text:style-name="P145">The ‘<text:span text:style-name="T90">Start at a time:’</text:span><text:span text:style-name="T158"> option allows the user to schedule a date and time in the future to start the hashing. However be aware that in development some inconsistencies were noticed with this. It seems to work OK on some processor architectures, but not all. Your mileage may vary so try it before using it for anything important. </text:span></text:p>
    <text:p text:style-name="P40"/>
    <text:p text:style-name="P146">The “<text:span text:style-name="T93">Load </text:span><text:span text:style-name="T90">Hashlist?</text:span>’ option is new to v3.0.0 and was perhaps the most frequently requested feature of QuickHash by users <text:span text:style-name="T159">over the years</text:span>. What it enables is for the user to import a list of any number (limit yet to be discovered) of existing hash values that may have been generated at an earlier date by QuickHash or perhaps by another data hashing tool or digital forensics tool. The list must be just one column of hash values without a header row. Once selected QuickHash will rapidly ingest the values. When the user then selects a folder of files, it will compute hashes in the folder and then lookup whether the corresponding hash exists in the list imported by the user (if the tick box is ticked). If it is, it will add “Yes” in the final rightmost column of the display grid. <text:span text:style-name="T159">Conversely, if it is not found, QuickHash will display “No”. On completion, three options will be enabled in the right click menu allowing the user to sort or filter out the values as necessary. The column will be empty if no hashlist has been imported. </text:span></text:p>
-   <text:p text:style-name="P154"><text:soft-page-break/>Note that a bug was identified in May 2018 and fixed in September 2018 with v3.0.3 where lowercase hashlists were not converted to uppercase, meaning values that were the same were not identified as such. This was fixed in v3.0.3 so that all imported lists were converted to uppercase if not already uppercase. </text:p>
+   <text:p text:style-name="P154">Note that a bug was identified in May 2018 and fixed in September 2018 with v3.0.3 where lowercase hashlists were not converted to uppercase, meaning values that were the same were not <text:soft-page-break/>identified as such. This was fixed in v3.0.3 so that all imported lists were converted to uppercase if not already uppercase. </text:p>
    <text:p text:style-name="P146"/>
    <text:p text:style-name="P153">The list will remain in memory until QuickHash is closed. The list can however be added to after one ingestion if another list needs to be added. Just click the button again to choose a second file of hash values to import and they will be added to the first one. </text:p>
    <text:p text:style-name="P146"/>
@@ -14963,10 +14963,10 @@
    <text:p text:style-name="P40"/>
    <text:p text:style-name="P10"><text:span text:style-name="T99">3.1.4 Copy : </text:span><text:span text:style-name="T21">The </text:span><text:span text:style-name="T66">Copy</text:span><text:span text:style-name="T21"> tab allows the user to select a </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T43"> </text:span><text:span text:style-name="T21">containing files he wishes to copy </text:span><text:span text:style-name="T45">from and another folder where he wishes to copy files to. </text:span><text:span text:style-name="T22">Both source and destination </text:span><text:span text:style-name="T45">folders</text:span><text:span text:style-name="T27"> </text:span><text:span text:style-name="T22">can be a local </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T22"> or a mapped network drive or a UNC unmapped network address. </text:span><text:span text:style-name="T43">Multiple source </text:span><text:span text:style-name="T45">folders</text:span><text:span text:style-name="T43"> can be selected as the source (using Ctrl and left mouse click) but only one destination </text:span><text:span text:style-name="T45">folder </text:span><text:span text:style-name="T43">can be selected as the destination </text:span><text:span text:style-name="T45">(the original folders will be rebuilt in the destination folder)</text:span><text:span text:style-name="T43">. </text:span></text:p>
    <text:p text:style-name="P64"/>
-   <text:p text:style-name="P10"><text:span text:style-name="T22">Having selected both </text:span><text:span text:style-name="T43">source and destination </text:span><text:span text:style-name="T45">folders</text:span><text:span text:style-name="T22">, u</text:span><text:span text:style-name="T21">pon clicking &apos;</text:span><text:span text:style-name="T66">Go</text:span><text:span text:style-name="T21">&apos;, QuickHash will hash the files in the source </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T21">, then copy them to the destination </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T21"> (whilst concurrently </text:span><text:span text:style-name="T22">reconstructing</text:span><text:span text:style-name="T21"> the </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T21"> path of the original files, </text:span><text:span text:style-name="T26">by default</text:span><text:span text:style-name="T21">) where it then re-hashes the files to check they match the hash values of the original computations. It is, in essence, a “forensic copy and paste”. As with the “FileS” tab, there are options to save the results to CSV or HTML and sub-</text:span><text:soft-page-break/><text:span text:style-name="T21">directories of the source directory can be ignored. </text:span><text:span text:style-name="T26">Also note that there is an option for the user to not have the source directory structure rebuilt in the destination by ticking the “</text:span><text:span text:style-name="T68">Don&apos;t rebuild path?</text:span><text:span text:style-name="T26">” option. </text:span></text:p>
+   <text:p text:style-name="P10"><text:span text:style-name="T22">Having selected both </text:span><text:span text:style-name="T43">source and destination </text:span><text:span text:style-name="T45">folders</text:span><text:span text:style-name="T22">, u</text:span><text:span text:style-name="T21">pon clicking &apos;</text:span><text:span text:style-name="T66">Go</text:span><text:span text:style-name="T21">&apos;, QuickHash will hash the files in the source </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T21">, then copy them to the destination </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T21"> (whilst concurrently </text:span><text:span text:style-name="T22">reconstructing</text:span><text:span text:style-name="T21"> the </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T21"> path of the original files, </text:span><text:span text:style-name="T26">by default</text:span><text:span text:style-name="T21">) where it then re-hashes the files to check they match the hash values of the original computations. It is, in essence, a “forensic copy and paste”. As with the “FileS” tab, there are options to save the results to CSV or HTML and sub-directories of the source directory can be ignored. </text:span><text:span text:style-name="T26">Also note that there is an option for the user to not have the source directory structure rebuilt in the destination by ticking the “</text:span><text:span text:style-name="T68">Don&apos;t rebuild </text:span><text:soft-page-break/><text:span text:style-name="T68">path?</text:span><text:span text:style-name="T26">” option. </text:span></text:p>
    <text:p text:style-name="P67"/>
    <text:p text:style-name="P68">There are <text:span text:style-name="T155">8</text:span> options that are unique to this tab that require explanation. </text:p>
-   <text:list xml:id="list554164170" text:style-name="L2">
+   <text:list xml:id="list2541408778" text:style-name="L2">
     <text:list-item>
      <text:p text:style-name="P168">Just LIST Directories?</text:p>
     </text:list-item>
@@ -14997,8 +14997,8 @@
    <text:p text:style-name="P65"/>
    <text:p text:style-name="P74">The “<text:span text:style-name="T65">Choose file types</text:span>” box allows the user to specify what file types to find, hash, and copy. So for example, if the user is only interested in .doc files, by entering <text:span text:style-name="T111">just </text:span>“<text:span text:style-name="T65">.doc;</text:span>”, only those file types will be found and copied. Multiple extensions can be used if <text:span text:style-name="T111">separated</text:span> with a &apos;;&apos; <text:span text:style-name="T108">ONLY (no spaces)</text:span>. Note that this type identification is conducted by filename only – not the more accurate file header signature analysis (which is currently not available in QuickHash). </text:p>
    <text:p text:style-name="P18"/>
-   <text:p text:style-name="P75"><text:span text:style-name="T101">The “</text:span><text:span text:style-name="T71">Don&apos;t rebuild path?</text:span><text:span text:style-name="T101">” option allows all files found in the source folder and its sub-folders to simply be dumped in the root of the destination folder without rebuilding the original path in the destination path. Obviously though two files of the same name cannot exist in the same directory on the same filesystem whereas two files of the same name may exist in one folder and any of its other folders. To account for this, when this option is enabled (it is off by default) QuickHash will check for the existence of a file with the same name in the destination directory for each file it copies. Where found, it will rename the second, third, fourth (and so on) instance of the </text:span><text:soft-page-break/><text:span text:style-name="T101">file by renaming it to </text:span><text:span text:style-name="T71">FileName.ext_DuplicatedNameX</text:span><text:span text:style-name="T102"> where X is the counter of duplicated filenames detected. Note this is not a check of file hash based on content – merely filename </text:span><text:span text:style-name="T104">and is provided due to filesystem restrictions</text:span><text:span text:style-name="T102">. </text:span></text:p>
-   <text:p text:style-name="P134"/>
+   <text:p text:style-name="P75"><text:span text:style-name="T101">The “</text:span><text:span text:style-name="T71">Don&apos;t rebuild path?</text:span><text:span text:style-name="T101">” option allows all files found in the source folder and its sub-folders to simply be dumped in the root of the destination folder without rebuilding the original path in the destination path. Obviously though two files of the same name cannot exist in the same directory on the same filesystem whereas two files of the same name may exist in one folder and any of its other folders. To account for this, when this option is enabled (it is off by default) QuickHash will check for the existence of a file with the same name in the destination directory for each file it copies. Where found, it will rename the second, third, fourth (and so on) instance of the file by renaming it to </text:span><text:span text:style-name="T71">FileName.ext_DuplicatedNameX</text:span><text:span text:style-name="T102"> where X is the counter of duplicated filenames detected. Note this is not a check of file hash based on content – merely filename </text:span><text:span text:style-name="T104">and is provided due to filesystem restrictions</text:span><text:span text:style-name="T102">. </text:span></text:p>
+   <text:p text:style-name="P134"><text:soft-page-break/></text:p>
    <text:p text:style-name="P135">The “<text:span text:style-name="T65">Copy hidden files?</text:span>” is disabled in the Windows version, because hidden files <text:span text:style-name="T109">in both hidden and unhidden folders </text:span>are found by default with <text:span text:style-name="T109">this particular tab in</text:span> QuickHash <text:span text:style-name="T109">(different to the &apos;</text:span><text:span text:style-name="T72">FileS</text:span><text:span text:style-name="T109">&apos; tab and its &apos;</text:span><text:span text:style-name="T72">Hidden folders too?</text:span><text:span text:style-name="T109">&apos; tick box)</text:span>. However, in Linux and Apple Mac, the box is enabled, due to the way that files and <text:span text:style-name="T155">folders</text:span> are both, in essence, &apos;files&apos; on those systems, so a hidden <text:span text:style-name="T155">folder </text:span>needs to be <text:span text:style-name="T109">dealt with </text:span>differently to a hidden file. <text:span text:style-name="T109">If you want such files when using either of those systems, tick this box. But Windows users need not be concerned about it. </text:span><text:s/></text:p>
    <text:p text:style-name="P135"/>
    <text:p text:style-name="P113">The hashes cannot be dynamically re-computed in this tab, unlike in the first two tabs. </text:p>
@@ -15011,13 +15011,13 @@
    <text:p text:style-name="P76"/>
    <text:p text:style-name="P78">Note, however, that if the files that are found are already near to the 260 character limit, but not beyond it, it is likely that when copied, the path length will exceed 260 characters. QuickHash will deal with this by implementing a filesystem bypass. </text:p>
    <text:p text:style-name="P20"/>
-   <text:p text:style-name="P133"><text:span text:style-name="T1">3.</text:span><text:span text:style-name="T14">1</text:span><text:span text:style-name="T1">.5 Compare Two Files</text:span> : It is commonly the case that a file exists in two different places, for example, a backup of a file. This tab allows a user to specifically choose one file, and then hash it against another file automatically, perhaps leaving them overnight if they are large. This avoids the need for the user to have to hash all the files in the folder of these two respective files (using the &apos;<text:span text:style-name="T65">FileS</text:span>&apos; tab), or without the need to hash FileA first, and then manually choos<text:span text:style-name="T155">ing</text:span> FileB second<text:span text:style-name="T155">ly</text:span> <text:soft-page-break/>using the &apos;<text:span text:style-name="T65">File</text:span>&apos; tab.</text:p>
+   <text:p text:style-name="P133"><text:span text:style-name="T1">3.</text:span><text:span text:style-name="T14">1</text:span><text:span text:style-name="T1">.5 Compare Two Files</text:span> : It is commonly the case that a file exists in two different places, for example, a backup of a file. This tab allows a user to specifically choose one file, and then hash it against another file automatically, perhaps leaving them overnight if they are large. This avoids the need for the user to have to hash all the files in the folder of these two respective files (using the &apos;<text:span text:style-name="T65">FileS</text:span>&apos; tab), or without the need to hash FileA first, and then manually choos<text:span text:style-name="T155">ing</text:span> FileB second<text:span text:style-name="T155">ly</text:span> using the &apos;<text:span text:style-name="T65">File</text:span>&apos; tab.</text:p>
    <text:p text:style-name="P133"/>
-   <text:p text:style-name="P137">Results can be saved to a text file, if needed, after hashing has completed and by clicking the &apos;<text:span text:style-name="T65">Save As</text:span>&apos; button. </text:p>
+   <text:p text:style-name="P137">Results can be saved to a text file, if needed, after hashing has completed and by clicking the &apos;<text:span text:style-name="T65">Save </text:span><text:soft-page-break/><text:span text:style-name="T65">As</text:span>&apos; button. </text:p>
    <text:p text:style-name="P21"/>
    <text:p text:style-name="P32"><draw:frame draw:style-name="fr1" draw:name="Frame9" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="9">
      <draw:text-box fo:min-height="6.2cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr6" draw:name="Image6" text:anchor-type="paragraph" svg:width="14.757cm" svg:height="4.932cm" draw:z-index="16"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr6" draw:name="Image6" text:anchor-type="paragraph" svg:width="14.757cm" svg:height="4.932cm" draw:z-index="16"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAA/gAAAFUCAIAAAAf+AB8AABvcklEQVR4nO3dDXwU5aEv/ic9
           557P9dy/tkdbtZLdBEyw6iZsWytZ8gKBwEJslOjGVDcJgkKKRiGt6VZIu00L6JraxRpLgRYk
           L9qYrUGRQDCGkBcTrNYlWXwhMSS7wbcqp9r7P7333HvKnWfedmZnZl/yull+33sunX3mmWee
@@ -15553,7 +15553,7 @@
        </draw:frame>Illustration <text:sequence text:ref-name="refIllustration7" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">8</text:sequence>: Comparing the hashes of two identical files</text:p>
      </draw:text-box>
     </draw:frame><text:span text:style-name="T41">As of v2.8.1, if </text:span><text:span text:style-name="T133">the user single mouse clicks</text:span><text:span text:style-name="T41"> the generated hash value, the hash value and the chosen algorithm with be copied to the clipboard. </text:span><text:span text:style-name="T42">This only applies to the “Compare two Files” tab, for now. </text:span><text:s/></text:p>
-   <text:p text:style-name="P93"><draw:frame draw:style-name="fr7" draw:name="Image15" text:anchor-type="paragraph" svg:width="5.45cm" svg:height="3.175cm" draw:z-index="17"><draw:image>
+   <text:p text:style-name="P93"><draw:frame draw:style-name="fr7" draw:name="Image15" text:anchor-type="paragraph" svg:width="5.45cm" svg:height="3.175cm" draw:z-index="17"><draw:image loext:mime-type="image/png">
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAM4AAAB4CAIAAAA17lr7AAANuElEQVR4nO2dDVRUVR7AL4V2
        Om27tXnSjBlGAj8QcCpsmYRBcGzM/IgYUkOGoLXWk+uKLY2ZOZLoipRY4XqUFk58+LGSuuGi
        KBIOIGx+jcNIKogwGKWVbV9n2zote+97b958vfni4xLD/3c843v33Xvf/735vXvvmzfD9Tfq
@@ -15627,8 +15627,8 @@
    <text:p text:style-name="P94">Of of course, the user can just take a screenshot of the results!</text:p>
    <text:p text:style-name="P93"/>
    <text:p text:style-name="P14"><text:span text:style-name="T99">3.1.6 Compare Two Folders : </text:span><text:span text:style-name="T23">This enables the user to compare the file content of two </text:span><text:span text:style-name="T45">folders</text:span><text:span text:style-name="T23">. The user must select one </text:span><text:span text:style-name="T45">folder</text:span><text:span text:style-name="T23"> </text:span><text:span text:style-name="T28">as the source</text:span><text:span text:style-name="T23"> (Dir A) and then a second </text:span><text:span text:style-name="T45">folder </text:span><text:span text:style-name="T28">to compare the source against</text:span><text:span text:style-name="T23"> (Dir B). QuickHash will then </text:span><text:span text:style-name="T31">count and </text:span><text:span text:style-name="T23">hash all the files in </text:span><text:span text:style-name="T67">Dir A</text:span><text:span text:style-name="T23"> and </text:span><text:span text:style-name="T67">Dir B</text:span><text:span text:style-name="T23">, storing the values in a list in memory. When complete, it </text:span><text:span text:style-name="T45">then counts the number of files in each folder and then it hashes them all. If the user does not tick ‘Cont if count differs?’, it will not proceed further and instead report a mis-match as the file count is </text:span><text:span text:style-name="T46">di</text:span><text:span text:style-name="T45">fferent, therefore Folder A and Folder B are clearly not the same. However, the user can override this by ticking that box. Then, if there is a mis-match of file count, it will still go on to hash all the files and then report those computed in both Folder A and Folder B.</text:span></text:p>
-   <text:p text:style-name="P100"><text:soft-page-break/></text:p>
-   <text:p text:style-name="P14"><text:span text:style-name="T45">The list of hashes is also held in memory where they are then compared very quickly. If both hash lists and the file count match, it will report a match even if the file names are different. </text:span><text:span text:style-name="T23"><text:s/>This makes QuickHash very fast at this comparison. </text:span></text:p>
+   <text:p text:style-name="P100"/>
+   <text:p text:style-name="P14"><text:span text:style-name="T45">The list of hashes is also held in memory where they are then compared very quickly. If both hash lists and the file count match, it will report a match even if the file names are different. </text:span><text:span text:style-name="T23"><text:s/>This makes </text:span><text:soft-page-break/><text:span text:style-name="T23">QuickHash very fast at this comparison. </text:span></text:p>
    <text:p text:style-name="P69"/>
    <text:p text:style-name="P69">If, however, <text:s/>there is a mismatch <text:span text:style-name="T156">of hash even if count is the same</text:span> QuickHash then does go on to compare the hash of each file <text:span text:style-name="T155">to work out which ones differ in Folder A to Folder B</text:span>. <text:span text:style-name="T155">The results are saved by default (unless the user unticks ‘Log results?’) to a text file. </text:span></text:p>
    <text:p text:style-name="P69"/>
@@ -15646,7 +15646,7 @@
    <text:p text:style-name="P73"/>
    <text:p text:style-name="P73"><draw:frame draw:style-name="fr1" draw:name="Frame10" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="4">
      <draw:text-box fo:min-height="12.995cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr5" draw:name="Image12" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="12.995cm" style:rel-height="scale" draw:z-index="12"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr5" draw:name="Image12" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="12.995cm" style:rel-height="scale" draw:z-index="13"><draw:image loext:mime-type="image/x-vclgraphic">
          <office:binary-data>VkNMTVRGAQAxAAAAAQAAAAEAGwAAAAAAAAAAAAAAAAABAAAAAQAAAAEAAAABAAAAATVQAAAw
           QAAACQAAAIsAAQACAAAAIACNAAEAAgAAAAAAjAABAAAAAACLAAEAAgAAACAAjQABAAIAAAAA
           AHUAAQD3igAAQk1uDxYAAAAAADYAAAAoAAAACAMAAG0CAAABABgAU0QAATgPFgAAAAAAAAAA
@@ -16322,7 +16322,7 @@
    <text:p text:style-name="P70"><text:soft-page-break/></text:p>
    <text:p text:style-name="P91"><draw:frame draw:style-name="fr1" draw:name="Frame11" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="2">
      <draw:text-box fo:min-height="10.934cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr5" draw:name="Image14" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="10.934cm" style:rel-height="scale" draw:z-index="3"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr5" draw:name="Image14" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="10.934cm" style:rel-height="scale" draw:z-index="3"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAA48AAAJKCAIAAAADWefrAADxpUlEQVR4nOzdBVwU2xoA8Jnt
           oLtbGgmlUUQwQAxsjGtjt3BV7O6Oa1y7O7G7GwsDW0EFAWGB7d23QSzLDOxisL77/X/veZfZ
           2TNnzvnmzMfZmYGUlpaGAAAAAAAABSdOnIiOjq7tWgApUm1XAAAAAAAAAFyQrQIAAAAAAM0F
@@ -17485,7 +17485,7 @@
    <text:p text:style-name="P22"><text:span text:style-name="T99">3.2 </text:span>Unicode</text:p>
    <text:p text:style-name="P60"><draw:frame draw:style-name="fr2" draw:name="Frame12" text:anchor-type="paragraph" svg:x="0.487cm" svg:y="2.921cm" svg:width="16.028cm" draw:z-index="10">
      <draw:text-box fo:min-height="5.946cm">
-      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr8" draw:name="Image10" text:anchor-type="paragraph" svg:width="13.862cm" svg:height="4.93cm" style:rel-height="scale" draw:z-index="11"><draw:image>
+      <text:p text:style-name="Illustration"><draw:frame draw:style-name="fr8" draw:name="Image10" text:anchor-type="paragraph" svg:width="13.862cm" svg:height="4.93cm" style:rel-height="scale" draw:z-index="11"><draw:image loext:mime-type="image/png">
          <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAwsAAAFMCAIAAAALBrcQAAAAAXNSR0IArs4c6QAAAARnQU1B
           AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAF3iSURBVHhe7b2/jhy7kiauB9iH+Lnr
           DSTIP8bgPMA1tgH1KwiYxXVkaOSOs8Y4OgsIkDHAeGPJO4BwnQHGG/Maax1gzbH2Fe4v/jEY
@@ -17961,7 +17961,7 @@
    <text:p text:style-name="P81"><text:soft-page-break/>If you value the program, or if your organisation, company or agency <text:span text:style-name="T156">does</text:span>, then please <text:span text:style-name="T138">do </text:span>consider making a donation using <text:a xlink:type="simple" xlink:href="https://paypal.me/quickhashgui" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T167">https://paypal.me/quickhashgui</text:span></text:a>. Doing so helps fund the <text:span text:style-name="T138">AWS </text:span>server costs and also helps inspire future development. <text:span text:style-name="T135">If you give your blessing, news of your support may be published on the website too, although we always ask first so don&apos;t let that put you off making a donation! Case studies are also of interest...if QuickHash has helped you with a major task or anything of importance then do please consider </text:span><text:a xlink:type="simple" xlink:href="https://www.quickhash-gui.org/about-quickhash-gui/submit-testimonial/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T135">submitting a testimonial</text:span></text:a><text:span text:style-name="T135"> for the website. Both things are </text:span>a good opportunity to get your company listed on the website of one of the worlds most widely used data hashing tool<text:span text:style-name="T126">s;</text:span> <text:a xlink:type="simple" xlink:href="http://quickhash-gui.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">http://QuickHash-gui.org</text:a>. <text:s/></text:p>
    <text:p text:style-name="P81"/>
    <text:p text:style-name="P98"><text:span text:style-name="T141">To donate : <text:s/></text:span><text:a xlink:type="simple" xlink:href="http://www.paypal.me/quickhashgui" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T143">www.paypal.me/quickhashgui</text:span></text:a></text:p>
-   <text:p text:style-name="P81"><draw:frame draw:style-name="fr9" draw:name="Image1" text:anchor-type="paragraph" svg:width="12.252cm" svg:height="14.307cm" draw:z-index="22"><draw:image>
+   <text:p text:style-name="P81"><draw:frame draw:style-name="fr9" draw:name="Image1" text:anchor-type="paragraph" svg:width="12.252cm" svg:height="14.307cm" draw:z-index="22"><draw:image loext:mime-type="image/png">
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAA94AAASECAYAAACS39c0AAGmoUlEQVR4nOy9B5wlZ3Xmfapu
        7DQ55xnNaKRRzoBASCAkgjHRYBvbu/599tpe22uwMc67a/v7vN7FCa9xANtgg8BksMlIiKiI
        hEA5T449nfvmqvrec956675Vt2737Z65PR2eP9y5dSu+VV1X3U+dc56TLVdrAQEAAAAAAAAA
