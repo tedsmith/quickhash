@@ -19,7 +19,7 @@ object frmAbout: TfrmAbout
       ''
       'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''
-      'Donations are welcomed! The website is hosted using AWS which is actually quite expensive! If you have found QuickHash useful to you or your business, please consider donating using PayPal at https://paypal.me/quickhash'
+      'Donations are welcomed! The website is hosted using AWS which is actually quite expensive! If you have found QuickHash useful to you or your business, please consider donating using PayPal at https://paypal.me/quickhashgui'
       ''
       'The development Github Page is : https://github.com/tedsmith/quickhash'
       ''
