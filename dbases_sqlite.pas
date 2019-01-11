@@ -199,23 +199,22 @@ begin
       end;
     {$endif}
     {$ifdef Linux}
-     // If it's 64-bit Debian based Linux, use the 64-bit Debian SQLite3 SO file
-
     try
-      slSQLitePaths :=  TStringList.Create;
-      // Most common on a 64-bit Debian based system
+      slSQLitePaths := TStringList.Create;
+      {$ifdef CPU64}
       slSQLitePaths.Add('/usr/lib/x86_64-linux-gnu/libsqlite3.so.0');
-      // Most 32-bit based distributions might have it in these paths:
-      slSQLitePaths.Add('/usr/lib/libsqlite3.so.0');
-      slSQLitePaths.Add('/usr/lib/i386-linux-gnu/libsqlite3.so.0');
-      slSQLitePaths.Add('/usr/lib32/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib32/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib/i386-linux-gnu/libsqlite3.so.0');
-      // Most 64-bit based distributions might have it in these paths, if not in the first one
       slSQLitePaths.Add('/usr/lib64/libsqlite3.so.0');
       slSQLitePaths.Add('/lib/x86_64-linux-gnu/libsqlite3.so.0');
       slSQLitePaths.Add('/lib64/libsqlite3.so.0');
+      {$else ifdef CPU32}
+      slSQLitePaths.Add('/usr/lib/i386-linux-gnu/libsqlite3.so.0');
+      slSQLitePaths.Add('/usr/lib32/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib/i386-linux-gnu/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib32/libsqlite3.so.0');
+      {$endif}
+      slSQLitePaths.Add('/usr/local/lib/libsqlite3.so.0');
+      slSQLitePaths.Add('/usr/lib/libsqlite3.so.0');
+      slSQLitePaths.Add('/lib/libsqlite3.so.0');
     finally
       SQLiteLibraryPath := ''; // just empty this for now
     end;
@@ -240,7 +239,7 @@ begin
       end
     else
     begin
-      SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath; // '/usr/lib/x86_64-linux-gnu/libsqlite3.so.0';
+      SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath;
       SQLDBLibraryLoaderLinux.Enabled := true;
       SQLDBLibraryLoaderLinux.LoadLibrary;
       if CreateGUID(guid) = 0 then
