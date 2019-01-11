@@ -3,7 +3,7 @@ Maintainer: Ted Smith <tedsmith28@yahoo.co.uk>
 Section: misc
 Priority: optional
 Build-Depends: debhelper (>= 9)
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 Homepage: http://quickhash-gui.org/
 Vcs-Git: https://github.com/tedsmith/quickhash.git
 Vcs-Browser: https://github.com/tedsmith/quickhash
@@ -11,6 +11,7 @@ Vcs-Browser: https://github.com/tedsmith/quickhash
 Package: quickhash
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: libsqlite3-0
 Description: Graphical data hashing tool
  QuickHash is a graphical means for users to easily
  hash data such as text, files, or even disks using Linux
