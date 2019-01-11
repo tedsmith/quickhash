@@ -1,10 +1,10 @@
 # Makefile for Linux
-# https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.6.4/
+# https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.8.4/
 
 PREFIX ?= /usr
 BIN = quickhash
 
-LAZARUSDIR ?= /usr/share/lazarus/1.6.4/
+LAZARUSDIR ?= /usr/share/lazarus/1.8.4/
 LAZBUILD := $(LAZARUSDIR)lazbuild
 LAZRES := $(LAZARUSDIR)tools/lazres
 
