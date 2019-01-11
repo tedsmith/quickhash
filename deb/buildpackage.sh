@@ -13,17 +13,17 @@ log="../build_${source}_${version}_${arch}.log"
 dpkg-checkbuilddeps || exit 1
 
 if [ "$(dpkg-query -W -f='${Status} ${version} ' lazarus-project fpc fpc-src 2>/dev/null; echo $?)" != \
-     "install ok installed 3.0.2 install ok installed 3.0.2 install ok installed 1.6.4 0" ];
+     "install ok installed 3.0.4 install ok installed 3.0.4 install ok installed 1.8.4 0" ];
 then
   cat <<EOL
 Before you can continue to build Debian packages
 you need to install the packages
- lazarus-project version 1.6.4
- fpc version 3.0.2
- fpc-src version 3.0.2
+ lazarus-project version 1.8.4
+ fpc version 3.0.4
+ fpc-src version 3.0.4
 from Sourceforge:
-https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.6.4/
-https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20i386%20DEB/Lazarus%201.6.4/
+https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.8.4/
+https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20i386%20DEB/Lazarus%201.8.4/
 EOL
   exit 1
 fi
