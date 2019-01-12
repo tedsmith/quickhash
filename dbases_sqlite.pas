@@ -1,7 +1,7 @@
 {   Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
                      and generating hash values for them.
 
-    Copyright (C) 2011-2018  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
     Use of the name 'QuickHash GUI' must refer to this utility
     only and must not be re-used in another tool if based upon this code.
-    The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
+    The code is Copyright of Ted Smith 2011 - 2019 (www.quickhash-gui.org)
 }
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
@@ -25,6 +25,9 @@ unit dbases_sqlite; // New to v3.0.0 of QuickHash
 interface
 
 uses
+{$ifdef Linux}
+  dl,
+{$endif}
   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
   LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
   sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes;
@@ -107,68 +110,59 @@ procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 var
   i : integer;
   guid : TGuid;
-  strFileNameRandomiser, SafePlaceForDB : string;
+  SQLiteLibraryPath, strFileNameRandomiser, SafePlaceForDB : string;
   {$ifdef Linux}
-    SQLiteLibraryPath : string;
-    slSQLitePaths  : TStringList;
+    LibHandle : Pointer;
+    Pdlinfo : Pdl_info;
+    PtrSQLiteLibraryPath : PChar;
   {$endif}
 begin
   // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
   // but didn't seem to work with Linux.
-  // So SQLDBLibraryLoader instances created for each OS sepertaely
+  // So SQLDBLibraryLoader instances created for each OS seperately
   // and the LibraryName adjusted accordingly from the component default value
   {$ifdef windows}
-    SQLDBLibraryLoaderWindows.ConnectionType:='SQLite3';
+    SQLDBLibraryLoaderWindows.ConnectionType := 'SQLite3';
   {$ifdef CPU32}
-    if FileExists('sqlite3-win32.dll') then
-    begin
-      SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win32.dll';
-    end
-    else
-      begin
-        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
-        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
-      end;
+    SQLiteLibraryPath := 'sqlite3-win32.dll';
   {$else ifdef CPU64}
-    if FileExists('sqlite3-win64.dll') then
-    begin
-      SQLDBLibraryLoaderWindows.LibraryName := 'sqlite3-win64.dll';
-    end
-    else
-      begin
-        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
-        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
-      end;
+    SQLiteLibraryPath := 'sqlite3-win64.dll';
   {$endif}
-    SQLDBLibraryLoaderWindows.Enabled := true;
-    SQLDBLibraryLoaderWindows.LoadLibrary;
-    if CreateGUID(guid) = 0 then
+  {$endif}
+  {$ifdef darwin}
+    SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
+    SQLiteLibraryPath := '/usr/lib/libsqlite3.dylib';
+  {$endif}
+  {$ifdef linux}
+    SQLDBLibraryLoaderLinux.ConnectionType := 'SQLite3';
+    SQLiteLibraryPath := '';
+    LibHandle := dlopen('libsqlite3.so.0', RTLD_LAZY);
+    if LibHandle <> nil then
     begin
-      strFileNameRandomiser := GUIDToString(guid);
-    end
-    else
-      begin
-        strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
-      end;
-    SafePlaceForDB := GetTempDir;
-    if ForceDirectories(SafePlaceForDB) then
-    begin
-      SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBWin_' + strFileNameRandomiser + '.sqlite';
-      // Create the database
-      CreateDatabase(SQLite3Connection1.DatabaseName);
-      if SQLIte3Connection1.Connected then
-      begin
-        lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-      end;
+      Pdlinfo := LibHandle;
+      PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
+      SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
+      PtrSQLiteLibraryPath := nil;
+      dlclose(LibHandle);
     end;
-    {$endif}
-    {$ifdef darwin}
-    SQLDBLibraryLoaderOSX.ConnectionType:='SQLite3';
-    if FileExists('/usr/lib/libsqlite3.dylib') then
+  {$endif}
+    if FileExists(SQLiteLibraryPath) then
     begin
-      SQLDBLibraryLoaderOSX.LibraryName := '/usr/lib/libsqlite3.dylib';
-      SQLDBLibraryLoaderOSX.Enabled := true;
-      SQLDBLibraryLoaderOSX.LoadLibrary;
+      {$ifdef windows}
+        SQLDBLibraryLoaderWindows.LibraryName := SQLiteLibraryPath;
+        SQLDBLibraryLoaderWindows.Enabled := true;
+        SQLDBLibraryLoaderWindows.LoadLibrary;
+      {$endif}
+      {$ifdef darwin}
+        SQLDBLibraryLoaderOSX.LibraryName := SQLiteLibraryPath;
+        SQLDBLibraryLoaderOSX.Enabled := true;
+        SQLDBLibraryLoaderOSX.LoadLibrary;
+      {$endif}
+      {$ifdef linux}
+        SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath;
+        SQLDBLibraryLoaderLinux.Enabled := true;
+        SQLDBLibraryLoaderLinux.LoadLibrary;
+      {$endif}
       if CreateGUID(guid) = 0 then
       begin
         strFileNameRandomiser := GUIDToString(guid);
@@ -177,14 +171,17 @@ begin
         begin
           strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
         end;
-      //  write the SQLite database file to system temp;
+      // write the SQLite database file to system temp
       SafePlaceForDB := GetTempDir;
       if ForceDirectories(SafePlaceForDB) then
       begin
-        SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBOSX_' + strFileNameRandomiser + '.sqlite';
+        SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
         // Create the database
         CreateDatabase(SQLite3Connection1.DatabaseName);
-        if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+        if SQLIte3Connection1.Connected then
+        begin
+          lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+        end;
       end
       else
         begin
@@ -193,78 +190,10 @@ begin
     end
     else
       begin
-        ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system (should be /usr/lib/libsqlite3.dylib)');
+        ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system.');
         MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
         MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
       end;
-    {$endif}
-    {$ifdef Linux}
-    try
-      slSQLitePaths := TStringList.Create;
-      {$ifdef CPU64}
-      slSQLitePaths.Add('/usr/lib/x86_64-linux-gnu/libsqlite3.so.0');
-      slSQLitePaths.Add('/usr/lib64/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib/x86_64-linux-gnu/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib64/libsqlite3.so.0');
-      {$else ifdef CPU32}
-      slSQLitePaths.Add('/usr/lib/i386-linux-gnu/libsqlite3.so.0');
-      slSQLitePaths.Add('/usr/lib32/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib/i386-linux-gnu/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib32/libsqlite3.so.0');
-      {$endif}
-      slSQLitePaths.Add('/usr/local/lib/libsqlite3.so.0');
-      slSQLitePaths.Add('/usr/lib/libsqlite3.so.0');
-      slSQLitePaths.Add('/lib/libsqlite3.so.0');
-    finally
-      SQLiteLibraryPath := ''; // just empty this for now
-    end;
-
-    // Now search each entry to see which one contains the SQLite SO file for the distribution in use
-    // and assign it to SQLiteLibraryPath.
-    for i := 0 to slSQLitePaths.Count -1 do
-    begin
-       if FileExists(slSQLitePaths.Strings[i]) then
-       begin
-         SQLiteLibraryPath := Trim(slSQLitePaths.Strings[i]);
-         slSQLitePaths.Free; // No need for this anymore
-         break;  // No need to itterate any further. We have our path to SQLite.
-       end;
-    end;
-
-    if Length(SQLiteLibraryPath) < 1 then
-      begin
-        ShowMessage('SQLite was not found on this Linux distribution.');
-        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
-        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
-      end
-    else
-    begin
-      SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath;
-      SQLDBLibraryLoaderLinux.Enabled := true;
-      SQLDBLibraryLoaderLinux.LoadLibrary;
-      if CreateGUID(guid) = 0 then
-      begin
-        strFileNameRandomiser := GUIDToString(guid);
-      end
-      else
-        begin
-          strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
-        end;
-      //  write the SQLite database file to system temp
-      SafePlaceForDB := gettempdir;
-      if ForceDirectories(SafePlaceForDB) then
-      begin
-        SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDBLinux_' + strFileNameRandomiser + '.sqlite';
-        // Create the database
-        CreateDatabase(SQLite3Connection1.DatabaseName);
-        if SQLIte3Connection1.Connected then lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-      end
-      else
-        begin
-          Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
-        end;
-      end;
-    {$endif}
 end;
 
 
