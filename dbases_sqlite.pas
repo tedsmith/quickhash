@@ -135,7 +135,7 @@ begin
   {$endif}
   {$ifdef linux}
     SQLDBLibraryLoaderLinux.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '';
+    SQLiteLibraryPath := '/usr/lib/libsqlite3.so.0';
     LibHandle := dlopen('libsqlite3.so.0', RTLD_LAZY);
     if LibHandle <> nil then
     begin
