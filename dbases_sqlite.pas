@@ -25,10 +25,7 @@ unit dbases_sqlite; // New to v3.0.0 of QuickHash
 interface
 
 uses
-{$ifdef Linux}
-  dl,
-{$endif}
-{$ifdef Darwin}
+{$ifdef UNIX}
   dl,
 {$endif}
   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
@@ -114,12 +111,7 @@ var
   i : integer;
   guid : TGuid;
   SQLiteLibraryPath, strFileNameRandomiser, SafePlaceForDB : string;
-  {$ifdef Linux}
-    LibHandle : Pointer;
-    Pdlinfo : Pdl_info;
-    PtrSQLiteLibraryPath : PChar;
-  {$endif}
-  {$ifdef Darwin}
+  {$ifdef UNIX}
     LibHandle : Pointer;
     Pdlinfo : Pdl_info;
     PtrSQLiteLibraryPath : PChar;
@@ -129,7 +121,7 @@ begin
   // but didn't seem to work with Linux.
   // So SQLDBLibraryLoader instances created for each OS seperately
   // and the LibraryName adjusted accordingly from the component default value
-  {$ifdef windows}
+  {$ifdef Windows}
     SQLDBLibraryLoaderWindows.ConnectionType := 'SQLite3';
   {$ifdef CPU32}
     SQLiteLibraryPath := 'sqlite3-win32.dll';
@@ -137,24 +129,16 @@ begin
     SQLiteLibraryPath := 'sqlite3-win64.dll';
   {$endif}
   {$endif}
-  {$ifdef darwin}
+  {$ifdef Darwin}
     SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '';
-    //LibHandle := dlopen('/usr/lib/libsqlite3.dylib', RTLD_LAZY);
     LibHandle := dlopen('libsqlite3.dylib', RTLD_LAZY);
-    if LibHandle <> nil then
-    begin
-      Pdlinfo := LibHandle;
-      PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
-      SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
-      PtrSQLiteLibraryPath := nil;
-      dlclose(LibHandle);
-    end;
   {$endif}
-  {$ifdef linux}
+  {$ifdef Linux}
     SQLDBLibraryLoaderLinux.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '';
     LibHandle := dlopen('libsqlite3.so.0', RTLD_LAZY);
+  {$endif}
+  {$ifdef UNIX}
+    SQLiteLibraryPath := '';
     if LibHandle <> nil then
     begin
       Pdlinfo := LibHandle;
