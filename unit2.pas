@@ -1,8 +1,8 @@
 {
-    Quick Hash - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
+    Quick Hash - A Linux, Windows and Apple Mac OSX GUI for quickly selecting one or more files
     and generating hash values for them.
 
-    Copyright (C) 2011-2018  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
 
     The use of the word 'quick' refers to the ease in which the software operates
     in both Linux, Apple Mac and Windows (very few options to worry about, no
@@ -436,6 +436,7 @@ type
     procedure MenuItem_SortByHashClick(Sender: TObject);
     procedure MenuItem_SortByHashListClick(Sender: TObject);
     procedure MenuItem_SortByIDClick(Sender: TObject);
+    procedure PageControl1Change(Sender: TObject);
     procedure Panel1CopyAndHashOptionsClick(Sender: TObject);
     procedure popmenuDBGrid_FilesPopup(Sender: TObject);
     procedure ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode);
@@ -939,6 +940,9 @@ begin
   memFileHashField.Clear;
   LoopCounter              := 0;
 
+  tabsheet2.Visible:= true;
+  tabsheet2.Show;
+
    begin
     filename := FileNames[0];
     if LazFileUtils.DirectoryExistsUTF8(filename) then
@@ -982,25 +986,11 @@ begin
         begin
           if Uppercase(fileHashValue) = Trim(Uppercase(lbleExpectedHash.Text)) then
             begin
-             // Showmessage('Expected hash matches the computed file hash, OK');
-              case QuestionDlg('HASHES MATCH - SUCCESS','Do you understand the hashes match OK?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
-              of
-                 mrYes : ShowMessage('The hash computation succeeded. The computed hash equals your expected hash');
-                 mrNo : ShowMessage('The hash you expected is what has been computed. All looks OK.');
-              else
-                ShowMessage('You cancelled the dialog.');
-              end;
+             Showmessage('Expected hash matches the computed file hash, OK');
             end
         else
           begin
-           // Showmessage('Expected hash DOES NOT match the computed file hash!');
-            case QuestionDlg('HASHES MIS-MATCH - FAILURE','Do you understand the hashes do NOT match?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
-              of
-                 mrYes : ShowMessage('The hash you expected has not been computed.');
-                 mrNo : ShowMessage('The hash you expected is not what has been computed. The file is possibly corrupt or you have input the expected hash incorrectly');
-              else
-                ShowMessage('You cancelled the dialog.');
-              end;
+            Showmessage('Expected hash DOES NOT match the computed file hash!');
           end;
         end;
      end
@@ -1381,25 +1371,10 @@ begin
      begin
        if Uppercase(memFileHashField.Lines[0]) = Trim(Uppercase(lbleExpectedHash.Text)) then
        begin
-         case QuestionDlg('HASHES MATCH - SUCCESS','Do you understand the hashes match OK?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
-         of
-            mrYes : ShowMessage('The hash computation succeeded. The computed hash equals your expected hash');
-            mrNo : ShowMessage('The hash you expected is what has been computed. All looks OK.');
-         else
-           ShowMessage('You cancelled the dialog.');
-         end;
+         Showmessage('Expected hash MATCHES the computed file hash!');
        end
-        else
-          begin
-           // Showmessage('Expected hash DOES NOT match the computed file hash!');
-            case QuestionDlg('HASHES MIS-MATCH - FAILURE','Do you understand the hashes do NOT match?',mtConfirmation,[mrNo, '&No','IsDefault',mrYes,'&Yes'],0)
-            of
-              mrYes : ShowMessage('The hash you expected has not been computed.');
-              mrNo : ShowMessage('The hash you expected is not what has been computed. The file is possibly corrupt or you have input the expected hash incorrectly');
-            else
-              ShowMessage('You cancelled the dialog.');
-            end;
-          end;
+       else
+         Showmessage('Expected hash DOES NOT match the computed file hash!');
      end;
 end;
 
@@ -1743,6 +1718,11 @@ procedure TMainForm.MenuItem_SortByIDClick(Sender: TObject);
 begin
   RecursiveDisplayGrid1.Clear;
   frmSQLiteDBases.SortByID(RecursiveDisplayGrid1);
+end;
+
+procedure TMainForm.PageControl1Change(Sender: TObject);
+begin
+
 end;
 
 

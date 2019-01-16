@@ -1,6 +1,14 @@
 ﻿Version History
 ===============
 
+v3.0.4 (Jan 2019)
+
+The 'File' tab was not showing automatically when using drag and drop. Now it does.
+
+On Linux and OSX, the program will now automatically use default system wide SQLite libraries. Thios should reduce the risk of the program failing to load due to an SQLite file not being where it is expected to be. 
+
+Reverted the "hash matches expected hash" or "hash does not match expected hash" back to how it was before v.3.0.3. Users complained that it was more confusing in v3.0.3 than previous versions. So now it is back to the normal OK dialog and it just tells you if it it matches or not. 
+
 v3.0.3 (Jan 2019)
 
 The 'Load Hashlist' functionality in the 'FileS' tab would accept all values but then compare them against computer uppercase hashes strings, meaning any lowercase imported values were not matched. 
@@ -15,8 +23,7 @@ The filehandles were not always being released properly, even if hashing complet
 The 'FileS' tab was computing file hashes of zero bytes returning the default initialisation hash for the chosen algorithm. I thought I had corrected that a long time ago but I may only have done 
 so for the 'File' tab according to the release notes. That was fixed returning instead 'ZERO BYTE FILE'. 
 
-A feature request was made asking for a clearer message when computed hashes do not match expected hash values input
-by the user. So a new message dialog is now shown that tries to make it very clear the hashes do, or do not, match for
+clear the hashes do, or do not, match for
 single file hashing in the 'File' tab or when using 'drag and drop' feature. 
 
 The exe version has been updated to the correct numbering for the version (forgot to update in the project file last time). 
