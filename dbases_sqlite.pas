@@ -28,6 +28,9 @@ uses
 {$ifdef Linux}
   dl,
 {$endif}
+{$ifdef Darwin}
+  dl,
+{$endif}
   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
   LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
   sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes;
@@ -116,6 +119,11 @@ var
     Pdlinfo : Pdl_info;
     PtrSQLiteLibraryPath : PChar;
   {$endif}
+  {$ifdef Darwin}
+    LibHandle : Pointer;
+    Pdlinfo : Pdl_info;
+    PtrSQLiteLibraryPath : PChar;
+  {$endif}
 begin
   // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
   // but didn't seem to work with Linux.
@@ -131,11 +139,21 @@ begin
   {$endif}
   {$ifdef darwin}
     SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '/usr/lib/libsqlite3.dylib';
+    SQLiteLibraryPath := '';
+    //LibHandle := dlopen('/usr/lib/libsqlite3.dylib', RTLD_LAZY);
+    LibHandle := dlopen('libsqlite3.dylib', RTLD_LAZY);
+    if LibHandle <> nil then
+    begin
+      Pdlinfo := LibHandle;
+      PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
+      SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
+      PtrSQLiteLibraryPath := nil;
+      dlclose(LibHandle);
+    end;
   {$endif}
   {$ifdef linux}
     SQLDBLibraryLoaderLinux.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '/usr/lib/libsqlite3.so.0';
+    SQLiteLibraryPath := '';
     LibHandle := dlopen('libsqlite3.so.0', RTLD_LAZY);
     if LibHandle <> nil then
     begin
