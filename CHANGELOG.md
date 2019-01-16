@@ -5,9 +5,9 @@ v3.0.4 (Jan 2019)
 
 The 'File' tab was not showing automatically when using drag and drop. Now it does.
 
-On Linux and OSX, the program will now automatically use default system wide SQLite libraries. Thios should reduce the risk of the program failing to load due to an SQLite file not being where it is expected to be. 
+On Linux and OSX, the program will now automatically use default system wide SQLite libraries. This should reduce the risk of the program failing to load due to an SQLite file not being where it is expected to be.
 
-Reverted the "hash matches expected hash" or "hash does not match expected hash" back to how it was before v.3.0.3. Users complained that it was more confusing in v3.0.3 than previous versions. So now it is back to the normal OK dialog and it just tells you if it it matches or not. 
+Reverted the "hash matches expected hash" or "hash does not match expected hash" back to how it was before v.3.0.3. Users complained that it was more confusing in v3.0.3 than previous versions. So now it is back to the normal OK dialog and it just tells you if it matches or not.
 
 v3.0.3 (Jan 2019)
 
