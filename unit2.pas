@@ -547,7 +547,7 @@ type
    tmp : integer;
 
    {$IFDEF WINDOWS}
-   // For coping better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
+   // For copying better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
    // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes. LongPathOverride
    // will always either be '\\?\' or '\\?\UNC\'
 
@@ -2531,7 +2531,7 @@ end;
 procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
-  FolderA, FolderB, LongPathOveride, HashVal, StringToWrite, RogueHash : string;
+  FolderA, FolderB, HashVal, StringToWrite, RogueHash : string;
 
   slFileListA, slFileListB, slMissingHashes  : TStringList;
 
@@ -2600,7 +2600,7 @@ begin
   // If so, adjust LongPathOverride for UNC mode and append the UNC prefix to
   // ensure that the 32K path length limit and the UNC rules are adhered to
 
-  LongPathOveride := '\\?\';
+  LongPathOverride := '\\?\';
 
   if (Pos('\\', FolderA) > 0) or (Pos('\\', FolderB) > 0) then
   begin
