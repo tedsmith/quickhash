@@ -2071,39 +2071,22 @@ end;
 procedure TMainForm.btnMakeTextLowerClick(Sender: TObject);
 var
   s : string;
-  i : integer;
 begin
-  s := memoHashText.Text;
-    for i := 1 to Length(s) do
-      begin
-        if s[i] in ['A'..'Z'] then
-        begin
-          s := Lowercase(s);
-          memoHashText.Text := s;
-        end;
-      end;
-    HashText(memoHashText);
-    application.ProcessMessages;
+  s := Lowercase(memoHashText.Text);
+  memoHashText.Text := s;
+  HashText(memoHashText);
+  application.ProcessMessages;
 end;
 
 procedure TMainForm.btnMakeTextUpperClick(Sender: TObject);
 var
   s : string;
-  i : integer;
 begin
-  s := memoHashText.Text;
-    for i := 1 to Length(s) do
-      begin
-        if s[i] in ['a'..'z'] then
-        begin
-          s := Uppercase(s);
-          memoHashText.Text := s;
-        end;
-      end;
-    HashText(memoHashText);
-    application.ProcessMessages;
+  s := Uppercase(memoHashText.Text);
+  memoHashText.Text := s;
+  HashText(memoHashText);
+  application.ProcessMessages;
 end;
-
 
 procedure TMainForm.cbFlipCaseFILEChange(Sender: TObject);
 var
