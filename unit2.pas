@@ -81,8 +81,10 @@ uses
       cthreads,
     {$ENDIF}
   {$ENDIF}
-
-  Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
+  {$IFNDEF Linux}
+    Strutils,
+  {$ENDIF}
+  Classes, SysUtils, FileUtil, LResources, Forms, Controls,
   Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
   LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
   XMLPropStorage, uDisplayGrid, diskmodule, clipbrd, DBGrids, DbCtrls,
@@ -930,15 +932,13 @@ procedure TMainForm.FormDropFiles(Sender: TObject;
 
 var
   filename, fileHashValue : ansistring;
-  start, stop, elapsed, scheduleStartTime : TDateTime;
-  LoopCounter : integer;
+  start, stop, elapsed : TDateTime;
 begin
   // First, clear the captions from any earlier file hashing actions
   StatusBar1.SimpleText    := '';
   lblStartedFileAt.Caption := '...';
   lblFileTimeTaken.Caption := '...';
   memFileHashField.Clear;
-  LoopCounter              := 0;
 
   tabsheet2.Visible:= true;
   tabsheet2.Show;
@@ -1635,10 +1635,7 @@ end;
 
 // Copy hash value of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
-var
-  CellOfInterest : string;
 begin
-  CellOfInterest := '';
   frmSQLiteDBases.CopyHashOfSelectedCell(RecursiveDisplayGrid1);
 end;
 
@@ -2531,7 +2528,7 @@ end;
 procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
-  FolderA, FolderB, HashVal, StringToWrite, RogueHash : string;
+  FolderA, FolderB, RogueHash : string;
 
   slFileListA, slFileListB, slMissingHashes  : TStringList;
 
@@ -2541,7 +2538,7 @@ var
 
   i, lenRogueHash : integer;
 
-  FolderAFileCount, FolderBFileCount, FileCountDifference, StringLength: integer;
+  FolderAFileCount, FolderBFileCount, FileCountDifference : integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
@@ -3571,15 +3568,16 @@ var
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
   TotalBytesRead_B, LoopCounter, IntFileSize : QWord;
-  strFileSize : string;
 
 begin
   TotalBytesRead_B := 0;
   IntFileSize      := 0;
-  strFileSize      := '';
   LoopCounter      := 0; // Used for periodic interface refresh, to avoid slowing things down.
 
   result := '';
+
+  // Initialise Buffer
+  FillChar(Buffer, SizeOf(Buffer), 0);
 
   case PageControl1.TabIndex of
         0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
@@ -3897,27 +3895,26 @@ type
   TRange = 'A'..'Z';   // For the drive lettering of Windows systems
 {$ENDIF}
 var
-  i, NoOfFilesCopiedOK, j, HashMismtachCount,
+  i, NoOfFilesCopiedOK, HashMismtachCount,
     FileCopyErrors, ZeroByteFilesCounter, DupCount : integer;
 
   SizeOfFile2, TotalBytesRead2, NoFilesExamined, SizeOfCurrentFile: Int64;
 
   SubDirStructure, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
-    FormattedSystemDate, OutputDirDateFormatted, CrDateModDateAccDate,
-    CSVLogFile2, HTMLLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
+    OutputDirDateFormatted, CrDateModDateAccDate,
+    CSVLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
     strTimeDifference,  FileMask,
     Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute: string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
-  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
+  FilesFoundToCopy, SLCopyErrors : TStringList;
 
   SummaryMessage : TForm;   // This is the summary message that appears at the end
 
   {$IFDEF WINDOWS}
-  k : integer;
-  CurrentFile : string;
+  j, k : integer;
   slTemp : TStringList;
   DriveLetter : char;  // For MS Windows drive letter irritances only
   {$ENDIF}
@@ -3937,8 +3934,8 @@ begin
   TotalBytesRead2         := 0;
   DupCount                := 0;
   i                       := 0;
-  j                       := 0;
   {$IFDEF Windows}
+  j                       := 0;
   k                       := 0;
   {$ENDIF}
   SizeOfCurrentFile       := -1;
@@ -3956,7 +3953,7 @@ begin
   DateTimeToStr(SystemDate);
 
   // Date and time for the user, to be displayed later
-  FormattedSystemDate := FormatDateTime('YYYY/MM/DD HH:MM:SS', SystemDate);
+  //FormattedSystemDate := FormatDateTime('YYYY/MM/DD HH:MM:SS', SystemDate);
 
   // Date and time for the output directory, to be used later with other dir structures
   OutputDirDateFormatted := FormatDateTime('YYYY-MM-DD_HH-MM-SS', SystemDate);

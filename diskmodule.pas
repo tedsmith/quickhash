@@ -103,7 +103,7 @@ type
     function InitialiseHashChoice(Sender : TObject) : Integer;
     procedure cbdisksChange(Sender: TObject);
     function GetDiskTechnicalSpecs(Sender: TObject) : Integer;
-    function GetDiskTechnicalSpecsLinux(Sender: TObject) : Integer;
+    procedure GetDiskTechnicalSpecsLinux(Sender: TObject);
     procedure InvokeDiskHashScheduler (Sender : TObject);
     procedure CheckSchedule(DesiredStartTime : TDateTime);
 
@@ -144,7 +144,7 @@ var
   {$endif}
 
   {$ifdef Unix}
-  function ListDrivesLinux : string;
+  procedure ListDrivesLinux();
   function GetOSNameLinux() : string;
   function GetBlockCountLinux(s : string) : string;
   function GetBlockSizeLinux(DiskDevName : string) : Integer;
@@ -166,11 +166,8 @@ implementation
 
 // Enable or disable elements depending on the OS hosting the application
 procedure TfrmDiskHashingModule.FormCreate(Sender: TObject);
-var
-  MissingFileCount : integer;
 begin
   Stop := false;
-  MissingFileCount := 0;
   ExecutionCount := 0;
   ledtComputedHashA.Enabled := false;
   ledtComputedHashB.Enabled := false;
@@ -339,12 +336,15 @@ const
 var
 
   DiskInfoProcess          : TProcess;
-  DiskInfoProcessUDISKS    : TProcess;
-  diskinfo, diskinfoUDISKS : TStringList;
+  diskinfo                 : TStringList;
   i                        : Integer;
   stmp, strModel, strVendor, strType, strSerial : String;
 
 begin
+  strModel := '';
+  strVendor := '';
+  strType := '';
+  strSerial := '';
 
   // Probe all attached disks and populate the interface
   DiskInfoProcess:=TProcess.Create(nil);
@@ -468,14 +468,14 @@ end;
 
 
 {$ifdef UNIX}
-function ListDrivesLinux : string;
+procedure ListDrivesLinux();
 var
   DisksProcess: TProcess;
   i: Integer;
   intPhysDiskSize, intLogDiskSize : QWord;
   slDisklist: TSTringList;
-  PhyDiskNode, PartitionNoNode, DriveLetterNode           : TTreeNode;
-  strPhysDiskSize, strLogDiskSize, DiskDevName, DiskLabels, dmCryptDiscovered   : string;
+  PhyDiskNode, DriveLetterNode : TTreeNode;
+  strPhysDiskSize, strLogDiskSize, DiskDevName, DiskLabels, dmCryptDiscovered : string;
 begin
   intPhysDiskSize := 0;
   DisksProcess:=TProcess.Create(nil);
@@ -529,7 +529,7 @@ begin
   frmDiskHashingModule.Treeview1.AlphaSort;
   slDisklist.Free;
   DisksProcess.Free;
- end;
+end;
 
 
 // Returns a string holding the disk block COUNT (not size) as extracted from the string from
@@ -553,14 +553,12 @@ end;
 function GetBlockSizeLinux(DiskDevName : string) : Integer;
 var
   DiskProcess: TProcess;
-  BlockSize, StartOffset, i : Integer;
+  i : Integer;
   slDevDisk: TSTringList;
   strBlockSize : string;
-  RelLine : boolean;
 
 begin
-  RelLine := false;
-  BlockSize := 0;
+  result := 0;
   DiskProcess:=TProcess.Create(nil);
   DiskProcess.Options:=[poWaitOnExit, poUsePipes];
   DiskProcess.CommandLine:='udisksctl info -b ' + DiskDevName;   //get all disks/partitions list
@@ -581,9 +579,9 @@ end;
 // Extracts the byte value "Size: " from the output of udisksctl info -b /dev/sdX
 function GetByteCountLinux(DiskDevName : string) : QWord;
 var
-  DiskProcess: TProcess;
-  StartOffset, i : Integer;
-  slDevDisk: TSTringList;
+  DiskProcess  : TProcess;
+  i            : Integer;
+  slDevDisk    : TSTringList;
   strByteCount : string;
   ScanDiskData : boolean;
   intByteCount : QWord;
@@ -635,6 +633,7 @@ end;
 // Returns the exact disk size for BOTH physical disks and logical drives as
 // reported by the Windows API and is used during the imaging stage
 function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
+{$ifdef Windows}
 const
   // These are defined at the MSDN.Microsoft.com website for DeviceIOControl
   // and https://forum.tuts4you.com/topic/22361-deviceiocontrol-ioctl-codes/
@@ -702,10 +701,13 @@ var
   BytesReturned: DWORD;
   DLength: TDiskLength;
 
+{$endif}
+
 begin
+  result        := 0;
+  {$ifdef Windows}
   ByteSize      := 0;
   BytesReturned := 0;
-  {$ifdef Windows}
   // https://msdn.microsoft.com/en-us/library/aa365178%28v=vs.85%29.aspx
   if not DeviceIOControl(hSelectedDisk,
                          IOCTL_DISK_GET_LENGTH_INFO,
@@ -892,12 +894,13 @@ var
   slDiskSpecs : TStringList;
 {$endif}
 begin
- {$ifdef Unix}
- GetDiskTechnicalSpecsLinux(Sender);
- {$endif}
+  result := -1;
 
- {$ifdef Windows}
-  result           := -1;
+  {$ifdef Unix}
+  GetDiskTechnicalSpecsLinux(Sender);
+  {$endif}
+
+  {$ifdef Windows}
   DiskName         := '';
   Size             := 0;
   TotalHeads       := 0;
@@ -1019,7 +1022,7 @@ begin
   {$endif}
 end;
 
-function TfrmDiskHashingModule.GetDiskTechnicalSpecsLinux(Sender : TObject) : integer;
+procedure TfrmDiskHashingModule.GetDiskTechnicalSpecsLinux(Sender : TObject);
 var
   DiskInfoProcessUDISKS    : TProcess;
   diskinfoUDISKS : TStringList;
@@ -1044,6 +1047,7 @@ end;
 // menHashDiskClick - OnClick event for right clicking a disk in the treeview and choosing "Hash this disk"
 // Makes a call to HashDisk after collecting all data about the disk first
 procedure TfrmDiskHashingModule.menHashDiskClick(Sender: TObject);
+{$ifdef Windows}
 const
   // These values are needed for For FSCTL_ALLOW_EXTENDED_DASD_IO to work properly
   // on logical volumes. They are sourced from
@@ -1054,21 +1058,25 @@ const
   FSCTL_ALLOW_EXTENDED_DASD_IO = ((FILE_DEVICE_FILE_SYSTEM shl 16)
                                    or (FILE_ANY_ACCESS shl 14)
                                    or (32 shl 2) or METHOD_NEITHER);
+{$endif}
 
   var
     SourceDevice                            : widestring;
     hSelectedDisk                           : THandle;
-    ExactDiskSize, SectorCount, HashResult  : Int64;
-    ExactSectorSize                         : integer;
+    ExactDiskSize, HashResult               : Int64;
+  //SectorCount                             : Int64;
+  //ExactSectorSize                         : integer;
     slHashLog                               : TStringList;
+    {$ifdef Windows}
     BytesReturned                           : DWORD;
+    {$endif}
     StartedAt, EndedAt, TimeTakenToHash     : TDateTime;
 
   begin
+    {$ifdef Windows}
     BytesReturned   := 0;
+    {$endif}
     ExactDiskSize   := 0;
-    ExactSectorSize := 0;
-    SectorCount     := 0;
     HashResult      := 0;
     HashChoice      := -1;
     StartedAt       := 0;
@@ -1122,14 +1130,14 @@ const
         // Now query the sector size.
         // 512 bytes is common with MBR but with GPT disks, 1024 or 4096 is likely
         {$ifdef Windows}
-        ExactSectorSize := GetSectorSizeInBytes(hSelectedDisk);
+        //ExactSectorSize := GetSectorSizeInBytes(hSelectedDisk);
         {$endif}
         {$ifdef Unix}
-        ExactSectorSize := GetBlockSizeLinux(SourceDevice);
+        //ExactSectorSize := GetBlockSizeLinux(SourceDevice);
         {$endif}
 
         // Now we can assign a sector count based on sector size and disk size
-        SectorCount   := ExactDiskSize DIV ExactSectorSize;
+        //SectorCount := ExactDiskSize DIV ExactSectorSize;
 
         frmProgress.lblTotalBytesSource.Caption := ' bytes hashed of ' + IntToStr(ExactDiskSize);
 
@@ -1587,8 +1595,10 @@ end;
 
 
 procedure TfrmDiskHashingModule.menShowDiskManagerClick(Sender: TObject);
+{$ifdef Windows}
 var
 ProcDiskManager : TProcess;
+{$endif}
 begin
   {$ifdef Windows}
   try
@@ -1813,6 +1823,7 @@ var
   oldmode                 : LongInt;
 
 begin
+  dummy := 0;
   oldmode := SetErrorMode(SEM_FAILCRITICALERRORS);
   try
     // After stripping it out for GetDriveIDFromLetter to work,
@@ -1846,7 +1857,7 @@ const
   IOCTL_DISK_GET_DRIVE_GEOMETRY      = $0070000;
 var
   DG : TDiskGeometry;
-  SectorSizeInBytes, BytesReturned : Integer;
+  BytesReturned : Integer;
 
 begin
   if not DeviceIOControl(hSelectedDisk,

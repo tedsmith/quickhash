@@ -111,7 +111,6 @@ implementation
 
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 var
-  i : integer;
   guid : TGuid;
   SQLiteLibraryPath, strFileNameRandomiser, SafePlaceForDB : string;
   {$ifdef Linux}
@@ -350,7 +349,7 @@ end;
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : string);
 var
-   strTitle, FileNameCell, FilePathCell, FileHashCell, AllRowCells : string;
+  strTitle, FileNameCell, FilePathCell, FileHashCell : string;
   NoOfRowsInGrid : integer;
   sl                : TStringList;
   fs                : TFileStreamUTF8;
@@ -1061,7 +1060,7 @@ end;
 procedure TfrmSQLiteDBases.SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
 var
    strTitle, SourceFilename, DestinationFileName, DateAttributes, SourceFileHash, DestinationFileHash : string;
-  i, NoOfRowsInGrid : integer;
+  NoOfRowsInGrid    : integer;
   sl                : TStringList;
   fs                : TFileStreamUTF8;
 
@@ -1069,7 +1068,6 @@ var
     strHTMLHeader      = '<HTML>'  ;
     strTITLEHeader     = '<TITLE>QuickHash HTML Output' ;
     strBODYHeader      = '<BODY>'  ;
-    strTABLEHeader     = '<table>' ;
     strTABLEROWStart   = '<TR>'    ;
     strTABLEDATAStart  = '<TD>'    ;
     strTABLEDataEnd    = '</TD>'   ;
