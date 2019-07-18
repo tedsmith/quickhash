@@ -960,7 +960,7 @@ begin
           end;
 
       start := Now;
-      lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
+      lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(Start);
 
       edtFileNameToBeHashed.Caption := (filename);
       StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
@@ -1089,7 +1089,7 @@ begin
         end;
 
         start := Now;
-        lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
+        lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(Start);
 
         edtFileNameToBeHashed.Caption := (filename);
         StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
@@ -1102,7 +1102,7 @@ begin
 
         stop := Now;
         elapsed := stop - start;
-        lbEndedFileAt.Caption    := 'Ended at   : ' + FormatDateTime('DD/MM/YYYY HH:MM:SS', stop);
+        lbEndedFileAt.Caption    := 'Ended at   : ' + DateTimeToStr(stop);
         lblFileTimeTaken.Caption := 'Time taken : ' + FormatDateTime('HH:MM:SS', elapsed);
         Application.ProcessMessages;
 
@@ -3364,14 +3364,14 @@ begin
       memFileHashField.Clear;
       StatusBar1.SimpleText := 'RECOMPUTING NEW HASH VALUE...Please wait.';
       start := Now;
-      lblStartedFileAt.Caption := 'Started at : '+ TimeToStr(start);
+      lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(start);
       Application.ProcessMessages;
       HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text);
       memFileHashField.Lines.Add(Uppercase(HashValue));
       stop := Now;
       elapsed := stop - start;
       StatusBar1.SimpleText := 'RECOMPUTED NEW HASH VALUE.';
-      lbEndedFileAt.Caption:= 'Ended at : '+ TimeToStr(stop);
+      lbEndedFileAt.Caption:= 'Ended at : '+ DateTimeToStr(stop);
       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
       // If the user has pasted an expected hash value, since the last hash computation,
       // then check if it matches the newly computed hash
