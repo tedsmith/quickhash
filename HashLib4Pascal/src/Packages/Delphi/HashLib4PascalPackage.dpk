@@ -1,0 +1,145 @@
+package HashLib4PascalPackage;
+
+{$R *.res}
+{$WARN DUPLICATE_CTOR_DTOR OFF}
+{$WARNINGS OFF}
+{$HINTS OFF}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$RUNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  soaprtl;
+
+contains
+  HlpHash in '..\..\Base\HlpHash.pas',
+  HlpHashBuffer in '..\..\Base\HlpHashBuffer.pas',
+  HlpHashCryptoNotBuildIn in '..\..\Base\HlpHashCryptoNotBuildIn.pas',
+  HlpHashFactory in '..\..\Base\HlpHashFactory.pas',
+  HlpHashResult in '..\..\Base\HlpHashResult.pas',
+  HlpHashRounds in '..\..\Base\HlpHashRounds.pas',
+  HlpHashSize in '..\..\Base\HlpHashSize.pas',
+  HlpHMACNotBuildInAdapter in '..\..\Base\HlpHMACNotBuildInAdapter.pas',
+  HlpKDF in '..\..\Base\HlpKDF.pas',
+  HlpMultipleTransformNonBlock in '..\..\Base\HlpMultipleTransformNonBlock.pas',
+  HlpAdler32 in '..\..\Checksum\HlpAdler32.pas',
+  HlpCRC in '..\..\Checksum\HlpCRC.pas',
+  HlpCRC16 in '..\..\Checksum\HlpCRC16.pas',
+  HlpCRC32 in '..\..\Checksum\HlpCRC32.pas',
+  HlpCRC32Fast in '..\..\Checksum\HlpCRC32Fast.pas',
+  HlpCRC64 in '..\..\Checksum\HlpCRC64.pas',
+  HlpBlake2B in '..\..\Crypto\HlpBlake2B.pas',
+  HlpBlake2S in '..\..\Crypto\HlpBlake2S.pas',
+  HlpGost in '..\..\Crypto\HlpGost.pas',
+  HlpGOST3411_2012 in '..\..\Crypto\HlpGOST3411_2012.pas',
+  HlpGrindahl256 in '..\..\Crypto\HlpGrindahl256.pas',
+  HlpGrindahl512 in '..\..\Crypto\HlpGrindahl512.pas',
+  HlpHAS160 in '..\..\Crypto\HlpHAS160.pas',
+  HlpHaval in '..\..\Crypto\HlpHaval.pas',
+  HlpMD2 in '..\..\Crypto\HlpMD2.pas',
+  HlpMD4 in '..\..\Crypto\HlpMD4.pas',
+  HlpMD5 in '..\..\Crypto\HlpMD5.pas',
+  HlpMDBase in '..\..\Crypto\HlpMDBase.pas',
+  HlpPanama in '..\..\Crypto\HlpPanama.pas',
+  HlpRadioGatun32 in '..\..\Crypto\HlpRadioGatun32.pas',
+  HlpRadioGatun64 in '..\..\Crypto\HlpRadioGatun64.pas',
+  HlpRIPEMD in '..\..\Crypto\HlpRIPEMD.pas',
+  HlpRIPEMD128 in '..\..\Crypto\HlpRIPEMD128.pas',
+  HlpRIPEMD160 in '..\..\Crypto\HlpRIPEMD160.pas',
+  HlpRIPEMD256 in '..\..\Crypto\HlpRIPEMD256.pas',
+  HlpRIPEMD320 in '..\..\Crypto\HlpRIPEMD320.pas',
+  HlpSHA0 in '..\..\Crypto\HlpSHA0.pas',
+  HlpSHA1 in '..\..\Crypto\HlpSHA1.pas',
+  HlpSHA2_224 in '..\..\Crypto\HlpSHA2_224.pas',
+  HlpSHA2_256 in '..\..\Crypto\HlpSHA2_256.pas',
+  HlpSHA2_256Base in '..\..\Crypto\HlpSHA2_256Base.pas',
+  HlpSHA2_384 in '..\..\Crypto\HlpSHA2_384.pas',
+  HlpSHA2_512 in '..\..\Crypto\HlpSHA2_512.pas',
+  HlpSHA2_512_224 in '..\..\Crypto\HlpSHA2_512_224.pas',
+  HlpSHA2_512_256 in '..\..\Crypto\HlpSHA2_512_256.pas',
+  HlpSHA2_512Base in '..\..\Crypto\HlpSHA2_512Base.pas',
+  HlpSHA3 in '..\..\Crypto\HlpSHA3.pas',
+  HlpSnefru in '..\..\Crypto\HlpSnefru.pas',
+  HlpTiger in '..\..\Crypto\HlpTiger.pas',
+  HlpTiger2 in '..\..\Crypto\HlpTiger2.pas',
+  HlpWhirlPool in '..\..\Crypto\HlpWhirlPool.pas',
+  HlpBlake2BConfig in '..\..\Crypto\Blake2BConfigurations\HlpBlake2BConfig.pas',
+  HlpBlake2BIvBuilder in '..\..\Crypto\Blake2BConfigurations\HlpBlake2BIvBuilder.pas',
+  HlpBlake2BTreeConfig in '..\..\Crypto\Blake2BConfigurations\HlpBlake2BTreeConfig.pas',
+  HlpBlake2SConfig in '..\..\Crypto\Blake2SConfigurations\HlpBlake2SConfig.pas',
+  HlpBlake2SIvBuilder in '..\..\Crypto\Blake2SConfigurations\HlpBlake2SIvBuilder.pas',
+  HlpBlake2STreeConfig in '..\..\Crypto\Blake2SConfigurations\HlpBlake2STreeConfig.pas',
+  HlpNullDigest in '..\..\NullDigest\HlpNullDigest.pas',
+  HlpAP in '..\..\Hash32\HlpAP.pas',
+  HlpBernstein in '..\..\Hash32\HlpBernstein.pas',
+  HlpBernstein1 in '..\..\Hash32\HlpBernstein1.pas',
+  HlpBKDR in '..\..\Hash32\HlpBKDR.pas',
+  HlpDEK in '..\..\Hash32\HlpDEK.pas',
+  HlpDJB in '..\..\Hash32\HlpDJB.pas',
+  HlpELF in '..\..\Hash32\HlpELF.pas',
+  HlpFNV in '..\..\Hash32\HlpFNV.pas',
+  HlpFNV1a in '..\..\Hash32\HlpFNV1a.pas',
+  HlpJenkins3 in '..\..\Hash32\HlpJenkins3.pas',
+  HlpJS in '..\..\Hash32\HlpJS.pas',
+  HlpMurmur2 in '..\..\Hash32\HlpMurmur2.pas',
+  HlpMurmurHash3_x86_32 in '..\..\Hash32\HlpMurmurHash3_x86_32.pas',
+  HlpOneAtTime in '..\..\Hash32\HlpOneAtTime.pas',
+  HlpPJW in '..\..\Hash32\HlpPJW.pas',
+  HlpRotating in '..\..\Hash32\HlpRotating.pas',
+  HlpRS in '..\..\Hash32\HlpRS.pas',
+  HlpSDBM in '..\..\Hash32\HlpSDBM.pas',
+  HlpShiftAndXor in '..\..\Hash32\HlpShiftAndXor.pas',
+  HlpSuperFast in '..\..\Hash32\HlpSuperFast.pas',
+  HlpXXHash32 in '..\..\Hash32\HlpXXHash32.pas',
+  HlpFNV1a64 in '..\..\Hash64\HlpFNV1a64.pas',
+  HlpFNV64 in '..\..\Hash64\HlpFNV64.pas',
+  HlpMurmur2_64 in '..\..\Hash64\HlpMurmur2_64.pas',
+  HlpSipHash in '..\..\Hash64\HlpSipHash.pas',
+  HlpXXHash64 in '..\..\Hash64\HlpXXHash64.pas',
+  HlpMurmurHash3_x64_128 in '..\..\Hash128\HlpMurmurHash3_x64_128.pas',
+  HlpMurmurHash3_x86_128 in '..\..\Hash128\HlpMurmurHash3_x86_128.pas',
+  HlpICRC in '..\..\Interfaces\HlpICRC.pas',
+  HlpIHash in '..\..\Interfaces\HlpIHash.pas',
+  HlpIHashInfo in '..\..\Interfaces\HlpIHashInfo.pas',
+  HlpIHashResult in '..\..\Interfaces\HlpIHashResult.pas',
+  HlpIKDF in '..\..\Interfaces\HlpIKDF.pas',
+  HlpIBlake2BConfig in '..\..\Interfaces\IBlake2BConfigurations\HlpIBlake2BConfig.pas',
+  HlpIBlake2BTreeConfig in '..\..\Interfaces\IBlake2BConfigurations\HlpIBlake2BTreeConfig.pas',
+  HlpIBlake2SConfig in '..\..\Interfaces\IBlake2SConfigurations\HlpIBlake2SConfig.pas',
+  HlpIBlake2STreeConfig in '..\..\Interfaces\IBlake2SConfigurations\HlpIBlake2STreeConfig.pas',
+  HlpPBKDF2_HMACNotBuildInAdapter in '..\..\KDF\HlpPBKDF2_HMACNotBuildInAdapter.pas',
+  HlpPBKDF_Argon2NotBuildInAdapter in '..\..\KDF\HlpPBKDF_Argon2NotBuildInAdapter.pas',
+  HlpArgon2TypeAndVersion in '..\..\KDF\HlpArgon2TypeAndVersion.pas',
+  HlpPBKDF_ScryptNotBuildInAdapter in '..\..\KDF\HlpPBKDF_ScryptNotBuildInAdapter.pas',
+  HlpNullable in '..\..\Nullable\HlpNullable.pas',
+  HlpConverters in '..\..\Utils\HlpConverters.pas',
+  HlpBitConverter in '..\..\Utils\HlpBitConverter.pas',
+  HlpBits in '..\..\Utils\HlpBits.pas',
+  HlpArrayUtils in '..\..\Utils\HlpArrayUtils.pas',
+  HlpHashLibTypes in '..\..\Utils\HlpHashLibTypes.pas';
+
+end.

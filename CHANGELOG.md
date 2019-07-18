@@ -1,6 +1,15 @@
 ﻿Version History
 ===============
 
+v3.1.0
+
+HashLib4Pascal library updated to master version available as of 18th July 2019. 
+
+v3.0.5 (July 2019)
+
+Not compiled version released as only minor code cleanup for the codebase, in advance of v3.1.0 development. 
+Adjusted date and time formatting in the FileS tab to ensure default date and time settings used instead of UK or USA style of formatting. 
+
 v3.0.4 (Jan 2019)
 
 The 'File' tab was not showing automatically when using drag and drop. Now it does.
