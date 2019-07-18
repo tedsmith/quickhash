@@ -5,7 +5,6 @@
     <General>
       <MainUnit Value="0"/>
       <Title Value="QuickHash"/>
-      <Icon Value="0"/>
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
@@ -42,64 +41,46 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="19">
+    <Units Count="11">
       <Unit0>
         <Filename Value="quickhash.lpr"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit2.pas"/>
+        <HasResources Value="True"/>
       </Unit1>
       <Unit2>
-        <Filename Value="unit2.lfm"/>
+        <Filename Value="udisplaygrid.pas"/>
+        <HasResources Value="True"/>
       </Unit2>
       <Unit3>
-        <Filename Value="dbases_sqlite.pas"/>
+        <Filename Value="diskmodule.pas"/>
+        <HasResources Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="dbases_sqlite.lfm"/>
+        <Filename Value="diskmodule.lfm"/>
       </Unit4>
       <Unit5>
-        <Filename Value="diskmodule.pas"/>
+        <Filename Value="diskspecification.lfm"/>
       </Unit5>
       <Unit6>
-        <Filename Value="diskmodule.lfm"/>
+        <Filename Value="diskspecification.pas"/>
+        <HasResources Value="True"/>
       </Unit6>
       <Unit7>
-        <Filename Value="diskspecification.pas"/>
+        <Filename Value="GPTMBR.pas"/>
       </Unit7>
       <Unit8>
-        <Filename Value="diskspecification.lfm"/>
+        <Filename Value="uGPT.pas"/>
       </Unit8>
       <Unit9>
-        <Filename Value="FindAllFilesEnhanced.pas"/>
+        <Filename Value="uprogress.pas"/>
+        <HasResources Value="True"/>
       </Unit9>
       <Unit10>
-        <Filename Value="frmaboutunit.pas"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <HasResources Value="True"/>
       </Unit10>
-      <Unit11>
-        <Filename Value="frmaboutunit.lfm"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="GPTMBR.pas"/>
-      </Unit12>
-      <Unit13>
-        <Filename Value="udisplaygrid.pas"/>
-      </Unit13>
-      <Unit14>
-        <Filename Value="udisplaygrid.lfm"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="uGPT.pas"/>
-      </Unit15>
-      <Unit16>
-        <Filename Value="uKnownHashLists.pas"/>
-      </Unit16>
-      <Unit17>
-        <Filename Value="uprogress.pas"/>
-      </Unit17>
-      <Unit18>
-        <Filename Value="uprogress.lfm"/>
-      </Unit18>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -117,12 +98,12 @@
     <CodeGeneration>
       <RelocatableUnit Value="True"/>
       <Checks>
-        <IOChecks Value="True"/>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
+        <IOChecks Value="False"/>
+        <RangeChecks Value="False"/>
+        <OverflowChecks Value="False"/>
         <StackChecks Value="True"/>
       </Checks>
-      <VerifyObjMethodCallValidity Value="True"/>
+      <VerifyObjMethodCallValidity Value="False"/>
       <Optimizations>
         <OptimizationLevel Value="3"/>
       </Optimizations>
@@ -139,6 +120,9 @@
       </Options>
     </Linking>
     <Other>
+      <CompilerMessages>
+        <IgnoredMessages idx5024="True"/><!-- "Param XX is unused" -->
+      </CompilerMessages>
       <CustomOptions Value="-OoREGVAR
 -OoPEEPHOLE"/>
     </Other>

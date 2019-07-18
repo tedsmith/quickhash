@@ -81,8 +81,10 @@ uses
       cthreads,
     {$ENDIF}
   {$ENDIF}
-
-  Classes, SysUtils, Strutils, FileUtil, LResources, Forms, Controls,
+  {$IFNDEF Linux}
+    Strutils,
+  {$ENDIF}
+  Classes, SysUtils, FileUtil, LResources, Forms, Controls,
   Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
   LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
   XMLPropStorage, uDisplayGrid, diskmodule, clipbrd, DBGrids, DbCtrls,
@@ -930,15 +932,13 @@ procedure TMainForm.FormDropFiles(Sender: TObject;
 
 var
   filename, fileHashValue : ansistring;
-  start, stop, elapsed, scheduleStartTime : TDateTime;
-  LoopCounter : integer;
+  start, stop, elapsed : TDateTime;
 begin
   // First, clear the captions from any earlier file hashing actions
   StatusBar1.SimpleText    := '';
   lblStartedFileAt.Caption := '...';
   lblFileTimeTaken.Caption := '...';
   memFileHashField.Clear;
-  LoopCounter              := 0;
 
   tabsheet2.Visible:= true;
   tabsheet2.Show;
@@ -960,7 +960,7 @@ begin
           end;
 
       start := Now;
-      lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
+      lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(Start);
 
       edtFileNameToBeHashed.Caption := (filename);
       StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
@@ -1089,7 +1089,7 @@ begin
         end;
 
         start := Now;
-        lblStartedFileAt.Caption := 'Started at : '+ FormatDateTime('dd/mm/yyyy hh:mm:ss', Start);
+        lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(Start);
 
         edtFileNameToBeHashed.Caption := (filename);
         StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
@@ -1102,7 +1102,7 @@ begin
 
         stop := Now;
         elapsed := stop - start;
-        lbEndedFileAt.Caption    := 'Ended at   : ' + FormatDateTime('DD/MM/YYYY HH:MM:SS', stop);
+        lbEndedFileAt.Caption    := 'Ended at   : ' + DateTimeToStr(stop);
         lblFileTimeTaken.Caption := 'Time taken : ' + FormatDateTime('HH:MM:SS', elapsed);
         Application.ProcessMessages;
 
@@ -1635,10 +1635,7 @@ end;
 
 // Copy hash value of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
-var
-  CellOfInterest : string;
 begin
-  CellOfInterest := '';
   frmSQLiteDBases.CopyHashOfSelectedCell(RecursiveDisplayGrid1);
 end;
 
@@ -2074,39 +2071,22 @@ end;
 procedure TMainForm.btnMakeTextLowerClick(Sender: TObject);
 var
   s : string;
-  i : integer;
 begin
-  s := memoHashText.Text;
-    for i := 1 to Length(s) do
-      begin
-        if s[i] in ['A'..'Z'] then
-        begin
-          s := Lowercase(s);
-          memoHashText.Text := s;
-        end;
-      end;
-    HashText(memoHashText);
-    application.ProcessMessages;
+  s := Lowercase(memoHashText.Text);
+  memoHashText.Text := s;
+  HashText(memoHashText);
+  application.ProcessMessages;
 end;
 
 procedure TMainForm.btnMakeTextUpperClick(Sender: TObject);
 var
   s : string;
-  i : integer;
 begin
-  s := memoHashText.Text;
-    for i := 1 to Length(s) do
-      begin
-        if s[i] in ['a'..'z'] then
-        begin
-          s := Uppercase(s);
-          memoHashText.Text := s;
-        end;
-      end;
-    HashText(memoHashText);
-    application.ProcessMessages;
+  s := Uppercase(memoHashText.Text);
+  memoHashText.Text := s;
+  HashText(memoHashText);
+  application.ProcessMessages;
 end;
-
 
 procedure TMainForm.cbFlipCaseFILEChange(Sender: TObject);
 var
@@ -2531,7 +2511,7 @@ end;
 procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
-  FolderA, FolderB, HashVal, StringToWrite, RogueHash : string;
+  FolderA, FolderB, RogueHash : string;
 
   slFileListA, slFileListB, slMissingHashes  : TStringList;
 
@@ -2541,7 +2521,7 @@ var
 
   i, lenRogueHash : integer;
 
-  FolderAFileCount, FolderBFileCount, FileCountDifference, StringLength: integer;
+  FolderAFileCount, FolderBFileCount, FileCountDifference : integer;
 
   StartTime, EndTime, TimeTaken : TDateTime;
 
@@ -3384,14 +3364,14 @@ begin
       memFileHashField.Clear;
       StatusBar1.SimpleText := 'RECOMPUTING NEW HASH VALUE...Please wait.';
       start := Now;
-      lblStartedFileAt.Caption := 'Started at : '+ TimeToStr(start);
+      lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(start);
       Application.ProcessMessages;
       HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text);
       memFileHashField.Lines.Add(Uppercase(HashValue));
       stop := Now;
       elapsed := stop - start;
       StatusBar1.SimpleText := 'RECOMPUTED NEW HASH VALUE.';
-      lbEndedFileAt.Caption:= 'Ended at : '+ TimeToStr(stop);
+      lbEndedFileAt.Caption:= 'Ended at : '+ DateTimeToStr(stop);
       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
       // If the user has pasted an expected hash value, since the last hash computation,
       // then check if it matches the newly computed hash
@@ -3571,15 +3551,16 @@ var
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
   TotalBytesRead_B, LoopCounter, IntFileSize : QWord;
-  strFileSize : string;
 
 begin
   TotalBytesRead_B := 0;
   IntFileSize      := 0;
-  strFileSize      := '';
   LoopCounter      := 0; // Used for periodic interface refresh, to avoid slowing things down.
 
   result := '';
+
+  // Initialise Buffer
+  FillChar(Buffer, SizeOf(Buffer), 0);
 
   case PageControl1.TabIndex of
         0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
@@ -3897,27 +3878,26 @@ type
   TRange = 'A'..'Z';   // For the drive lettering of Windows systems
 {$ENDIF}
 var
-  i, NoOfFilesCopiedOK, j, HashMismtachCount,
+  i, NoOfFilesCopiedOK, HashMismtachCount,
     FileCopyErrors, ZeroByteFilesCounter, DupCount : integer;
 
   SizeOfFile2, TotalBytesRead2, NoFilesExamined, SizeOfCurrentFile: Int64;
 
   SubDirStructure, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
-    FormattedSystemDate, OutputDirDateFormatted, CrDateModDateAccDate,
-    CSVLogFile2, HTMLLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
+    OutputDirDateFormatted, CrDateModDateAccDate,
+    CSVLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
     strTimeDifference,  FileMask,
     Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute: string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
-  FilesFoundToCopy, DirectoriesFoundList, SLCopyErrors : TStringList;
+  FilesFoundToCopy, SLCopyErrors : TStringList;
 
   SummaryMessage : TForm;   // This is the summary message that appears at the end
 
   {$IFDEF WINDOWS}
-  k : integer;
-  CurrentFile : string;
+  j, k : integer;
   slTemp : TStringList;
   DriveLetter : char;  // For MS Windows drive letter irritances only
   {$ENDIF}
@@ -3937,8 +3917,8 @@ begin
   TotalBytesRead2         := 0;
   DupCount                := 0;
   i                       := 0;
-  j                       := 0;
   {$IFDEF Windows}
+  j                       := 0;
   k                       := 0;
   {$ENDIF}
   SizeOfCurrentFile       := -1;
@@ -3956,7 +3936,7 @@ begin
   DateTimeToStr(SystemDate);
 
   // Date and time for the user, to be displayed later
-  FormattedSystemDate := FormatDateTime('YYYY/MM/DD HH:MM:SS', SystemDate);
+  //FormattedSystemDate := FormatDateTime('YYYY/MM/DD HH:MM:SS', SystemDate);
 
   // Date and time for the output directory, to be used later with other dir structures
   OutputDirDateFormatted := FormatDateTime('YYYY-MM-DD_HH-MM-SS', SystemDate);

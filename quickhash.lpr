@@ -75,9 +75,9 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, lazdbexport, Unit2, FindAllFilesEnhanced, diskmodule, uDisplayGrid,
-  diskspecification, uProgress, frmAboutUnit, zvdatetimectrls, dbases_sqlite,
-  uKnownHashLists;
+  //FindAllFilesEnhanced, uKnownHashLists,
+  Forms, lazdbexport, Unit2, diskmodule, uDisplayGrid,
+  diskspecification, uProgress, frmAboutUnit, zvdatetimectrls, dbases_sqlite;
 
 {$R *.res}
 
