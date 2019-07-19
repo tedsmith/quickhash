@@ -77,6 +77,7 @@ type
     procedure CopyFileNameOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyFilePathOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyHashOfSelectedCell(DBGrid : TDBGrid);
+    procedure CopyAllHashesFILESTAB(DBGrid : TDBGrid);
     procedure CopySelectedRowFILESTAB(DBGrid : TDBGrid);
     procedure CopySelectedRowCOPYTAB(DBGrid : TDBGrid);
     procedure SortBySourceFilename(DBGrid : TDBGrid);
@@ -918,7 +919,7 @@ begin
   end;
 end;
 
-// // Used by the FILES tab display grid to copy the content of Column 3 (Hash Value) to clipboard
+// Used by the FILES tab display grid to copy the content of Column 3 (Hash Value) to clipboard
 procedure TfrmSQLiteDBases.CopyHashOfSelectedCell(DBGrid : TDBGrid);
 var
   CellOfInterest : string;
@@ -928,6 +929,55 @@ begin
   begin
     CellOfInterest := DBGrid.DataSource.DataSet.Fields[3].Value;
     Clipboard.AsText := CellOfInterest;
+  end;
+end;
+
+// Used by the FILES tab display grid to copy all the hash values of Column 3 to clipboard
+// Useful to create hashlists without adding the entire grid content
+procedure TfrmSQLiteDBases.CopyAllHashesFILESTAB(DBGrid : TDBGrid);
+var
+  slFileHashes : TStringList;
+  ChosenHashAlg, Header : string;
+begin
+  ChosenHashAlg := '';
+  Header        := '';
+  case MainForm.AlgorithmChoiceRadioBox3.ItemIndex of
+      0: begin
+      ChosenHashAlg := 'MD5';
+      end;
+      1: begin
+      ChosenHashAlg := 'SHA-1';
+      end;
+      2: begin
+      ChosenHashAlg := 'SHA-3';
+      end;
+      3: begin
+      ChosenHashAlg := 'SHA256';
+      end;
+      4: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      5: begin
+      ChosenHashAlg := 'xxHash';
+      end;
+      6: begin
+      ChosenHashAlg := 'Blake2B';
+      end;
+  end;
+
+  Header := ChosenHashAlg;
+  try
+    slFileHashes := TStringList.Create;
+    slFileHashes.Add(Header); // Give the list a header of the chosen hash algorithm
+    while not DBGrid.DataSource.DataSet.EOF do
+    begin
+      slFileHashes.Add(DBGrid.DataSource.DataSet.Fields[3].Text);
+      DBGrid.DataSource.DataSet.Next;
+    end;
+    Clipboard.AsText := slFileHashes.Text;
+  finally
+    slFileHashes.Free;
+    ShowMessage('Hash column content now in clipboard.');
   end;
 end;
 

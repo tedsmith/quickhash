@@ -150,12 +150,14 @@ type
   end;
 
    TMainForm = class(TForm)
+    AlgorithmChoiceRadioBox1: TRadioGroup;
+    AlgorithmChoiceRadioBox2: TRadioGroup;
     AlgorithmChoiceRadioBox3: TRadioGroup;
     AlgorithmChoiceRadioBox4: TRadioGroup;
-    AlgorithmChoiceRadioBox1: TRadioGroup;
-    AlgorithmChoiceRadioBox6: TRadioGroup;
     AlgorithmChoiceRadioBox5: TRadioGroup;
+    AlgorithmChoiceRadioBox6: TRadioGroup;
     AlgorithmChoiceRadioBox7: TRadioGroup;
+
     b64FileGridPopupMenu: TPopupMenu;
     b64DecoderProgress: TEdit;
     b64StringGrid2FileS: TStringGrid;
@@ -200,6 +202,7 @@ type
     lblTotalFileCountB: TLabel;
     lblTotalFileCountNumberB: TLabel;
     memFolderCompareSummary: TMemo;
+    MenuItem_CopyAllHashesToClipboardFILES: TMenuItem;
     MenuItem_FilterOutYes: TMenuItem;
     MenuItem_FilterOutNo: TMenuItem;
     MenuItem_SortByHashList: TMenuItem;
@@ -329,7 +332,6 @@ type
     Label6: TLabel;
     lblStartedFileAt: TLabel;
     lblFileTimeTaken: TLabel;
-    AlgorithmChoiceRadioBox2: TRadioGroup;
     memFileHashField: TMemo;
     FLBLDialog: TOpenDialog;
     SaveDialog5: TSaveDialog;
@@ -380,6 +382,7 @@ type
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox3Click(Sender: TObject);
+    procedure AlgorithmChoiceRadioBox7Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox4Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox6Click(Sender: TObject);
@@ -421,6 +424,7 @@ type
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
+    procedure MenuItem_CopyAllHashesToClipboardFILESClick(Sender: TObject);
     procedure MenuItem_DeleteDupsClick(Sender: TObject);
     procedure MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
     procedure MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
@@ -647,20 +651,20 @@ begin
   RecursiveDisplayGrid1.Visible:= false;
 
   {$ifdef CPU64}
-  AlgorithmChoiceRadioBox1.Items.Strings[4] := 'xxHash64';
-  AlgorithmChoiceRadioBox2.Items.Strings[4] := 'xxHash64';
-  AlgorithmChoiceRadioBox3.Items.Strings[4] := 'xxHash64';
-  AlgorithmChoiceRadioBox4.Items.Strings[4] := 'xxHash64';
-  AlgorithmChoiceRadioBox5.Items.Strings[4] := 'xxHash64';
-  AlgorithmChoiceRadioBox6.Items.Strings[4] := 'xxHash64';
+  AlgorithmChoiceRadioBox1.Items.Strings[5] := 'xxHash64';
+  AlgorithmChoiceRadioBox2.Items.Strings[5] := 'xxHash64';
+  AlgorithmChoiceRadioBox3.Items.Strings[5] := 'xxHash64';
+  AlgorithmChoiceRadioBox4.Items.Strings[5] := 'xxHash64';
+  AlgorithmChoiceRadioBox5.Items.Strings[5] := 'xxHash64';
+  AlgorithmChoiceRadioBox6.Items.Strings[5] := 'xxHash64';
   MainForm.Caption := MainForm.Caption + ', 64-bit';
   {$else if CPU32}
-  AlgorithmChoiceRadioBox1.Items.Strings[4] := 'xxHash32';
-  AlgorithmChoiceRadioBox2.Items.Strings[4] := 'xxHash32';
-  AlgorithmChoiceRadioBox3.Items.Strings[4] := 'xxHash32';
-  AlgorithmChoiceRadioBox4.Items.Strings[4] := 'xxHash32';
-  AlgorithmChoiceRadioBox5.Items.Strings[4] := 'xxHash32';
-  AlgorithmChoiceRadioBox6.Items.Strings[4] := 'xxHash32';
+  AlgorithmChoiceRadioBox1.Items.Strings[5] := 'xxHash32';
+  AlgorithmChoiceRadioBox2.Items.Strings[5] := 'xxHash32';
+  AlgorithmChoiceRadioBox3.Items.Strings[5] := 'xxHash32';
+  AlgorithmChoiceRadioBox4.Items.Strings[5] := 'xxHash32';
+  AlgorithmChoiceRadioBox5.Items.Strings[5] := 'xxHash32';
+  AlgorithmChoiceRadioBox6.Items.Strings[5] := 'xxHash32';
   MainForm.Caption := MainForm.Caption + ', 32-bit';
   {$endif}
 
@@ -1422,13 +1426,19 @@ begin
       ChosenHashAlg := 'SHA-1';
       end;
       2: begin
-      ChosenHashAlg := 'SHA256';
+      ChosenHashAlg := 'SHA-3';
       end;
       3: begin
-      ChosenHashAlg := 'SHA512';
+      ChosenHashAlg := 'SHA256';
       end;
       4: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      5: begin
       ChosenHashAlg := 'xxHash';
+      end;
+      6: begin
+      ChosenHashAlg := 'Blake2B';
       end;
   end;
   if lblFileAHash.Caption = '...' then
@@ -1453,13 +1463,19 @@ begin
       ChosenHashAlg := 'SHA-1';
       end;
       2: begin
-      ChosenHashAlg := 'SHA256';
+      ChosenHashAlg := 'SHA-3';
       end;
       3: begin
-      ChosenHashAlg := 'SHA512';
+      ChosenHashAlg := 'SHA256';
       end;
       4: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      5: begin
       ChosenHashAlg := 'xxHash';
+      end;
+      6: begin
+      ChosenHashAlg := 'Blake2B';
       end;
   end;
   if lblFileBHash.Caption = '...' then
@@ -1600,6 +1616,12 @@ begin
   Showmessage('Grid row data copied to clipboard OK');
 end;
 
+procedure TMainForm.MenuItem_CopyAllHashesToClipboardFILESClick(Sender: TObject
+  );
+begin
+  frmSQLiteDBases.CopyAllHashesFILESTAB(RecursiveDisplayGrid1);
+end;
+
 procedure TMainForm.MenuItem_DeleteDupsClick(Sender: TObject);
 
 begin
@@ -1732,6 +1754,7 @@ begin
   AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
+  AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
 end;
 
 procedure TMainForm.AlgorithmChoiceRadioBox2Click(Sender: TObject);
@@ -1741,6 +1764,7 @@ begin
   AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
+  AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
 end;
 
 procedure TMainForm.AlgorithmChoiceRadioBox3Click(Sender: TObject);
@@ -1750,7 +1774,9 @@ begin
   AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
+  AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
 end;
+
 
 procedure TMainForm.AlgorithmChoiceRadioBox4Click(Sender: TObject);
 begin
@@ -1759,6 +1785,7 @@ begin
   AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
+  AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
 end;
 
 procedure TMainForm.AlgorithmChoiceRadioBox5Click(Sender: TObject);
@@ -1768,6 +1795,7 @@ begin
   AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
   AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
+  AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
 end;
 
 procedure TMainForm.AlgorithmChoiceRadioBox6Click(Sender: TObject);
@@ -1777,8 +1805,18 @@ begin
   AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
   AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
+  AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
 end;
 
+procedure TMainForm.AlgorithmChoiceRadioBox7Click(Sender: TObject);
+begin
+  AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
+  AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
+  AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
+  AlgorithmChoiceRadioBox4.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
+  AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
+  AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
+end;
 
 // New to v2.8.3, to better facilitate use of the Expected Hash field
 procedure TMainForm.btnClearHashFieldClick(Sender: TObject);
@@ -3409,9 +3447,8 @@ begin
   result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(PWideChar(strToBeHashed), TEncoding.UTF8).ToString();
 end;
 
-// For use in the 'Text' tab only, for hashing text elements. Not to be used
-// for general text hashing. To do that, use ValidateTextWithHash and examine
-// the resulting SHA256 value
+// For use in the 'Text' tab only, for hashing text elements.
+// returns empty string failure. Hash string on success
 function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 var
   TabRadioGroup1: TRadioGroup;
@@ -3426,107 +3463,38 @@ begin
         2: TabRadioGroup1 := AlgorithmChoiceRadioBox3;  //RadioGroup on the 3rd tab.
         3: TabRadioGroup1 := AlgorithmChoiceRadioBox4;  //RadioGroup on the 4th tab.
         4: TabRadioGroup1 := AlgorithmChoiceRadioBox6;  //RadioGroup on the 5th tab.
+        5: TabRadioGroup1 := AlgorithmChoiceRadioBox7;  //RadioGroup on the 6th tab.
       end;
 
       case TabRadioGroup1.ItemIndex of
         0: begin
-             result := THashFactory.TCrypto.CreateMD5().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateMD5().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();       // MD5
            end;
         1: begin
-             result := THashFactory.TCrypto.CreateSHA1().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA1().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();      // SHA-1
            end;
         2: begin
-             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA3_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // SHA-3 (new as of v3.1.0)
            end;
         3: begin
-             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+             result := THashFactory.TCrypto.CreateSHA2_256().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // SHA-256
            end;
         4: begin
+             result := THashFactory.TCrypto.CreateSHA2_512().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // SHA-512
+           end;
+        5: begin
            {$ifdef CPU64}
-            result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+            result := THashFactory.THash64.CreateXXHash64().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();   // xxHash
            {$else if CPU32}
             result := THashFactory.THash32.CreateXXHash32().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            {$endif}
            end;
+        6: begin
+             result := THashFactory.TCrypto.CreateBlake2B_256.ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // SHA-3 (new as of v3.1.0)
+           end;
       end;
     end; // End of string length check
 end;
-
-{ DEPRECATED AS OF V2.8.0 in favour of HashLib4Pascal library instead of DCPCrypt
-function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
-
-  var
-    TabRadioGroup1: TRadioGroup;
-    varMD5Hash: TDCP_MD5;
-    varSHA1Hash: TDCP_SHA1;
-    varSHA256Hash: TDCP_SHA256;
-    varSHA512Hash: TDCP_SHA512;
-
-    DigestMD5:    array[0..31] of byte;  // MD5 produces a 128 bit digest (32 byte output)
-    DigestSHA1:   array[0..31] of byte;  // SHA1 produces a 160 bit digest (32 byte output)
-    DigestSHA256: array[0..31] of byte;  // SHA256 produces a 256 bit digest (32 byte output)
-    DigestSHA512: array[0..63] of byte;  // SHA512 produces a 512 bit digest (64 byte output)
-
-    i: integer;
-    GeneratedHash: string;
-    SourceData : ansistring;
-
-  begin
-    SourceData := '';
-    GeneratedHash := '';
-    SourceData := strToBeHashed;
-    if Length(SourceData) > 0 then
-      begin
-        case PageControl1.TabIndex of
-          0: TabRadioGroup1 := AlgorithmChoiceRadioBox1;  //RadioGroup on the 1st tab.
-          1: TabRadioGroup1 := AlgorithmChoiceRadioBox2;  //RadioGroup on the 2nd tab.
-          2: TabRadioGroup1 := AlgorithmChoiceRadioBox3;  //RadioGroup on the 3rd tab.
-          3: TabRadioGroup1 := AlgorithmChoiceRadioBox4;  //RadioGroup on the 4th tab.
-          4: TabRadioGroup1 := AlgorithmChoiceRadioBox6;  //RadioGroup on the 5th tab.
-        end;
-
-        case TabRadioGroup1.ItemIndex of
-          0: begin
-               varMD5Hash := TDCP_MD5.Create(nil);        // create the hash instance
-               varMD5Hash.Init;                           // initialize it
-               varMD5Hash.UpdateStr(SourceData);          // hash the string
-               varMD5Hash.Final(DigestMD5);               // produce the digest
-               varMD5Hash.Free;                           // Free the resource
-               for i := 0 to 15 do                        // Generate 32 (16 hex values)character output
-                 GeneratedHash := GeneratedHash + IntToHex(DigestMD5[i],2);
-             end;
-          1: begin
-               varSHA1Hash := TDCP_SHA1.Create(nil);
-               varSHA1Hash.Init;
-               varSHA1Hash.UpdateStr(SourceData);
-               varSHA1Hash.Final(DigestSHA1);
-               varSHA1Hash.Free;
-               for i := 0 to 19 do                        // 40 (20 hex values) character output
-                GeneratedHash := GeneratedHash + IntToHex(DigestSHA1[i],2);
-             end;
-          2: begin
-               varSHA256Hash := TDCP_SHA256.Create(nil);
-               varSHA256Hash.Init;
-               varSHA256Hash.UpdateStr(SourceData);
-               varSHA256Hash.Final(DigestSHA256);
-               varSHA256Hash.Free;
-               for i := 0 to 31 do                        // 64 (32 hex values) character output
-                GeneratedHash := GeneratedHash + IntToHex(DigestSHA256[i],2);
-             end;
-          3: begin
-               varSHA512Hash := TDCP_SHA512.Create(nil);
-               varSHA512Hash.Init;
-               varSHA512Hash.UpdateStr(SourceData);
-               varSHA512Hash.Final(DigestSHA512);
-               varSHA512Hash.Free;
-               for i := 0 to 63 do                        // 128 (64 hex values) character output
-                GeneratedHash := GeneratedHash + IntToHex(DigestSHA512[i],2);
-             end;
-      end;
-    end;
-    result := GeneratedHash;  // return the resultant hash digest, if successfully computed
-  end;
-}
 
 function TMainForm.CalcTheHashFile(FileToBeHashed:string):string;
 const
@@ -3534,10 +3502,21 @@ const
 var
   TabRadioGroup2: TRadioGroup;
   fsFileToBeHashed: TFileStream;
-  // HashLib4Pascal types for MD5, SHA-1, SHA256 and SHA-512
-  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512 : IHash;
-  HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256,
-    HashInstanceResultSHA512 : IHashResult;
+  // HashLib4Pascal types for MD5, SHA-1, SHA3-256, SHA256, SHA-512 and Blake2B
+  HashInstanceMD5,
+  HashInstanceSHA1,
+  HashInstanceSHA3,
+  HashInstanceSHA256,
+  HashInstanceSHA512,
+  HashInstanceBlake2B       : IHash;
+
+  HashInstanceResultMD5,
+  HashInstanceResultSHA1,
+  HashInstanceResultSHA3,
+  HashInstanceResultSHA256,
+  HashInstanceResultSHA512,
+  HashInstanceResultBlake2B : IHashResult;
+
   // HashLib4Pascal types for xxHash. xxHash64 is crazy fast on 64, but if run on a 32-bit
   // system, performance is hindered considerably. So for this algorithm, CPU dependant
   // instances are created
@@ -3666,6 +3645,36 @@ begin
         end; // End of SHA-1
 
       2: begin
+          // SHA-3-256
+          HashInstanceSHA3 := THashFactory.TCrypto.CreateSHA3_256();
+          HashInstanceSHA3.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceSHA3.TransformUntyped(Buffer, i);
+                  // If the File tab is the tab doing the hashing, refresh the interface
+                  if PageControl1.ActivePage = TabSheet2 then
+                  begin
+                  inc(TotalBytesRead_B, i);
+                  inc(LoopCounter, 1);
+                  if LoopCounter = 40 then
+                    begin
+                    pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                    lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                    LoopCounter := 0;
+                    Application.ProcessMessages;
+                    end;
+                  end;
+              end;
+            until false;
+          HashInstanceResultSHA3 := HashInstanceSHA3.TransformFinal();
+          result := HashInstanceResultSHA3.ToString()
+          end; // End of SHA3-256
+
+      3: begin
         // SHA256
         HashInstanceSHA256 := THashFactory.TCrypto.CreateSHA2_256();
         HashInstanceSHA256.Initialize();
@@ -3695,7 +3704,7 @@ begin
         result := HashInstanceResultSHA256.ToString()
         end;  // End of SHA256
 
-      3: begin
+      4: begin
         // SHA512
         HashInstanceSHA512 := THashFactory.TCrypto.CreateSHA2_512();
         HashInstanceSHA512.Initialize();
@@ -3725,7 +3734,7 @@ begin
         result := HashInstanceResultSHA512.ToString()
         end;  // End of SHA512
 
-      4: begin
+      5: begin
         // xxHash
         {$ifdef CPU64}
         HashInstancexxHash64 := THashFactory.THash64.CreateXXHash64();
@@ -3737,6 +3746,18 @@ begin
           else
             begin
               HashInstancexxHash64.TransformUntyped(Buffer, i);
+              if PageControl1.ActivePage = TabSheet2 then
+                begin
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  Application.ProcessMessages;
+                  end;
+                end;
             end;
           until false;
         HashInstanceResultxxHash64 := HashInstancexxHash64.TransformFinal();
@@ -3770,6 +3791,36 @@ begin
         result := HashInstanceResultxxHash32.ToString()
         {$endif}
         end;  // End of xxHash
+
+       6: begin
+        // Blake2B
+        HashInstanceBlake2B := THashFactory.TCrypto.CreateBlake2B_256();
+        HashInstanceBlake2B.Initialize();
+          repeat
+          i := fsFileToBeHashed.Read(Buffer, BufSize);
+          if i <= 0 then
+            break
+          else
+            begin
+              HashInstanceBlake2B.TransformUntyped(Buffer, i);
+              // If the File tab is the tab doing the hashing, refresh the interface
+              if PageControl1.ActivePage = TabSheet2 then
+                begin
+                inc(TotalBytesRead_B, i);
+                inc(LoopCounter, 1);
+                if LoopCounter = 40 then
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  Application.ProcessMessages;
+                  end;
+                end;
+            end;
+          until false;
+        HashInstanceResultBlake2B := HashInstanceBlake2B.TransformFinal();
+        result := HashInstanceResultBlake2B.ToString()
+        end; // End of Blake2B
     end; // end of case statement
   end // end of FileSize greater than zero byte check
   else

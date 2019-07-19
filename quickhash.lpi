@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <General>
       <MainUnit Value="0"/>
       <Title Value="QuickHash"/>
@@ -25,15 +25,16 @@
     <PublishOptions>
       <Version Value="2"/>
       <DestinationDirectory Value="C:/tmp/src"/>
-      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
-      <UseExcludeFileFilter Value="True"/>
-      <ExcludeFileFilter Value="*.(lpi|bak|ppu|ppw|o|so);*~;backup"/>
     </PublishOptions>
     <RunParams>
-      <local>
-        <FormatVersion Value="1"/>
-        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
-      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default">
+          <local>
+            <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+          </local>
+        </Mode0>
+      </Modes>
     </RunParams>
     <RequiredPackages Count="6">
       <Item1>
@@ -55,11 +56,11 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="20">
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -69,9 +70,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="1590"/>
+        <CursorPos X="3" Y="1578"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -82,8 +84,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uDisplayGrid"/>
-        <EditorIndex Value="2"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="7"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -92,8 +94,8 @@
         <ComponentName Value="frmDiskHashingModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="8"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit3>
@@ -101,14 +103,14 @@
         <Filename Value="diskmodule.lfm"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="26"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit4>
       <Unit5>
         <Filename Value="diskspecification.lfm"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="26"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit5>
       <Unit6>
@@ -117,23 +119,23 @@
         <ComponentName Value="frmTechSpecs"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="4"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="9"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="GPTMBR.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="5"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="10"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="uGPT.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="6"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="11"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
@@ -143,8 +145,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uProgress"/>
-        <EditorIndex Value="7"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="12"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit9>
       <Unit10>
@@ -153,12 +155,209 @@
         <ComponentName Value="frmSQLiteDBases"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="8"/>
-        <UsageCount Value="20"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="13"/>
+        <TopLine Value="940"/>
+        <CursorPos X="29" Y="953"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="HashLib4Pascal/src/Interfaces/HlpIHashResult.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="6" Y="2"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="../../Packages/HashLib4Pascal/HashLib/src/Base/HlpHashFactory.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="350"/>
+        <CursorPos X="25" Y="382"/>
+        <UsageCount Value="10"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="../../Packages/HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="11"/>
+        <UsageCount Value="10"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="../../Packages/HashLib4Pascal/src/Base/HlpHashFactory.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="372"/>
+        <CursorPos X="22" Y="409"/>
+        <UsageCount Value="10"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="../../Libraries/HashLib4Pascal/HashLib/src/Base/HlpHashResult.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="138"/>
+        <CursorPos X="18" Y="156"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="../../../../../../lazarus-v2.0.2/lcl/include/radiogroup.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="423"/>
+        <CursorPos Y="441"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="../../../../../../lazarus-v2.0.2/lcl/include/control.inc"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="3551"/>
+        <CursorPos Y="3568"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="../../../../../../lazarus-v2.0.2/lcl/clipbrd.pp"/>
+        <UnitName Value="Clipbrd"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="245"/>
+        <CursorPos Y="263"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="frmaboutunit.pas"/>
+        <ComponentName Value="frmAbout"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="frmAboutUnit"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="23"/>
+        <CursorPos X="19" Y="31"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit19>
     </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="../../../../../../lazarus-v2.0.2/lcl/include/control.inc"/>
+        <Caret Line="3576" TopLine="3556"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../../../../../lazarus-v2.0.2/lcl/include/control.inc"/>
+        <Caret Line="3547" TopLine="3529"/>
+      </Position2>
+      <Position3>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1449" Column="30" TopLine="1690"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1450" Column="30" TopLine="1450"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1451" Column="30" TopLine="1451"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1450" Column="30" TopLine="1450"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1449" Column="30" TopLine="1449"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1451" Column="30" TopLine="1451"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1620" Column="27" TopLine="1612"/>
+      </Position9>
+      <Position10>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="938" Column="32" TopLine="584"/>
+      </Position10>
+      <Position11>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="948" TopLine="914"/>
+      </Position11>
+      <Position12>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="940" Column="8" TopLine="922"/>
+      </Position12>
+      <Position13>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="945" Column="56" TopLine="925"/>
+      </Position13>
+      <Position14>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1636" Column="36" TopLine="1612"/>
+      </Position14>
+      <Position15>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="155" Column="29" TopLine="137"/>
+      </Position15>
+      <Position16>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="384" Column="39" TopLine="355"/>
+      </Position16>
+      <Position17>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="656" Column="27" TopLine="627"/>
+      </Position17>
+      <Position18>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="669" Column="26" TopLine="635"/>
+      </Position18>
+      <Position19>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1753" Column="27" TopLine="1723"/>
+      </Position19>
+      <Position20>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1819" Column="26" TopLine="1784"/>
+      </Position20>
+      <Position21>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="3468" Column="26" TopLine="3433"/>
+      </Position21>
+      <Position22>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="3540" Column="54" TopLine="3518"/>
+      </Position22>
+      <Position23>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="974" TopLine="949"/>
+      </Position23>
+      <Position24>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1421" Column="17" TopLine="1414"/>
+      </Position24>
+      <Position25>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="943" Column="17" TopLine="925"/>
+      </Position25>
+      <Position26>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1421" Column="8" TopLine="1414"/>
+      </Position26>
+      <Position27>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="3407" Column="27" TopLine="3389"/>
+      </Position27>
+      <Position28>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="494" Column="15" TopLine="477"/>
+      </Position28>
+      <Position29>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="3749" Column="59" TopLine="3736"/>
+      </Position29>
+      <Position30>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1578" Column="3" TopLine="1569"/>
+      </Position30>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

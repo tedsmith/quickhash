@@ -1,10 +1,10 @@
 object MainForm: TMainForm
-  Left = 411
+  Left = 674
   Height = 733
-  Top = 177
+  Top = 197
   Width = 1023
   AllowDropFiles = True
-  Caption = 'QuickHash v3.0.4 (Jan 2019) - The easy and convenient way to hash data in Linux, OSX and Windows'
+  Caption = 'QuickHash v3.1.0 (July 2019) - The easy and convenient way to hash data in Linux, OSX and Windows'
   ClientHeight = 713
   ClientWidth = 1023
   Menu = MainMenu1
@@ -13,17 +13,17 @@ object MainForm: TMainForm
   OnDropFiles = FormDropFiles
   Position = poScreenCenter
   SessionProperties = 'Position'
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.2.0'
   object PageControl1: TPageControl
     Left = 24
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -111,13 +111,7 @@ object MainForm: TMainForm
           Top = 368
           Width = 822
           Anchors = [akTop, akLeft, akRight]
-          EditLabel.AnchorSideLeft.Control = lbleExpectedHashText
-          EditLabel.AnchorSideRight.Control = lbleExpectedHashText
-          EditLabel.AnchorSideRight.Side = asrBottom
-          EditLabel.AnchorSideBottom.Control = lbleExpectedHashText
-          EditLabel.Left = 8
           EditLabel.Height = 17
-          EditLabel.Top = 348
           EditLabel.Width = 822
           EditLabel.Caption = 'Expected Hash Value (clear, then paste value from other utility)'
           EditLabel.ParentColor = False
@@ -221,7 +215,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
         Left = 16
-        Height = 129
+        Height = 174
         Hint = 'Having typed some text in the text area, you can'#13#10'easily recompute different hashes for the text inputted'#13#10'by choosing a different hash algorithm'
         Top = 10
         Width = 96
@@ -235,16 +229,18 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 107
+        ClientHeight = 152
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
           'MD5'
           'SHA-1'
+          'SHA-3'
           'SHA256'
           'SHA512'
           'xxHash'
+          'Blake2B'
         )
         OnClick = AlgorithmChoiceRadioBox1Click
         OnSelectionChanged = HashText
@@ -256,7 +252,7 @@ object MainForm: TMainForm
       object SystemRAMGroupBox: TGroupBox
         Left = 16
         Height = 81
-        Top = 152
+        Top = 192
         Width = 96
         Caption = 'System RAM'
         ClientHeight = 59
@@ -392,13 +388,7 @@ object MainForm: TMainForm
           Top = 264
           Width = 820
           Anchors = [akTop, akLeft, akRight]
-          EditLabel.AnchorSideLeft.Control = lbleExpectedHash
-          EditLabel.AnchorSideRight.Control = lbleExpectedHash
-          EditLabel.AnchorSideRight.Side = asrBottom
-          EditLabel.AnchorSideBottom.Control = lbleExpectedHash
-          EditLabel.Left = 8
           EditLabel.Height = 17
-          EditLabel.Top = 244
           EditLabel.Width = 820
           EditLabel.Caption = 'Expected Hash Value (paste from other utility before or after file hashing)'
           EditLabel.ParentColor = False
@@ -420,7 +410,7 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Enter date and time (hours and minutes) '#13#10'to start the process. Must be in the future!'
           Top = 32
-          Width = 132
+          Width = 136
           CenturyFrom = 1941
           MaxDate = 72686
           MinDate = 42736
@@ -494,7 +484,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup
         Left = 16
-        Height = 129
+        Height = 174
         Top = 10
         Width = 96
         AutoFill = True
@@ -507,16 +497,18 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 107
+        ClientHeight = 152
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
           'MD5'
           'SHA-1'
+          'SHA-3'
           'SHA256'
           'SHA512'
           'xxHash'
+          'Blake2B'
         )
         OnClick = AlgorithmChoiceRadioBox2Click
         OnSelectionChanged = AlgorithmChoiceRadioBox2SelectionChanged
@@ -759,7 +751,7 @@ object MainForm: TMainForm
           Left = 128
           Height = 25
           Top = 36
-          Width = 132
+          Width = 136
           CenturyFrom = 1941
           MaxDate = 72686
           MinDate = 42736
@@ -846,7 +838,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox3: TRadioGroup
         Left = 16
-        Height = 129
+        Height = 174
         Top = 10
         Width = 96
         AutoFill = True
@@ -859,16 +851,18 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 107
+        ClientHeight = 152
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
           'MD5'
           'SHA-1'
+          'SHA-3'
           'SHA256'
           'SHA512'
           'xxHash'
+          'Blake2B'
         )
         OnClick = AlgorithmChoiceRadioBox3Click
         ParentFont = False
@@ -1119,7 +1113,7 @@ object MainForm: TMainForm
             Height = 25
             Hint = 'Enter date and time (hours and minutes) '
             Top = 64
-            Width = 132
+            Width = 136
             CenturyFrom = 1941
             MaxDate = 73050
             MinDate = 42736
@@ -1254,7 +1248,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox4: TRadioGroup
         Left = 16
-        Height = 129
+        Height = 174
         Top = 10
         Width = 96
         AutoFill = True
@@ -1267,16 +1261,18 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 107
+        ClientHeight = 152
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
           'MD5'
           'SHA-1'
+          'SHA-3'
           'SHA256'
           'SHA512'
           'xxHash'
+          'Blake2B'
         )
         OnClick = AlgorithmChoiceRadioBox4Click
         ParentFont = False
@@ -1289,7 +1285,7 @@ object MainForm: TMainForm
       ClientWidth = 983
       object AlgorithmChoiceRadioBox5: TRadioGroup
         Left = 16
-        Height = 129
+        Height = 174
         Top = 10
         Width = 96
         AutoFill = True
@@ -1302,16 +1298,18 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 107
+        ClientHeight = 152
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
           'MD5'
           'SHA-1'
+          'SHA-3'
           'SHA256'
           'SHA512'
           'xxHash'
+          'Blake2B'
         )
         OnClick = AlgorithmChoiceRadioBox5Click
         OnSelectionChanged = AlgorithmChoiceRadioBox5SelectionChanged
@@ -1461,7 +1459,7 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Enter date and time (hours and minutes) '
           Top = 132
-          Width = 132
+          Width = 136
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = 42736
@@ -1516,7 +1514,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox6: TRadioGroup
         Left = 16
-        Height = 129
+        Height = 174
         Top = 10
         Width = 96
         AutoFill = True
@@ -1529,16 +1527,18 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 107
+        ClientHeight = 152
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
           'MD5'
           'SHA-1'
+          'SHA-3'
           'SHA256'
           'SHA512'
           'xxHash'
+          'Blake2B'
         )
         OnClick = AlgorithmChoiceRadioBox6Click
         ParentFont = False
@@ -1603,7 +1603,7 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Enter date and time (hours and minutes) '
           Top = 200
-          Width = 132
+          Width = 136
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = 42736
@@ -1843,7 +1843,7 @@ object MainForm: TMainForm
       ClientWidth = 983
       object AlgorithmChoiceRadioBox7: TRadioGroup
         Left = 16
-        Height = 129
+        Height = 174
         Top = 10
         Width = 96
         AutoFill = True
@@ -1856,18 +1856,20 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 107
+        ClientHeight = 152
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
         Items.Strings = (
           'MD5'
           'SHA-1'
+          'SHA-3'
           'SHA256'
           'SHA512'
           'xxHash'
+          'Blake2B'
         )
-        OnClick = AlgorithmChoiceRadioBox3Click
+        OnClick = AlgorithmChoiceRadioBox7Click
         ParentFont = False
         TabOrder = 0
       end
@@ -2279,8 +2281,12 @@ object MainForm: TMainForm
       OnClick = MenuItem_CopyHashOfSelectedCellClick
     end
     object MenuItem_CopyGridToClipboardFILES: TMenuItem
-      Caption = 'Copy entire grid to clipboard'
+      Caption = 'Copy entire grid'
       OnClick = MenuItem_CopyGridToClipboardFILESClick
+    end
+    object MenuItem_CopyAllHashesToClipboardFILES: TMenuItem
+      Caption = 'Copy all hash values'
+      OnClick = MenuItem_CopyAllHashesToClipboardFILESClick
     end
     object MenuItem_ShowDuplicates: TMenuItem
       Caption = 'Show only duplicates'

@@ -7,7 +7,7 @@ object frmAbout: TfrmAbout
   ClientHeight = 597
   ClientWidth = 509
   Position = poMainFormCenter
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.2.0'
   object memAbout: TMemo
     Left = 16
     Height = 536
@@ -15,7 +15,7 @@ object frmAbout: TfrmAbout
     Width = 479
     Anchors = [akTop, akLeft, akRight, akBottom]
     Lines.Strings = (
-      'v3.0.4, Developed by Ted Smith (c) 2011-2019'
+      'v3.1.0, Developed by Ted Smith (c) 2011-2019'
       ''
       'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''
@@ -34,6 +34,8 @@ object frmAbout: TfrmAbout
       'The HashLib4Pascal library is licensed under MIT and developed by the talented Ugochukwu Mmaduekwe Stanley (aka Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'
       ''
       'xxHash64 : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/, Github user Cyan4973. Use of the library is also welcomed and acknowledged and very much appreciated'
+      ''
+      'Blake2B : https://blake2.net/ : Use of the fast and secure Blake2B algorithm is acknowledged and welcomed. '
       '    '
       'QuickHash is open-source and released under the GPL2 license. '
     )
