@@ -282,6 +282,7 @@ type
     pbFile: TProgressBar;
     FilesDBGrid_SaveCSVDialog: TSaveDialog;
     FilesSaveAsHTMLDialog: TSaveDialog;
+    SaveDialog8_SaveJustHashes: TSaveDialog;
     sdFileAndFolderListOnly: TSaveDialog;
     sdHashListLookupResults: TSaveDialog;
     SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
@@ -1616,10 +1617,20 @@ begin
   Showmessage('Grid row data copied to clipboard OK');
 end;
 
-procedure TMainForm.MenuItem_CopyAllHashesToClipboardFILESClick(Sender: TObject
-  );
+procedure TMainForm.MenuItem_CopyAllHashesToClipboardFILESClick(Sender: TObject);
+var
+  WriteToFile : boolean;
 begin
-  frmSQLiteDBases.CopyAllHashesFILESTAB(RecursiveDisplayGrid1);
+  WriteToFile := false;
+  if NoOfFilesInDir2 > 10000 then
+  begin
+  if (MessageDlg('Proceed?', 'File count exceeds 10K. High memory use expected. Save to file instead?', mtConfirmation,
+   [mbNo, mbYes],0) = mrYes) then
+   begin
+     WriteToFile := true;
+   end;
+  frmSQLiteDBases.CopyAllHashesFILESTAB(RecursiveDisplayGrid1, WriteToFile);
+  end;
 end;
 
 procedure TMainForm.MenuItem_DeleteDupsClick(Sender: TObject);

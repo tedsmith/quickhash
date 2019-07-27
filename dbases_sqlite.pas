@@ -77,7 +77,7 @@ type
     procedure CopyFileNameOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyFilePathOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyHashOfSelectedCell(DBGrid : TDBGrid);
-    procedure CopyAllHashesFILESTAB(DBGrid : TDBGrid);
+    procedure CopyAllHashesFILESTAB(DBGrid : TDBGrid; UseFileFlag : Boolean);
     procedure CopySelectedRowFILESTAB(DBGrid : TDBGrid);
     procedure CopySelectedRowCOPYTAB(DBGrid : TDBGrid);
     procedure SortBySourceFilename(DBGrid : TDBGrid);
@@ -341,7 +341,7 @@ begin
     inc(NoOfRows, 1);
     DBGrid.DataSource.DataSet.Next;
   end;
-  // Got to top of grid.
+  // Go to top of grid.
   DBGrid.DataSource.DataSet.First;
   // Return count
   If NoOfRows > -1 then result := NoOfRows;
@@ -934,13 +934,19 @@ end;
 
 // Used by the FILES tab display grid to copy all the hash values of Column 3 to clipboard
 // Useful to create hashlists without adding the entire grid content
-procedure TfrmSQLiteDBases.CopyAllHashesFILESTAB(DBGrid : TDBGrid);
+procedure TfrmSQLiteDBases.CopyAllHashesFILESTAB(DBGrid : TDBGrid; UseFileFlag : Boolean);
 var
-  slFileHashes : TStringList;
-  ChosenHashAlg, Header : string;
+  slFileHashes   : TStringList;
+  tempfile       : TFileStream;
+  n : integer;
+  ChosenHashAlg,
+    Header,
+    FileForCopiedHashes,
+    linetowrite  : string;
 begin
   ChosenHashAlg := '';
   Header        := '';
+  n             := 0;
   case MainForm.AlgorithmChoiceRadioBox3.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -966,18 +972,59 @@ begin
   end;
 
   Header := ChosenHashAlg;
-  try
-    slFileHashes := TStringList.Create;
-    slFileHashes.Add(Header); // Give the list a header of the chosen hash algorithm
-    while not DBGrid.DataSource.DataSet.EOF do
+
+  // If hash value count too large for clipboard use, write to a file
+  if UseFileFlag then
+  begin
+    if MainForm.SaveDialog8_SaveJustHashes.Execute then
     begin
-      slFileHashes.Add(DBGrid.DataSource.DataSet.Fields[3].Text);
-      DBGrid.DataSource.DataSet.Next;
+      Mainform.StatusBar2.SimpleText := 'Writing hash values to file...please wait';
+      Application.ProcessMessages;
+      FileForCopiedHashes := MainForm.SaveDialog8_SaveJustHashes.FileName;
+
+      try
+        tempfile := TFileStream.Create(FileForCopiedHashes, fmCreate);
+        // Give the list a header of the chosen hash algorithm
+        linetowrite := Header + #13#10;
+        tempfile.Write(linetowrite[1], Length(linetowrite));
+        // Now add all the hash strings
+        DBGrid.DataSource.DataSet.First;
+        while not DBGrid.DataSource.DataSet.EOF do
+        begin
+          linetowrite := (DBGrid.DataSource.DataSet.Fields[3].Text) + #13#10;
+          n := Length(linetowrite);
+          try
+            tempfile.Write(linetowrite[1], n);
+          finally
+            DBGrid.DataSource.DataSet.Next;
+          end;
+        end;
+      finally
+        tempfile.Free;
+      end;
+      Mainform.StatusBar2.SimpleText := 'DONE';
+      ShowMessage('Hash column content now in ' + FileForCopiedHashes);
+    end
+    else ShowMessage('Unable to create a file to store the hashes. Check write permissions of location');
+  end
+  else // Hash value count should go into clipboard OK unless the host is shockingly low on memory
+  begin
+    Mainform.StatusBar2.SimpleText := 'Writing hash values to clipboard...please wait';
+    try
+      slFileHashes := TStringList.Create;
+      slFileHashes.Add(Header); // Give the list a header of the chosen hash algorithm
+      DBGrid.DataSource.DataSet.First;
+      while not DBGrid.DataSource.DataSet.EOF do
+      begin
+        slFileHashes.Add(DBGrid.DataSource.DataSet.Fields[3].Text);
+        DBGrid.DataSource.DataSet.Next;
+      end;
+      Clipboard.AsText := slFileHashes.Text;
+    finally
+      slFileHashes.Free;
+      Mainform.StatusBar2.SimpleText := 'DONE. Hash column content now in clipboard.';
+      ShowMessage('Hash column content now in clipboard.');
     end;
-    Clipboard.AsText := slFileHashes.Text;
-  finally
-    slFileHashes.Free;
-    ShowMessage('Hash column content now in clipboard.');
   end;
 end;
 

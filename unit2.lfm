@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 674
+  Left = 492
   Height = 733
-  Top = 197
+  Top = 106
   Width = 1023
   AllowDropFiles = True
   Caption = 'QuickHash v3.1.0 (July 2019) - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet2
+    ActivePage = TabSheet3
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -2328,5 +2328,9 @@ object MainForm: TMainForm
   object sdFileAndFolderListOnly: TSaveDialog
     left = 112
     top = 640
+  end
+  object SaveDialog8_SaveJustHashes: TSaveDialog
+    left = 72
+    top = 312
   end
 end
