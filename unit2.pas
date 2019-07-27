@@ -2773,7 +2773,7 @@ begin
               FileCountDifference      := FolderAFileCount-FolderBFileCount;
               StatusBar6.SimpleText:= 'File count mis-matches by ' + IntToStr(FileCountDifference) + ' but you chose to hash anyway. Comparing files in both folders using hashing...';
               memFolderCompareSummary.Lines.Add('File count mis-matches by ' + IntToStr(FileCountDifference) + ' but you chose to hash anyway.');
-              memFolderCompareSummary.Lines.Add(lblFolderAName.Caption + ' contains ' + lblTotalFileCountNumberA.Caption + ' files, ' + lblFolderAName.Caption + ' contains ' + lblTotalFileCountNumberB.Caption + ' files.');
+              memFolderCompareSummary.Lines.Add(lblFolderAName.Caption + ' contains ' + lblTotalFileCountNumberA.Caption + ' files, ' + lblFolderBName.Caption + ' contains ' + lblTotalFileCountNumberB.Caption + ' files.');
               memFolderCompareSummary.Lines.Add('Now hashing files...please wait');
               HashListA := HashFolderAList(FolderA, slFileListA, FolderAFileCount, NeedToSave);
               HashListB := HashFolderBList(FolderB, slFileListB, FolderBFileCount, NeedToSave);
