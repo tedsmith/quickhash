@@ -1629,8 +1629,8 @@ begin
    begin
      WriteToFile := true;
    end;
-  frmSQLiteDBases.CopyAllHashesFILESTAB(RecursiveDisplayGrid1, WriteToFile);
   end;
+  frmSQLiteDBases.CopyAllHashesFILESTAB(RecursiveDisplayGrid1, WriteToFile);
 end;
 
 procedure TMainForm.MenuItem_DeleteDupsClick(Sender: TObject);
