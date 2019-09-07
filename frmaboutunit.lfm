@@ -7,7 +7,7 @@ object frmAbout: TfrmAbout
   ClientHeight = 597
   ClientWidth = 509
   Position = poMainFormCenter
-  LCLVersion = '2.0.2.0'
+  LCLVersion = '2.0.4.0'
   object memAbout: TMemo
     Left = 16
     Height = 536
@@ -19,11 +19,11 @@ object frmAbout: TfrmAbout
       ''
       'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''
-      'Donations are welcomed! The website is hosted using AWS which is actually quite expensive! If you have found QuickHash useful to you or your business, please consider donating using PayPal at https://paypal.me/quickhashgui'
+      'Github Page is : https://github.com/tedsmith/quickhash'
       ''
-      'The development Github Page is : https://github.com/tedsmith/quickhash'
+      'Bug Tracker http://www.quickhash-gui.org/bug-tracker/  '
       ''
-      'Bug Tracker is available at http://www.quickhash-gui.org/bug-tracker/ where bugs and feature requests can be submitted, reviewed and tracked. '
+      'Donations are welcomed! Please consider donating using PayPal at https://paypal.me/quickhashgui'
       ''
       'Contributions made by DaReal Shinji (http://www.github.com/darealshinji), especially regarding repository maintenance and Debian packaging are both welcomed and acknowledged, in addition to the Lazarus forum members, who are always so helpful. '
       ''

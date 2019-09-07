@@ -20,7 +20,7 @@
 }
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
-{$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
+{$mode objfpc}{$H+} // {$H+} ensures all strings are of unlimited size, and set as ansistring
 
 interface
 
@@ -40,7 +40,7 @@ type
   { TfrmSQLiteDBases }
 
   TfrmSQLiteDBases = class(TForm)
-    CSVExporter1: TCSVExporter;
+    CSVExporter1: TCSVExporter; // We use this for users who want to clipboard the results. Works fine if not too many values.
     DataSource1: TDataSource;
     DataSource2: TDataSource;
     lblConnectionStatus: TLabel;
@@ -352,8 +352,8 @@ procedure TfrmSQLiteDBases.SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : strin
 var
   strTitle, FileNameCell, FilePathCell, FileHashCell : string;
   NoOfRowsInGrid : integer;
-  sl                : TStringList;
-  fs                : TFileStreamUTF8;
+  sl             : TStringList;
+  fs             : TFileStreamUTF8;
 
   const
     strHTMLHeader      = '<HTML>'  ;
@@ -528,10 +528,61 @@ end;
 // Requires the lazdbexport package be installed in Lazarus IDE
 procedure TfrmSQLiteDBases.SaveDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
-  Exporter : TCSVExporter;
-  ExportSettings: TCSVFormatSettings;
+  linetowrite : ansistring;
+  n : integer;
+  CSVFileToWrite : TFilestreamUTF8;
+  KnownHashFlagIsSet : boolean;
 begin
-  // Go to start of grid
+  Mainform.StatusBar2.SimpleText := 'Writing hash values to file...please wait';
+  Application.ProcessMessages;
+  linetowrite := '';
+  n := 0;
+  KnownHashFlagIsSet := false;
+
+  try
+    CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+    // Now add all the hash strings
+    DBGrid.DataSource.DataSet.First;
+    // Write all columns, but dont try to include the Known Hash result if not computed to start with
+    // This boolean check should be quicker instead of checking for every row whether the field is empty or not
+    if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
+      else KnownHashFlagIsSet := false;
+
+    while not DBGrid.DataSource.DataSet.EOF do
+    begin
+      if KnownHashFlagIsSet then
+      begin
+        // Include all columns except the row count. That's not needed for a CSV output.
+        linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[4].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
+      end
+      else
+        begin
+          // Include all columns (except the row count) including the Known Hash Flag result.
+          linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+        end;
+     n := 0;
+     n := Length(linetowrite);
+     try
+       CSVFileToWrite.Write(linetowrite[1], n);
+     finally
+       DBGrid.DataSource.DataSet.Next;
+     end;
+    end;
+  finally
+    CSVFileToWrite.Free;
+  end;
+  Mainform.StatusBar2.SimpleText := 'DONE';
+  ShowMessage('Grid data now in ' + Filename);
+end;
+
+  {// Go to start of grid
   DBGrid.DataSource.DataSet.First;
   // And export it
   try
@@ -548,8 +599,8 @@ begin
   finally
     Exporter.Free;
     ExportSettings.Free;
-  end;
-end;
+  end; }
+
 
 // Copies a DBGrid content to a temp text file then reads it into clipboard
 procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);

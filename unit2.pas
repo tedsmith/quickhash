@@ -39,7 +39,7 @@
 
     Use of the name 'QuickHash GUI' must refer to this utility
     only and must not be re-used in another tool if based upon this code.
-    The code is Copyright of Ted Smith 2011 - 2018 (www.quickhash-gui.org)
+    The code is Copyright of Ted Smith 2011 - 2019 (www.quickhash-gui.org)
 
     HashLib4Pascal and xxHash64 libraries are both licensed under the MIT License
     https://opensource.org/licenses/MIT
@@ -52,6 +52,8 @@
     xxHash64       : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/
                      Github user Cyan4973. Use of the library is also welcomed and acknowledged
                      and very much appreciated
+
+    BLAKE2 is specified in RFC 7693, and available on GitHub. It is licensed under CC0 (public domain-like).
 
     QuickHash is created using the Freepascal Compiler and Lazarus-IDE
     http://www.lazarus-ide.org/ developed by Sourceforge users :
