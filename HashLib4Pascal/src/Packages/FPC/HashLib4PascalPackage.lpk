@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="HashLib4PascalPackage"/>
+    <Type Value="RunTimeOnly"/>
+    <Author Value="Xor-el (Ugochukwu Mmaduekwe)"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\Include"/>
+        <OtherUnitFiles Value="..\..\Base;..\..\Checksum;..\..\Crypto;..\..\Hash128;..\..\Hash32;..\..\Hash64;..\..\Interfaces;..\..\Nullable;..\..\Utils;..\..\KDF;..\..\Crypto\Blake2BConfigurations;..\..\Crypto\Blake2SConfigurations;..\..\Interfaces\IBlake2BConfigurations;..\..\Interfaces\IBlake2SConfigurations;..\..\NullDigest"/>
+        <UnitOutputDirectory Value="lib\HashLib4Pascal\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <CodeGeneration>
+        <Optimizations>
+          <OptimizationLevel Value="4"/>
+        </Optimizations>
+      </CodeGeneration>
+    </CompilerOptions>
+    <Description Value="HashLib4Pascal is a Delphi/FPC compatible library that provides an easy to use interface for computing hashes and checksums of strings (with a specified encoding), files, streams, byte arrays and untyped data to mention but a few.
+"/>
+    <License Value="MIT License"/>
+    <Version Major="3" Minor="7"/>
+    <Files Count="107">
+      <Item1>
+        <Filename Value="..\..\Base\HlpHash.pas"/>
+        <UnitName Value="HlpHash"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\..\Base\HlpHashBuffer.pas"/>
+        <UnitName Value="HlpHashBuffer"/>
+      </Item2>
+      <Item3>
+        <Filename Value="..\..\Base\HlpHashCryptoNotBuildIn.pas"/>
+        <UnitName Value="HlpHashCryptoNotBuildIn"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\..\Base\HlpHashFactory.pas"/>
+        <UnitName Value="HlpHashFactory"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\..\Base\HlpHashResult.pas"/>
+        <UnitName Value="HlpHashResult"/>
+      </Item5>
+      <Item6>
+        <Filename Value="..\..\Base\HlpHashRounds.pas"/>
+        <UnitName Value="HlpHashRounds"/>
+      </Item6>
+      <Item7>
+        <Filename Value="..\..\Base\HlpHashSize.pas"/>
+        <UnitName Value="HlpHashSize"/>
+      </Item7>
+      <Item8>
+        <Filename Value="..\..\Base\HlpHMACNotBuildInAdapter.pas"/>
+        <UnitName Value="HlpHMACNotBuildInAdapter"/>
+      </Item8>
+      <Item9>
+        <Filename Value="..\..\Base\HlpMultipleTransformNonBlock.pas"/>
+        <UnitName Value="HlpMultipleTransformNonBlock"/>
+      </Item9>
+      <Item10>
+        <Filename Value="..\..\Checksum\HlpAdler32.pas"/>
+        <UnitName Value="HlpAdler32"/>
+      </Item10>
+      <Item11>
+        <Filename Value="..\..\Checksum\HlpCRC.pas"/>
+        <UnitName Value="HlpCRC"/>
+      </Item11>
+      <Item12>
+        <Filename Value="..\..\Checksum\HlpCRC16.pas"/>
+        <UnitName Value="HlpCRC16"/>
+      </Item12>
+      <Item13>
+        <Filename Value="..\..\Checksum\HlpCRC32.pas"/>
+        <UnitName Value="HlpCRC32"/>
+      </Item13>
+      <Item14>
+        <Filename Value="..\..\Checksum\HlpCRC64.pas"/>
+        <UnitName Value="HlpCRC64"/>
+      </Item14>
+      <Item15>
+        <Filename Value="..\..\Crypto\HlpGost.pas"/>
+        <UnitName Value="HlpGost"/>
+      </Item15>
+      <Item16>
+        <Filename Value="..\..\Crypto\HlpGrindahl256.pas"/>
+        <UnitName Value="HlpGrindahl256"/>
+      </Item16>
+      <Item17>
+        <Filename Value="..\..\Crypto\HlpGrindahl512.pas"/>
+        <UnitName Value="HlpGrindahl512"/>
+      </Item17>
+      <Item18>
+        <Filename Value="..\..\Crypto\HlpHAS160.pas"/>
+        <UnitName Value="HlpHAS160"/>
+      </Item18>
+      <Item19>
+        <Filename Value="..\..\Crypto\HlpHaval.pas"/>
+        <UnitName Value="HlpHaval"/>
+      </Item19>
+      <Item20>
+        <Filename Value="..\..\Crypto\HlpMD2.pas"/>
+        <UnitName Value="HlpMD2"/>
+      </Item20>
+      <Item21>
+        <Filename Value="..\..\Crypto\HlpMD4.pas"/>
+        <UnitName Value="HlpMD4"/>
+      </Item21>
+      <Item22>
+        <Filename Value="..\..\Crypto\HlpMD5.pas"/>
+        <UnitName Value="HlpMD5"/>
+      </Item22>
+      <Item23>
+        <Filename Value="..\..\Crypto\HlpMDBase.pas"/>
+        <UnitName Value="HlpMDBase"/>
+      </Item23>
+      <Item24>
+        <Filename Value="..\..\Crypto\HlpPanama.pas"/>
+        <UnitName Value="HlpPanama"/>
+      </Item24>
+      <Item25>
+        <Filename Value="..\..\Crypto\HlpRadioGatun32.pas"/>
+        <UnitName Value="HlpRadioGatun32"/>
+      </Item25>
+      <Item26>
+        <Filename Value="..\..\Crypto\HlpRadioGatun64.pas"/>
+        <UnitName Value="HlpRadioGatun64"/>
+      </Item26>
+      <Item27>
+        <Filename Value="..\..\Crypto\HlpRIPEMD.pas"/>
+        <UnitName Value="HlpRIPEMD"/>
+      </Item27>
+      <Item28>
+        <Filename Value="..\..\Crypto\HlpRIPEMD128.pas"/>
+        <UnitName Value="HlpRIPEMD128"/>
+      </Item28>
+      <Item29>
+        <Filename Value="..\..\Crypto\HlpRIPEMD160.pas"/>
+        <UnitName Value="HlpRIPEMD160"/>
+      </Item29>
+      <Item30>
+        <Filename Value="..\..\Crypto\HlpRIPEMD256.pas"/>
+        <UnitName Value="HlpRIPEMD256"/>
+      </Item30>
+      <Item31>
+        <Filename Value="..\..\Crypto\HlpRIPEMD320.pas"/>
+        <UnitName Value="HlpRIPEMD320"/>
+      </Item31>
+      <Item32>
+        <Filename Value="..\..\Crypto\HlpSHA0.pas"/>
+        <UnitName Value="HlpSHA0"/>
+      </Item32>
+      <Item33>
+        <Filename Value="..\..\Crypto\HlpSHA1.pas"/>
+        <UnitName Value="HlpSHA1"/>
+      </Item33>
+      <Item34>
+        <Filename Value="..\..\Crypto\HlpSHA2_224.pas"/>
+        <UnitName Value="HlpSHA2_224"/>
+      </Item34>
+      <Item35>
+        <Filename Value="..\..\Crypto\HlpSHA2_256.pas"/>
+        <UnitName Value="HlpSHA2_256"/>
+      </Item35>
+      <Item36>
+        <Filename Value="..\..\Crypto\HlpSHA2_256Base.pas"/>
+        <UnitName Value="HlpSHA2_256Base"/>
+      </Item36>
+      <Item37>
+        <Filename Value="..\..\Crypto\HlpSHA2_384.pas"/>
+        <UnitName Value="HlpSHA2_384"/>
+      </Item37>
+      <Item38>
+        <Filename Value="..\..\Crypto\HlpSHA2_512.pas"/>
+        <UnitName Value="HlpSHA2_512"/>
+      </Item38>
+      <Item39>
+        <Filename Value="..\..\Crypto\HlpSHA2_512Base.pas"/>
+        <UnitName Value="HlpSHA2_512Base"/>
+      </Item39>
+      <Item40>
+        <Filename Value="..\..\Crypto\HlpSHA2_512_224.pas"/>
+        <UnitName Value="HlpSHA2_512_224"/>
+      </Item40>
+      <Item41>
+        <Filename Value="..\..\Crypto\HlpSHA2_512_256.pas"/>
+        <UnitName Value="HlpSHA2_512_256"/>
+      </Item41>
+      <Item42>
+        <Filename Value="..\..\Crypto\HlpSHA3.pas"/>
+        <UnitName Value="HlpSHA3"/>
+      </Item42>
+      <Item43>
+        <Filename Value="..\..\Crypto\HlpSnefru.pas"/>
+        <UnitName Value="HlpSnefru"/>
+      </Item43>
+      <Item44>
+        <Filename Value="..\..\Crypto\HlpTiger.pas"/>
+        <UnitName Value="HlpTiger"/>
+      </Item44>
+      <Item45>
+        <Filename Value="..\..\Crypto\HlpTiger2.pas"/>
+        <UnitName Value="HlpTiger2"/>
+      </Item45>
+      <Item46>
+        <Filename Value="..\..\Crypto\HlpWhirlPool.pas"/>
+        <UnitName Value="HlpWhirlPool"/>
+      </Item46>
+      <Item47>
+        <Filename Value="..\..\Hash128\HlpMurmurHash3_x64_128.pas"/>
+        <UnitName Value="HlpMurmurHash3_x64_128"/>
+      </Item47>
+      <Item48>
+        <Filename Value="..\..\NullDigest\HlpNullDigest.pas"/>
+        <UnitName Value="HlpNullDigest"/>
+      </Item48>
+      <Item49>
+        <Filename Value="..\..\Hash32\HlpAP.pas"/>
+        <UnitName Value="HlpAP"/>
+      </Item49>
+      <Item50>
+        <Filename Value="..\..\Hash32\HlpBernstein.pas"/>
+        <UnitName Value="HlpBernstein"/>
+      </Item50>
+      <Item51>
+        <Filename Value="..\..\Hash32\HlpBernstein1.pas"/>
+        <UnitName Value="HlpBernstein1"/>
+      </Item51>
+      <Item52>
+        <Filename Value="..\..\Hash32\HlpBKDR.pas"/>
+        <UnitName Value="HlpBKDR"/>
+      </Item52>
+      <Item53>
+        <Filename Value="..\..\Hash32\HlpDEK.pas"/>
+        <UnitName Value="HlpDEK"/>
+      </Item53>
+      <Item54>
+        <Filename Value="..\..\Hash32\HlpDJB.pas"/>
+        <UnitName Value="HlpDJB"/>
+      </Item54>
+      <Item55>
+        <Filename Value="..\..\Hash32\HlpELF.pas"/>
+        <UnitName Value="HlpELF"/>
+      </Item55>
+      <Item56>
+        <Filename Value="..\..\Hash32\HlpFNV.pas"/>
+        <UnitName Value="HlpFNV"/>
+      </Item56>
+      <Item57>
+        <Filename Value="..\..\Hash32\HlpFNV1a.pas"/>
+        <UnitName Value="HlpFNV1a"/>
+      </Item57>
+      <Item58>
+        <Filename Value="..\..\Hash32\HlpJenkins3.pas"/>
+        <UnitName Value="HlpJenkins3"/>
+      </Item58>
+      <Item59>
+        <Filename Value="..\..\Hash32\HlpJS.pas"/>
+        <UnitName Value="HlpJS"/>
+      </Item59>
+      <Item60>
+        <Filename Value="..\..\Hash32\HlpMurmur2.pas"/>
+        <UnitName Value="HlpMurmur2"/>
+      </Item60>
+      <Item61>
+        <Filename Value="..\..\Hash32\HlpMurmurHash3_x86_32.pas"/>
+        <UnitName Value="HlpMurmurHash3_x86_32"/>
+      </Item61>
+      <Item62>
+        <Filename Value="..\..\Hash32\HlpOneAtTime.pas"/>
+        <UnitName Value="HlpOneAtTime"/>
+      </Item62>
+      <Item63>
+        <Filename Value="..\..\Hash32\HlpPJW.pas"/>
+        <UnitName Value="HlpPJW"/>
+      </Item63>
+      <Item64>
+        <Filename Value="..\..\Hash32\HlpRotating.pas"/>
+        <UnitName Value="HlpRotating"/>
+      </Item64>
+      <Item65>
+        <Filename Value="..\..\Hash32\HlpRS.pas"/>
+        <UnitName Value="HlpRS"/>
+      </Item65>
+      <Item66>
+        <Filename Value="..\..\Hash32\HlpSDBM.pas"/>
+        <UnitName Value="HlpSDBM"/>
+      </Item66>
+      <Item67>
+        <Filename Value="..\..\Hash32\HlpShiftAndXor.pas"/>
+        <UnitName Value="HlpShiftAndXor"/>
+      </Item67>
+      <Item68>
+        <Filename Value="..\..\Hash32\HlpSuperFast.pas"/>
+        <UnitName Value="HlpSuperFast"/>
+      </Item68>
+      <Item69>
+        <Filename Value="..\..\Hash32\HlpXXHash32.pas"/>
+        <UnitName Value="HlpXXHash32"/>
+      </Item69>
+      <Item70>
+        <Filename Value="..\..\Hash64\HlpFNV1a64.pas"/>
+        <UnitName Value="HlpFNV1a64"/>
+      </Item70>
+      <Item71>
+        <Filename Value="..\..\Hash64\HlpFNV64.pas"/>
+        <UnitName Value="HlpFNV64"/>
+      </Item71>
+      <Item72>
+        <Filename Value="..\..\Hash64\HlpMurmur2_64.pas"/>
+        <UnitName Value="HlpMurmur2_64"/>
+      </Item72>
+      <Item73>
+        <Filename Value="..\..\Hash64\HlpSipHash.pas"/>
+        <UnitName Value="HlpSipHash"/>
+      </Item73>
+      <Item74>
+        <Filename Value="..\..\Hash64\HlpXXHash64.pas"/>
+        <UnitName Value="HlpXXHash64"/>
+      </Item74>
+      <Item75>
+        <Filename Value="..\..\Include\HashLib.inc"/>
+        <Type Value="Include"/>
+      </Item75>
+      <Item76>
+        <Filename Value="..\..\Include\HashLibHelper.inc"/>
+        <Type Value="Include"/>
+      </Item76>
+      <Item77>
+        <Filename Value="..\..\Interfaces\HlpIHash.pas"/>
+        <UnitName Value="HlpIHash"/>
+      </Item77>
+      <Item78>
+        <Filename Value="..\..\Interfaces\HlpIHashInfo.pas"/>
+        <UnitName Value="HlpIHashInfo"/>
+      </Item78>
+      <Item79>
+        <Filename Value="..\..\Interfaces\HlpIHashResult.pas"/>
+        <UnitName Value="HlpIHashResult"/>
+      </Item79>
+      <Item80>
+        <Filename Value="..\..\Nullable\HlpNullable.pas"/>
+        <UnitName Value="HlpNullable"/>
+      </Item80>
+      <Item81>
+        <Filename Value="..\..\Utils\HlpConverters.pas"/>
+        <UnitName Value="HlpConverters"/>
+      </Item81>
+      <Item82>
+        <Filename Value="..\..\Utils\HlpBitConverter.pas"/>
+        <UnitName Value="HlpBitConverter"/>
+      </Item82>
+      <Item83>
+        <Filename Value="..\..\Utils\HlpBits.pas"/>
+        <UnitName Value="HlpBits"/>
+      </Item83>
+      <Item84>
+        <Filename Value="..\..\Utils\HlpHashLibTypes.pas"/>
+        <UnitName Value="HlpHashLibTypes"/>
+      </Item84>
+      <Item85>
+        <Filename Value="..\..\Hash128\HlpMurmurHash3_x86_128.pas"/>
+        <UnitName Value="HlpMurmurHash3_x86_128"/>
+      </Item85>
+      <Item86>
+        <Filename Value="..\..\KDF\HlpPBKDF2_HMACNotBuildInAdapter.pas"/>
+        <UnitName Value="HlpPBKDF2_HMACNotBuildInAdapter"/>
+      </Item86>
+      <Item87>
+        <Filename Value="..\..\Interfaces\HlpIKDF.pas"/>
+        <UnitName Value="HlpIKDF"/>
+      </Item87>
+      <Item88>
+        <Filename Value="..\..\Base\HlpKDF.pas"/>
+        <UnitName Value="HlpKDF"/>
+      </Item88>
+      <Item89>
+        <Filename Value="..\..\Interfaces\HlpICRC.pas"/>
+        <UnitName Value="HlpICRC"/>
+      </Item89>
+      <Item90>
+        <Filename Value="..\..\Crypto\HlpBlake2B.pas"/>
+        <UnitName Value="HlpBlake2B"/>
+      </Item90>
+      <Item91>
+        <Filename Value="..\..\Crypto\HlpBlake2S.pas"/>
+        <UnitName Value="HlpBlake2S"/>
+      </Item91>
+      <Item92>
+        <Filename Value="..\..\Crypto\Blake2BConfigurations\HlpBlake2BConfig.pas"/>
+        <UnitName Value="HlpBlake2BConfig"/>
+      </Item92>
+      <Item93>
+        <Filename Value="..\..\Crypto\Blake2BConfigurations\HlpBlake2BIvBuilder.pas"/>
+        <UnitName Value="HlpBlake2BIvBuilder"/>
+      </Item93>
+      <Item94>
+        <Filename Value="..\..\Crypto\Blake2BConfigurations\HlpBlake2BTreeConfig.pas"/>
+        <UnitName Value="HlpBlake2BTreeConfig"/>
+      </Item94>
+      <Item95>
+        <Filename Value="..\..\Crypto\Blake2SConfigurations\HlpBlake2SConfig.pas"/>
+        <UnitName Value="HlpBlake2SConfig"/>
+      </Item95>
+      <Item96>
+        <Filename Value="..\..\Crypto\Blake2SConfigurations\HlpBlake2SIvBuilder.pas"/>
+        <UnitName Value="HlpBlake2SIvBuilder"/>
+      </Item96>
+      <Item97>
+        <Filename Value="..\..\Crypto\Blake2SConfigurations\HlpBlake2STreeConfig.pas"/>
+        <UnitName Value="HlpBlake2STreeConfig"/>
+      </Item97>
+      <Item98>
+        <Filename Value="..\..\Interfaces\IBlake2BConfigurations\HlpIBlake2BConfig.pas"/>
+        <UnitName Value="HlpIBlake2BConfig"/>
+      </Item98>
+      <Item99>
+        <Filename Value="..\..\Interfaces\IBlake2BConfigurations\HlpIBlake2BTreeConfig.pas"/>
+        <UnitName Value="HlpIBlake2BTreeConfig"/>
+      </Item99>
+      <Item100>
+        <Filename Value="..\..\Interfaces\IBlake2SConfigurations\HlpIBlake2SConfig.pas"/>
+        <UnitName Value="HlpIBlake2SConfig"/>
+      </Item100>
+      <Item101>
+        <Filename Value="..\..\Interfaces\IBlake2SConfigurations\HlpIBlake2STreeConfig.pas"/>
+        <UnitName Value="HlpIBlake2STreeConfig"/>
+      </Item101>
+      <Item102>
+        <Filename Value="..\..\Crypto\HlpGOST3411_2012.pas"/>
+        <UnitName Value="HlpGOST3411_2012"/>
+      </Item102>
+      <Item103>
+        <Filename Value="..\..\Checksum\HlpCRC32Fast.pas"/>
+        <UnitName Value="HlpCRC32Fast"/>
+      </Item103>
+      <Item104>
+        <Filename Value="..\..\KDF\HlpArgon2TypeAndVersion.pas"/>
+        <UnitName Value="HlpArgon2TypeAndVersion"/>
+      </Item104>
+      <Item105>
+        <Filename Value="..\..\KDF\HlpPBKDF_Argon2NotBuildInAdapter.pas"/>
+        <UnitName Value="HlpPBKDF_Argon2NotBuildInAdapter"/>
+      </Item105>
+      <Item106>
+        <Filename Value="..\..\KDF\HlpPBKDF_ScryptNotBuildInAdapter.pas"/>
+        <UnitName Value="HlpPBKDF_ScryptNotBuildInAdapter"/>
+      </Item106>
+      <Item107>
+        <Filename Value="..\..\Utils\HlpArrayUtils.pas"/>
+        <UnitName Value="HlpArrayUtils"/>
+      </Item107>
+    </Files>
+    <LazDoc PackageName="(default)"/>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="FCL"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

@@ -20,7 +20,7 @@
 }
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
-{$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
+{$mode objfpc}{$H+} // {$H+} ensures all strings are of unlimited size, and set as ansistring
 
 interface
 
@@ -40,7 +40,7 @@ type
   { TfrmSQLiteDBases }
 
   TfrmSQLiteDBases = class(TForm)
-    CSVExporter1: TCSVExporter;
+    CSVExporter1: TCSVExporter; // We use this for users who want to clipboard the results. Works fine if not too many values.
     DataSource1: TDataSource;
     DataSource2: TDataSource;
     lblConnectionStatus: TLabel;
@@ -77,6 +77,7 @@ type
     procedure CopyFileNameOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyFilePathOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyHashOfSelectedCell(DBGrid : TDBGrid);
+    procedure CopyAllHashesFILESTAB(DBGrid : TDBGrid; UseFileFlag : Boolean);
     procedure CopySelectedRowFILESTAB(DBGrid : TDBGrid);
     procedure CopySelectedRowCOPYTAB(DBGrid : TDBGrid);
     procedure SortBySourceFilename(DBGrid : TDBGrid);
@@ -340,7 +341,7 @@ begin
     inc(NoOfRows, 1);
     DBGrid.DataSource.DataSet.Next;
   end;
-  // Got to top of grid.
+  // Go to top of grid.
   DBGrid.DataSource.DataSet.First;
   // Return count
   If NoOfRows > -1 then result := NoOfRows;
@@ -351,8 +352,8 @@ procedure TfrmSQLiteDBases.SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : strin
 var
   strTitle, FileNameCell, FilePathCell, FileHashCell : string;
   NoOfRowsInGrid : integer;
-  sl                : TStringList;
-  fs                : TFileStreamUTF8;
+  sl             : TStringList;
+  fs             : TFileStreamUTF8;
 
   const
     strHTMLHeader      = '<HTML>'  ;
@@ -527,10 +528,61 @@ end;
 // Requires the lazdbexport package be installed in Lazarus IDE
 procedure TfrmSQLiteDBases.SaveDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
-  Exporter : TCSVExporter;
-  ExportSettings: TCSVFormatSettings;
+  linetowrite : ansistring;
+  n : integer;
+  CSVFileToWrite : TFilestreamUTF8;
+  KnownHashFlagIsSet : boolean;
 begin
-  // Go to start of grid
+  Mainform.StatusBar2.SimpleText := 'Writing hash values to file...please wait';
+  Application.ProcessMessages;
+  linetowrite := '';
+  n := 0;
+  KnownHashFlagIsSet := false;
+
+  try
+    CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+    // Now add all the hash strings
+    DBGrid.DataSource.DataSet.First;
+    // Write all columns, but dont try to include the Known Hash result if not computed to start with
+    // This boolean check should be quicker instead of checking for every row whether the field is empty or not
+    if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
+      else KnownHashFlagIsSet := false;
+
+    while not DBGrid.DataSource.DataSet.EOF do
+    begin
+      if KnownHashFlagIsSet then
+      begin
+        // Include all columns except the row count. That's not needed for a CSV output.
+        linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[4].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
+      end
+      else
+        begin
+          // Include all columns (except the row count) including the Known Hash Flag result.
+          linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+        end;
+     n := 0;
+     n := Length(linetowrite);
+     try
+       CSVFileToWrite.Write(linetowrite[1], n);
+     finally
+       DBGrid.DataSource.DataSet.Next;
+     end;
+    end;
+  finally
+    CSVFileToWrite.Free;
+  end;
+  Mainform.StatusBar2.SimpleText := 'DONE';
+  ShowMessage('Grid data now in ' + Filename);
+end;
+
+  {// Go to start of grid
   DBGrid.DataSource.DataSet.First;
   // And export it
   try
@@ -547,8 +599,8 @@ begin
   finally
     Exporter.Free;
     ExportSettings.Free;
-  end;
-end;
+  end; }
+
 
 // Copies a DBGrid content to a temp text file then reads it into clipboard
 procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
@@ -918,7 +970,7 @@ begin
   end;
 end;
 
-// // Used by the FILES tab display grid to copy the content of Column 3 (Hash Value) to clipboard
+// Used by the FILES tab display grid to copy the content of Column 3 (Hash Value) to clipboard
 procedure TfrmSQLiteDBases.CopyHashOfSelectedCell(DBGrid : TDBGrid);
 var
   CellOfInterest : string;
@@ -928,6 +980,102 @@ begin
   begin
     CellOfInterest := DBGrid.DataSource.DataSet.Fields[3].Value;
     Clipboard.AsText := CellOfInterest;
+  end;
+end;
+
+// Used by the FILES tab display grid to copy all the hash values of Column 3 to clipboard
+// Useful to create hashlists without adding the entire grid content
+procedure TfrmSQLiteDBases.CopyAllHashesFILESTAB(DBGrid : TDBGrid; UseFileFlag : Boolean);
+var
+  slFileHashes   : TStringList;
+  tempfile       : TFileStream;
+  n : integer;
+  ChosenHashAlg,
+    Header,
+    FileForCopiedHashes,
+    linetowrite  : string;
+begin
+  ChosenHashAlg := '';
+  Header        := '';
+  n             := 0;
+  case MainForm.AlgorithmChoiceRadioBox3.ItemIndex of
+      0: begin
+      ChosenHashAlg := 'MD5';
+      end;
+      1: begin
+      ChosenHashAlg := 'SHA-1';
+      end;
+      2: begin
+      ChosenHashAlg := 'SHA-3';
+      end;
+      3: begin
+      ChosenHashAlg := 'SHA256';
+      end;
+      4: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      5: begin
+      ChosenHashAlg := 'xxHash';
+      end;
+      6: begin
+      ChosenHashAlg := 'Blake2B';
+      end;
+  end;
+
+  Header := ChosenHashAlg;
+
+  // If hash value count too large for clipboard use, write to a file
+  if UseFileFlag then
+  begin
+    if MainForm.SaveDialog8_SaveJustHashes.Execute then
+    begin
+      Mainform.StatusBar2.SimpleText := 'Writing hash values to file...please wait';
+      Application.ProcessMessages;
+      FileForCopiedHashes := MainForm.SaveDialog8_SaveJustHashes.FileName;
+
+      try
+        tempfile := TFileStream.Create(FileForCopiedHashes, fmCreate);
+        // Give the list a header of the chosen hash algorithm
+        linetowrite := Header + #13#10;
+        tempfile.Write(linetowrite[1], Length(linetowrite));
+        // Now add all the hash strings
+        DBGrid.DataSource.DataSet.First;
+        while not DBGrid.DataSource.DataSet.EOF do
+        begin
+          linetowrite := (DBGrid.DataSource.DataSet.Fields[3].Text) + #13#10;
+          n := Length(linetowrite);
+          try
+            tempfile.Write(linetowrite[1], n);
+          finally
+            DBGrid.DataSource.DataSet.Next;
+          end;
+        end;
+      finally
+        tempfile.Free;
+      end;
+      Mainform.StatusBar2.SimpleText := 'DONE';
+      ShowMessage('Hash column content now in ' + FileForCopiedHashes);
+    end
+    else ShowMessage('Unable to create a file to store the hashes. Check write permissions of location');
+  end
+  else // Hash value count should go into clipboard OK unless the host is shockingly low on memory
+  begin
+    Mainform.StatusBar2.SimpleText := 'Writing hash values to clipboard...please wait';
+    try
+      slFileHashes := TStringList.Create;
+      slFileHashes.Add(Header); // Give the list a header of the chosen hash algorithm
+      DBGrid.DataSource.DataSet.First;
+      while not DBGrid.DataSource.DataSet.EOF do
+      begin
+        slFileHashes.Add(DBGrid.DataSource.DataSet.Fields[3].Text);
+        DBGrid.DataSource.DataSet.Next;
+      end;
+      Clipboard.AsText := slFileHashes.Text;
+    finally
+      slFileHashes.Free;
+      Mainform.StatusBar2.SimpleText := 'DONE. Hash column content now in clipboard.';
+      ShowMessage('Hash column content now in clipboard.');
+    end;
   end;
 end;
 

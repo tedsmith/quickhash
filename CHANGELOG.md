@@ -1,6 +1,23 @@
 ﻿Version History
 ===============
 
+v3.1.0 Branch
+
+Update : HashLib4Pascal library updated to master version available as of 18th July 2019.
+New : Added SHA-3 (256) hash algorithm 
+New : Added Blake2B (256) hash algorithm (best on 64-bit systems, faster than MD5, SHA-1, SHA-3, SHA256 and SHA512 and more reliable than MD5, SHA-1 and comparable to SHA-3) : https://blake2.net/ 
+New : The FileS tab right-click menu now includes 'Copy all hashes' option, to clipboard ALL the hash values in the hash column. If > 10K values, will ask user if he wants to write to a file instead. 
+Fix : The "Compare Two Files" tab had a bug. If the user clicked the resulting hash, it would be copied to clipboard correctly but be described as MD5 even if the chosen algorithm was not MD5. Fixed. 
+Fix : In all tabs, xxHash in 64-bit mode did not show a progress bar. The 32-bit version did though. That discrepency was fixed. 
+Fix : When comparing two folders, if there was a count mis-match, the log showed the same name for both folders, instead of "Folder A and Folder B", it said "Folder A and Folder A". Fixed. 
+Fix : In the FileS tab, when exporting BILLIONS of files an out of memory limit was reached. This should now be fixed due to implementation of a file write stream instead of using CSVExport library.
+Fix : Theoretical compliance to Apple OSX Catalina 64-bit enforcement. 
+ 
+v3.0.5 (July 2019)
+
+Not compiled version released as only minor code cleanup for the codebase, in advance of v3.1.0 development. 
+Fix : Adjusted date and time formatting in the FileS tab to ensure default date and time settings used instead of UK or USA style of formatting. 
+
 v3.0.4 (Jan 2019)
 
 The 'File' tab was not showing automatically when using drag and drop. Now it does.
