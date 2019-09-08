@@ -216,7 +216,7 @@ object MainForm: TMainForm
       object AlgorithmChoiceRadioBox1: TRadioGroup
         Left = 16
         Height = 174
-        Hint = 'Having typed some text in the text area, you can'#13#10'easily recompute different hashes for the text inputted'#13#10'by choosing a different hash algorithm'
+        Hint = 'Easily recompute different hashes'#13#10'by choosing a different hash algorithm.'#13#10'Note SHA-3 and Blake2b are 256 bit mode. '
         Top = 10
         Width = 96
         AutoFill = True

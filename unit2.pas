@@ -53,7 +53,12 @@
                      Github user Cyan4973. Use of the library is also welcomed and acknowledged
                      and very much appreciated
 
-    BLAKE2 is specified in RFC 7693, and available on GitHub. It is licensed under CC0 (public domain-like).
+    BLAKE2 is specified in RFC 7693, and available on GitHub.
+    It is licensed under CC0 (public domain-like) and made available only in 256 bit mode
+    in QuickHash-GUI (first appearing in v3.1.0) for now.
+
+    SHA-3 is made available only in 256 bit mode in QuickHash-GUI
+    (first appearing in v3.1.0) for now.
 
     QuickHash is created using the Freepascal Compiler and Lazarus-IDE
     http://www.lazarus-ide.org/ developed by Sourceforge users :
@@ -152,236 +157,235 @@ type
   end;
 
    TMainForm = class(TForm)
-    AlgorithmChoiceRadioBox1: TRadioGroup;
-    AlgorithmChoiceRadioBox2: TRadioGroup;
-    AlgorithmChoiceRadioBox3: TRadioGroup;
-    AlgorithmChoiceRadioBox4: TRadioGroup;
-    AlgorithmChoiceRadioBox5: TRadioGroup;
-    AlgorithmChoiceRadioBox6: TRadioGroup;
-    AlgorithmChoiceRadioBox7: TRadioGroup;
-
-    b64FileGridPopupMenu: TPopupMenu;
-    b64DecoderProgress: TEdit;
-    b64StringGrid2FileS: TStringGrid;
-    btnClearTextArea: TButton;
-    btnCompare: TButton;
-    btnCompareTwoFiles: TButton;
-    btnCompareTwoFilesSaveAs: TButton;
-    btnFileACompare: TButton;
-    btnFileBCompare: TButton;
-    btnFLBL: TButton;
-    btnHashFile: TButton;
-    btnLBL: TButton;
-    btnRecursiveDirectoryHashing: TButton;
-    btnClipboardResults: TButton;
-    btnCallDiskHasherModule: TButton;
-    btnStopScan1: TButton;
-    btnStopScan2: TButton;
-    btnClearHashField: TButton;
-    btnB64FileChooser: TButton;
-    btnB64FileSChooser: TButton;
-    btnB64JustDecodeFiles: TButton;
-    btnMakeTextUpper: TButton;
-    btnMakeTextLower: TButton;
-    btnLoadHashList: TButton;
-    Button8CopyAndHash: TButton;
-    cbFlipCaseFILE: TCheckBox;
-    cbToggleInputDataToOutputFile: TCheckBox;
-    b64ProgressFileS: TEdit;
-    cbFlipCaseTEXT: TCheckBox;
-    cbUNCModeCompFolders: TCheckBox;
-    cbSaveComparisons: TCheckBox;
-    cbOverrideFileCountDiffer: TCheckBox;
-    cbLoadHashList: TCheckBox;
-    edtUNCPathCompareA: TEdit;
-    edtUNCPathCompareB: TEdit;
-    FileSDBNavigator: TDBNavigator;
-    lblTotalFileCountNumberA: TLabel;
-    lblTotalFileCountA: TLabel;
-    lblCompareTwoFoldersInstruction1: TLabel;
-    lblCompareTwoFoldersInstruction2: TLabel;
-
-    lblTotalFileCountB: TLabel;
-    lblTotalFileCountNumberB: TLabel;
-    memFolderCompareSummary: TMemo;
+    AlgorithmChoiceRadioBox1              : TRadioGroup;
+    AlgorithmChoiceRadioBox2              : TRadioGroup;
+    AlgorithmChoiceRadioBox3              : TRadioGroup;
+    AlgorithmChoiceRadioBox4              : TRadioGroup;
+    AlgorithmChoiceRadioBox5              : TRadioGroup;
+    AlgorithmChoiceRadioBox6              : TRadioGroup;
+    AlgorithmChoiceRadioBox7              : TRadioGroup;
+    b64FileGridPopupMenu                  : TPopupMenu;
+    b64DecoderProgress                    : TEdit;
+    b64StringGrid2FileS                   : TStringGrid;
+    btnClearTextArea                      : TButton;
+    btnCompare                            : TButton;
+    btnCompareTwoFiles                    : TButton;
+    btnCompareTwoFilesSaveAs              : TButton;
+    btnFileACompare                       : TButton;
+    btnFileBCompare                       : TButton;
+    btnFLBL                               : TButton;
+    btnHashFile                           : TButton;
+    btnLBL                                : TButton;
+    btnRecursiveDirectoryHashing          : TButton;
+    btnClipboardResults                   : TButton;
+    btnCallDiskHasherModule               : TButton;
+    btnStopScan1                          : TButton;
+    btnStopScan2                          : TButton;
+    btnClearHashField                     : TButton;
+    btnB64FileChooser                     : TButton;
+    btnB64FileSChooser                    : TButton;
+    btnB64JustDecodeFiles                 : TButton;
+    btnMakeTextUpper                      : TButton;
+    btnMakeTextLower                      : TButton;
+    btnLoadHashList                       : TButton;
+    Button8CopyAndHash                    : TButton;
+    cbFlipCaseFILE                        : TCheckBox;
+    cbToggleInputDataToOutputFile         : TCheckBox;
+    b64ProgressFileS                      : TEdit;
+    cbFlipCaseTEXT                        : TCheckBox;
+    cbUNCModeCompFolders                  : TCheckBox;
+    cbSaveComparisons                     : TCheckBox;
+    cbOverrideFileCountDiffer             : TCheckBox;
+    cbLoadHashList                        : TCheckBox;
+    edtUNCPathCompareA                    : TEdit;
+    edtUNCPathCompareB                    : TEdit;
+    FileSDBNavigator                      : TDBNavigator;
+    lblTotalFileCountNumberA              : TLabel;
+    lblTotalFileCountA                    : TLabel;
+    lblCompareTwoFoldersInstruction1      : TLabel;
+    lblCompareTwoFoldersInstruction2      : TLabel;
+    lblTotalFileCountB                    : TLabel;
+    lblTotalFileCountNumberB              : TLabel;
+    memFolderCompareSummary               : TMemo;
     MenuItem_CopyAllHashesToClipboardFILES: TMenuItem;
-    MenuItem_FilterOutYes: TMenuItem;
-    MenuItem_FilterOutNo: TMenuItem;
-    MenuItem_SortByHashList: TMenuItem;
-    MenuItem_SortByID: TMenuItem;
-    MenuItem_DeleteDups: TMenuItem;
-    MenuItem_SaveFILESTabToHTML: TMenuItem;
-    MenuItem_CopyGridToClipboardFILES: TMenuItem;
-    MenuItem_CopySelectedRow: TMenuItem;
-    MenuItem_SaveToHTML: TMenuItem;
-    HashListChooserDialog: TOpenDialog;
-    pbCompareDirA: TProgressBar;
-    pbCompareDirB: TProgressBar;
-    RecursiveDisplayGrid1: TDBGrid;
-    MenuItem_CopyFilepathOfSelectedCell: TMenuItem;
-    MenuItem_CopyHashOfSelectedCell: TMenuItem;
-    MenuItem_CopyFileNameOfSelectedCell: TMenuItem;
-    MenuItem_CopySelectedRowFILESTAB: TMenuItem;
-    MenuItem_SortByFilePath: TMenuItem;
-    MenuItem_SortByFilename: TMenuItem;
-    MenuItem_SortByHash: TMenuItem;
-    MenuItem_RestoreListFILES: TMenuItem;
-    MenuItem_SaveToCSV: TMenuItem;
-    MenuItem_ShowDuplicates: TMenuItem;
-    popmenuDBGrid_Files: TPopupMenu;
-    lblPercentageProgressFileTab: TLabel;
-    lblB64Warning: TLabel;
-    lblB64DecoderWarning: TLabel;
-    lblNoOfFilesToExamine2: TLabel;
-    lblschedulertickboxCompareTab: TCheckBox;
-    lblschedulertickboxCompareDirsTab: TCheckBox;
-    lblschedulertickboxFileSTab: TCheckBox;
-    lblschedulertickboxCopyTab: TCheckBox;
-    lblschedulertickboxFileTab: TCheckBox;
-    edtFileBName: TEdit;
-    edtFileAName: TEdit;
-    FileTypeMaskCheckBox2: TCheckBox;
-    chkUNCMode: TCheckBox;
-    chkHiddenFiles: TCheckBox;
-    chkCopyHidden: TCheckBox;
-    CheckBoxListOfDirsAndFilesOnly: TCheckBox;
-    CheckBoxListOfDirsOnly: TCheckBox;
-    chkNoRecursiveCopy: TCheckBox;
-    chkNoPathReconstruction: TCheckBox;
-    chkRecursiveDirOverride: TCheckBox;
-    CopyFilesHashingGroupBox: TGroupBox;
-    DirectoryHashingGroupBox: TGroupBox;
-    DirSelectedField: TEdit;
-    Edit2SourcePath: TEdit;
-    Edit3DestinationPath: TEdit;
-    FileHashingGroupBox: TGroupBox;
-    edtFileNameToBeHashed: TEdit;
-    FileMaskField: TEdit;
-    FileMaskField2: TEdit;
-    FileTypeMaskCheckBox1: TCheckBox;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    GroupBox4: TGroupBox;
-    GroupBox5: TGroupBox;
-    Label15: TLabel;
-    lbEndedFileAt: TLabel;
-    MainMenu1: TMainMenu;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
-    MenuItem2A: TMenuItem;
-    MenuItem1C: TMenuItem;
-    MenuItem1A: TMenuItem;
-    MenuItem1B: TMenuItem;
-    b64FileChooserDialog: TOpenDialog;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
-    MenuItem5: TMenuItem;
-    MenuItem6: TMenuItem;
-    pbFileS: TProgressBar;
-    pbCopy: TProgressBar;
-    b64FilesGridPopupMenu: TPopupMenu;
-    b64SaveDialog: TSaveDialog;
-    pbFile: TProgressBar;
-    FilesDBGrid_SaveCSVDialog: TSaveDialog;
-    FilesSaveAsHTMLDialog: TSaveDialog;
-    SaveDialog8_SaveJustHashes: TSaveDialog;
-    sdFileAndFolderListOnly: TSaveDialog;
-    sdHashListLookupResults: TSaveDialog;
-    SaveErrorsCompareDirsSaveDialog8: TSaveDialog;
-    b64FileSChooserDialog: TSelectDirectoryDialog;
-    b64FileSSourceDecoderDialog: TSelectDirectoryDialog;
-    b64FileSDestinationDecoderDialog: TSelectDirectoryDialog;
-    ShellTreeView_FolderA: TShellTreeView;
-    ShellTreeView_FolderB: TShellTreeView;
-    StatusBar6: TStatusBar;
-    b64StringGrid1File: TStringGrid;
-    SystemRAMGroupBox: TGroupBox;
-    ImageList1: TImageList;
-    lblRAM: TLabel;
-    lbleExpectedHash: TLabeledEdit;
-    lbleExpectedHashText: TLabeledEdit;
-    lblURLBanner: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
-    lblFolderAName: TLabel;
-    lblFolderBName: TLabel;
-    lblFileAHash: TLabel;
-    lblFileBHash: TLabel;
-    lblFilesCopiedPercentage: TLabel;
-    lblDataCopiedSoFar: TLabel;
-    lblHashMatchResult: TLabel;
-    lblNoOfFilesToExamine: TLabel;
-    lblPercentageComplete: TLabel;
-    lblTotalBytesExamined: TLabel;
-    lblFilesExamined: TLabel;
-    lblNoFilesInDir: TLabel;
-    lblDragAndDropNudge: TLabel;
-    lblDiskHashingRunAsAdminWarning: TLabel;
-    lblStatusA: TLabel;
-    Label11: TLabel;
-    Label12: TLabel;
-    Label13: TLabel;
-    lblTimeTaken6C: TLabel;
-    lblTimeTaken5C: TLabel;
-    lblTimeTaken6A: TLabel;
-    lblTimeTaken6B: TLabel;
-    lblTimeTaken5B: TLabel;
-    lblTimeTaken5A: TLabel;
-    lblTimeTaken4: TLabel;
-    lblTimeTaken3: TLabel;
-    Label2: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
-    lblStartedFileAt: TLabel;
-    lblFileTimeTaken: TLabel;
-    memFileHashField: TMemo;
-    FLBLDialog: TOpenDialog;
-    SaveDialog5: TSaveDialog;
-    SaveDialog6: TSaveDialog;
-    SaveDialog7: TSaveDialog;
-    SelectDirectoryDialog4: TSelectDirectoryDialog;
-    SelectDirectoryDialog5: TSelectDirectoryDialog;
-    DirListA: TShellTreeView;
-    DirListB: TShellTreeView;
-    StatusBar1: TStatusBar;
-    StatusBar2: TStatusBar;
-    StatusBar3: TStatusBar;
-    StatusBar4: TStatusBar;
-    StrHashValue: TMemo;
-    memoHashText: TMemo;
-    NoOfFilesExamined: TEdit;
-    OpenDialog1: TOpenDialog;
-    PageControl1: TPageControl;
-    Panel1CopyAndHashOptions: TPanel;
-    PercentageComplete: TLabel;
-    SaveDialog1: TSaveDialog;
-    SaveDialog2: TSaveDialog;
-    SaveDialog3: TSaveDialog;
-    SaveDialog4: TSaveDialog;
-    SaveToCSVCheckBox2: TCheckBox;
-    SaveFILESTabToHTMLCheckBox2: TCheckBox;
-    SelectDirectoryDialog1: TSelectDirectoryDialog;
-    SelectDirectoryDialog2: TSelectDirectoryDialog;
-    SelectDirectoryDialog3: TSelectDirectoryDialog;
-    sysRAMTimer: TTimer;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    TabSheet3: TTabSheet;
-    TabSheet4: TTabSheet;
-    TabSheet5: TTabSheet;
-    TabSheet6: TTabSheet;
-    TabSheet7: TTabSheet;
-    TabSheet8: TTabSheet;
-    TextHashingGroupBox: TGroupBox;
-    QH_MainFormXMLPropStorage: TXMLPropStorage;
-    SchedulerTimer: TTimer;
-    TextHashingGroupBox1: TGroupBox;
-    ZVDateTimePickerCompareDirsTab: TZVDateTimePicker;
-    ZVDateTimePickerCopyTab    : TZVDateTimePicker;
-    ZVDateTimePickerCompareTab : TZVDateTimePicker;
-    ZVDateTimePickerFileTab    : TZVDateTimePicker;
-    ZVDateTimePickerFileSTab   : TZVDateTimePicker;
+    MenuItem_FilterOutYes                 : TMenuItem;
+    MenuItem_FilterOutNo                  : TMenuItem;
+    MenuItem_SortByHashList               : TMenuItem;
+    MenuItem_SortByID                     : TMenuItem;
+    MenuItem_DeleteDups                   : TMenuItem;
+    MenuItem_SaveFILESTabToHTML           : TMenuItem;
+    MenuItem_CopyGridToClipboardFILES     : TMenuItem;
+    MenuItem_CopySelectedRow              : TMenuItem;
+    MenuItem_SaveToHTML                   : TMenuItem;
+    HashListChooserDialog                 : TOpenDialog;
+    pbCompareDirA                         : TProgressBar;
+    pbCompareDirB                         : TProgressBar;
+    RecursiveDisplayGrid1                 : TDBGrid;
+    MenuItem_CopyFilepathOfSelectedCell   : TMenuItem;
+    MenuItem_CopyHashOfSelectedCell       : TMenuItem;
+    MenuItem_CopyFileNameOfSelectedCell   : TMenuItem;
+    MenuItem_CopySelectedRowFILESTAB      : TMenuItem;
+    MenuItem_SortByFilePath               : TMenuItem;
+    MenuItem_SortByFilename               : TMenuItem;
+    MenuItem_SortByHash                   : TMenuItem;
+    MenuItem_RestoreListFILES             : TMenuItem;
+    MenuItem_SaveToCSV                    : TMenuItem;
+    MenuItem_ShowDuplicates               : TMenuItem;
+    popmenuDBGrid_Files                   : TPopupMenu;
+    lblPercentageProgressFileTab          : TLabel;
+    lblB64Warning                         : TLabel;
+    lblB64DecoderWarning                  : TLabel;
+    lblNoOfFilesToExamine2                : TLabel;
+    lblschedulertickboxCompareTab         : TCheckBox;
+    lblschedulertickboxCompareDirsTab     : TCheckBox;
+    lblschedulertickboxFileSTab           : TCheckBox;
+    lblschedulertickboxCopyTab            : TCheckBox;
+    lblschedulertickboxFileTab            : TCheckBox;
+    edtFileBName                          : TEdit;
+    edtFileAName                          : TEdit;
+    FileTypeMaskCheckBox2                 : TCheckBox;
+    chkUNCMode                            : TCheckBox;
+    chkHiddenFiles                        : TCheckBox;
+    chkCopyHidden                         : TCheckBox;
+    CheckBoxListOfDirsAndFilesOnly        : TCheckBox;
+    CheckBoxListOfDirsOnly                : TCheckBox;
+    chkNoRecursiveCopy                    : TCheckBox;
+    chkNoPathReconstruction               : TCheckBox;
+    chkRecursiveDirOverride               : TCheckBox;
+    CopyFilesHashingGroupBox              : TGroupBox;
+    DirectoryHashingGroupBox              : TGroupBox;
+    DirSelectedField                      : TEdit;
+    Edit2SourcePath                       : TEdit;
+    Edit3DestinationPath                  : TEdit;
+    FileHashingGroupBox                   : TGroupBox;
+    edtFileNameToBeHashed                 : TEdit;
+    FileMaskField                         : TEdit;
+    FileMaskField2                        : TEdit;
+    FileTypeMaskCheckBox1                 : TCheckBox;
+    GroupBox1                             : TGroupBox;
+    GroupBox2                             : TGroupBox;
+    GroupBox4                             : TGroupBox;
+    GroupBox5                             : TGroupBox;
+    Label15                               : TLabel;
+    lbEndedFileAt                         : TLabel;
+    MainMenu1                             : TMainMenu;
+    MenuItem1                             : TMenuItem;
+    MenuItem2                             : TMenuItem;
+    MenuItem2A                            : TMenuItem;
+    MenuItem1C                            : TMenuItem;
+    MenuItem1A                            : TMenuItem;
+    MenuItem1B                            : TMenuItem;
+    b64FileChooserDialog                  : TOpenDialog;
+    MenuItem3                             : TMenuItem;
+    MenuItem4                             : TMenuItem;
+    MenuItem5                             : TMenuItem;
+    MenuItem6                             : TMenuItem;
+    pbFileS                               : TProgressBar;
+    pbCopy                                : TProgressBar;
+    b64FilesGridPopupMenu                 : TPopupMenu;
+    b64SaveDialog                         : TSaveDialog;
+    pbFile                                : TProgressBar;
+    FilesDBGrid_SaveCSVDialog             : TSaveDialog;
+    FilesSaveAsHTMLDialog                 : TSaveDialog;
+    SaveDialog8_SaveJustHashes            : TSaveDialog;
+    sdFileAndFolderListOnly               : TSaveDialog;
+    sdHashListLookupResults               : TSaveDialog;
+    SaveErrorsCompareDirsSaveDialog8      : TSaveDialog;
+    b64FileSChooserDialog                 : TSelectDirectoryDialog;
+    b64FileSSourceDecoderDialog           : TSelectDirectoryDialog;
+    b64FileSDestinationDecoderDialog      : TSelectDirectoryDialog;
+    ShellTreeView_FolderA                 : TShellTreeView;
+    ShellTreeView_FolderB                 : TShellTreeView;
+    StatusBar6                            : TStatusBar;
+    b64StringGrid1File                    : TStringGrid;
+    SystemRAMGroupBox                     : TGroupBox;
+    ImageList1                            : TImageList;
+    lblRAM                                : TLabel;
+    lbleExpectedHash                      : TLabeledEdit;
+    lbleExpectedHashText                  : TLabeledEdit;
+    lblURLBanner                          : TLabel;
+    Label8                                : TLabel;
+    Label9                                : TLabel;
+    lblFolderAName                        : TLabel;
+    lblFolderBName                        : TLabel;
+    lblFileAHash                          : TLabel;
+    lblFileBHash                          : TLabel;
+    lblFilesCopiedPercentage              : TLabel;
+    lblDataCopiedSoFar                    : TLabel;
+    lblHashMatchResult                    : TLabel;
+    lblNoOfFilesToExamine                 : TLabel;
+    lblPercentageComplete                 : TLabel;
+    lblTotalBytesExamined                 : TLabel;
+    lblFilesExamined                      : TLabel;
+    lblNoFilesInDir                       : TLabel;
+    lblDragAndDropNudge                   : TLabel;
+    lblDiskHashingRunAsAdminWarning       : TLabel;
+    lblStatusA                            : TLabel;
+    Label11                               : TLabel;
+    Label12                               : TLabel;
+    Label13                               : TLabel;
+    lblTimeTaken6C                        : TLabel;
+    lblTimeTaken5C                        : TLabel;
+    lblTimeTaken6A                        : TLabel;
+    lblTimeTaken6B                        : TLabel;
+    lblTimeTaken5B                        : TLabel;
+    lblTimeTaken5A                        : TLabel;
+    lblTimeTaken4                         : TLabel;
+    lblTimeTaken3                         : TLabel;
+    Label2                                : TLabel;
+    Label4                                : TLabel;
+    Label5                                : TLabel;
+    Label6                                : TLabel;
+    lblStartedFileAt                      : TLabel;
+    lblFileTimeTaken                      : TLabel;
+    memFileHashField                      : TMemo;
+    FLBLDialog                            : TOpenDialog;
+    SaveDialog5                           : TSaveDialog;
+    SaveDialog6                           : TSaveDialog;
+    SaveDialog7                           : TSaveDialog;
+    SelectDirectoryDialog4                : TSelectDirectoryDialog;
+    SelectDirectoryDialog5                : TSelectDirectoryDialog;
+    DirListA                              : TShellTreeView;
+    DirListB                              : TShellTreeView;
+    StatusBar1                            : TStatusBar;
+    StatusBar2                            : TStatusBar;
+    StatusBar3                            : TStatusBar;
+    StatusBar4                            : TStatusBar;
+    StrHashValue                          : TMemo;
+    memoHashText                          : TMemo;
+    NoOfFilesExamined                     : TEdit;
+    OpenDialog1                           : TOpenDialog;
+    PageControl1                          : TPageControl;
+    Panel1CopyAndHashOptions              : TPanel;
+    PercentageComplete                    : TLabel;
+    SaveDialog1                           : TSaveDialog;
+    SaveDialog2                           : TSaveDialog;
+    SaveDialog3                           : TSaveDialog;
+    SaveDialog4                           : TSaveDialog;
+    SaveToCSVCheckBox2                    : TCheckBox;
+    SaveFILESTabToHTMLCheckBox2           : TCheckBox;
+    SelectDirectoryDialog1                : TSelectDirectoryDialog;
+    SelectDirectoryDialog2                : TSelectDirectoryDialog;
+    SelectDirectoryDialog3                : TSelectDirectoryDialog;
+    sysRAMTimer                           : TTimer;
+    TabSheet1                             : TTabSheet;
+    TabSheet2                             : TTabSheet;
+    TabSheet3                             : TTabSheet;
+    TabSheet4                             : TTabSheet;
+    TabSheet5                             : TTabSheet;
+    TabSheet6                             : TTabSheet;
+    TabSheet7                             : TTabSheet;
+    TabSheet8                             : TTabSheet;
+    TextHashingGroupBox                   : TGroupBox;
+    QH_MainFormXMLPropStorage             : TXMLPropStorage;
+    SchedulerTimer                        : TTimer;
+    TextHashingGroupBox1                  : TGroupBox;
+    ZVDateTimePickerCompareDirsTab        : TZVDateTimePicker;
+    ZVDateTimePickerCopyTab               : TZVDateTimePicker;
+    ZVDateTimePickerCompareTab            : TZVDateTimePicker;
+    ZVDateTimePickerFileTab               : TZVDateTimePicker;
+    ZVDateTimePickerFileSTab              : TZVDateTimePicker;
+    // Procedures
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox3Click(Sender: TObject);
@@ -492,17 +496,24 @@ type
     procedure ClearText(Sender: TObject);
     procedure TabSheet6ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
+    procedure SHA1RadioButton3Change(Sender: TObject);
+    procedure TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure TabSheet3ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
+    procedure EmptyDisplayGrid(Grid : TStringGrid);
+    procedure CheckSchedule(DesiredStartTime : TDateTime);
+    procedure InvokeScheduler(Sender : TObject);
+    procedure CommitCount(Sender : TObject);
+
+    // Functions
+    function RoundToNearest(TheDateTime,TheRoundStep:TDateTime):TdateTime;
     function  ValidateTextWithHash(strToBeHashed:ansistring): string;
     function  CalcTheHashString(strToBeHashed:ansistring):string;
     function  CalcTheHashFile(FileToBeHashed:string):string;
     function  FormatByteSize(const bytes: QWord): string;
     function  RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
-    procedure SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
-    procedure EmptyDisplayGrid(Grid : TStringGrid);
-    procedure CheckSchedule(DesiredStartTime : TDateTime);
-    procedure InvokeScheduler(Sender : TObject);
-    function RoundToNearest(TheDateTime,TheRoundStep:TDateTime):TdateTime;
-    procedure CommitCount(Sender : TObject);
     function RetrieveFileList(FolderName : string) : TStringList;
     function HashFolderAList(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
     function HashFolderBList(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
@@ -525,11 +536,6 @@ type
       {$ENDIF}
     {$ENDIF}
     function CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTime: Boolean): Boolean;
-    procedure SHA1RadioButton3Change(Sender: TObject);
-    procedure TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
-      var Handled: Boolean);
-    procedure TabSheet3ContextPopup(Sender: TObject; MousePos: TPoint;
-      var Handled: Boolean);
 
   private
    // Global handle exception controller, courtesy of GetMem from the forums
@@ -539,21 +545,19 @@ type
   public
     { public declarations }
 
-   FileCounter, NoOfFilesInDir2: integer; // Used jointly by Button3Click and Hashfile procedures
-   CommitFrequencyChecker : integer; // To keep track of SQLite commits
-   TotalBytesRead : UInt64;
+   FileCounter, NoOfFilesInDir2: integer;   // Used jointly by Button3Click and Hashfile procedures
+   CommitFrequencyChecker, tmp : integer;   // To keep track of SQLite commits
+   TotalBytesRead              : UInt64;
    StopScan1, StopScan2, SourceDirValid, DestDirValid : Boolean;
-   SourceDir, DestDir : string; // For the joint copy and hash routines
+   SourceDir, DestDir : string;             // For the joint copy and hash routines
 
-    DirA, DirB : string;
-   sValue1 : string; // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
+   DirA, DirB : string;
+   sValue1 : string;                        // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
 
-   slMultipleDirNames : TStringList;
+   slMultipleDirNames             : TStringList;
    fsSaveFolderComparisonsLogFile : TFileStream;
 
    MultipleDirsChosen, StartHashing : boolean;
-
-   tmp : integer;
 
    {$IFDEF WINDOWS}
    // For copying better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
@@ -633,8 +637,8 @@ begin
     end;
 
   StartHashing := false;
-  StopScan1 := false;
-  StopScan2 := false;
+  StopScan1    := false;
+  StopScan2    := false;
 
   {$ifdef Windows}
   // These are the default values to be prefixed before a path to invoke the 32K
@@ -694,17 +698,18 @@ begin
   end;  }
 
   {$IFDEF WINDOWS}
-    Label8.Caption        := '';
-    chkCopyHidden.Enabled := false;
-    chkCopyHidden.ShowHint:= true;
-    chkCopyHidden.Hint:= 'On Windows, QuickHash finds hidden files and folders by default';
+    Label8.Caption            := '';
+    chkCopyHidden.Enabled     := false;
+    chkCopyHidden.ShowHint    := true;
+    chkCopyHidden.Hint        := 'On Windows, QuickHash finds hidden files and folders by default';
+
     // Remove the advice about using the File tab for hashing files.
-    Label6.Caption := '';
+    Label6.Caption            := '';
     SystemRAMGroupBox.Visible := true;
-    sysRAMTimer.enabled := true;
-    lblRAM.Caption := GetSystemMem;
-    Edit2SourcePath.Enabled:=true;
-    Edit2SourcePath.Visible:=true;
+    sysRAMTimer.enabled       := true;
+    lblRAM.Caption            := GetSystemMem;
+    Edit2SourcePath.Enabled   :=true;
+    Edit2SourcePath.Visible   :=true;
     Edit3DestinationPath.Enabled:=true;
     Edit3DestinationPath.Visible:=true;
   {$ENDIF}
@@ -783,7 +788,7 @@ begin
   t := Now;
   // Round the chosen time and the current time to the nearest second
   // https://stackoverflow.com/questions/4122218/in-delphi-how-do-i-round-a-tdatetime-to-closest-second-minute-five-minute-etc
-  t := RoundToNearest(t, EncodeTime(0,0,1,0));
+  t                := RoundToNearest(t, EncodeTime(0,0,1,0));
   DesiredStartTime := RoundToNearest(DesiredStartTime, EncodeTime(0,0,1,0));
   if t = DesiredStartTime then
     begin
@@ -1359,7 +1364,6 @@ begin
   OpenURL(QuickHashDonateURL);
 end;
 
-
 // In the event that the user pastes an expected hash value AFTER computing
 // the hash of the file, this onKeyUp event will then see if the pasted value
 // matches the value just computed. New to v2.8.3
@@ -1565,7 +1569,6 @@ begin
   end;
 end;
 
-
 procedure TMainForm.MenuItem1AClick(Sender: TObject);
 begin
 
@@ -1760,6 +1763,7 @@ end;
 
 // These radio click events are to ensure the same hash algorithm is chosen
 // for all the tabs, if the user changes it from the default. New to v.2.8.2
+// Ensure all radio buttons equal MD5
 procedure TMainForm.AlgorithmChoiceRadioBox1Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
@@ -1769,7 +1773,7 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
 end;
-
+// Ensure all radio buttons equal SHA-1
 procedure TMainForm.AlgorithmChoiceRadioBox2Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
@@ -1779,7 +1783,7 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
 end;
-
+// Ensure all radio buttons equal SHA-3 (256 bit mode)
 procedure TMainForm.AlgorithmChoiceRadioBox3Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
@@ -1789,8 +1793,7 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
 end;
-
-
+// Ensure all radio buttons equal SHA256
 procedure TMainForm.AlgorithmChoiceRadioBox4Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
@@ -1800,7 +1803,7 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
 end;
-
+// Ensure all radio buttons equal SHA512
 procedure TMainForm.AlgorithmChoiceRadioBox5Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
@@ -1810,7 +1813,7 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
 end;
-
+// Ensure all radio buttons equal xxHash
 procedure TMainForm.AlgorithmChoiceRadioBox6Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
@@ -1820,7 +1823,7 @@ begin
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
 end;
-
+// Ensure all radio buttons equal Blake2B (256 bit mode)
 procedure TMainForm.AlgorithmChoiceRadioBox7Click(Sender: TObject);
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
@@ -3303,7 +3306,7 @@ var
   slCompareTwoFiles : TStringList;
   ChosenHashAlg : string;
 begin
-  ChosenHashAlg := 'MD5';
+  ChosenHashAlg := '';
   case AlgorithmChoiceRadioBox5.ItemIndex of
       0: begin
       ChosenHashAlg := 'MD5';
@@ -3312,13 +3315,19 @@ begin
       ChosenHashAlg := 'SHA-1';
       end;
       2: begin
-      ChosenHashAlg := 'SHA256';
+      ChosenHashAlg := 'SHA-3';
       end;
       3: begin
-      ChosenHashAlg := 'SHA512';
+      ChosenHashAlg := 'SHA256';
       end;
       4: begin
+      ChosenHashAlg := 'SHA512';
+      end;
+      5: begin
       ChosenHashAlg := 'xxHash';
+      end;
+      6: begin
+      ChosenHashAlg := 'Blake2b';
       end;
   end;
   slCompareTwoFiles := TStringList.Create;
@@ -3505,7 +3514,7 @@ begin
         6: begin
              result := THashFactory.TCrypto.CreateBlake2B_256.ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // SHA-3 (new as of v3.1.0)
            end;
-      end;
+      end;  // end of case statement
     end; // End of string length check
 end;
 

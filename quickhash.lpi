@@ -60,7 +60,7 @@
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -72,8 +72,9 @@
         <UnitName Value="Unit2"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="12" Y="6"/>
-        <UsageCount Value="33"/>
+        <TopLine Value="857"/>
+        <CursorPos X="8" Y="793"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -85,7 +86,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uDisplayGrid"/>
         <EditorIndex Value="6"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit2>
@@ -96,7 +97,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="7"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit3>
@@ -104,14 +105,14 @@
         <Filename Value="diskmodule.lfm"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit4>
       <Unit5>
         <Filename Value="diskspecification.lfm"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit5>
       <Unit6>
@@ -121,7 +122,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="8"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit6>
@@ -130,7 +131,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="9"/>
         <CursorPos X="28" Y="9"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
@@ -138,7 +139,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="10"/>
         <CursorPos X="28" Y="10"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
@@ -149,7 +150,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uProgress"/>
         <EditorIndex Value="11"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit9>
@@ -162,7 +163,7 @@
         <EditorIndex Value="12"/>
         <TopLine Value="544"/>
         <CursorPos X="47" Y="556"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit10>
@@ -204,7 +205,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="423"/>
         <CursorPos Y="441"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="16"/>
         <Loaded Value="True"/>
       </Unit16>
       <Unit17>
@@ -212,7 +213,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="3551"/>
         <CursorPos Y="3568"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="16"/>
         <Loaded Value="True"/>
       </Unit17>
       <Unit18>
@@ -221,7 +222,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="245"/>
         <CursorPos Y="263"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="16"/>
         <Loaded Value="True"/>
       </Unit18>
       <Unit19>
@@ -231,132 +232,133 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="frmAboutUnit"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="17" Y="15"/>
-        <UsageCount Value="14"/>
+        <TopLine Value="26"/>
+        <CursorPos X="11" Y="51"/>
+        <UsageCount Value="15"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit19>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2869" Column="41" TopLine="2839"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="698" Column="3" TopLine="693"/>
       </Position1>
       <Position2>
         <Filename Value="unit2.pas"/>
-        <Caret Line="2882" Column="49" TopLine="2853"/>
+        <Caret Line="4496" Column="34" TopLine="4467"/>
       </Position2>
       <Position3>
         <Filename Value="unit2.pas"/>
-        <Caret Line="2896" Column="49" TopLine="2867"/>
+        <Caret Line="1689" Column="25" TopLine="1680"/>
       </Position3>
       <Position4>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2934" Column="41" TopLine="2904"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="62" Column="15" TopLine="44"/>
       </Position4>
       <Position5>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2935" Column="41" TopLine="2905"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="549" Column="13" TopLine="525"/>
       </Position5>
       <Position6>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2948" Column="51" TopLine="2919"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="534" Column="15" TopLine="529"/>
       </Position6>
       <Position7>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="2962" Column="49" TopLine="2933"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="560" Column="19" TopLine="533"/>
       </Position7>
       <Position8>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="3906" Column="26" TopLine="3877"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="34" Column="43" TopLine="10"/>
       </Position8>
       <Position9>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="698" Column="3" TopLine="693"/>
+        <Caret Line="42" Column="34" TopLine="25"/>
       </Position9>
       <Position10>
         <Filename Value="unit2.pas"/>
-        <Caret Line="4496" Column="34" TopLine="4467"/>
+        <Caret Line="1689" Column="25" TopLine="1680"/>
       </Position10>
       <Position11>
         <Filename Value="unit2.pas"/>
-        <Caret Line="1689" Column="25" TopLine="1680"/>
+        <Caret Line="1701" Column="29" TopLine="1680"/>
       </Position11>
       <Position12>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="62" Column="15" TopLine="44"/>
+        <Caret Line="63" Column="15" TopLine="46"/>
       </Position12>
       <Position13>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="549" Column="13" TopLine="525"/>
+        <Caret Line="533" Column="35" TopLine="528"/>
       </Position13>
       <Position14>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="534" Column="15" TopLine="529"/>
+        <Caret Line="531" Column="34" TopLine="519"/>
       </Position14>
       <Position15>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="560" Column="19" TopLine="533"/>
+        <Caret Line="537" Column="29" TopLine="519"/>
       </Position15>
       <Position16>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="34" Column="43" TopLine="10"/>
+        <Caret Line="18" Column="74"/>
       </Position16>
       <Position17>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="42" Column="34" TopLine="25"/>
+        <Caret Line="34" Column="48" TopLine="4"/>
       </Position17>
       <Position18>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="1689" Column="25" TopLine="1680"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="43" Column="23" TopLine="13"/>
       </Position18>
       <Position19>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="1701" Column="29" TopLine="1680"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="62" Column="22" TopLine="32"/>
       </Position19>
       <Position20>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="63" Column="15" TopLine="46"/>
+        <Caret Line="563" Column="43" TopLine="542"/>
       </Position20>
       <Position21>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="533" Column="35" TopLine="528"/>
+        <Caret Line="547" Column="18" TopLine="529"/>
       </Position21>
       <Position22>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="531" Column="34" TopLine="519"/>
+        <Caret Line="548" Column="9" TopLine="531"/>
       </Position22>
       <Position23>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="537" Column="29" TopLine="519"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="6" Column="12"/>
       </Position23>
       <Position24>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="18" Column="74"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1210" Column="71" TopLine="1198"/>
       </Position24>
       <Position25>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="34" Column="48" TopLine="4"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="496" Column="15" TopLine="478"/>
       </Position25>
       <Position26>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="43" Column="23" TopLine="13"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="3500" Column="37" TopLine="3475"/>
       </Position26>
       <Position27>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="62" Column="22" TopLine="32"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1581" Column="7" TopLine="1578"/>
       </Position27>
       <Position28>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="563" Column="43" TopLine="542"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="61" Column="41" TopLine="31"/>
       </Position28>
       <Position29>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="547" Column="18" TopLine="529"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1148" Column="3" TopLine="1138"/>
       </Position29>
       <Position30>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="548" Column="9" TopLine="531"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="501" Column="15" TopLine="484"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

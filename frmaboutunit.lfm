@@ -35,7 +35,7 @@ object frmAbout: TfrmAbout
       ''
       'xxHash64 : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/, Github user Cyan4973. Use of the library is also welcomed and acknowledged and very much appreciated'
       ''
-      'Blake2B : https://blake2.net/ : Use of the fast and secure Blake2B algorithm is acknowledged and welcomed. '
+      'Blake2B : https://blake2.net/ : Use of the fast and secure Blake2B (256 bit) algorithm is acknowledged and welcomed. '
       '    '
       'QuickHash is open-source and released under the GPL2 license. '
     )

@@ -25,11 +25,12 @@ LazarusResources.Add('TfrmAbout','FORMDATA',[
   +' Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'#6#0#6#185'xxHash6'
   +'4 : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash'
   +'/, Github user Cyan4973. Use of the library is also welcomed and acknowledg'
-  +'ed and very much appreciated'#6#0#6'kBlake2B : https://blake2.net/ : Use of'
-  +' the fast and secure Blake2B algorithm is acknowledged and welcomed. '#6#4
-  +'    '#6'>QuickHash is open-source and released under the GPL2 license. '#0#8
-  +'ReadOnly'#9#10'ScrollBars'#7#10'ssAutoBoth'#8'TabOrder'#2#0#0#0#7'TButton'#7
-  +'Button1'#21'AnchorSideTop.Control'#7#8'memAbout'#18'AnchorSideTop.Side'#7#9
-  +'asrBottom'#4'Left'#2' '#6'Height'#2#25#3'Top'#3'('#2#5'Width'#3#147#0#7'Cap'
-  +'tion'#6#5'Close'#7'OnClick'#7#12'Button1Click'#8'TabOrder'#2#1#0#0#0
+  +'ed and very much appreciated'#6#0#6'uBlake2B : https://blake2.net/ : Use of'
+  +' the fast and secure Blake2B (256 bit) algorithm is acknowledged and welcom'
+  +'ed. '#6#4'    '#6'>QuickHash is open-source and released under the GPL2 lic'
+  +'ense. '#0#8'ReadOnly'#9#10'ScrollBars'#7#10'ssAutoBoth'#8'TabOrder'#2#0#0#0
+  +#7'TButton'#7'Button1'#21'AnchorSideTop.Control'#7#8'memAbout'#18'AnchorSide'
+  +'Top.Side'#7#9'asrBottom'#4'Left'#2' '#6'Height'#2#25#3'Top'#3'('#2#5'Width'
+  +#3#147#0#7'Caption'#6#5'Close'#7'OnClick'#7#12'Button1Click'#8'TabOrder'#2#1
+  +#0#0#0
 ]);
