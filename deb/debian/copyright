@@ -3,7 +3,7 @@ Upstream-Name: QuickHash
 Source: https://github.com/tedsmith/quickhash
 
 Files: *
-Copyright: 2011-2019, Ted Smith <tedsmith28@yahoo.co.uk>
+Copyright: 2011-2019, Ted Smith <tedsmith@quickhash-gui.org>
 License: GPL-2+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

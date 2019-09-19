@@ -1,5 +1,5 @@
 Source: quickhash
-Maintainer: Ted Smith <tedsmith28@yahoo.co.uk>
+Maintainer: Ted Smith <tedsmith@quickhash-gui.org>
 Section: misc
 Priority: optional
 Build-Depends: debhelper (>= 9)
