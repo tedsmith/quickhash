@@ -5,6 +5,7 @@
     <General>
       <MainUnit Value="0"/>
       <Title Value="QuickHash"/>
+      <Icon Value="quickhash_linux.ico"/>
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
