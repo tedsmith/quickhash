@@ -10,7 +10,7 @@ LAZRES := $(LAZARUSDIR)tools/lazres
 
 RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs
 
-PACKAGES := HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk \
+PACKAGES := HashLib4Pascal/src/Packages/FPC/HashLib4PascalPackage.lpk \
  DateTimePicker/zvdatetimectrls.lpk \
  $(LAZARUSDIR)components/dbexport/lazdbexport.lpk
 
