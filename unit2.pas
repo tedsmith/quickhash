@@ -2297,21 +2297,12 @@ var
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
   frmSQLiteDBases.EmptyDBTable('TBL_FILES', RecursiveDisplayGrid1);
-  // Now get the user to choose his folder for hashing, or, use the existing
-  // folder name if triggered by algorithms selection change
-  if SelectDirectoryDialog1.FileName = '' then
-  begin
+  // Now get the user to choose his folder for hashing
   if SelectDirectoryDialog1.Execute then
     begin
       DirSelectedField.Caption := SelectDirectoryDialog1.FileName;
       DirToHash := SelectDirectoryDialog1.FileName;
-    end;
-  end
-  else
-  begin
-    DirSelectedField.Caption := SelectDirectoryDialog1.FileName;
-    DirToHash := SelectDirectoryDialog1.FileName;
-  end;
+
       {$ifdef Windows}
       // If chosen path is a UNC path, we need to append the UNC prefix to the
       // Unicode 32K long API call of \\?\
@@ -2446,8 +2437,7 @@ var
          StatusBar2.SimpleText:= 'See rightmost column for hashset correlations. ' + IntToStr(CountHashesInKnownList) + ' unique hashes are in the imported hash list';
        end;
   end; // end of SelectDirectoryDialog1.Execute
-
-
+end;
 
 // The clipboard button on the 'FileS' tab, this will copy the DBGrid to clipboard
 procedure TMainForm.btnClipboardResultsClick(Sender: TObject);
@@ -2886,8 +2876,18 @@ begin
         begin
         HashVal := CalcTheHashFile(slFileListA.Strings[i]);
         HashListA.Add(HashVal, @HashVal);
+
         // Write values to database. +1 because DB rowcount is not zero based
+        {$ifdef Windows}
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
+        {$else}
+        {$ifdef Darwin}
         frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        {$endif}
+        {$IFDEF UNIX and !$ifdef Darwin}
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        {$ENDIF}
+        {$endif}
 
         if SaveData then
           begin
@@ -2913,7 +2913,16 @@ begin
         HashVal := 'ZERO BYTE FILE';
         HashListA.Add(HashVal, @HashVal);
         // Write values to database
+        {$ifdef Windows}
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
+        {$else}
+        {$ifdef Darwin}
         frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        {$endif}
+        {$IFDEF UNIX and !$ifdef Darwin}
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        {$ENDIF}
+        {$endif}
 
         if SaveData then
          begin
@@ -2982,7 +2991,16 @@ begin
           HashVal := CalcTheHashFile(slFileListB.Strings[j]);
           HashListB.Add(HashVal, @HashVal);
           // Write values to database  +1 because DB rowcount is not zero based
+          {$ifdef Windows}
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
+          {$else}
+          {$ifdef Darwin}
           frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+          {$endif}
+          {$IFDEF UNIX and !$ifdef Darwin}
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+          {$ENDIF}
+          {$endif}
 
           if SaveData then
             begin
@@ -3007,8 +3025,18 @@ begin
       begin
         HashVal := 'ZERO BYTE FILE';
         HashListB.Add(HashVal, @HashVal);
+
         // Write values to database
+        {$ifdef Windows}
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
+        {$else}
+        {$ifdef Darwin}
         frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+        {$endif}
+        {$IFDEF UNIX and !$ifdef Darwin}
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+        {$ENDIF}
+        {$endif}
 
         if SaveData then
           begin

@@ -61,8 +61,9 @@
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="47" Y="15"/>
-        <UsageCount Value="159"/>
+        <TopLine Value="76"/>
+        <CursorPos X="33" Y="99"/>
+        <UsageCount Value="160"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -409,10 +410,14 @@
       <Unit47>
         <Filename Value="diskspecification.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmTechSpecs"/>
         <HasResources Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="25" Y="27"/>
-        <UsageCount Value="66"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="23"/>
+        <UsageCount Value="67"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit47>
       <Unit48>
         <Filename Value="frmaboutunit.pas"/>
@@ -421,9 +426,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="frmAboutUnit"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <CursorPos X="48" Y="10"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit48>
@@ -433,9 +438,10 @@
         <ComponentName Value="frmSQLiteDBases"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
-        <CursorPos X="28" Y="4"/>
-        <UsageCount Value="66"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="1249"/>
+        <CursorPos X="61" Y="1249"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit49>
@@ -446,8 +452,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="24" Y="5"/>
-        <UsageCount Value="66"/>
+        <TopLine Value="985"/>
+        <CursorPos X="19" Y="1011"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit50>
@@ -458,7 +465,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
       </Unit51>
       <Unit52>
         <Filename Value="udisplaygrid.pas"/>
@@ -469,7 +476,7 @@
         <UnitName Value="uDisplayGrid"/>
         <EditorIndex Value="1"/>
         <CursorPos X="26" Y="12"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit52>
@@ -480,7 +487,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
       </Unit53>
       <Unit54>
         <Filename Value="uKnownHashLists.pas"/>
@@ -489,7 +496,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
       </Unit54>
       <Unit55>
         <Filename Value="unit2.pas"/>
@@ -500,8 +507,9 @@
         <UnitName Value="Unit2"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="10" Y="7"/>
-        <UsageCount Value="66"/>
+        <TopLine Value="2866"/>
+        <CursorPos X="9" Y="2879"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit55>
@@ -510,9 +518,9 @@
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
         <UnitName Value="uProgress"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <CursorPos X="27" Y="6"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
       </Unit56>
       <Unit57>
@@ -539,9 +547,10 @@
         <ComponentName Value="frmDisplayGrid3"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="6"/>
-        <CursorPos X="56" Y="96"/>
-        <UsageCount Value="45"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="73"/>
+        <CursorPos X="40" Y="20"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit59>
@@ -681,50 +690,50 @@
         <UsageCount Value="11"/>
       </Unit78>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="812" TopLine="798"/>
+        <Caret Line="1095" TopLine="1082"/>
       </Position1>
       <Position2>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="813" TopLine="798"/>
+        <Caret Line="1099" TopLine="1082"/>
       </Position2>
       <Position3>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="815" TopLine="798"/>
+        <Caret Line="1144" Column="34" TopLine="1136"/>
       </Position3>
       <Position4>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="815" TopLine="798"/>
+        <Caret Line="156" Column="12" TopLine="142"/>
       </Position4>
       <Position5>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="819" TopLine="798"/>
+        <Caret Line="1351" Column="21" TopLine="1334"/>
       </Position5>
       <Position6>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="819" TopLine="798"/>
+        <Caret Line="1154" Column="27" TopLine="1143"/>
       </Position6>
       <Position7>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="821" TopLine="798"/>
+        <Caret Line="156" Column="12" TopLine="151"/>
       </Position7>
       <Position8>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="848" TopLine="835"/>
+        <Caret Line="1266" Column="18" TopLine="1251"/>
       </Position8>
       <Position9>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="1095" TopLine="1082"/>
+        <Filename Value="quickhash.lpr"/>
+        <Caret Line="93" Column="54" TopLine="75"/>
       </Position9>
       <Position10>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1099" TopLine="1082"/>
+        <Caret Line="1145" Column="9" TopLine="1134"/>
       </Position10>
       <Position11>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1144" Column="34" TopLine="1136"/>
+        <Caret Line="1151" Column="37" TopLine="1134"/>
       </Position11>
       <Position12>
         <Filename Value="diskmodule.pas"/>
@@ -732,68 +741,76 @@
       </Position12>
       <Position13>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1351" Column="21" TopLine="1334"/>
+        <Caret Line="1395" Column="5" TopLine="1333"/>
       </Position13>
       <Position14>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1154" Column="27" TopLine="1143"/>
+        <Caret Line="1094" Column="46" TopLine="1078"/>
       </Position14>
       <Position15>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="156" Column="12" TopLine="151"/>
+        <Caret Line="103" Column="14" TopLine="90"/>
       </Position15>
       <Position16>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1266" Column="18" TopLine="1251"/>
+        <Caret Line="811" Column="52" TopLine="806"/>
       </Position16>
       <Position17>
-        <Filename Value="quickhash.lpr"/>
-        <Caret Line="93" Column="54" TopLine="75"/>
+        <Filename Value="diskmodule.pas"/>
+        <Caret Line="1151" Column="25" TopLine="1138"/>
       </Position17>
       <Position18>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1145" Column="9" TopLine="1134"/>
+        <Caret Line="156" Column="12" TopLine="142"/>
       </Position18>
       <Position19>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1151" Column="37" TopLine="1134"/>
+        <Caret Line="1602" Column="47" TopLine="1584"/>
       </Position19>
       <Position20>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="156" Column="12" TopLine="142"/>
+        <Caret Line="1409" Column="3" TopLine="1393"/>
       </Position20>
       <Position21>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="1395" Column="5" TopLine="1333"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="9" Column="32"/>
       </Position21>
       <Position22>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1094" Column="46" TopLine="1078"/>
+        <Caret Line="1327" Column="71" TopLine="1309"/>
       </Position22>
       <Position23>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="103" Column="14" TopLine="90"/>
+        <Caret Line="106" Column="23" TopLine="77"/>
       </Position23>
       <Position24>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="811" Column="52" TopLine="806"/>
+        <Caret Line="1011" Column="19" TopLine="985"/>
       </Position24>
       <Position25>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="1151" Column="25" TopLine="1138"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="11" Column="24"/>
       </Position25>
       <Position26>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="156" Column="12" TopLine="142"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="62" Column="34" TopLine="40"/>
       </Position26>
       <Position27>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="1602" Column="47" TopLine="1584"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="2322" Column="22" TopLine="2319"/>
       </Position27>
       <Position28>
-        <Filename Value="diskmodule.pas"/>
-        <Caret Line="1409" Column="3" TopLine="1393"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="2880" Column="129" TopLine="2866"/>
       </Position28>
+      <Position29>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="2975" Column="131" TopLine="2955"/>
+      </Position29>
+      <Position30>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="2924" Column="97" TopLine="2903"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
