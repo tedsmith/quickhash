@@ -1,36 +1,36 @@
 { This is an automatically generated lazarus resource file }
 
 LazarusResources.Add('TfrmAbout','FORMDATA',[
-  'TPF0'#9'TfrmAbout'#8'frmAbout'#4'Left'#3#11#2#6'Height'#3'U'#2#3'Top'#3#138#0
-  +#5'Width'#3#253#1#7'Caption'#6#19'About QuickHash-GUI'#12'ClientHeight'#3'U'
-  +#2#11'ClientWidth'#3#253#1#8'Position'#7#16'poMainFormCenter'#10'LCLVersion'
-  +#6#7'2.0.4.0'#0#5'TMemo'#8'memAbout'#4'Left'#2#16#6'Height'#3#24#2#3'Top'#2
-  +#16#5'Width'#3#223#1#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#8'akBottom'
-  +#0#13'Lines.Strings'#1#6',v3.1.0, Developed by Ted Smith (c) 2011-2019'#6#0#6
-  +#127'Home Page : http://www.quickhash-gui.org (First registered in 2011 on S'
-  +'ourceforge at http://sourceforge.net/projects/quickhash)'#6#0#6'6Github Pag'
-  +'e is : https://github.com/tedsmith/quickhash'#6#0#6'7Bug Tracker http://www'
-  +'.quickhash-gui.org/bug-tracker/  '#6#0#6'_Donations are welcomed! Please co'
-  +'nsider donating using PayPal at https://paypal.me/quickhashgui'#6#0#6#244'C'
-  +'ontributions made by DaReal Shinji (http://www.github.com/darealshinji), es'
-  +'pecially regarding repository maintenance and Debian packaging are both wel'
-  +'comed and acknowledged, in addition to the Lazarus forum members, who are a'
-  +'lways so helpful. '#6#0#12#20#1#0#0'For a private communication or technica'
-  +'l help which the website does not answer, you can e-mail me at tedsmith@qui'
-  +'ckhash-gui.org, however, this should not be used as the means to ask about '
-  +'bugs or problems. Please use the bug tracker for that so that other users c'
-  +'an benefit. '#6#0#6'QCreated using the Lazarus IDE and the Freepascal Compi'
-  +'ler (www.lazarus-ide.org). '#6#0#6#167'The HashLib4Pascal library is licens'
-  +'ed under MIT and developed by the talented Ugochukwu Mmaduekwe Stanley (aka'
-  +' Xor-el - see https://github.com/Xor-el/HashLib4Pascal).'#6#0#6#185'xxHash6'
-  +'4 : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash'
-  +'/, Github user Cyan4973. Use of the library is also welcomed and acknowledg'
-  +'ed and very much appreciated'#6#0#6'uBlake2B : https://blake2.net/ : Use of'
-  +' the fast and secure Blake2B (256 bit) algorithm is acknowledged and welcom'
-  +'ed. '#6#4'    '#6'>QuickHash is open-source and released under the GPL2 lic'
-  +'ense. '#0#8'ReadOnly'#9#10'ScrollBars'#7#10'ssAutoBoth'#8'TabOrder'#2#0#0#0
-  +#7'TButton'#7'Button1'#21'AnchorSideTop.Control'#7#8'memAbout'#18'AnchorSide'
-  +'Top.Side'#7#9'asrBottom'#4'Left'#2' '#6'Height'#2#25#3'Top'#3'('#2#5'Width'
-  +#3#147#0#7'Caption'#6#5'Close'#7'OnClick'#7#12'Button1Click'#8'TabOrder'#2#1
-  +#0#0#0
+  'TPF0'#9'TfrmAbout'#8'frmAbout'#4'Left'#3#11#2#6'Height'#3'A'#2#3'Top'#3#158#0
+  +#5'Width'#3'H'#3#7'Caption'#6#19'About QuickHash-GUI'#12'ClientHeight'#3'A'#2
+  +#11'ClientWidth'#3'H'#3#8'Position'#7#16'poMainFormCenter'#10'LCLVersion'#6#7
+  +'2.0.4.0'#0#5'TMemo'#8'memAbout'#4'Left'#2#16#6'Height'#3#4#2#3'Top'#2#16#5
+  +'Width'#3'*'#3#7'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#8'akBottom'#0#13
+  +'Lines.Strings'#1#6',v3.2.0, Developed by Ted Smith (c) 2011-2020'#6#0#6#127
+  +'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourc'
+  +'eforge at http://sourceforge.net/projects/quickhash)'#6#0#6'6Github Page is'
+  +' : https://github.com/tedsmith/quickhash'#6#0#6'7Bug Tracker http://www.qui'
+  +'ckhash-gui.org/bug-tracker/  '#6#0#6'_Donations are welcomed! Please consid'
+  +'er donating using PayPal at https://paypal.me/quickhashgui'#6#0#6#244'Contr'
+  +'ibutions made by DaReal Shinji (http://www.github.com/darealshinji), especi'
+  +'ally regarding repository maintenance and Debian packaging are both welcome'
+  +'d and acknowledged, in addition to the Lazarus forum members, who are alway'
+  +'s so helpful. '#6#0#12#20#1#0#0'For a private communication or technical he'
+  +'lp which the website does not answer, you can e-mail me at tedsmith@quickha'
+  +'sh-gui.org, however, this should not be used as the means to ask about bugs'
+  +' or problems. Please use the bug tracker for that so that other users can b'
+  +'enefit. '#6#0#6'QCreated using the Lazarus IDE and the Freepascal Compiler '
+  +'(www.lazarus-ide.org). '#6#0#6#167'The HashLib4Pascal library is licensed u'
+  +'nder MIT and developed by the talented Ugochukwu Mmaduekwe Stanley (aka Xor'
+  +'-el - see https://github.com/Xor-el/HashLib4Pascal).'#6#0#6#185'xxHash64 : '
+  +'https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/, G'
+  +'ithub user Cyan4973. Use of the library is also welcomed and acknowledged a'
+  +'nd very much appreciated'#6#0#6#179'Blake2B & Blake3 : https://blake2.net/ '
+  +'& https://github.com/BLAKE3-team/BLAKE3 : Use of the fast and secure Blake2'
+  +'B (256 bit) and Blake3 algorithms are acknowledged and welcomed. '#6#4'    '
+  +#6'>QuickHash is open-source and released under the GPL2 license. '#0#8'Read'
+  +'Only'#9#10'ScrollBars'#7#10'ssAutoBoth'#8'TabOrder'#2#0#0#0#7'TButton'#7'Bu'
+  +'tton1'#21'AnchorSideTop.Control'#7#8'memAbout'#18'AnchorSideTop.Side'#7#9'a'
+  +'srBottom'#4'Left'#2' '#6'Height'#2#25#3'Top'#3#20#2#5'Width'#3#147#0#7'Capt'
+  +'ion'#6#5'Close'#7'OnClick'#7#12'Button1Click'#8'TabOrder'#2#1#0#0#0
 ]);

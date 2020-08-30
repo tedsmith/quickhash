@@ -10,7 +10,6 @@ uses
 {$ENDIF DELPHI2010}
   HlpHashLibTypes,
 {$IFDEF DELPHI}
-  HlpBitConverter,
   HlpHashBuffer,
   HlpHash,
 {$ENDIF DELPHI}
@@ -37,13 +36,13 @@ implementation
 
 function TSHA2_384.Clone(): IHash;
 var
-  HashInstance: TSHA2_384;
+  LHashInstance: TSHA2_384;
 begin
-  HashInstance := TSHA2_384.Create();
-  HashInstance.Fm_state := System.Copy(Fm_state);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  result := HashInstance as IHash;
+  LHashInstance := TSHA2_384.Create();
+  LHashInstance.FState := System.Copy(FState);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
@@ -54,27 +53,22 @@ end;
 
 function TSHA2_384.GetResult: THashLibByteArray;
 begin
-
   System.SetLength(result, 6 * System.SizeOf(UInt64));
-  TConverters.be64_copy(PUInt64(Fm_state), 0, PByte(result), 0,
+  TConverters.be64_copy(PUInt64(FState), 0, PByte(result), 0,
     System.Length(result));
-
 end;
 
 procedure TSHA2_384.Initialize;
 begin
-
-  Fm_state[0] := UInt64($CBBB9D5DC1059ED8);
-  Fm_state[1] := $629A292A367CD507;
-  Fm_state[2] := UInt64($9159015A3070DD17);
-  Fm_state[3] := $152FECD8F70E5939;
-  Fm_state[4] := $67332667FFC00B31;
-  Fm_state[5] := UInt64($8EB44A8768581511);
-  Fm_state[6] := UInt64($DB0C2E0D64F98FA7);
-  Fm_state[7] := $47B5481DBEFA4FA4;
-
+  FState[0] := UInt64($CBBB9D5DC1059ED8);
+  FState[1] := $629A292A367CD507;
+  FState[2] := UInt64($9159015A3070DD17);
+  FState[3] := $152FECD8F70E5939;
+  FState[4] := $67332667FFC00B31;
+  FState[5] := UInt64($8EB44A8768581511);
+  FState[6] := UInt64($DB0C2E0D64F98FA7);
+  FState[7] := $47B5481DBEFA4FA4;
   Inherited Initialize();
-
 end;
 
 end.

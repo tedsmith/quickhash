@@ -1,20 +1,20 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 409
-  Height = 527
-  Top = 315
-  Width = 790
-  Caption = 'QuickHash - Copy Results'
-  ClientHeight = 527
-  ClientWidth = 790
+  Left = 808
+  Height = 561
+  Top = 557
+  Width = 1010
+  Caption = 'QuickHash-GUI - Copy Results'
+  ClientHeight = 561
+  ClientWidth = 1010
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.4.0'
   object btnClipboardResultsCOPYTAB: TButton
     Left = 280
     Height = 25
     Hint = 'Click to have the display grid content copied '#13#10'to clipboard. To have ENTIRE grid copied, '#13#10'ensure top left cell is selected using mouse. '#13#10'Otherwise it copies from active position in the grid. '
-    Top = 480
+    Top = 514
     Width = 80
     Anchors = [akLeft, akBottom]
     Caption = 'Clipboard'
@@ -24,21 +24,21 @@ object frmDisplayGrid1: TfrmDisplayGrid1
   end
   object RecursiveDisplayGrid_COPY: TDBGrid
     Left = 16
-    Height = 432
+    Height = 466
     Top = 24
-    Width = 751
+    Width = 971
     Anchors = [akTop, akLeft, akRight, akBottom]
     Color = clWindow
     Columns = <>
     DataSource = frmSQLiteDBases.DataSource2
-    Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
     PopupMenu = frmDisplayGridPopupMenu
     TabOrder = 1
   end
   object CopyTabDBNavigator: TDBNavigator
     Left = 16
     Height = 25
-    Top = 480
+    Top = 514
     Width = 241
     Anchors = [akLeft, akBottom]
     BevelOuter = bvNone
@@ -56,8 +56,8 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast]
   end
   object frmDisplayGridPopupMenu: TPopupMenu
-    left = 584
-    top = 376
+    left = 400
+    top = 344
     object MenuItem_SortBySourceNameCOPYGRID: TMenuItem
       Caption = 'Sort by Source FileName'
       OnClick = MenuItem_SortBySourceNameCOPYGRIDClick
@@ -96,7 +96,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     end
   end
   object frmDisplayGridSaveDialog1: TSaveDialog
-    left = 736
+    left = 616
     top = 376
   end
 end

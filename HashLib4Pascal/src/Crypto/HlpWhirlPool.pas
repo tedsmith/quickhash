@@ -10,7 +10,6 @@ uses
 {$ENDIF DELPHI2010}
   HlpHashLibTypes,
 {$IFDEF DELPHI}
-  HlpBitConverter,
   HlpHashBuffer,
   HlpHash,
 {$ENDIF DELPHI}
@@ -24,53 +23,51 @@ type
   TWhirlPool = class sealed(TBlockHash, ICryptoNotBuildIn, ITransformBlock)
 
   strict private
-
-    Fm_hash: THashLibUInt64Array;
+  var
+    FHash: THashLibUInt64Array;
 
     class var
 
-      Fs_C0, Fs_C1, Fs_C2, Fs_C3, Fs_C4, Fs_C5, Fs_C6, Fs_C7,
-      Fs_rc: THashLibUInt64Array;
+      FSC0, FSC1, FSC2, FSC3, FSC4, FSC5, FSC6, FSC7, FSRC: THashLibUInt64Array;
 
 {$REGION 'Consts'}
 
   const
-
     ROUNDS = Int32(10);
     REDUCTION_POLYNOMIAL = UInt32($011D);
 
-    s_SBOX: array [0 .. 255] of UInt32 = ($18, $23, $C6, $E8, $87, $B8, $01,
-      $4F, $36, $A6, $D2, $F5, $79, $6F, $91, $52, $60, $BC, $9B, $8E, $A3, $0C,
-      $7B, $35, $1D, $E0, $D7, $C2, $2E, $4B, $FE, $57, $15, $77, $37, $E5, $9F,
-      $F0, $4A, $DA, $58, $C9, $29, $0A, $B1, $A0, $6B, $85, $BD, $5D, $10, $F4,
-      $CB, $3E, $05, $67, $E4, $27, $41, $8B, $A7, $7D, $95, $D8, $FB, $EE, $7C,
-      $66, $DD, $17, $47, $9E, $CA, $2D, $BF, $07, $AD, $5A, $83, $33, $63, $02,
-      $AA, $71, $C8, $19, $49, $D9, $F2, $E3, $5B, $88, $9A, $26, $32, $B0, $E9,
-      $0F, $D5, $80, $BE, $CD, $34, $48, $FF, $7A, $90, $5F, $20, $68, $1A, $AE,
-      $B4, $54, $93, $22, $64, $F1, $73, $12, $40, $08, $C3, $EC, $DB, $A1, $8D,
-      $3D, $97, $00, $CF, $2B, $76, $82, $D6, $1B, $B5, $AF, $6A, $50, $45, $F3,
-      $30, $EF, $3F, $55, $A2, $EA, $65, $BA, $2F, $C0, $DE, $1C, $FD, $4D, $92,
-      $75, $06, $8A, $B2, $E6, $0E, $1F, $62, $D4, $A8, $96, $F9, $C5, $25, $59,
-      $84, $72, $39, $4C, $5E, $78, $38, $8C, $D1, $A5, $E2, $61, $B3, $21, $9C,
-      $1E, $43, $C7, $FC, $04, $51, $99, $6D, $0D, $FA, $DF, $7E, $24, $3B, $AB,
-      $CE, $11, $8F, $4E, $B7, $EB, $3C, $81, $94, $F7, $B9, $13, $2C, $D3, $E7,
-      $6E, $C4, $03, $56, $44, $7F, $A9, $2A, $BB, $C1, $53, $DC, $0B, $9D, $6C,
-      $31, $74, $F6, $46, $AC, $89, $14, $E1, $16, $3A, $69, $09, $70, $B6, $D0,
-      $ED, $CC, $42, $98, $A4, $28, $5C, $F8, $86);
+    SSBOX: array [0 .. 255] of UInt32 = ($18, $23, $C6, $E8, $87, $B8, $01, $4F,
+      $36, $A6, $D2, $F5, $79, $6F, $91, $52, $60, $BC, $9B, $8E, $A3, $0C, $7B,
+      $35, $1D, $E0, $D7, $C2, $2E, $4B, $FE, $57, $15, $77, $37, $E5, $9F, $F0,
+      $4A, $DA, $58, $C9, $29, $0A, $B1, $A0, $6B, $85, $BD, $5D, $10, $F4, $CB,
+      $3E, $05, $67, $E4, $27, $41, $8B, $A7, $7D, $95, $D8, $FB, $EE, $7C, $66,
+      $DD, $17, $47, $9E, $CA, $2D, $BF, $07, $AD, $5A, $83, $33, $63, $02, $AA,
+      $71, $C8, $19, $49, $D9, $F2, $E3, $5B, $88, $9A, $26, $32, $B0, $E9, $0F,
+      $D5, $80, $BE, $CD, $34, $48, $FF, $7A, $90, $5F, $20, $68, $1A, $AE, $B4,
+      $54, $93, $22, $64, $F1, $73, $12, $40, $08, $C3, $EC, $DB, $A1, $8D, $3D,
+      $97, $00, $CF, $2B, $76, $82, $D6, $1B, $B5, $AF, $6A, $50, $45, $F3, $30,
+      $EF, $3F, $55, $A2, $EA, $65, $BA, $2F, $C0, $DE, $1C, $FD, $4D, $92, $75,
+      $06, $8A, $B2, $E6, $0E, $1F, $62, $D4, $A8, $96, $F9, $C5, $25, $59, $84,
+      $72, $39, $4C, $5E, $78, $38, $8C, $D1, $A5, $E2, $61, $B3, $21, $9C, $1E,
+      $43, $C7, $FC, $04, $51, $99, $6D, $0D, $FA, $DF, $7E, $24, $3B, $AB, $CE,
+      $11, $8F, $4E, $B7, $EB, $3C, $81, $94, $F7, $B9, $13, $2C, $D3, $E7, $6E,
+      $C4, $03, $56, $44, $7F, $A9, $2A, $BB, $C1, $53, $DC, $0B, $9D, $6C, $31,
+      $74, $F6, $46, $AC, $89, $14, $E1, $16, $3A, $69, $09, $70, $B6, $D0, $ED,
+      $CC, $42, $98, $A4, $28, $5C, $F8, $86);
 
 {$ENDREGION}
     class constructor WhirlPool;
 
     class function PackIntoUInt64(b7, b6, b5, b4, b3, b2, b1, b0: UInt32)
       : UInt64; static; inline;
-    class function MaskWithReductionPolynomial(input: UInt32): UInt32;
+    class function MaskWithReductionPolynomial(AInput: UInt32): UInt32;
       static; inline;
 
   strict protected
     function GetResult(): THashLibByteArray; override;
     procedure Finish(); override;
-    procedure TransformBlock(a_data: PByte; a_data_length: Int32;
-      a_index: Int32); override;
+    procedure TransformBlock(AData: PByte; ADataLength: Int32;
+      AIndex: Int32); override;
 
   public
     constructor Create();
@@ -85,69 +82,71 @@ implementation
 
 function TWhirlPool.Clone(): IHash;
 var
-  HashInstance: TWhirlPool;
+  LHashInstance: TWhirlPool;
 begin
-  HashInstance := TWhirlPool.Create();
-  HashInstance.Fm_hash := System.Copy(Fm_hash);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  result := HashInstance as IHash;
+  LHashInstance := TWhirlPool.Create();
+  LHashInstance.FHash := System.Copy(FHash);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
 constructor TWhirlPool.Create;
 begin
   Inherited Create(64, 64);
-
-  System.SetLength(Fm_hash, 8);
-
+  System.SetLength(FHash, 8);
 end;
 
 procedure TWhirlPool.Finish;
 var
-  bits: UInt64;
-  padindex: Int32;
-  pad: THashLibByteArray;
+  LBits: UInt64;
+  LPadIndex: Int32;
+  LPad: THashLibByteArray;
 begin
-  bits := Fm_processed_bytes * 8;
-  if (Fm_buffer.Pos > 31) then
-
-    padindex := (120 - Fm_buffer.Pos)
+  LBits := FProcessedBytesCount * 8;
+  if (FBuffer.Position > 31) then
+  begin
+    LPadIndex := (120 - FBuffer.Position)
+  end
   else
-    padindex := (56 - Fm_buffer.Pos);
+  begin
+    LPadIndex := (56 - FBuffer.Position);
+  end;
 
-  System.SetLength(pad, padindex + 8);
+  System.SetLength(LPad, LPadIndex + 8);
 
-  pad[0] := $80;
+  LPad[0] := $80;
 
-  bits := TConverters.be2me_64(bits);
+  LBits := TConverters.be2me_64(LBits);
 
-  TConverters.ReadUInt64AsBytesLE(bits, pad, padindex);
+  TConverters.ReadUInt64AsBytesLE(LBits, LPad, LPadIndex);
 
-  padindex := padindex + 8;
+  LPadIndex := LPadIndex + 8;
 
-  TransformBytes(pad, 0, padindex);
-
+  TransformBytes(LPad, 0, LPadIndex);
 end;
 
 function TWhirlPool.GetResult: THashLibByteArray;
 begin
-  System.SetLength(result, System.Length(Fm_hash) * System.SizeOf(UInt64));
-  TConverters.be64_copy(PUInt64(Fm_hash), 0, PByte(result), 0,
+  System.SetLength(result, System.Length(FHash) * System.SizeOf(UInt64));
+  TConverters.be64_copy(PUInt64(FHash), 0, PByte(result), 0,
     System.Length(result));
 end;
 
 procedure TWhirlPool.Initialize;
 begin
-  TArrayUtils.ZeroFill(Fm_hash);
+  TArrayUtils.ZeroFill(FHash);
   Inherited Initialize();
 end;
 
-class function TWhirlPool.MaskWithReductionPolynomial(input: UInt32): UInt32;
+class function TWhirlPool.MaskWithReductionPolynomial(AInput: UInt32): UInt32;
 begin
-  if (input >= $100) then
-    input := input xor REDUCTION_POLYNOMIAL;
-  result := input;
+  if (AInput >= $100) then
+  begin
+    AInput := AInput xor REDUCTION_POLYNOMIAL;
+  end;
+  result := AInput;
 end;
 
 class function TWhirlPool.PackIntoUInt64(b7, b6, b5, b4, b3, b2, b1,
@@ -158,148 +157,137 @@ begin
     xor (UInt64(b1) shl 8) xor b0;
 end;
 
-procedure TWhirlPool.TransformBlock(a_data: PByte; a_data_length: Int32;
-  a_index: Int32);
+procedure TWhirlPool.TransformBlock(AData: PByte; ADataLength: Int32;
+  AIndex: Int32);
 var
-  data, k, m, temp: array [0 .. 7] of UInt64;
-  i, round: Int32;
-
+  LData, LK, LM, LTemp: array [0 .. 7] of UInt64;
+  LIdx, LRound: Int32;
 begin
+  TConverters.be64_copy(AData, AIndex, @(LData[0]), 0, ADataLength);
 
-  TConverters.be64_copy(a_data, a_index, @(data[0]), 0, a_data_length);
-
-  i := 0;
-  while i < 8 do
+  LIdx := 0;
+  while LIdx < 8 do
   begin
-    k[i] := Fm_hash[i];
-    temp[i] := data[i] xor k[i];
-    System.Inc(i);
+    LK[LIdx] := FHash[LIdx];
+    LTemp[LIdx] := LData[LIdx] xor LK[LIdx];
+    System.Inc(LIdx);
   end;
 
-  round := 1;
+  LRound := 1;
 
-  while round <= ROUNDS do
+  while LRound <= ROUNDS do
   begin
+    LIdx := 0;
 
-    i := 0;
-
-    while i < 8 do
+    while LIdx < 8 do
     begin
+      LM[LIdx] := 0;
+      LM[LIdx] := LM[LIdx] xor (FSC0[Byte(LK[(LIdx - 0) and 7] shr 56)]);
+      LM[LIdx] := LM[LIdx] xor (FSC1[Byte(LK[(LIdx - 1) and 7] shr 48)]);
+      LM[LIdx] := LM[LIdx] xor (FSC2[Byte(LK[(LIdx - 2) and 7] shr 40)]);
+      LM[LIdx] := LM[LIdx] xor (FSC3[Byte(LK[(LIdx - 3) and 7] shr 32)]);
+      LM[LIdx] := LM[LIdx] xor (FSC4[Byte(LK[(LIdx - 4) and 7] shr 24)]);
+      LM[LIdx] := LM[LIdx] xor (FSC5[Byte(LK[(LIdx - 5) and 7] shr 16)]);
+      LM[LIdx] := LM[LIdx] xor (FSC6[Byte(LK[(LIdx - 6) and 7] shr 8)]);
+      LM[LIdx] := LM[LIdx] xor (FSC7[Byte(LK[(LIdx - 7) and 7])]);
 
-      m[i] := 0;
-      m[i] := m[i] xor (Fs_C0[Byte(k[(i - 0) and 7] shr 56)]);
-      m[i] := m[i] xor (Fs_C1[Byte(k[(i - 1) and 7] shr 48)]);
-      m[i] := m[i] xor (Fs_C2[Byte(k[(i - 2) and 7] shr 40)]);
-      m[i] := m[i] xor (Fs_C3[Byte(k[(i - 3) and 7] shr 32)]);
-      m[i] := m[i] xor (Fs_C4[Byte(k[(i - 4) and 7] shr 24)]);
-      m[i] := m[i] xor (Fs_C5[Byte(k[(i - 5) and 7] shr 16)]);
-      m[i] := m[i] xor (Fs_C6[Byte(k[(i - 6) and 7] shr 8)]);
-      m[i] := m[i] xor (Fs_C7[Byte(k[(i - 7) and 7])]);
-
-      System.Inc(i);
+      System.Inc(LIdx);
     end;
 
-    System.Move(m[0], k[0], 8 * System.SizeOf(UInt64));
+    System.Move(LM[0], LK[0], 8 * System.SizeOf(UInt64));
 
-    k[0] := k[0] xor Fs_rc[round];
+    LK[0] := LK[0] xor FSRC[LRound];
 
-    i := 0;
+    LIdx := 0;
 
-    while i < 8 do
-
+    while LIdx < 8 do
     begin
-      m[i] := k[i];
+      LM[LIdx] := LK[LIdx];
 
-      m[i] := m[i] xor (Fs_C0[Byte(temp[(i - 0) and 7] shr 56)]);
-      m[i] := m[i] xor (Fs_C1[Byte(temp[(i - 1) and 7] shr 48)]);
-      m[i] := m[i] xor (Fs_C2[Byte(temp[(i - 2) and 7] shr 40)]);
-      m[i] := m[i] xor (Fs_C3[Byte(temp[(i - 3) and 7] shr 32)]);
-      m[i] := m[i] xor (Fs_C4[Byte(temp[(i - 4) and 7] shr 24)]);
-      m[i] := m[i] xor (Fs_C5[Byte(temp[(i - 5) and 7] shr 16)]);
-      m[i] := m[i] xor (Fs_C6[Byte(temp[(i - 6) and 7] shr 8)]);
-      m[i] := m[i] xor (Fs_C7[Byte(temp[(i - 7) and 7])]);
+      LM[LIdx] := LM[LIdx] xor (FSC0[Byte(LTemp[(LIdx - 0) and 7] shr 56)]);
+      LM[LIdx] := LM[LIdx] xor (FSC1[Byte(LTemp[(LIdx - 1) and 7] shr 48)]);
+      LM[LIdx] := LM[LIdx] xor (FSC2[Byte(LTemp[(LIdx - 2) and 7] shr 40)]);
+      LM[LIdx] := LM[LIdx] xor (FSC3[Byte(LTemp[(LIdx - 3) and 7] shr 32)]);
+      LM[LIdx] := LM[LIdx] xor (FSC4[Byte(LTemp[(LIdx - 4) and 7] shr 24)]);
+      LM[LIdx] := LM[LIdx] xor (FSC5[Byte(LTemp[(LIdx - 5) and 7] shr 16)]);
+      LM[LIdx] := LM[LIdx] xor (FSC6[Byte(LTemp[(LIdx - 6) and 7] shr 8)]);
+      LM[LIdx] := LM[LIdx] xor (FSC7[Byte(LTemp[(LIdx - 7) and 7])]);
 
-      System.Inc(i);
+      System.Inc(LIdx);
     end;
 
-    System.Move(m[0], temp[0], System.Length(temp) * System.SizeOf(UInt64));
+    System.Move(LM[0], LTemp[0], System.Length(LTemp) * System.SizeOf(UInt64));
 
-    System.Inc(round);
-
+    System.Inc(LRound);
   end;
 
-  i := 0;
+  LIdx := 0;
 
-  while i < 8 do
+  while LIdx < 8 do
   begin
-    Fm_hash[i] := Fm_hash[i] xor (temp[i] xor data[i]);
+    FHash[LIdx] := FHash[LIdx] xor (LTemp[LIdx] xor LData[LIdx]);
 
-    System.Inc(i);
+    System.Inc(LIdx);
   end;
 
-  System.FillChar(data, System.SizeOf(data), UInt64(0));
-
+  System.FillChar(LData, System.SizeOf(LData), UInt64(0));
 end;
 
 class constructor TWhirlPool.WhirlPool;
 var
-  i, r: Int32;
+  LIdx, LR: Int32;
   v1, v2, v4, v5, v8, v9: UInt32;
 begin
+  System.SetLength(FSC0, 256);
+  System.SetLength(FSC1, 256);
+  System.SetLength(FSC2, 256);
+  System.SetLength(FSC3, 256);
+  System.SetLength(FSC4, 256);
+  System.SetLength(FSC5, 256);
+  System.SetLength(FSC6, 256);
+  System.SetLength(FSC7, 256);
 
-  System.SetLength(Fs_C0, 256);
-  System.SetLength(Fs_C1, 256);
-  System.SetLength(Fs_C2, 256);
-  System.SetLength(Fs_C3, 256);
-  System.SetLength(Fs_C4, 256);
-  System.SetLength(Fs_C5, 256);
-  System.SetLength(Fs_C6, 256);
-  System.SetLength(Fs_C7, 256);
+  System.SetLength(FSRC, ROUNDS + 1);
 
-  System.SetLength(Fs_rc, ROUNDS + 1);
-
-  i := 0;
-  while i < 256 do
-
+  LIdx := 0;
+  while LIdx < 256 do
   begin
-    v1 := s_SBOX[i];
+    v1 := SSBOX[LIdx];
     v2 := MaskWithReductionPolynomial(v1 shl 1);
     v4 := MaskWithReductionPolynomial(v2 shl 1);
     v5 := v4 xor v1;
     v8 := MaskWithReductionPolynomial(v4 shl 1);
     v9 := v8 xor v1;
 
-    Fs_C0[i] := PackIntoUInt64(v1, v1, v4, v1, v8, v5, v2, v9);
-    Fs_C1[i] := PackIntoUInt64(v9, v1, v1, v4, v1, v8, v5, v2);
-    Fs_C2[i] := PackIntoUInt64(v2, v9, v1, v1, v4, v1, v8, v5);
-    Fs_C3[i] := PackIntoUInt64(v5, v2, v9, v1, v1, v4, v1, v8);
-    Fs_C4[i] := PackIntoUInt64(v8, v5, v2, v9, v1, v1, v4, v1);
-    Fs_C5[i] := PackIntoUInt64(v1, v8, v5, v2, v9, v1, v1, v4);
-    Fs_C6[i] := PackIntoUInt64(v4, v1, v8, v5, v2, v9, v1, v1);
-    Fs_C7[i] := PackIntoUInt64(v1, v4, v1, v8, v5, v2, v9, v1);
+    FSC0[LIdx] := PackIntoUInt64(v1, v1, v4, v1, v8, v5, v2, v9);
+    FSC1[LIdx] := PackIntoUInt64(v9, v1, v1, v4, v1, v8, v5, v2);
+    FSC2[LIdx] := PackIntoUInt64(v2, v9, v1, v1, v4, v1, v8, v5);
+    FSC3[LIdx] := PackIntoUInt64(v5, v2, v9, v1, v1, v4, v1, v8);
+    FSC4[LIdx] := PackIntoUInt64(v8, v5, v2, v9, v1, v1, v4, v1);
+    FSC5[LIdx] := PackIntoUInt64(v1, v8, v5, v2, v9, v1, v1, v4);
+    FSC6[LIdx] := PackIntoUInt64(v4, v1, v8, v5, v2, v9, v1, v1);
+    FSC7[LIdx] := PackIntoUInt64(v1, v4, v1, v8, v5, v2, v9, v1);
 
-    System.Inc(i);
+    System.Inc(LIdx);
   end;
 
-  Fs_rc[0] := 0;
+  FSRC[0] := 0;
 
-  r := 1;
+  LR := 1;
 
-  while r <= ROUNDS do
-
+  while LR <= ROUNDS do
   begin
+    LIdx := 8 * (LR - 1);
+    FSRC[LR] := (FSC0[LIdx] and $FF00000000000000)
+      xor (FSC1[LIdx + 1] and $00FF000000000000)
+      xor (FSC2[LIdx + 2] and $0000FF0000000000)
+      xor (FSC3[LIdx + 3] and $000000FF00000000)
+      xor (FSC4[LIdx + 4] and $00000000FF000000)
+      xor (FSC5[LIdx + 5] and $0000000000FF0000)
+      xor (FSC6[LIdx + 6] and $000000000000FF00)
+      xor (FSC7[LIdx + 7] and $00000000000000FF);
 
-    i := 8 * (r - 1);
-    Fs_rc[r] := (Fs_C0[i] and $FF00000000000000)
-      xor (Fs_C1[i + 1] and $00FF000000000000)
-      xor (Fs_C2[i + 2] and $0000FF0000000000)
-      xor (Fs_C3[i + 3] and $000000FF00000000)
-      xor (Fs_C4[i + 4] and $00000000FF000000)
-      xor (Fs_C5[i + 5] and $0000000000FF0000)
-      xor (Fs_C6[i + 6] and $000000000000FF00)
-      xor (Fs_C7[i + 7] and $00000000000000FF);
-
-    System.Inc(r);
+    System.Inc(LR);
   end;
 end;
 

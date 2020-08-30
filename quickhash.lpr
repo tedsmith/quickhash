@@ -1,7 +1,7 @@
 {   Quick Hash - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
     and generating hash values for them.
 
-    Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2020  Ted Smith www.quickhash-gui.org
 
     The use of the word 'quick' refers to the ease in which the software operates
     in both Linux, Apple Mac and Windows (very few options to worry about, no
@@ -52,6 +52,10 @@
                      Github user Cyan4973. Use of the library is also welcomed and acknowledged
                      and very much appreciated
 
+    Blake2b & Blake3 : https://blake2.net/ & https://github.com/BLAKE3-team/BLAKE3
+                       Use of the fast and secure Blake2B (256 bit) and Blake3 algorithms
+                       are acknowledged and welcomed, new to v3.2.0.
+
     QuickHash is created using the Freepascal Compiler and Lazarus-IDE
     http://www.lazarus-ide.org/ developed by Sourceforge users :
     mgaertner,
@@ -76,20 +80,23 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   //FindAllFilesEnhanced, uKnownHashLists,
-  Forms, lazdbexport, Unit2, diskmodule, uDisplayGrid,
-  diskspecification, uProgress, frmAboutUnit, zvdatetimectrls, dbases_sqlite;
+  Forms, lazdbexport, uDisplayGrid, udisplaygrid3, Unit2, dbases_sqlite,
+  frmAboutUnit, zvdatetimectrls, diskmodule, uProgress;
 
 {$R *.res}
 
 begin
-  Application.Title:='QuickHash';
+  Application.Scaled:=True;
+  Application.Title:='Quickhash-GUI';
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);
+  Application.CreateForm(TfrmDisplayGrid3, frmDisplayGrid3);
   Application.CreateForm(TfrmAbout, frmAbout);
   Application.CreateForm(TfrmSQLiteDBases, frmSQLiteDBases);
-  {$IFDEF Windows}
   Application.CreateForm(TfrmDiskHashingModule, frmDiskHashingModule);
+  Application.CreateForm(TfrmProgress, frmProgress);
+  {$IFDEF Windows}
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmTechSpecs, frmTechSpecs);
   {$ENDIF}
@@ -97,9 +104,6 @@ begin
    // nothing
   {$else}
   {$IFDEF UNIX and !$ifdef Darwin}
-  Application.CreateForm(TfrmDiskHashingModule, frmDiskHashingModule);
-  Application.CreateForm(TfrmProgress, frmProgress);
-  Application.CreateForm(TfrmTechSpecs, frmTechSpecs);
   {$ENDIF}
   {$ENDIF}
   Application.Run;

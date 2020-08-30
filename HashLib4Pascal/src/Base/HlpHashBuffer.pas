@@ -5,46 +5,45 @@ unit HlpHashBuffer;
 interface
 
 uses
-{$IFDEF HAS_UNITSCOPE}
-  System.SysUtils,
-{$ELSE}
   SysUtils,
-{$ENDIF HAS_UNITSCOPE}
   HlpArrayUtils,
   HlpHashLibTypes;
 
 resourcestring
-  SHashBufferMessage = 'HashBuffer, Length: %d, Pos: %d, IsEmpty: %s';
+  SHashBufferMessage = 'HashBuffer, Length: %d, Position: %d, IsEmpty: %s';
 
 type
   THashBuffer = record
 
   private
-
-    Fm_data: THashLibByteArray;
-    Fm_pos: Int32;
+  var
+    FData: THashLibByteArray;
+    FPosition: Int32;
 
     function GetIsEmpty: Boolean; inline;
     function GetIsFull: Boolean; inline;
-    function GetPos: Int32; inline;
+    function GetPosition: Int32; inline;
     function GetLength: Int32; inline;
 
   public
-    constructor Create(a_length: Int32);
+    constructor Create(ALength: Int32);
+
     procedure Initialize();
     function GetBytes(): THashLibByteArray; inline;
     function GetBytesZeroPadded(): THashLibByteArray; inline;
-    function Feed(a_data: PByte; a_length_a_data: Int32;
-      var a_start_index: Int32; var a_length: Int32;
-      var a_processed_bytes: UInt64): Boolean; overload;
-    function Feed(a_data: PByte; a_length_a_data: Int32; a_length: Int32)
+
+    function Feed(AData: PByte; ADataLength: Int32; var AStartIndex: Int32;
+      var ALength: Int32; var AProcessedBytesCount: UInt64): Boolean; overload;
+
+    function Feed(AData: PByte; ADataLength: Int32; ALength: Int32)
       : Boolean; overload;
+
     function ToString(): String;
     function Clone(): THashBuffer; inline;
 
     property IsEmpty: Boolean read GetIsEmpty;
     property IsFull: Boolean read GetIsFull;
-    property Pos: Int32 read GetPos;
+    property Position: Int32 read GetPosition;
     property Length: Int32 read GetLength;
   end;
 
@@ -55,95 +54,94 @@ implementation
 function THashBuffer.Clone(): THashBuffer;
 begin
   result := Default (THashBuffer);
-  result.Fm_data := System.Copy(Fm_data);
-  result.Fm_pos := Fm_pos;
+  result.FData := System.Copy(FData);
+  result.FPosition := FPosition;
 end;
 
-constructor THashBuffer.Create(a_length: Int32);
+constructor THashBuffer.Create(ALength: Int32);
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_length > 0);
+  System.Assert(ALength > 0);
 {$ENDIF DEBUG}
-  System.SetLength(Fm_data, a_length);
+  System.SetLength(FData, ALength);
   Initialize();
-
 end;
 
 function THashBuffer.GetIsFull: Boolean;
 begin
-  result := Fm_pos = System.Length(Fm_data);
+  result := FPosition = System.Length(FData);
 end;
 
-function THashBuffer.Feed(a_data: PByte; a_length_a_data: Int32;
-  a_length: Int32): Boolean;
+function THashBuffer.Feed(AData: PByte; ADataLength: Int32;
+  ALength: Int32): Boolean;
 var
-  &Length: Int32;
+  LLength: Int32;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_length >= 0);
-  System.Assert(a_length <= a_length_a_data);
+  System.Assert(ALength >= 0);
+  System.Assert(ALength <= ADataLength);
   System.Assert(not IsFull);
 {$ENDIF DEBUG}
-  if (a_length_a_data = 0) then
+  if (ADataLength = 0) then
   begin
     result := false;
     Exit;
   end;
 
-  if (a_length = 0) then
+  if (ALength = 0) then
   begin
     result := false;
     Exit;
   end;
-  Length := System.Length(Fm_data) - Fm_pos;
-  if (Length > a_length) then
+  LLength := System.Length(FData) - FPosition;
+  if (LLength > ALength) then
   begin
-    Length := a_length;
+    LLength := ALength;
   end;
 
-  System.Move(a_data[0], Fm_data[Fm_pos], Length * System.SizeOf(Byte));
+  System.Move(AData[0], FData[FPosition], LLength * System.SizeOf(Byte));
 
-  Fm_pos := Fm_pos + Length;
+  FPosition := FPosition + LLength;
 
   result := IsFull;
 end;
 
-function THashBuffer.Feed(a_data: PByte; a_length_a_data: Int32;
-  var a_start_index, a_length: Int32; var a_processed_bytes: UInt64): Boolean;
+function THashBuffer.Feed(AData: PByte; ADataLength: Int32;
+  var AStartIndex, ALength: Int32; var AProcessedBytesCount: UInt64): Boolean;
 var
-  &Length: Int32;
+  LLength: Int32;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_start_index >= 0);
-  System.Assert(a_length >= 0);
-  System.Assert((a_start_index + a_length) <= a_length_a_data);
+  System.Assert(AStartIndex >= 0);
+  System.Assert(ALength >= 0);
+  System.Assert((AStartIndex + ALength) <= ADataLength);
   System.Assert(not IsFull);
 {$ENDIF DEBUG}
-  if (a_length_a_data = 0) then
+  if (ADataLength = 0) then
   begin
     result := false;
     Exit;
   end;
 
-  if (a_length = 0) then
+  if (ALength = 0) then
   begin
     result := false;
     Exit;
   end;
 
-  Length := System.Length(Fm_data) - Fm_pos;
-  if (Length > a_length) then
+  LLength := System.Length(FData) - FPosition;
+  if (LLength > ALength) then
   begin
-    Length := a_length;
+    LLength := ALength;
   end;
 
-  System.Move(a_data[a_start_index], Fm_data[Fm_pos],
-    Length * System.SizeOf(Byte));
+  System.Move(AData[AStartIndex], FData[FPosition],
+    LLength * System.SizeOf(Byte));
 
-  Fm_pos := Fm_pos + Length;
-  a_start_index := a_start_index + Length;
-  a_length := a_length - Length;
-  a_processed_bytes := a_processed_bytes + UInt64(Length);
+  FPosition := FPosition + LLength;
+  AStartIndex := AStartIndex + LLength;
+  ALength := ALength - LLength;
+  AProcessedBytesCount := AProcessedBytesCount + UInt64(LLength);
 
   result := IsFull;
 end;
@@ -153,42 +151,42 @@ begin
 {$IFDEF DEBUG}
   System.Assert(IsFull);
 {$ENDIF DEBUG}
-  Fm_pos := 0;
-  result := Fm_data;
+  FPosition := 0;
+  result := FData;
 end;
 
 function THashBuffer.GetBytesZeroPadded: THashLibByteArray;
 begin
-  TArrayUtils.Fill(Fm_data, Fm_pos, (System.Length(Fm_data) - Fm_pos) +
-    Fm_pos, Byte(0));
-  Fm_pos := 0;
-  result := Fm_data;
+  TArrayUtils.Fill(FData, FPosition, (System.Length(FData) - FPosition) +
+    FPosition, Byte(0));
+  FPosition := 0;
+  result := FData;
 end;
 
 function THashBuffer.GetIsEmpty: Boolean;
 begin
-  result := Fm_pos = 0;
+  result := FPosition = 0;
 end;
 
 function THashBuffer.GetLength: Int32;
 begin
-  result := System.Length(Fm_data);
+  result := System.Length(FData);
 end;
 
-function THashBuffer.GetPos: Int32;
+function THashBuffer.GetPosition: Int32;
 begin
-  result := Fm_pos;
+  result := FPosition;
 end;
 
 procedure THashBuffer.Initialize;
 begin
-  Fm_pos := 0;
-  TArrayUtils.ZeroFill(Fm_data);
+  FPosition := 0;
+  TArrayUtils.ZeroFill(FData);
 end;
 
 function THashBuffer.ToString: String;
 begin
-  result := Format(SHashBufferMessage, [Self.Length, Self.Pos,
+  result := Format(SHashBufferMessage, [Self.Length, Self.Position,
     BoolToStr(Self.IsEmpty, True)]);
 end;
 

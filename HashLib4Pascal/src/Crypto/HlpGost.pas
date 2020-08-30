@@ -9,7 +9,6 @@ uses
 {$IFDEF DELPHI}
   HlpHash,
   HlpHashBuffer,
-  HlpBitConverter,
 {$ENDIF DELPHI}
   HlpBits,
   HlpConverters,
@@ -24,20 +23,21 @@ type
 
   strict private
 
-    Fm_state, Fm_hash: THashLibUInt32Array;
-
     class var
 
-      Fs_sbox1, Fs_sbox2, Fs_sbox3, Fs_sbox4: THashLibUInt32Array;
+      FSBox1, FSBox2, FSBox3, FSBox4: THashLibUInt32Array;
 
-    procedure Compress(a_m: PCardinal);
+  var
+    FState, FHash: THashLibUInt32Array;
+
+    procedure Compress(APtr: PCardinal);
     class constructor Gost();
 
   strict protected
     procedure Finish(); override;
     function GetResult(): THashLibByteArray; override;
-    procedure TransformBlock(a_data: PByte; a_data_length: Int32;
-      a_index: Int32); override;
+    procedure TransformBlock(AData: PByte; ADataLength: Int32;
+      AIndex: Int32); override;
 
   public
     constructor Create();
@@ -52,18 +52,18 @@ implementation
 
 function TGost.Clone(): IHash;
 var
-  HashInstance: TGost;
+  LHashInstance: TGost;
 begin
-  HashInstance := TGost.Create();
-  HashInstance.Fm_state := System.Copy(Fm_state);
-  HashInstance.Fm_hash := System.Copy(Fm_hash);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  result := HashInstance as IHash;
+  LHashInstance := TGost.Create();
+  LHashInstance.FState := System.Copy(FState);
+  LHashInstance.FHash := System.Copy(FHash);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
-procedure TGost.Compress(a_m: PCardinal);
+procedure TGost.Compress(APtr: PCardinal);
 var
   u0, u1, u2, u3, u4, u5, u6, u7, v0, v1, v2, v3, v4, v5, v6, v7, w0, w1, w2,
     w3, w4, w5, w6, w7, key0, key1, key2, key3, key4, key5, key6, key7, r, l,
@@ -71,28 +71,27 @@ var
   i: Int32;
   s: array [0 .. 7] of UInt32;
 begin
-  u0 := Fm_hash[0];
-  u1 := Fm_hash[1];
-  u2 := Fm_hash[2];
-  u3 := Fm_hash[3];
-  u4 := Fm_hash[4];
-  u5 := Fm_hash[5];
-  u6 := Fm_hash[6];
-  u7 := Fm_hash[7];
+  u0 := FHash[0];
+  u1 := FHash[1];
+  u2 := FHash[2];
+  u3 := FHash[3];
+  u4 := FHash[4];
+  u5 := FHash[5];
+  u6 := FHash[6];
+  u7 := FHash[7];
 
-  v0 := a_m[0];
-  v1 := a_m[1];
-  v2 := a_m[2];
-  v3 := a_m[3];
-  v4 := a_m[4];
-  v5 := a_m[5];
-  v6 := a_m[6];
-  v7 := a_m[7];
+  v0 := APtr[0];
+  v1 := APtr[1];
+  v2 := APtr[2];
+  v3 := APtr[3];
+  v4 := APtr[4];
+  v5 := APtr[5];
+  v6 := APtr[6];
+  v7 := APtr[7];
 
   i := 0;
 
   while i < 8 do
-
   begin
     w0 := u0 xor v0;
     w1 := u1 xor v1;
@@ -120,105 +119,105 @@ begin
     key7 := (w1 shr 24) or ((w3 and $FF000000) shr 16) or
       ((w5 and $FF000000) shr 8) or (w7 and $FF000000);
 
-    r := Fm_hash[i];
-    l := Fm_hash[i + 1];
+    r := FHash[i];
+    l := FHash[i + 1];
 
     t := key0 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key1 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key2 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key3 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key4 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key5 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key6 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key7 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key0 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key1 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key2 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key3 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key4 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key5 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key6 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key7 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key0 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key1 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key2 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key3 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key4 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key5 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key6 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key7 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key7 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key6 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key5 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key4 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key3 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key2 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key1 + r;
-    l := l xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    l := l xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
     t := key0 + l;
-    r := r xor (Fs_sbox1[Byte(t)] xor Fs_sbox2[Byte(t shr 8)] xor Fs_sbox3
-      [Byte(t shr 16)] xor Fs_sbox4[t shr 24]);
+    r := r xor (FSBox1[Byte(t)] xor FSBox2[Byte(t shr 8)] xor FSBox3
+      [Byte(t shr 16)] xor FSBox4[t shr 24]);
 
     t := r;
     r := l;
@@ -269,125 +268,121 @@ begin
     System.Inc(i, 2);
   end;
 
-  u0 := a_m[0] xor s[6];
-  u1 := a_m[1] xor s[7];
-  u2 := a_m[2] xor (s[0] shl 16) xor (s[0] shr 16) xor (s[0] and $FFFF)
+  u0 := APtr[0] xor s[6];
+  u1 := APtr[1] xor s[7];
+  u2 := APtr[2] xor (s[0] shl 16) xor (s[0] shr 16) xor (s[0] and $FFFF)
     xor (s[1] and $FFFF) xor (s[1] shr 16) xor (s[2] shl 16)
     xor s[6] xor (s[6] shl 16) xor (s[7] and $FFFF0000) xor (s[7] shr 16);
-  u3 := a_m[3] xor (s[0] and $FFFF) xor (s[0] shl 16) xor (s[1] and $FFFF)
+  u3 := APtr[3] xor (s[0] and $FFFF) xor (s[0] shl 16) xor (s[1] and $FFFF)
     xor (s[1] shl 16) xor (s[1] shr 16) xor (s[2] shl 16) xor (s[2] shr 16)
     xor (s[3] shl 16) xor s[6] xor (s[6] shl 16) xor (s[6] shr 16)
     xor (s[7] and $FFFF) xor (s[7] shl 16) xor (s[7] shr 16);
-  u4 := a_m[4] xor (s[0] and $FFFF0000) xor (s[0] shl 16) xor (s[0] shr 16)
+  u4 := APtr[4] xor (s[0] and $FFFF0000) xor (s[0] shl 16) xor (s[0] shr 16)
     xor (s[1] and $FFFF0000) xor (s[1] shr 16) xor (s[2] shl 16)
     xor (s[2] shr 16) xor (s[3] shl 16) xor (s[3] shr 16) xor (s[4] shl 16)
     xor (s[6] shl 16) xor (s[6] shr 16) xor (s[7] and $FFFF) xor (s[7] shl 16)
     xor (s[7] shr 16);
-  u5 := a_m[5] xor (s[0] shl 16) xor (s[0] shr 16) xor (s[0] and $FFFF0000)
+  u5 := APtr[5] xor (s[0] shl 16) xor (s[0] shr 16) xor (s[0] and $FFFF0000)
     xor (s[1] and $FFFF) xor s[2] xor (s[2] shr 16) xor (s[3] shl 16)
     xor (s[3] shr 16) xor (s[4] shl 16) xor (s[4] shr 16) xor (s[5] shl 16)
     xor (s[6] shl 16) xor (s[6] shr 16) xor (s[7] and $FFFF0000)
     xor (s[7] shl 16) xor (s[7] shr 16);
-  u6 := a_m[6] xor s[0] xor (s[1] shr 16) xor (s[2] shl 16)
+  u6 := APtr[6] xor s[0] xor (s[1] shr 16) xor (s[2] shl 16)
     xor s[3] xor (s[3] shr 16) xor (s[4] shl 16) xor (s[4] shr 16)
     xor (s[5] shl 16) xor (s[5] shr 16) xor s[6] xor (s[6] shl 16)
     xor (s[6] shr 16) xor (s[7] shl 16);
-  u7 := a_m[7] xor (s[0] and $FFFF0000) xor (s[0] shl 16) xor (s[1] and $FFFF)
+  u7 := APtr[7] xor (s[0] and $FFFF0000) xor (s[0] shl 16) xor (s[1] and $FFFF)
     xor (s[1] shl 16) xor (s[2] shr 16) xor (s[3] shl 16)
     xor s[4] xor (s[4] shr 16) xor (s[5] shl 16) xor (s[5] shr 16)
     xor (s[6] shr 16) xor (s[7] and $FFFF) xor (s[7] shl 16) xor (s[7] shr 16);
 
-  v0 := Fm_hash[0] xor (u1 shl 16) xor (u0 shr 16);
-  v1 := Fm_hash[1] xor (u2 shl 16) xor (u1 shr 16);
-  v2 := Fm_hash[2] xor (u3 shl 16) xor (u2 shr 16);
-  v3 := Fm_hash[3] xor (u4 shl 16) xor (u3 shr 16);
-  v4 := Fm_hash[4] xor (u5 shl 16) xor (u4 shr 16);
-  v5 := Fm_hash[5] xor (u6 shl 16) xor (u5 shr 16);
-  v6 := Fm_hash[6] xor (u7 shl 16) xor (u6 shr 16);
-  v7 := Fm_hash[7] xor (u0 and $FFFF0000) xor (u0 shl 16) xor (u7 shr 16)
+  v0 := FHash[0] xor (u1 shl 16) xor (u0 shr 16);
+  v1 := FHash[1] xor (u2 shl 16) xor (u1 shr 16);
+  v2 := FHash[2] xor (u3 shl 16) xor (u2 shr 16);
+  v3 := FHash[3] xor (u4 shl 16) xor (u3 shr 16);
+  v4 := FHash[4] xor (u5 shl 16) xor (u4 shr 16);
+  v5 := FHash[5] xor (u6 shl 16) xor (u5 shr 16);
+  v6 := FHash[6] xor (u7 shl 16) xor (u6 shr 16);
+  v7 := FHash[7] xor (u0 and $FFFF0000) xor (u0 shl 16) xor (u7 shr 16)
     xor (u1 and $FFFF0000) xor (u1 shl 16) xor (u6 shl 16)
     xor (u7 and $FFFF0000);
 
-  Fm_hash[0] := (v0 and $FFFF0000) xor (v0 shl 16) xor (v0 shr 16)
-    xor (v1 shr 16) xor (v1 and $FFFF0000) xor (v2 shl 16) xor (v3 shr 16)
-    xor (v4 shl 16) xor (v5 shr 16) xor v5 xor (v6 shr 16) xor (v7 shl 16)
-    xor (v7 shr 16) xor (v7 and $FFFF);
-  Fm_hash[1] := (v0 shl 16) xor (v0 shr 16) xor (v0 and $FFFF0000)
+  FHash[0] := (v0 and $FFFF0000) xor (v0 shl 16) xor (v0 shr 16) xor (v1 shr 16)
+    xor (v1 and $FFFF0000) xor (v2 shl 16) xor (v3 shr 16) xor (v4 shl 16)
+    xor (v5 shr 16) xor v5 xor (v6 shr 16) xor (v7 shl 16) xor (v7 shr 16)
+    xor (v7 and $FFFF);
+  FHash[1] := (v0 shl 16) xor (v0 shr 16) xor (v0 and $FFFF0000)
     xor (v1 and $FFFF) xor v2 xor (v2 shr 16) xor (v3 shl 16) xor (v4 shr 16)
     xor (v5 shl 16) xor (v6 shl 16) xor v6 xor (v7 and $FFFF0000)
     xor (v7 shr 16);
-  Fm_hash[2] := (v0 and $FFFF) xor (v0 shl 16) xor (v1 shl 16) xor (v1 shr 16)
+  FHash[2] := (v0 and $FFFF) xor (v0 shl 16) xor (v1 shl 16) xor (v1 shr 16)
     xor (v1 and $FFFF0000) xor (v2 shl 16) xor (v3 shr 16)
     xor v3 xor (v4 shl 16) xor (v5 shr 16) xor v6 xor (v6 shr 16)
     xor (v7 and $FFFF) xor (v7 shl 16) xor (v7 shr 16);
-  Fm_hash[3] := (v0 shl 16) xor (v0 shr 16) xor (v0 and $FFFF0000)
+  FHash[3] := (v0 shl 16) xor (v0 shr 16) xor (v0 and $FFFF0000)
     xor (v1 and $FFFF0000) xor (v1 shr 16) xor (v2 shl 16) xor (v2 shr 16)
     xor v2 xor (v3 shl 16) xor (v4 shr 16) xor v4 xor (v5 shl 16)
     xor (v6 shl 16) xor (v7 and $FFFF) xor (v7 shr 16);
-  Fm_hash[4] := (v0 shr 16) xor (v1 shl 16) xor v1 xor (v2 shr 16)
+  FHash[4] := (v0 shr 16) xor (v1 shl 16) xor v1 xor (v2 shr 16)
     xor v2 xor (v3 shl 16) xor (v3 shr 16) xor v3 xor (v4 shl 16)
     xor (v5 shr 16) xor v5 xor (v6 shl 16) xor (v6 shr 16) xor (v7 shl 16);
-  Fm_hash[5] := (v0 shl 16) xor (v0 and $FFFF0000) xor (v1 shl 16)
-    xor (v1 shr 16) xor (v1 and $FFFF0000) xor (v2 shl 16)
-    xor v2 xor (v3 shr 16) xor v3 xor (v4 shl 16) xor (v4 shr 16)
-    xor v4 xor (v5 shl 16) xor (v6 shl 16) xor (v6 shr 16)
-    xor v6 xor (v7 shl 16) xor (v7 shr 16) xor (v7 and $FFFF0000);
-  Fm_hash[6] := v0 xor v2 xor (v2 shr 16) xor v3 xor (v3 shl 16)
+  FHash[5] := (v0 shl 16) xor (v0 and $FFFF0000) xor (v1 shl 16) xor (v1 shr 16)
+    xor (v1 and $FFFF0000) xor (v2 shl 16) xor v2 xor (v3 shr 16)
+    xor v3 xor (v4 shl 16) xor (v4 shr 16) xor v4 xor (v5 shl 16)
+    xor (v6 shl 16) xor (v6 shr 16) xor v6 xor (v7 shl 16) xor (v7 shr 16)
+    xor (v7 and $FFFF0000);
+  FHash[6] := v0 xor v2 xor (v2 shr 16) xor v3 xor (v3 shl 16)
     xor v4 xor (v4 shr 16) xor (v5 shl 16) xor (v5 shr 16)
     xor v5 xor (v6 shl 16) xor (v6 shr 16) xor v6 xor (v7 shl 16) xor v7;
-  Fm_hash[7] := v0 xor (v0 shr 16) xor (v1 shl 16) xor (v1 shr 16)
-    xor (v2 shl 16) xor (v3 shr 16) xor v3 xor (v4 shl 16)
-    xor v4 xor (v5 shr 16) xor v5 xor (v6 shl 16) xor (v6 shr 16)
-    xor (v7 shl 16) xor v7;
+  FHash[7] := v0 xor (v0 shr 16) xor (v1 shl 16) xor (v1 shr 16) xor (v2 shl 16)
+    xor (v3 shr 16) xor v3 xor (v4 shl 16) xor v4 xor (v5 shr 16)
+    xor v5 xor (v6 shl 16) xor (v6 shr 16) xor (v7 shl 16) xor v7;
 
 end;
 
 constructor TGost.Create;
 begin
   Inherited Create(32, 32);
-  System.SetLength(Fm_state, 8);
-  System.SetLength(Fm_hash, 8);
-
+  System.SetLength(FState, 8);
+  System.SetLength(FHash, 8);
 end;
 
 procedure TGost.Finish;
 var
-  bits: UInt64;
-  pad: THashLibByteArray;
-  m_length: THashLibUInt32Array;
+  LBits: UInt64;
+  LPad: THashLibByteArray;
+  LLength: THashLibUInt32Array;
 begin
-  bits := Fm_processed_bytes * 8;
+  LBits := FProcessedBytesCount * 8;
 
-  if (Fm_buffer.Pos > 0) then
+  if (FBuffer.Position > 0) then
   begin
-    System.SetLength(pad, 32 - Fm_buffer.Pos);
-    TransformBytes(pad, 0, 32 - Fm_buffer.Pos);
+    System.SetLength(LPad, 32 - FBuffer.Position);
+    TransformBytes(LPad, 0, 32 - FBuffer.Position);
   end;
-  System.SetLength(m_length, 8);
-  m_length[0] := UInt32(bits);
-  m_length[1] := UInt32(bits shr 32);
+  System.SetLength(LLength, 8);
+  LLength[0] := UInt32(LBits);
+  LLength[1] := UInt32(LBits shr 32);
 
-  Compress(PCardinal(m_length));
+  Compress(PCardinal(LLength));
 
-  Compress(PCardinal(Fm_state));
-
+  Compress(PCardinal(FState));
 end;
 
 function TGost.GetResult: THashLibByteArray;
 begin
   System.SetLength(result, 8 * System.SizeOf(UInt32));
-  TConverters.le32_copy(PCardinal(Fm_hash), 0, PByte(result), 0,
+  TConverters.le32_copy(PCardinal(FHash), 0, PByte(result), 0,
     System.Length(result));
 end;
 
 class constructor TGost.Gost;
 var
-  sbox: THashLibMatrixUInt32Array;
-
-  i, a, b: Int32;
+  LSBox: THashLibMatrixUInt32Array;
+  LIdx, LA, LB: Int32;
   ax, bx, cx, dx: UInt32;
 begin
-  sbox := THashLibMatrixUInt32Array.Create(THashLibUInt32Array.Create(4, 10, 9,
+  LSBox := THashLibMatrixUInt32Array.Create(THashLibUInt32Array.Create(4, 10, 9,
     2, 13, 8, 0, 14, 6, 11, 1, 12, 7, 15, 5, 3), THashLibUInt32Array.Create(14,
     11, 4, 12, 6, 13, 15, 10, 2, 3, 8, 1, 0, 7, 5, 9),
     THashLibUInt32Array.Create(5, 8, 1, 13, 10, 3, 4, 2, 14, 15, 12, 7, 6, 0, 9,
@@ -398,76 +393,71 @@ begin
     9, 0, 10, 14, 7, 6, 8, 2, 12), THashLibUInt32Array.Create(1, 15, 13, 0, 5,
     7, 10, 4, 9, 2, 3, 14, 6, 11, 8, 12));
 
-  System.SetLength(Fs_sbox1, 256);
-  System.SetLength(Fs_sbox2, 256);
-  System.SetLength(Fs_sbox3, 256);
-  System.SetLength(Fs_sbox4, 256);
+  System.SetLength(FSBox1, 256);
+  System.SetLength(FSBox2, 256);
+  System.SetLength(FSBox3, 256);
+  System.SetLength(FSBox4, 256);
 
-  i := 0;
+  LIdx := 0;
 
-  for a := 0 to 15 do
-
+  for LA := 0 to 15 do
   begin
-    ax := sbox[1, a] shl 15;
-    bx := sbox[3, a] shl 23;
-    cx := sbox[5, a];
+    ax := LSBox[1, LA] shl 15;
+    bx := LSBox[3, LA] shl 23;
+    cx := LSBox[5, LA];
     cx := TBits.RotateRight32(cx, 1);
-    dx := sbox[7, a] shl 7;
+    dx := LSBox[7, LA] shl 7;
 
-    for b := 0 to 15 do
-
+    for LB := 0 to 15 do
     begin
-      Fs_sbox1[i] := ax or (sbox[0, b] shl 11);
-      Fs_sbox2[i] := bx or (sbox[2, b] shl 19);
-      Fs_sbox3[i] := cx or (sbox[4, b] shl 27);
-      Fs_sbox4[i] := dx or (sbox[6, b] shl 3);
-      System.Inc(i);
+      FSBox1[LIdx] := ax or (LSBox[0, LB] shl 11);
+      FSBox2[LIdx] := bx or (LSBox[2, LB] shl 19);
+      FSBox3[LIdx] := cx or (LSBox[4, LB] shl 27);
+      FSBox4[LIdx] := dx or (LSBox[6, LB] shl 3);
+      System.Inc(LIdx);
     end;
-
   end;
 
 end;
 
 procedure TGost.Initialize;
 begin
-  TArrayUtils.ZeroFill(Fm_state);
-  TArrayUtils.ZeroFill(Fm_hash);
-
+  TArrayUtils.ZeroFill(FState);
+  TArrayUtils.ZeroFill(FHash);
   Inherited Initialize();
 end;
 
-procedure TGost.TransformBlock(a_data: PByte; a_data_length: Int32;
-  a_index: Int32);
+procedure TGost.TransformBlock(AData: PByte; ADataLength: Int32; AIndex: Int32);
 var
-  data, m: array [0 .. 7] of UInt32;
-  c, a, b: UInt32;
-  i: Int32;
+  LData, LM: array [0 .. 7] of UInt32;
+  LC, LA, LB: UInt32;
+  LIdx: Int32;
 begin
+  LC := 0;
 
-  c := 0;
+  TConverters.le32_copy(AData, AIndex, @(LData[0]), 0, ADataLength);
 
-  TConverters.le32_copy(a_data, a_index, @(data[0]), 0, a_data_length);
-
-  for i := 0 to 7 do
+  for LIdx := 0 to 7 do
   begin
-    a := data[i];
-    m[i] := a;
-    b := Fm_state[i];
-    c := a + c + Fm_state[i];
-    Fm_state[i] := c;
-    if ((c < a) or (c < b)) then
-
-      c := UInt32(1)
+    LA := LData[LIdx];
+    LM[LIdx] := LA;
+    LB := FState[LIdx];
+    LC := LA + LC + FState[LIdx];
+    FState[LIdx] := LC;
+    if ((LC < LA) or (LC < LB)) then
+    begin
+      LC := UInt32(1)
+    end
     else
-      c := UInt32(0);
-
+    begin
+      LC := UInt32(0);
+    end;
   end;
 
-  Compress(@(m[0]));
+  Compress(@(LM[0]));
 
-  System.FillChar(m, System.SizeOf(m), UInt32(0));
-  System.FillChar(data, System.SizeOf(data), UInt32(0));
-
+  System.FillChar(LM, System.SizeOf(LM), UInt32(0));
+  System.FillChar(LData, System.SizeOf(LData), UInt32(0));
 end;
 
 end.

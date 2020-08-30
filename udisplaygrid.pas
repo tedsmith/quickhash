@@ -9,7 +9,7 @@ unit uDisplayGrid;
   Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
                    and generating hash values for them.
 
-  Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
+  Copyright (C) 2011-2020  Ted Smith www.quickhash-gui.org
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ type
 
   TfrmDisplayGrid1 = class(TForm)
     btnClipboardResultsCOPYTAB: TButton;
+    RecursiveDisplayGrid_COPY: TDBGrid;
     CopyTabDBNavigator: TDBNavigator;
     MenuItem_SaveDBToCSV: TMenuItem;
     MenuItem_CopySelectedRowCOPYGRID: TMenuItem;
@@ -50,7 +51,6 @@ type
     MenuItem_SortBySourceNameCOPYGRID: TMenuItem;
     MenuItem_SortBySourceHashCOPYGRID: TMenuItem;
     MenuItem_SortByDestinationHashCOPYGRID: TMenuItem;
-    RecursiveDisplayGrid_COPY: TDBGrid;
     frmDisplayGridPopupMenu: TPopupMenu;
     frmDisplayGridSaveDialog1: TSaveDialog;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -145,6 +145,7 @@ begin
     frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid_COPY, ExportFilename);
   end;
 end;
+
 
 procedure TfrmDisplayGrid1.MenuItem_ShowAllCOPYGRIDClick(Sender: TObject);
 begin

@@ -22,30 +22,30 @@ type
     FC: THashLibMatrixByteArray;
     FT: THashLibMatrixUInt64Array;
 
-    procedure InternalUpdate(input: Byte); inline;
+    procedure InternalUpdate(AInput: Byte); inline;
     procedure xor512(const A, B: THashLibByteArray); inline;
-    procedure E(const K, a_m: THashLibByteArray);
+    procedure E(const K, M: THashLibByteArray);
     procedure F(const V: THashLibByteArray);
-    procedure g_N(const a_h, a_N, a_m: THashLibByteArray); inline;
-    procedure addMod512(const A: THashLibByteArray; num: Int32); overload;
-    procedure addMod512(const A, B: THashLibByteArray); overload;
-    procedure reverse(const src, dst: THashLibByteArray);
+    procedure GN(const AH, AN, AM: THashLibByteArray); inline;
+    procedure AddMod512(const A: THashLibByteArray; Num: Int32); overload;
+    procedure AddMod512(const A, B: THashLibByteArray); overload;
+    procedure Reverse(const ASource, ADestination: THashLibByteArray);
 
     class constructor GOST3411_2012();
 
   strict protected
 
   var
-    FIV, FN, FSigma, FKi, Fm, Fh, Ftmp, Fblock: THashLibByteArray;
+    FIV, FN, FSigma, FKi, FM, FH, FTemp, FBlock: THashLibByteArray;
 
-    FbOff: Int32;
+    FBOff: Int32;
 
-    constructor Create(a_hash_size: Int32; const IV: THashLibByteArray);
+    constructor Create(AHashSize: Int32; const IV: THashLibByteArray);
 
   public
     procedure Initialize; override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_data_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ADataLength: Int32); override;
     function TransformFinal: IHashResult; override;
 
   end;
@@ -93,14 +93,14 @@ begin
   end;
 end;
 
-procedure TGOST3411_2012.addMod512(const A: THashLibByteArray; num: Int32);
+procedure TGOST3411_2012.AddMod512(const A: THashLibByteArray; Num: Int32);
 var
   c, i: Int32;
 begin
-  c := (A[63] and $FF) + (num and $FF);
+  c := (A[63] and $FF) + (Num and $FF);
   A[63] := Byte(c);
 
-  c := (A[62] and $FF) + ((TBits.Asr32(num, 8)) and $FF) + (TBits.Asr32(c, 8));
+  c := (A[62] and $FF) + ((TBits.Asr32(Num, 8)) and $FF) + (TBits.Asr32(c, 8));
   A[62] := Byte(c);
 
   i := 61;
@@ -114,7 +114,7 @@ begin
 
 end;
 
-procedure TGOST3411_2012.addMod512(const A, B: THashLibByteArray);
+procedure TGOST3411_2012.AddMod512(const A, B: THashLibByteArray);
 var
   i, c: Int32;
 begin
@@ -129,33 +129,33 @@ begin
   end;
 end;
 
-constructor TGOST3411_2012.Create(a_hash_size: Int32;
+constructor TGOST3411_2012.Create(AHashSize: Int32;
   const IV: THashLibByteArray);
 begin
-  Inherited Create(a_hash_size, 64);
+  Inherited Create(AHashSize, 64);
   System.SetLength(FIV, 64);
   System.SetLength(FN, 64);
   System.SetLength(FSigma, 64);
   System.SetLength(FKi, 64);
-  System.SetLength(Fm, 64);
-  System.SetLength(Fh, 64);
+  System.SetLength(FM, 64);
+  System.SetLength(FH, 64);
 
   // Temporary buffers
-  System.SetLength(Ftmp, 64);
-  System.SetLength(Fblock, 64);
+  System.SetLength(FTemp, 64);
+  System.SetLength(FBlock, 64);
 
-  FbOff := 64;
+  FBOff := 64;
 
   System.Move(IV[0], FIV[0], 64 * System.SizeOf(Byte));
-  System.Move(IV[0], Fh[0], 64 * System.SizeOf(Byte));
+  System.Move(IV[0], FH[0], 64 * System.SizeOf(Byte));
 end;
 
-procedure TGOST3411_2012.E(const K, a_m: THashLibByteArray);
+procedure TGOST3411_2012.E(const K, M: THashLibByteArray);
 var
   i: Int32;
 begin
   System.Move(K[0], FKi[0], 64 * System.SizeOf(Byte));
-  xor512(K, a_m);
+  xor512(K, M);
   F(K);
   for i := 0 to System.Pred(11) do
   begin
@@ -1515,78 +1515,79 @@ begin
 {$ENDREGION}
 end;
 
-procedure TGOST3411_2012.g_N(const a_h, a_N, a_m: THashLibByteArray);
+procedure TGOST3411_2012.GN(const AH, AN, AM: THashLibByteArray);
 begin
-  System.Move(a_h[0], Ftmp[0], 64 * System.SizeOf(Byte));
+  System.Move(AH[0], FTemp[0], 64 * System.SizeOf(Byte));
 
-  xor512(a_h, a_N);
-  F(a_h);
+  xor512(AH, AN);
+  F(AH);
 
-  E(a_h, a_m);
-  xor512(a_h, Ftmp);
-  xor512(a_h, a_m);
+  E(AH, AM);
+  xor512(AH, FTemp);
+  xor512(AH, AM);
 end;
 
 procedure TGOST3411_2012.Initialize;
 begin
-  FbOff := 64;
+  FBOff := 64;
   TArrayUtils.ZeroFill(FN);
   TArrayUtils.ZeroFill(FSigma);
 
-  System.Move(FIV[0], Fh[0], 64 * System.SizeOf(Byte));
+  System.Move(FIV[0], FH[0], 64 * System.SizeOf(Byte));
 
-  TArrayUtils.ZeroFill(Fblock);
+  TArrayUtils.ZeroFill(FBlock);
 end;
 
-procedure TGOST3411_2012.InternalUpdate(input: Byte);
+procedure TGOST3411_2012.InternalUpdate(AInput: Byte);
 begin
-  System.Dec(FbOff);
-  Fblock[FbOff] := input;
-  if (FbOff = 0) then
+  System.Dec(FBOff);
+  FBlock[FBOff] := AInput;
+  if (FBOff = 0) then
   begin
-    g_N(Fh, FN, Fblock);
-    addMod512(FN, 512);
-    addMod512(FSigma, Fblock);
-    FbOff := 64;
+    GN(FH, FN, FBlock);
+    AddMod512(FN, 512);
+    AddMod512(FSigma, FBlock);
+    FBOff := 64;
   end;
 end;
 
-procedure TGOST3411_2012.reverse(const src, dst: THashLibByteArray);
+procedure TGOST3411_2012.Reverse(const ASource, ADestination
+  : THashLibByteArray);
 var
   len, i: Int32;
 begin
-  len := System.Length(src);
+  len := System.Length(ASource);
   for i := 0 to System.Pred(len) do
   begin
-    dst[len - 1 - i] := src[i];
+    ADestination[len - 1 - i] := ASource[i];
   end;
 end;
 
-procedure TGOST3411_2012.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_data_length: Int32);
+procedure TGOST3411_2012.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ADataLength: Int32);
 begin
-  while ((FbOff <> 64) and (a_data_length > 0)) do
+  while ((FBOff <> 64) and (ADataLength > 0)) do
   begin
-    InternalUpdate(a_data[a_index]);
-    System.Inc(a_index);
-    System.Dec(a_data_length);
+    InternalUpdate(AData[AIndex]);
+    System.Inc(AIndex);
+    System.Dec(ADataLength);
   end;
-  while (a_data_length >= 64) do
+  while (ADataLength >= 64) do
   begin
-    System.Move(a_data[a_index], Ftmp[0], 64 * System.SizeOf(Byte));
-    reverse(Ftmp, Fblock);
-    g_N(Fh, FN, Fblock);
-    addMod512(FN, 512);
-    addMod512(FSigma, Fblock);
+    System.Move(AData[AIndex], FTemp[0], 64 * System.SizeOf(Byte));
+    Reverse(FTemp, FBlock);
+    GN(FH, FN, FBlock);
+    AddMod512(FN, 512);
+    AddMod512(FSigma, FBlock);
 
-    a_data_length := a_data_length - 64;
-    a_index := a_index + 64;
+    ADataLength := ADataLength - 64;
+    AIndex := AIndex + 64;
   end;
-  while (a_data_length > 0) do
+  while (ADataLength > 0) do
   begin
-    InternalUpdate(a_data[a_index]);
-    System.Inc(a_index);
-    System.Dec(a_data_length);
+    InternalUpdate(AData[AIndex]);
+    System.Inc(AIndex);
+    System.Dec(ADataLength);
   end;
 
 end;
@@ -1596,33 +1597,33 @@ var
   tempRes: THashLibByteArray;
   lenM, i: Int32;
 begin
-  lenM := 64 - FbOff;
+  lenM := 64 - FBOff;
 
   // At this point it is certain that lenM is smaller than 64
   i := 0;
   while i <> (64 - lenM) do
   begin
-    Fm[i] := 0;
+    FM[i] := 0;
     System.Inc(i);
   end;
 
-  Fm[63 - lenM] := 1;
+  FM[63 - lenM] := 1;
 
-  if (FbOff <> 64) then
+  if (FBOff <> 64) then
   begin
-    System.Move(Fblock[FbOff], Fm[64 - lenM], lenM * System.SizeOf(Byte));
+    System.Move(FBlock[FBOff], FM[64 - lenM], lenM * System.SizeOf(Byte));
   end;
 
-  g_N(Fh, FN, Fm);
-  addMod512(FN, lenM * 8);
-  addMod512(FSigma, Fm);
-  g_N(Fh, FZero, FN);
-  g_N(Fh, FZero, FSigma);
+  GN(FH, FN, FM);
+  AddMod512(FN, lenM * 8);
+  AddMod512(FSigma, FM);
+  GN(FH, FZero, FN);
+  GN(FH, FZero, FSigma);
 
-  reverse(Fh, Ftmp);
+  Reverse(FH, FTemp);
 
   System.SetLength(tempRes, 64);
-  System.Move(Ftmp[0], tempRes[0], 64 * System.SizeOf(Byte));
+  System.Move(FTemp[0], tempRes[0], 64 * System.SizeOf(Byte));
 
   result := THashResult.Create(tempRes);
 
@@ -1633,19 +1634,19 @@ end;
 
 function TGOST3411_2012_256.Clone(): IHash;
 var
-  HashInstance: TGOST3411_2012_256;
+  LHashInstance: TGOST3411_2012_256;
 begin
-  HashInstance := TGOST3411_2012_256.Create();
-  HashInstance.FIV := System.Copy(FIV);
-  HashInstance.FN := System.Copy(FN);
-  HashInstance.FSigma := System.Copy(FSigma);
-  HashInstance.FKi := System.Copy(FKi);
-  HashInstance.Fm := System.Copy(Fm);
-  HashInstance.Fh := System.Copy(Fh);
-  HashInstance.Ftmp := System.Copy(Ftmp);
-  HashInstance.Fblock := System.Copy(Fblock);
-  HashInstance.FbOff := FbOff;
-  result := HashInstance as IHash;
+  LHashInstance := TGOST3411_2012_256.Create();
+  LHashInstance.FIV := System.Copy(FIV);
+  LHashInstance.FN := System.Copy(FN);
+  LHashInstance.FSigma := System.Copy(FSigma);
+  LHashInstance.FKi := System.Copy(FKi);
+  LHashInstance.FM := System.Copy(FM);
+  LHashInstance.FH := System.Copy(FH);
+  LHashInstance.FTemp := System.Copy(FTemp);
+  LHashInstance.FBlock := System.Copy(FBlock);
+  LHashInstance.FBOff := FBOff;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
@@ -1665,31 +1666,31 @@ end;
 
 function TGOST3411_2012_256.TransformFinal: IHashResult;
 var
-  output, tempRes: THashLibByteArray;
+  LOutput, LTempRes: THashLibByteArray;
 begin
-  output := inherited TransformFinal.GetBytes;
-  System.SetLength(tempRes, HashSize);
-  System.Move(output[32], tempRes[0], 32 * System.SizeOf(Byte));
-  result := THashResult.Create(tempRes);
+  LOutput := inherited TransformFinal().GetBytes;
+  System.SetLength(LTempRes, HashSize);
+  System.Move(LOutput[32], LTempRes[0], 32 * System.SizeOf(Byte));
+  result := THashResult.Create(LTempRes);
 end;
 
 { TGOST3411_2012_512 }
 
 function TGOST3411_2012_512.Clone(): IHash;
 var
-  HashInstance: TGOST3411_2012_512;
+  LHashInstance: TGOST3411_2012_512;
 begin
-  HashInstance := TGOST3411_2012_512.Create();
-  HashInstance.FIV := System.Copy(FIV);
-  HashInstance.FN := System.Copy(FN);
-  HashInstance.FSigma := System.Copy(FSigma);
-  HashInstance.FKi := System.Copy(FKi);
-  HashInstance.Fm := System.Copy(Fm);
-  HashInstance.Fh := System.Copy(Fh);
-  HashInstance.Ftmp := System.Copy(Ftmp);
-  HashInstance.Fblock := System.Copy(Fblock);
-  HashInstance.FbOff := FbOff;
-  result := HashInstance as IHash;
+  LHashInstance := TGOST3411_2012_512.Create();
+  LHashInstance.FIV := System.Copy(FIV);
+  LHashInstance.FN := System.Copy(FN);
+  LHashInstance.FSigma := System.Copy(FSigma);
+  LHashInstance.FKi := System.Copy(FKi);
+  LHashInstance.FM := System.Copy(FM);
+  LHashInstance.FH := System.Copy(FH);
+  LHashInstance.FTemp := System.Copy(FTemp);
+  LHashInstance.FBlock := System.Copy(FBlock);
+  LHashInstance.FBOff := FBOff;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 

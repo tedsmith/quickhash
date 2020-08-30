@@ -8,12 +8,8 @@ unit HlpNullable;
 interface
 
 uses
-  HlpHashLibTypes,
-{$IFDEF HAS_UNITSCOPE}
-  System.TypInfo
-{$ELSE}
-  TypInfo
-{$ENDIF HAS_UNITSCOPE};
+  TypInfo,
+  HlpHashLibTypes;
 
 resourcestring
   SCannotAssignPointerToNullable =

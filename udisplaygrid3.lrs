@@ -1,0 +1,10 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TfrmDisplayGrid3','FORMDATA',[
+  'TPF0'#16'TfrmDisplayGrid3'#15'frmDisplayGrid3'#4'Left'#3#184#2#6'Height'#3
+  +#240#0#3'Top'#3#245#0#5'Width'#3't'#2#7'Caption'#6#15'frmDisplayGrid3'#12'Cl'
+  +'ientHeight'#3#240#0#11'ClientWidth'#3't'#2#10'LCLVersion'#6#7'2.0.4.0'#0#7
+  +'TDBGrid'#9'dbGridC2F'#4'Left'#2#16#6'Height'#3#200#0#3'Top'#2#16#5'Width'#3
+  +'H'#2#5'Color'#7#8'clWindow'#7'Columns'#14#0#10'DataSource'#7#27'frmSQLiteDB'
+  +'ases.DataSource3'#8'TabOrder'#2#0#0#0#0
+]);

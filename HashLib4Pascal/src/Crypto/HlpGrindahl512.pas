@@ -12,7 +12,6 @@ uses
 {$IFDEF DELPHI}
   HlpHash,
   HlpHashBuffer,
-  HlpBitConverter,
 {$ENDIF DELPHI}
   HlpBits,
   HlpConverters,
@@ -25,19 +24,18 @@ type
   TGrindahl512 = class sealed(TBlockHash, ICryptoNotBuildIn, ITransformBlock)
 
   strict private
-
-    Fm_state, Fm_temp: THashLibUInt64Array;
+  var
+    FState, FTemp: THashLibUInt64Array;
 
     class var
 
-      Fs_table_0, Fs_table_1, Fs_table_2, Fs_table_3, Fs_table_4, Fs_table_5,
-      Fs_table_6, Fs_table_7: THashLibUInt64Array;
+      FSTable0, FSTable1, FSTable2, FSTable3, FSTable4, FSTable5, FSTable6,
+      FSTable7: THashLibUInt64Array;
 
 {$REGION 'Consts'}
 
   const
-
-    s_master_table: array [0 .. 255] of UInt64 = (UInt64($C6636397633551A2),
+    SMasterTable: array [0 .. 255] of UInt64 = (UInt64($C6636397633551A2),
       UInt64($F87C7CEB7CCD1326), UInt64($EE7777C777952952),
       UInt64($F67B7BF77BF50102), UInt64($FFF2F2E5F2D11A34),
       UInt64($D66B6BB76B7561C2), UInt64($DE6F6FA76F5579F2),
@@ -168,17 +166,17 @@ type
       UInt64($2C16165816B074E8));
 
 {$ENDREGION}
-    class function CalcTable(i: Int32): THashLibUInt64Array;
+    class function CalcTable(AI: Int32): THashLibUInt64Array;
 
-    procedure InjectMsg(a_full_process: Boolean);
+    procedure InjectMsg(AFullProcess: Boolean);
 
     class constructor Grindahl512();
 
   strict protected
     procedure Finish(); override;
     function GetResult(): THashLibByteArray; override;
-    procedure TransformBlock(a_data: PByte; a_data_length: Int32;
-      a_index: Int32); override;
+    procedure TransformBlock(AData: PByte; ADataLength: Int32;
+      AIndex: Int32); override;
 
   public
     constructor Create();
@@ -191,225 +189,206 @@ implementation
 
 { TGrindahl512 }
 
-class function TGrindahl512.CalcTable(i: Int32): THashLibUInt64Array;
+class function TGrindahl512.CalcTable(AI: Int32): THashLibUInt64Array;
 var
-  j: Int32;
+  Jdx: Int32;
 begin
   System.SetLength(result, 256);
-  j := 0;
-  while j < 256 do
+  Jdx := 0;
+  while Jdx < 256 do
   begin
-    result[j] := TBits.RotateRight64(s_master_table[j], i * 8);
-    System.Inc(j);
+    result[Jdx] := TBits.RotateRight64(SMasterTable[Jdx], AI * 8);
+    System.Inc(Jdx);
   end;
 end;
 
 function TGrindahl512.Clone(): IHash;
 var
-  HashInstance: TGrindahl512;
+  LHashInstance: TGrindahl512;
 begin
-  HashInstance := TGrindahl512.Create();
-  HashInstance.Fm_state := System.Copy(Fm_state);
-  HashInstance.Fm_temp := System.Copy(Fm_temp);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  result := HashInstance as IHash;
+  LHashInstance := TGrindahl512.Create();
+  LHashInstance.FState := System.Copy(FState);
+  LHashInstance.FTemp := System.Copy(FTemp);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
 constructor TGrindahl512.Create;
 begin
   Inherited Create(64, 8);
-  System.SetLength(Fm_state, 13);
-  System.SetLength(Fm_temp, 13);
+  System.SetLength(FState, 13);
+  System.SetLength(FTemp, 13);
 end;
 
 procedure TGrindahl512.Finish;
 var
-  padding_size, i: Int32;
-  msg_length: UInt64;
-  pad: THashLibByteArray;
+  LPaddingSize, LIdx: Int32;
+  LMessageLength: UInt64;
+  LPad: THashLibByteArray;
 begin
-  padding_size := 16 - Int32(Fm_processed_bytes and UInt32(7));
-  msg_length := (Fm_processed_bytes shr UInt64(3)) + 1;
+  LPaddingSize := 16 - Int32(FProcessedBytesCount and UInt32(7));
+  LMessageLength := (FProcessedBytesCount shr UInt64(3)) + 1;
 
-  System.SetLength(pad, padding_size);
+  System.SetLength(LPad, LPaddingSize);
 
-  pad[0] := $80;
+  LPad[0] := $80;
 
-  msg_length := TConverters.be2me_64(msg_length);
+  LMessageLength := TConverters.be2me_64(LMessageLength);
 
-  TConverters.ReadUInt64AsBytesLE(msg_length, pad, padding_size - 8);
+  TConverters.ReadUInt64AsBytesLE(LMessageLength, LPad, LPaddingSize - 8);
 
-  TransformBytes(pad, 0, padding_size - 8);
+  TransformBytes(LPad, 0, LPaddingSize - 8);
 
-  Fm_state[0] := TConverters.ReadBytesAsUInt64LE(PByte(pad), padding_size - 8);
+  FState[0] := TConverters.ReadBytesAsUInt64LE(PByte(LPad), LPaddingSize - 8);
 
-  Fm_state[0] := TConverters.be2me_64(Fm_state[0]);
+  FState[0] := TConverters.be2me_64(FState[0]);
 
   InjectMsg(true);
 
-  i := 0;
+  LIdx := 0;
 
-  while i < 8 do
+  while LIdx < 8 do
   begin
     InjectMsg(true);
-    System.Inc(i);
+    System.Inc(LIdx);
   end;
-
 end;
 
 function TGrindahl512.GetResult: THashLibByteArray;
 begin
-
   System.SetLength(result, 8 * System.SizeOf(UInt64));
-
-  TConverters.be64_copy(PUInt64(Fm_state), 5 * System.SizeOf(UInt64),
+  TConverters.be64_copy(PUInt64(FState), 5 * System.SizeOf(UInt64),
     PByte(result), 0, System.Length(result));
-
 end;
 
 class constructor TGrindahl512.Grindahl512;
 var
-  LowVal1, LowVal2: Int32;
+  LLowIndex1, LLowIndex2: Int32;
 begin
+  System.SetLength(FSTable0, System.Length(SMasterTable));
 
-  System.SetLength(Fs_table_0, System.Length(s_master_table));
+  LLowIndex1 := System.Low(SMasterTable);
+  LLowIndex2 := System.Low(FSTable0);
 
-  LowVal1 := System.Low(s_master_table);
-  LowVal2 := System.Low(Fs_table_0);
+  System.Move(SMasterTable[LLowIndex1], FSTable0[LLowIndex2],
+    System.SizeOf(SMasterTable));
 
-  System.Move(s_master_table[LowVal1], Fs_table_0[LowVal2],
-    System.SizeOf(s_master_table));
-
-  Fs_table_1 := CalcTable(1);
-  Fs_table_2 := CalcTable(2);
-  Fs_table_3 := CalcTable(3);
-  Fs_table_4 := CalcTable(4);
-  Fs_table_5 := CalcTable(5);
-  Fs_table_6 := CalcTable(6);
-  Fs_table_7 := CalcTable(7);
-
+  FSTable1 := CalcTable(1);
+  FSTable2 := CalcTable(2);
+  FSTable3 := CalcTable(3);
+  FSTable4 := CalcTable(4);
+  FSTable5 := CalcTable(5);
+  FSTable6 := CalcTable(6);
+  FSTable7 := CalcTable(7);
 end;
 
 procedure TGrindahl512.Initialize;
 begin
-  TArrayUtils.ZeroFill(Fm_state);
-  TArrayUtils.ZeroFill(Fm_temp);
-
+  TArrayUtils.ZeroFill(FState);
+  TArrayUtils.ZeroFill(FTemp);
   Inherited Initialize();
-
 end;
 
-procedure TGrindahl512.InjectMsg(a_full_process: Boolean);
+procedure TGrindahl512.InjectMsg(AFullProcess: Boolean);
 var
-  u: THashLibUInt64Array;
+  LU: THashLibUInt64Array;
 begin
+  FState[12] := FState[12] xor $01;
 
-  Fm_state[12] := Fm_state[12] xor $01;
-
-  if (a_full_process) then
+  if (AFullProcess) then
   begin
-    Fm_temp[0] := Fs_table_0[Byte(Fm_state[12] shr 56)] xor Fs_table_1
-      [Byte(Fm_state[11] shr 48)] xor Fs_table_2[Byte(Fm_state[10] shr 40)
-      ] xor Fs_table_3[Byte(Fm_state[9] shr 32)] xor Fs_table_4
-      [Byte(Fm_state[8] shr 24)] xor Fs_table_5[Byte(Fm_state[7] shr 16)
-      ] xor Fs_table_6[Byte(Fm_state[6] shr 8)] xor Fs_table_7
-      [Byte(Fm_state[5])];
+    FTemp[0] := FSTable0[Byte(FState[12] shr 56)] xor FSTable1
+      [Byte(FState[11] shr 48)] xor FSTable2[Byte(FState[10] shr 40)
+      ] xor FSTable3[Byte(FState[9] shr 32)] xor FSTable4[Byte(FState[8] shr 24)
+      ] xor FSTable5[Byte(FState[7] shr 16)] xor FSTable6[Byte(FState[6] shr 8)
+      ] xor FSTable7[Byte(FState[5])];
   end;
 
-  Fm_temp[1] := Fs_table_0[Byte(Fm_state[0] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[12] shr 48)] xor Fs_table_2[Byte(Fm_state[11] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[10] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[9] shr 24)] xor Fs_table_5[Byte(Fm_state[8] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[7] shr 8)] xor Fs_table_7[Byte(Fm_state[6])];
+  FTemp[1] := FSTable0[Byte(FState[0] shr 56)] xor FSTable1
+    [Byte(FState[12] shr 48)] xor FSTable2[Byte(FState[11] shr 40)] xor FSTable3
+    [Byte(FState[10] shr 32)] xor FSTable4[Byte(FState[9] shr 24)] xor FSTable5
+    [Byte(FState[8] shr 16)] xor FSTable6[Byte(FState[7] shr 8)] xor FSTable7
+    [Byte(FState[6])];
 
-  Fm_temp[2] := Fs_table_0[Byte(Fm_state[1] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[0] shr 48)] xor Fs_table_2[Byte(Fm_state[12] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[11] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[10] shr 24)] xor Fs_table_5[Byte(Fm_state[9] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[8] shr 8)] xor Fs_table_7[Byte(Fm_state[7])];
+  FTemp[2] := FSTable0[Byte(FState[1] shr 56)] xor FSTable1
+    [Byte(FState[0] shr 48)] xor FSTable2[Byte(FState[12] shr 40)] xor FSTable3
+    [Byte(FState[11] shr 32)] xor FSTable4[Byte(FState[10] shr 24)] xor FSTable5
+    [Byte(FState[9] shr 16)] xor FSTable6[Byte(FState[8] shr 8)] xor FSTable7
+    [Byte(FState[7])];
 
-  Fm_temp[3] := Fs_table_0[Byte(Fm_state[2] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[1] shr 48)] xor Fs_table_2[Byte(Fm_state[0] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[12] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[11] shr 24)] xor Fs_table_5[Byte(Fm_state[10] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[9] shr 8)] xor Fs_table_7[Byte(Fm_state[8])];
+  FTemp[3] := FSTable0[Byte(FState[2] shr 56)] xor FSTable1
+    [Byte(FState[1] shr 48)] xor FSTable2[Byte(FState[0] shr 40)] xor FSTable3
+    [Byte(FState[12] shr 32)] xor FSTable4[Byte(FState[11] shr 24)] xor FSTable5
+    [Byte(FState[10] shr 16)] xor FSTable6[Byte(FState[9] shr 8)] xor FSTable7
+    [Byte(FState[8])];
 
-  Fm_temp[4] := Fs_table_0[Byte(Fm_state[3] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[2] shr 48)] xor Fs_table_2[Byte(Fm_state[1] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[0] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[12] shr 24)] xor Fs_table_5[Byte(Fm_state[11] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[10] shr 8)] xor Fs_table_7
-    [Byte(Fm_state[9])];
+  FTemp[4] := FSTable0[Byte(FState[3] shr 56)] xor FSTable1
+    [Byte(FState[2] shr 48)] xor FSTable2[Byte(FState[1] shr 40)] xor FSTable3
+    [Byte(FState[0] shr 32)] xor FSTable4[Byte(FState[12] shr 24)] xor FSTable5
+    [Byte(FState[11] shr 16)] xor FSTable6[Byte(FState[10] shr 8)] xor FSTable7
+    [Byte(FState[9])];
 
-  Fm_temp[5] := Fs_table_0[Byte(Fm_state[4] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[3] shr 48)] xor Fs_table_2[Byte(Fm_state[2] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[1] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[0] shr 24)] xor Fs_table_5[Byte(Fm_state[12] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[11] shr 8)] xor Fs_table_7
-    [Byte(Fm_state[10])];
+  FTemp[5] := FSTable0[Byte(FState[4] shr 56)] xor FSTable1
+    [Byte(FState[3] shr 48)] xor FSTable2[Byte(FState[2] shr 40)] xor FSTable3
+    [Byte(FState[1] shr 32)] xor FSTable4[Byte(FState[0] shr 24)] xor FSTable5
+    [Byte(FState[12] shr 16)] xor FSTable6[Byte(FState[11] shr 8)] xor FSTable7
+    [Byte(FState[10])];
 
-  Fm_temp[6] := Fs_table_0[Byte(Fm_state[5] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[4] shr 48)] xor Fs_table_2[Byte(Fm_state[3] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[2] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[1] shr 24)] xor Fs_table_5[Byte(Fm_state[0] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[12] shr 8)] xor Fs_table_7
-    [Byte(Fm_state[11])];
+  FTemp[6] := FSTable0[Byte(FState[5] shr 56)] xor FSTable1
+    [Byte(FState[4] shr 48)] xor FSTable2[Byte(FState[3] shr 40)] xor FSTable3
+    [Byte(FState[2] shr 32)] xor FSTable4[Byte(FState[1] shr 24)] xor FSTable5
+    [Byte(FState[0] shr 16)] xor FSTable6[Byte(FState[12] shr 8)] xor FSTable7
+    [Byte(FState[11])];
 
-  Fm_temp[7] := Fs_table_0[Byte(Fm_state[6] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[5] shr 48)] xor Fs_table_2[Byte(Fm_state[4] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[3] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[2] shr 24)] xor Fs_table_5[Byte(Fm_state[1] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[0] shr 8)] xor Fs_table_7
-    [Byte(Fm_state[12])];
+  FTemp[7] := FSTable0[Byte(FState[6] shr 56)] xor FSTable1
+    [Byte(FState[5] shr 48)] xor FSTable2[Byte(FState[4] shr 40)] xor FSTable3
+    [Byte(FState[3] shr 32)] xor FSTable4[Byte(FState[2] shr 24)] xor FSTable5
+    [Byte(FState[1] shr 16)] xor FSTable6[Byte(FState[0] shr 8)] xor FSTable7
+    [Byte(FState[12])];
 
-  Fm_temp[8] := Fs_table_0[Byte(Fm_state[7] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[6] shr 48)] xor Fs_table_2[Byte(Fm_state[5] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[4] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[3] shr 24)] xor Fs_table_5[Byte(Fm_state[2] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[1] shr 8)] xor Fs_table_7[Byte(Fm_state[0])];
+  FTemp[8] := FSTable0[Byte(FState[7] shr 56)] xor FSTable1
+    [Byte(FState[6] shr 48)] xor FSTable2[Byte(FState[5] shr 40)] xor FSTable3
+    [Byte(FState[4] shr 32)] xor FSTable4[Byte(FState[3] shr 24)] xor FSTable5
+    [Byte(FState[2] shr 16)] xor FSTable6[Byte(FState[1] shr 8)] xor FSTable7
+    [Byte(FState[0])];
 
-  Fm_temp[9] := Fs_table_0[Byte(Fm_state[8] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[7] shr 48)] xor Fs_table_2[Byte(Fm_state[6] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[5] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[4] shr 24)] xor Fs_table_5[Byte(Fm_state[3] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[2] shr 8)] xor Fs_table_7[Byte(Fm_state[1])];
+  FTemp[9] := FSTable0[Byte(FState[8] shr 56)] xor FSTable1
+    [Byte(FState[7] shr 48)] xor FSTable2[Byte(FState[6] shr 40)] xor FSTable3
+    [Byte(FState[5] shr 32)] xor FSTable4[Byte(FState[4] shr 24)] xor FSTable5
+    [Byte(FState[3] shr 16)] xor FSTable6[Byte(FState[2] shr 8)] xor FSTable7
+    [Byte(FState[1])];
 
-  Fm_temp[10] := Fs_table_0[Byte(Fm_state[9] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[8] shr 48)] xor Fs_table_2[Byte(Fm_state[7] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[6] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[5] shr 24)] xor Fs_table_5[Byte(Fm_state[4] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[3] shr 8)] xor Fs_table_7[Byte(Fm_state[2])];
+  FTemp[10] := FSTable0[Byte(FState[9] shr 56)] xor FSTable1
+    [Byte(FState[8] shr 48)] xor FSTable2[Byte(FState[7] shr 40)] xor FSTable3
+    [Byte(FState[6] shr 32)] xor FSTable4[Byte(FState[5] shr 24)] xor FSTable5
+    [Byte(FState[4] shr 16)] xor FSTable6[Byte(FState[3] shr 8)] xor FSTable7
+    [Byte(FState[2])];
 
-  Fm_temp[11] := Fs_table_0[Byte(Fm_state[10] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[9] shr 48)] xor Fs_table_2[Byte(Fm_state[8] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[7] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[6] shr 24)] xor Fs_table_5[Byte(Fm_state[5] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[4] shr 8)] xor Fs_table_7[Byte(Fm_state[3])];
+  FTemp[11] := FSTable0[Byte(FState[10] shr 56)] xor FSTable1
+    [Byte(FState[9] shr 48)] xor FSTable2[Byte(FState[8] shr 40)] xor FSTable3
+    [Byte(FState[7] shr 32)] xor FSTable4[Byte(FState[6] shr 24)] xor FSTable5
+    [Byte(FState[5] shr 16)] xor FSTable6[Byte(FState[4] shr 8)] xor FSTable7
+    [Byte(FState[3])];
 
-  Fm_temp[12] := Fs_table_0[Byte(Fm_state[11] shr 56)] xor Fs_table_1
-    [Byte(Fm_state[10] shr 48)] xor Fs_table_2[Byte(Fm_state[9] shr 40)
-    ] xor Fs_table_3[Byte(Fm_state[8] shr 32)] xor Fs_table_4
-    [Byte(Fm_state[7] shr 24)] xor Fs_table_5[Byte(Fm_state[6] shr 16)
-    ] xor Fs_table_6[Byte(Fm_state[5] shr 8)] xor Fs_table_7[Byte(Fm_state[4])];
+  FTemp[12] := FSTable0[Byte(FState[11] shr 56)] xor FSTable1
+    [Byte(FState[10] shr 48)] xor FSTable2[Byte(FState[9] shr 40)] xor FSTable3
+    [Byte(FState[8] shr 32)] xor FSTable4[Byte(FState[7] shr 24)] xor FSTable5
+    [Byte(FState[6] shr 16)] xor FSTable6[Byte(FState[5] shr 8)] xor FSTable7
+    [Byte(FState[4])];
 
-  u := Fm_temp;
-  Fm_temp := Fm_state;
-  Fm_state := u;
-
+  LU := FTemp;
+  FTemp := FState;
+  FState := LU;
 end;
 
-procedure TGrindahl512.TransformBlock(a_data: PByte; a_data_length: Int32;
-  a_index: Int32);
+procedure TGrindahl512.TransformBlock(AData: PByte; ADataLength: Int32;
+  AIndex: Int32);
 begin
-
-  Fm_state[0] := TConverters.ReadBytesAsUInt64LE(a_data, a_index);
-
-  Fm_state[0] := TConverters.be2me_64(Fm_state[0]);
-
+  FState[0] := TConverters.ReadBytesAsUInt64LE(AData, AIndex);
+  FState[0] := TConverters.be2me_64(FState[0]);
   InjectMsg(false);
-
 end;
 
 end.

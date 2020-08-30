@@ -2,7 +2,7 @@
     Quick Hash - A Linux, Windows and Apple Mac OSX GUI for quickly selecting one or more files
     and generating hash values for them.
 
-    Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2020  Ted Smith www.quickhash-gui.org
 
     The use of the word 'quick' refers to the ease in which the software operates
     in both Linux, Apple Mac and Windows (very few options to worry about, no
@@ -94,8 +94,8 @@ uses
   Classes, SysUtils, FileUtil, LResources, Forms, Controls,
   Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
   LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
-  XMLPropStorage, uDisplayGrid, diskmodule, clipbrd, DBGrids, DbCtrls,
-  ZVDateTimePicker, frmAboutUnit, base64,
+  XMLPropStorage,  diskmodule,
+  clipbrd, DBGrids, DbCtrls, ZVDateTimePicker, frmAboutUnit, base64,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -103,9 +103,12 @@ uses
   HlpHashFactory,
   HlpIHash,
   HlpIHashResult,
+  HlpBlake3,
 
   // New as of v3.0.0
-  dbases_sqlite,
+  dbases_sqlite, uDisplayGrid,
+  // New as of v3.2.0
+  udisplaygrid3,
   // Also new as of v3.0.0, for creating hash lists for faster comparisons of two folders
   contnrs,
   // Also new as of v3.0.0, for importing hash lists
@@ -195,7 +198,6 @@ type
     cbFlipCaseTEXT                        : TCheckBox;
     cbUNCModeCompFolders                  : TCheckBox;
     cbSaveComparisons                     : TCheckBox;
-    cbOverrideFileCountDiffer             : TCheckBox;
     cbLoadHashList                        : TCheckBox;
     edtUNCPathCompareA                    : TEdit;
     edtUNCPathCompareB                    : TEdit;
@@ -405,8 +407,6 @@ type
     procedure cbFlipCaseFILEChange(Sender: TObject);
     procedure cbFlipCaseTEXTChange(Sender: TObject);
     procedure cbLoadHashListChange(Sender: TObject);
-    procedure cbOverrideFileCountDifferChange(Sender: TObject);
-    procedure cbSaveComparisonsChange(Sender: TObject);
     procedure cbToggleInputDataToOutputFileChange(Sender: TObject);
     procedure cbUNCModeCompFoldersChange(Sender: TObject);
     procedure edtUNCPathCompareAChange(Sender: TObject);
@@ -515,8 +515,8 @@ type
     function  FormatByteSize(const bytes: QWord): string;
     function  RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     function RetrieveFileList(FolderName : string) : TStringList;
-    function HashFolderAList(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
-    function HashFolderBList(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
+    function HashFolderListA(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
+    function HashFolderListB(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
     function CompareHashLists(aHashList1, aHashlist2: TFPHashList): Boolean;
     function ComputeWhatHashesAreMissing(aHashList1, aHashList2 : TFPHashList) : TStringList;
     function GetSubDirListing(FolderName : string) : TStringList;
@@ -588,8 +588,6 @@ var
 
   {$R *.lfm}
 
-// Global function, CommitCount, keeps track of file counts and updates the SQLIte DB periodically
-// to avoid unnecessary database commits, which slow it down
 
 implementation
 
@@ -598,6 +596,8 @@ begin
 // see http://forum.lazarus.freepascal.org/index.php/topic,39842.0.html
 end;
 
+// Global function, CommitCount, keeps track of file counts and updates the SQLIte DB periodically
+// to avoid unnecessary database commits, which slow it down
 procedure TMainForm.CommitCount(Sender : TObject);
 begin
   inc(CommitFrequencyChecker, 1);
@@ -624,18 +624,23 @@ begin
   y := screen.Height;
   tmp := 1;
 
+  {No longer needed since v3.2.0 due to implementing "LCL Scaling" in project options
+  but lets keep it here for now in case users report issues
+
   if x < MainForm.Width then
     begin
        MainForm.Width := x - 50;
        frmDisplayGrid1.Width := MainForm.Width - 20;
+       frmDisplayGrid3.Width := MainForm.Width - 20;
      end;
 
   if y < MainForm.Height then
     begin
        Mainform.Height := y - 50;
        frmDisplayGrid1.Width := MainForm.Width - 20;
+       frmDisplayGrid3.Width := MainForm.Width - 20;
     end;
-
+  }
   StartHashing := false;
   StopScan1    := false;
   StopScan2    := false;
@@ -674,28 +679,6 @@ begin
   AlgorithmChoiceRadioBox6.Items.Strings[5] := 'xxHash32';
   MainForm.Caption := MainForm.Caption + ', 32-bit';
   {$endif}
-
-  // Better to have some folder icons for each node of the tree but
-  // I can't work out at the moment how to do it for ever folder.
-  // The following only does the root nodes.
-
-  // Place a folder icon for each node of the trees
- { z := 0;
-  for z := 0 to DirListA.Items.Count -1 do
-  begin
-    DirListA.Items[z].ImageIndex := 0; // Add the folder icon for each DirListA node
-    if DirListA.Items[z].HasChildren then
-      for y := 0 to DirListA.Items[y].Count do
-      begin
-        DirListA.Items[y].Index:=;
-      end;
-  end;
-
-  z := 0;
-  for z := 0 to DirListB.Items.Count -1 do
-  begin
-    DirListB.Items[z].ImageIndex := 0; // Add the folder icon for each DirListB node
-  end;  }
 
   {$IFDEF WINDOWS}
     Label8.Caption            := '';
@@ -803,6 +786,7 @@ begin
     StartHashing := false;
   end;
 end;
+
 
 function TMainForm.RoundToNearest(TheDateTime,TheRoundStep:TDateTime):TdateTime;
   begin
@@ -1053,8 +1037,9 @@ procedure TMainForm.btnHashFileClick(Sender: TObject);
 var
   filename : string;
   fileHashValue : ansistring;
-  start, stop, elapsed, scheduleStartTime : TDateTime;
+  start, stop, scheduleStartTime : TDateTime;
   LoopCounter : integer;
+  elapsed, StartSecondsCounter, EndSecondsCounter : Int64;
 begin
   PageControl1.ActivePage := Tabsheet2;  // Ensure File tab activated if triggered via menu
   filename := '';
@@ -1100,7 +1085,9 @@ begin
             until scheduleStartTime = Now;
         end;
 
-        start := Now;
+        //start := Now;
+        start:=Now;
+        StartSecondsCounter := getTickCount;
         lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(Start);
 
         edtFileNameToBeHashed.Caption := (filename);
@@ -1111,11 +1098,11 @@ begin
         StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
         OpenDialog1.Close;
-
         stop := Now;
-        elapsed := stop - start;
+        EndSecondsCounter := getTickCount;
+        elapsed:=EndSecondsCounter - StartSecondsCounter;
         lbEndedFileAt.Caption    := 'Ended at   : ' + DateTimeToStr(stop);
-        lblFileTimeTaken.Caption := 'Time taken : ' + FormatDateTime('HH:MM:SS', elapsed);
+        lblFileTimeTaken.Caption := 'Time taken : ' + IntToStr(elapsed DIV 1000) + ' secs';
         Application.ProcessMessages;
 
         // If the user has ane existing hash to check in expected hash value field,
@@ -1149,8 +1136,8 @@ begin
     begin
       ShowMessage('Enter text into the text field first.');
       exit;
-    end;
-
+    end
+  else
   try
     slLBL := TStringListUTF8.Create;
     if not cbToggleInputDataToOutputFile.Checked then
@@ -1447,6 +1434,9 @@ begin
       6: begin
       ChosenHashAlg := 'Blake2B';
       end;
+      7: begin
+      ChosenHashAlg := 'Blake3';
+      end;
   end;
   if lblFileAHash.Caption = '...' then
     exit
@@ -1483,6 +1473,9 @@ begin
       end;
       6: begin
       ChosenHashAlg := 'Blake2B';
+      end;
+      7: begin
+      ChosenHashAlg := 'Blake3';
       end;
   end;
   if lblFileBHash.Caption = '...' then
@@ -1760,11 +1753,15 @@ begin
 
 end;
 
-
 // These radio click events are to ensure the same hash algorithm is chosen
-// for all the tabs, if the user changes it from the default. New to v.2.8.2
-// Ensure all radio buttons equal MD5
-procedure TMainForm.AlgorithmChoiceRadioBox1Click(Sender: TObject);
+// for all the tabs, if the user changes it from the default. New to v.2.8.2.
+// Note that as of v3.2.0, there are 7 RadioBoxes. Each box has 8 options.
+// So new click procedures are not needed for every new algorithm added. Only when
+// new Radio Boxes are added. Example : AlgorithmChoiceRadioBox1 has 8 options.
+// But as long Radio Box's 2, 3, 4, 5, 6 are 'refreshed' they will show the selected
+// radio, which might be 1 (MD5) or 8 (Blake3).
+
+procedure TMainForm.AlgorithmChoiceRadioBox1Click(Sender: TObject);      // Ensure all radio buttons equal MD5
 begin
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
   AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
@@ -1773,8 +1770,8 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox1.ItemIndex;
 end;
-// Ensure all radio buttons equal SHA-1
-procedure TMainForm.AlgorithmChoiceRadioBox2Click(Sender: TObject);
+
+procedure TMainForm.AlgorithmChoiceRadioBox2Click(Sender: TObject);        // Ensure all radio buttons equal SHA-1
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
   AlgorithmChoiceRadioBox3.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
@@ -1783,8 +1780,8 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox2.ItemIndex;
 end;
-// Ensure all radio buttons equal SHA-3 (256 bit mode)
-procedure TMainForm.AlgorithmChoiceRadioBox3Click(Sender: TObject);
+
+procedure TMainForm.AlgorithmChoiceRadioBox3Click(Sender: TObject);        // Ensure all radio buttons equal SHA-3 (256 bit mode)
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
@@ -1793,8 +1790,8 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox3.ItemIndex;
 end;
-// Ensure all radio buttons equal SHA256
-procedure TMainForm.AlgorithmChoiceRadioBox4Click(Sender: TObject);
+
+procedure TMainForm.AlgorithmChoiceRadioBox4Click(Sender: TObject);        // Ensure all radio buttons equal SHA256
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
@@ -1803,8 +1800,8 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox4.ItemIndex;
 end;
-// Ensure all radio buttons equal SHA512
-procedure TMainForm.AlgorithmChoiceRadioBox5Click(Sender: TObject);
+
+procedure TMainForm.AlgorithmChoiceRadioBox5Click(Sender: TObject);        // Ensure all radio buttons equal SHA512
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
@@ -1813,8 +1810,8 @@ begin
   AlgorithmChoiceRadioBox6.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox5.ItemIndex;
 end;
-// Ensure all radio buttons equal xxHash
-procedure TMainForm.AlgorithmChoiceRadioBox6Click(Sender: TObject);
+
+procedure TMainForm.AlgorithmChoiceRadioBox6Click(Sender: TObject);        // Ensure all radio buttons equal xxHash
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
@@ -1823,8 +1820,8 @@ begin
   AlgorithmChoiceRadioBox5.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
   AlgorithmChoiceRadioBox7.ItemIndex := AlgorithmChoiceRadioBox6.ItemIndex;
 end;
-// Ensure all radio buttons equal Blake2B (256 bit mode)
-procedure TMainForm.AlgorithmChoiceRadioBox7Click(Sender: TObject);
+
+procedure TMainForm.AlgorithmChoiceRadioBox7Click(Sender: TObject);        // Ensure all radio buttons equal Blake2B (256 bit mode)
 begin
   AlgorithmChoiceRadioBox1.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
   AlgorithmChoiceRadioBox2.ItemIndex := AlgorithmChoiceRadioBox7.ItemIndex;
@@ -2201,21 +2198,6 @@ begin
   end;
 end;
 
-procedure TMainForm.cbOverrideFileCountDifferChange(Sender: TObject);
-begin
-  if cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := true;
-  if not cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := false;
-end;
-
-// Whenever the cbSaveComparisons checkbox is changed, check if the cbOverrideFileCountDiffer
-// checkbox is also checked. If it is, prevent the user from making cbSaveComparison unchecked
-// Because the program has to be able to save the results if the user wishes to
-// override the file count check and hash the files even if there is mis-count
-procedure TMainForm.cbSaveComparisonsChange(Sender: TObject);
-begin
-  if cbOverrideFileCountDiffer.Checked then cbSaveComparisons.Checked := true;
-end;
-
 
 procedure TMainForm.Panel1CopyAndHashOptionsClick(Sender: TObject);
 begin
@@ -2315,13 +2297,21 @@ var
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
   frmSQLiteDBases.EmptyDBTable('TBL_FILES', RecursiveDisplayGrid1);
-
-  // Now get the user to choose his folder for hashing
+  // Now get the user to choose his folder for hashing, or, use the existing
+  // folder name if triggered by algorithms selection change
+  if SelectDirectoryDialog1.FileName = '' then
+  begin
   if SelectDirectoryDialog1.Execute then
     begin
       DirSelectedField.Caption := SelectDirectoryDialog1.FileName;
       DirToHash := SelectDirectoryDialog1.FileName;
-
+    end;
+  end
+  else
+  begin
+    DirSelectedField.Caption := SelectDirectoryDialog1.FileName;
+    DirToHash := SelectDirectoryDialog1.FileName;
+  end;
       {$ifdef Windows}
       // If chosen path is a UNC path, we need to append the UNC prefix to the
       // Unicode 32K long API call of \\?\
@@ -2455,8 +2445,8 @@ var
        begin
          StatusBar2.SimpleText:= 'See rightmost column for hashset correlations. ' + IntToStr(CountHashesInKnownList) + ' unique hashes are in the imported hash list';
        end;
-    end; // end of SelectDirectoryDialog1.Execute
-end;
+  end; // end of SelectDirectoryDialog1.Execute
+
 
 
 // The clipboard button on the 'FileS' tab, this will copy the DBGrid to clipboard
@@ -2520,15 +2510,34 @@ end;
 
 function TMainForm.CompareHashLists(aHashList1, aHashlist2: TFPHashList): Boolean;
 var
-  i: Integer;
+  i, j : integer;
 begin
   Result := False;
+  // First check the count value matches. If it doesnt then they;ll never match to exit and return false
   if (aHashList1.Count <> aHashlist2.Count) then
+  begin
     Exit;
-  for i := 0 to aHashList1.Count-1 do
-    if (aHashlist2.FindIndexOf(aHashList1.NameOfIndex(i)) < 0) then
-      Exit;
-  Result := True;
+  end
+  else
+    begin
+    for i := 0 to aHashList1.Count-1 do
+      begin
+        if (aHashlist2.FindIndexOf(aHashList1.NameOfIndex(i)) < 0) then
+        begin
+          result := false;
+          Exit;
+        end;
+      end;
+    for j := 0 to aHashList2.Count-1 do
+      begin
+        if (aHashlist1.FindIndexOf(aHashList2.NameOfIndex(j)) < 0) then
+        begin
+          Result := false;
+          Exit;
+        end;
+      end;
+    end;
+    Result := true; //if we get this far, both lists must match
 end;
 
 function TMainForm.ComputeWhatHashesAreMissing(aHashList1, aHashList2 : TFPHashList) : TStringList;
@@ -2569,7 +2578,7 @@ var
 
   slFileListA, slFileListB, slMissingHashes  : TStringList;
 
-  HashListA, HashListB : TFPHashList;
+  tfpHashListA, tfpHashListB : TFPHashList;
 
   NeedToSave : Boolean;
 
@@ -2593,6 +2602,10 @@ begin
   lblTotalFileCountNumberA.Caption := '';
   lblTotalFileCountNumberB.Caption := '';
   memFolderCompareSummary.Clear;
+
+  // Empty database table TBL_COMPARE_TWO_FOLDERS from earlier runs, otherwise entries from
+  // previous runs will be listed with this new run
+   frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS', frmDisplayGrid3.dbGridC2F);
 
   if cbUNCModeCompFolders.Checked then
   begin
@@ -2726,78 +2739,73 @@ begin
         FolderBFileCount := slFileListB.Count;
         lblTotalFileCountNumberB.Caption := IntToStr(FolderBFileCount);
 
+        //Populate database with all rows required for the biggest of the two folders
+        // If they match, just use the FolderA file count
+        if FolderAFileCount > FolderBFileCount then
+        begin
+        frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderAFileCount);
+        end
+          else if FolderBFileCount > FolderAFileCount then
+          begin
+          frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderBFileCount);
+          end
+            else if FolderAFileCount = FolderBFileCount then
+            begin
+            frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderAFileCount);
+            end;
+
         // If the file counts match in both Folders
 
         if FolderAFileCount = FolderBFileCount then
         begin
           // Compare the result.
           StatusBar6.SimpleText:= 'File count matches. Now comparing files in both folders using hashing...';
-          HashListA := HashFolderAList(FolderA, slFileListA, FolderAFileCount, NeedToSave);
-          HashListB := HashFolderBList(FolderB, slFileListB, FolderBFileCount, NeedToSave);
+          tfpHashListA := HashFolderListA(FolderA, slFileListA, FolderAFileCount, NeedToSave);
+          tfpHashListB := HashFolderListB(FolderB, slFileListB, FolderBFileCount, NeedToSave);
 
-          if CompareHashLists(HashListA, HashListB) then
+          if CompareHashLists(tfpHashListA, tfpHashListB) then
             begin
               memFolderCompareSummary.Lines.Add('Result : MATCH!');
-              StatusBar6.SimpleText := 'The files of both folders are the same. MATCH!';
+              StatusBar6.SimpleText := 'The file CONTENT of both folders are the same. MATCH!';
             end
           else
           begin
             memFolderCompareSummary.Lines.Add('Result : MIS-MATCH!');
-            StatusBar6.SimpleText := 'The files of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!';
+            StatusBar6.SimpleText := 'The file CONTENT of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!';
           end;
-          HashListA.Free;
-          HashListB.Free;
-        end; // End of if FileCounts match
-
-        // If the Folder A has less files than FolderB and user is not interested in proceeding
-        if (FolderAFileCount < FolderBFileCount) AND (cbOverrideFileCountDiffer.Checked = false) then
+          tfpHashListA.Free;
+          tfpHashListB.Free;
+        end // End of if FileCounts match
+        else
+        begin
+          if (FolderAFileCount < FolderBFileCount) then
           begin
+            StatusBar6.SimpleText:= 'FolderA has less files than FolderB. Comparing files in both folders using hashing...';
+            tfpHashListB := HashFolderListA(FolderB, slFileListB, FolderBFileCount, NeedToSave);
+            tfpHashListA := HashFolderListB(FolderA, slFileListA, FolderAFileCount, NeedToSave);
             FileCountDifference    := FolderBFileCount-FolderAFileCount;
             StatusBar6.SimpleText  := 'The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.';
             memFolderCompareSummary.Lines.Add('The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.');
-            memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
             pbCompareDirA.Position := 100;
             pbCompareDirB.Position := 100;
+            tfpHashListA.Free;
+            tfpHashListB.Free;
           end
-        else
-          // If the Folder B has less files than FolderA and user is not interested in proceeding
-          if (FolderAFileCount > FolderBFileCount) AND (cbOverrideFileCountDiffer.Checked = false) then
-          begin
-            FileCountDifference      := FolderAFileCount-FolderBFileCount;
-            StatusBar6.SimpleText    := 'The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.';
-            memFolderCompareSummary.Lines.Add('The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.');
-            memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
-            pbCompareDirA.Position   := 100;
-            pbCompareDirB.Position   := 100;
-          end
-            else
-            // There is a file count difference, but the user still wants to proceed with the comparison anyway
-            // He has checked the box cbOverrideFileCountDiffer "Cont. if count differs?"
-            if ((FolderAFileCount > FolderBFileCount) OR (FolderBFileCount > FolderAFileCount)) AND (cbOverrideFileCountDiffer.Checked = true) then
+          else
+            if (FolderAFileCount > FolderBFileCount) then
             begin
+              StatusBar6.SimpleText:= 'FolderA has more files than FolderB. Comparing files in both folders using hashing...';
+              tfpHashListA := HashFolderListA(FolderA, slFileListA, FolderAFileCount, NeedToSave);
+              tfpHashListB := HashFolderListB(FolderB, slFileListB, FolderBFileCount, NeedToSave);
               FileCountDifference      := FolderAFileCount-FolderBFileCount;
-              StatusBar6.SimpleText:= 'File count mis-matches by ' + IntToStr(FileCountDifference) + ' but you chose to hash anyway. Comparing files in both folders using hashing...';
-              memFolderCompareSummary.Lines.Add('File count mis-matches by ' + IntToStr(FileCountDifference) + ' but you chose to hash anyway.');
-              memFolderCompareSummary.Lines.Add(lblFolderAName.Caption + ' contains ' + lblTotalFileCountNumberA.Caption + ' files, ' + lblFolderBName.Caption + ' contains ' + lblTotalFileCountNumberB.Caption + ' files.');
-              memFolderCompareSummary.Lines.Add('Now hashing files...please wait');
-              HashListA := HashFolderAList(FolderA, slFileListA, FolderAFileCount, NeedToSave);
-              HashListB := HashFolderBList(FolderB, slFileListB, FolderBFileCount, NeedToSave);
-              try
-                slMissingHashes := TStringList.Create;
-                slMissingHashes := ComputeWhatHashesAreMissing(HashListA, HashListB);
-                for i := 0 to slMissingHashes.Count -1 do
-                  begin
-                    RogueHash := 'Missing Hash Value: ' + slMissingHashes.Strings[i] + #13#10;
-                    lenRogueHash := Length(RogueHash);
-                    fsSaveFolderComparisonsLogFile.Write(RogueHash[1], lenRogueHash);
-                  end;
-              finally
-                slMissingHashes.free;
-                HashListA.Free;
-                HashListB.Free;
-              end;
-              StatusBar6.SimpleText := 'Completed but with differences. MIS-MATCH. Check the log file';
-            end;
+              StatusBar6.SimpleText    := 'The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.';
+              memFolderCompareSummary.Lines.Add('The file count of both folders are NOT the same by ' + IntToStr(FileCountDifference) + ' files.');
+              pbCompareDirA.Position   := 100;
+              pbCompareDirB.Position   := 100;
+              tfpHashListA.Free;
+              tfpHashListB.Free;
+            end
+        end;
       finally
         slFileListB.Free; // Release FileListB
       end;
@@ -2813,41 +2821,36 @@ begin
   memFolderCompareSummary.Lines.Add('Files in Folder A : '      + IntToStr(FolderAFileCount));
   memFolderCompareSummary.Lines.Add('Files in Folder B : '      + IntToStr(FolderBFileCount));
   memFolderCompareSummary.Lines.Add('File count differs by : '  + IntToStr(FileCountDifference));
-  if (FileCountDifference > 0) AND (cbOverrideFileCountDiffer.Checked = false) then
-   begin
-     memFolderCompareSummary.Lines.Add('To establish differences, tick box "Cont. if count differs?" and re-run');
-   end;
   memFolderCompareSummary.Lines.Add('Finished analysis');
 
-  if cbSaveComparisons.Checked then
+  if NeedToSave then
     begin
-      try
-      // Save the memo data to the file too. Useful regardless of whether files were
-      // just counted and found to be different by file count, or whether they were
-      // hashed and found to be the same or different
-      if NeedToSave then
-        begin
-          fsSaveFolderComparisonsLogFile.Write(memFolderCompareSummary.Text[1], Length(memFolderCompareSummary.Text));
-        end;
-      finally
-        memFolderCompareSummary.Lines.Add('Results saved to ' + fsSaveFolderComparisonsLogFile.FileName);
-        fsSaveFolderComparisonsLogFile.Free;
-      end;
+      fsSaveFolderComparisonsLogFile.Write(memFolderCompareSummary.Text[1], Length(memFolderCompareSummary.Text));
+      memFolderCompareSummary.Lines.Add('Results saved to ' + fsSaveFolderComparisonsLogFile.FileName);
+      fsSaveFolderComparisonsLogFile.Free;
     end;
-    Application.ProcessMessages;
+  Application.ProcessMessages;
   end // End of If DirectoryExists...
   else
   begin
     ShowMessage('Invalid folders. Please select valid FolderA and FolderB');
     exit;
   end;
+
+   // Commit any final database values that may not have yet been comitted
+   // and make the display grid of compared folder content visible
+  frmSQLiteDBases.SQLTransaction1.CommitRetaining;
+  frmSQLiteDBases.UpdateGridCOMPARETWOFOLDERSTAB(nil);
+  frmDisplayGrid3.Visible := true;
+  frmDisplayGrid3.Show;
 end;
 
-function TMainForm.HashFolderAList(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
+function TMainForm.HashFolderListA(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
 var
   HashListA  : TFPHashList;
   i, FilesProcessedA, StringLength : integer;
-  HashVal, StringToWrite, HeaderLineA, HeaderLineB : string;
+  StringToWrite, HeaderLineA, HeaderLineB : string;
+  HashVal : shortstring;  // limit string to 255 chars. SHA512 (the longest) is 128 chars
 begin
   FilesProcessedA := 0;
   // Now hash the files in FolderA
@@ -2866,23 +2869,39 @@ begin
         {$ENDIF}
       {$endif}
 
+    // Create and initialise hash list
     HashListA := TFPHashList.Create;
     HeaderLineA := 'Computed hashes from ' + Path + ' : ' + #13#10;
     HeaderLineB := '=====================' + #13#10;
 
-    fsSaveFolderComparisonsLogFile.Write(HeaderLineA[1], Length(HeaderLineA));
-    fsSaveFolderComparisonsLogFile.Write(HeaderLineB[1], Length(HeaderLineB));
+    if SaveData then
+    begin
+      fsSaveFolderComparisonsLogFile.Write(HeaderLineA[1], Length(HeaderLineA));
+      fsSaveFolderComparisonsLogFile.Write(HeaderLineB[1], Length(HeaderLineB));
+    end;
 
     for i := 0 to slFileListA.Count -1 do
     begin
       if FileSize(slFileListA.Strings[i]) > 0 then
         begin
         HashVal := CalcTheHashFile(slFileListA.Strings[i]);
-        HashListA.Add(HashVal, Pointer(HashVal));
+        HashListA.Add(HashVal, @HashVal);
+        // Write values to database. +1 because DB rowcount is not zero based
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+
         if SaveData then
           begin
             StringLength := -1;
-            StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+            {$ifdef Windows}
+              StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+            {$else}
+              {$ifdef Darwin}
+                StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+            {$endif}
+              {$IFDEF UNIX and !$ifdef Darwin}
+                StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+              {$ENDIF}
+            {$endif}
             StringLength := Length(StringToWrite);
             fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
           end;
@@ -2892,14 +2911,26 @@ begin
       else
       begin
         HashVal := 'ZERO BYTE FILE';
-        HashListA.Add(HashVal, Pointer(HashVal));
+        HashListA.Add(HashVal, @HashVal);
+        // Write values to database
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+
         if SaveData then
-          begin
-            StringLength := -1;
+         begin
+          StringLength := -1;
+          {$ifdef Windows}
             StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
-            StringLength := Length(StringToWrite);
-            fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
-          end;
+          {$else}
+            {$ifdef Darwin}
+              StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+          {$endif}
+            {$IFDEF UNIX and !$ifdef Darwin}
+              StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+            {$ENDIF}
+          {$endif}
+          StringLength := Length(StringToWrite);
+          fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
+        end;
         inc(FilesProcessedA, 1);
         pbCompareDirA.Position := ((FilesProcessedA * 100) DIV intFileCount);
       end;
@@ -2909,11 +2940,12 @@ begin
   end;
 end;
 
-function TMainForm.HashFolderBList(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
+function TMainForm.HashFolderListB(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
 var
   HashListB : TFPHashList;
   j, FilesProcessedB, StringLength : integer;
-  HashVal, StringToWrite, HeaderLineA, HeaderLineB : string;
+  StringToWrite, HeaderLineA, HeaderLineB : string;
+  HashVal : shortstring;  // limit string to 255 chars. SHA512 (the longest) is 128 chars
 begin
   FilesProcessedB := 0;
   // Now hash the files in FolderB
@@ -2932,37 +2964,65 @@ begin
         {$ENDIF}
       {$endif}
 
+    // Create and initialise hash list
     HashListB := TFPHashList.Create;
     HeaderLineA := 'Computed hashes from ' + Path + ' : ' + #13#10;
     HeaderLineB := '=====================' + #13#10;
 
-    fsSaveFolderComparisonsLogFile.Write(HeaderLineA[1], Length(HeaderLineA));
-    fsSaveFolderComparisonsLogFile.Write(HeaderLineB[1], Length(HeaderLineB));
+    if SaveData then
+    begin
+      fsSaveFolderComparisonsLogFile.Write(HeaderLineA[1], Length(HeaderLineA));
+      fsSaveFolderComparisonsLogFile.Write(HeaderLineB[1], Length(HeaderLineB));
+    end;
 
     for j := 0 to slFileListB.Count -1 do
     begin
       if FileSize(slFileListB.Strings[j]) > 0 then
         begin
           HashVal := CalcTheHashFile(slFileListB.Strings[j]);
-          HashListB.Add(HashVal, Pointer(HashVal));
+          HashListB.Add(HashVal, @HashVal);
+          // Write values to database  +1 because DB rowcount is not zero based
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+
           if SaveData then
             begin
               StringLength := -1;
-              StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+              {$ifdef Windows}
+               StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+              {$else}
+               {$ifdef Darwin}
+                 StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+              {$endif}
+               {$IFDEF UNIX and !$ifdef Darwin}
+                 StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+               {$ENDIF}
+              {$endif}
               StringLength := Length(StringToWrite);
               fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
-            end;
+              end;
           inc(FilesProcessedB, 1);
           pbCompareDirB.Position := ((FilesProcessedB * 100) DIV intFileCount);
         end
       else
       begin
         HashVal := 'ZERO BYTE FILE';
-        HashListB.Add(HashVal, Pointer(HashVal));
+        HashListB.Add(HashVal, @HashVal);
+        // Write values to database
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+
         if SaveData then
           begin
             StringLength := -1;
-            StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+            {$ifdef Windows}
+              StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+            {$else}
+             {$ifdef Darwin}
+               StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+            {$endif}
+             {$IFDEF UNIX and !$ifdef Darwin}
+               StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+             {$ENDIF}
+            {$endif}
             StringLength := Length(StringToWrite);
             fsSaveFolderComparisonsLogFile.Write(StringToWrite[1], StringLength);
           end;
@@ -2974,6 +3034,7 @@ begin
     result := HashListB;
   end;
 end;
+
 // btnClearTextAreaClick : Clears the whole text field if the user requests to do so
 procedure TMainForm.btnClearTextAreaClick(Sender: TObject);
 begin
@@ -3082,7 +3143,7 @@ begin
           begin
             // Empty database table TBL_COPY from any earlier runs, otherwise entries from
             // previous runs will be listed with this new run
-            frmSQLiteDBases.EmptyDBTable('TBL_COPY', frmDisplayGrid1.RecursiveDisplayGrid_COPY);
+            frmSQLiteDBases.EmptyDBTableCOPY('TBL_COPY', frmDisplayGrid1.RecursiveDisplayGrid_COPY);
 
             Application.ProcessMessages;
 
@@ -3246,59 +3307,57 @@ begin
     Application.ProcessMessages;
     Abort;
   end
-  else
+  else if lblschedulertickboxCompareTab.Checked then
     begin
-      if lblschedulertickboxCompareTab.Checked then
+      if ZVDateTimePickerCompareTab.DateTime < Now then
       begin
-        if ZVDateTimePickerCompareTab.DateTime < Now then
-        begin
-         ShowMessage('Scheduled start time is in the past. Correct it.');
-         exit;
-        end
-        else
-        scheduleStartTime     := ZVDateTimePickerCompareTab.DateTime;
-        StatusBar4.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
-         repeat
-           // This sleep loop avoids straining the CPU too much but also ensures the
-           // interface stays responsive to button clicks etc.
-           // So every 1K itteration, refresh the interface until the scheduled start
-           // arrives or the user clicks Abort.
-           inc(LoopCounter,1);
-           if LoopCounter = 1000 then
-             begin
-               Application.ProcessMessages;
-               LoopCounter := 0;
-             end;
-           sleep(0);
-         until scheduleStartTime = Now;
-      end;
-      // FileA
-      StatusBar4.SimpleText := 'Computing hash of ' + FileA + '...';
-
-      if LazFileUtils.FileExistsUTF8(FileA) then
-      begin
-        Application.ProcessMessages;
-        FileAHash := Uppercase(CalcTheHashFile(FileA));
-        lblFileAHash.Caption := FileAHash;
+       ShowMessage('Scheduled start time is in the past. Correct it.');
+       exit;
       end
-      else ShowMessage('File A is invalid or cannot be accessed');
-
-      //FileB
-      StatusBar4.SimpleText := 'Computing hash of ' + FileB + '...';
-      if LazFileUtils.FileExistsUTF8(FileB) then
-      begin
-        Application.ProcessMessages;
-        FileBHash := Uppercase(CalcTheHashFile(FileB));
-        lblFileBHash.Caption := FileBHash;
-      end
-      else ShowMessage('File B is invalid or cannot be accessed');
-
-      // Compare FileA and FileB Hash values
-      CompareTwoHashes(FileAHash, FileBHash);
-      StatusBar4.SimpleText := 'Hash comparison complete.';
-      btnCompareTwoFilesSaveAs.Enabled := true;
-      Application.ProcessMessages;
+      else
+      scheduleStartTime     := ZVDateTimePickerCompareTab.DateTime;
+      StatusBar4.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
+       repeat
+         // This sleep loop avoids straining the CPU too much but also ensures the
+         // interface stays responsive to button clicks etc.
+         // So every 1K itteration, refresh the interface until the scheduled start
+         // arrives or the user clicks Abort.
+         inc(LoopCounter,1);
+         if LoopCounter = 1000 then
+           begin
+             Application.ProcessMessages;
+             LoopCounter := 0;
+           end;
+         sleep(0);
+       until scheduleStartTime = Now;
     end;
+
+    // FileA
+    StatusBar4.SimpleText := 'Computing hash of ' + FileA + '...';
+
+    if LazFileUtils.FileExistsUTF8(FileA) then
+    begin
+      Application.ProcessMessages;
+      FileAHash := Uppercase(CalcTheHashFile(FileA));
+      lblFileAHash.Caption := FileAHash;
+    end
+    else ShowMessage('File A is invalid or cannot be accessed');
+
+    //FileB
+    StatusBar4.SimpleText := 'Computing hash of ' + FileB + '...';
+    if LazFileUtils.FileExistsUTF8(FileB) then
+    begin
+      Application.ProcessMessages;
+      FileBHash := Uppercase(CalcTheHashFile(FileB));
+      lblFileBHash.Caption := FileBHash;
+    end
+    else ShowMessage('File B is invalid or cannot be accessed');
+
+  // Compare FileA and FileB Hash values
+  CompareTwoHashes(FileAHash, FileBHash);
+  StatusBar4.SimpleText := 'Hash comparison complete.';
+  btnCompareTwoFilesSaveAs.Enabled := true;
+  Application.ProcessMessages;
 end;
 
 procedure TMainForm.btnCompareTwoFilesSaveAsClick(Sender: TObject);
@@ -3328,6 +3387,9 @@ begin
       end;
       6: begin
       ChosenHashAlg := 'Blake2b';
+      end;
+      7: begin
+      ChosenHashAlg := 'Blake3';
       end;
   end;
   slCompareTwoFiles := TStringList.Create;
@@ -3413,7 +3475,8 @@ end;
 procedure TMainForm.AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
 var
   HashValue : ansistring;
-  start, stop, elapsed : TDateTime;
+  start, stop : TDateTime;
+  elapsed, StartSecondsCounter, EndSecondsCounter : Int64;
 begin
   if edtFileNameToBeHashed.Text <> 'File being hashed...' then
     begin
@@ -3424,15 +3487,17 @@ begin
       memFileHashField.Clear;
       StatusBar1.SimpleText := 'RECOMPUTING NEW HASH VALUE...Please wait.';
       start := Now;
+      StartSecondsCounter := GetTickCount;
       lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(start);
       Application.ProcessMessages;
       HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text);
       memFileHashField.Lines.Add(Uppercase(HashValue));
       stop := Now;
-      elapsed := stop - start;
+      EndSecondsCounter := GetTickCount;
+      elapsed := EndSecondsCounter - StartSecondsCounter;
       StatusBar1.SimpleText := 'RECOMPUTED NEW HASH VALUE.';
       lbEndedFileAt.Caption:= 'Ended at : '+ DateTimeToStr(stop);
-      lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
+      lblFileTimeTaken.Caption := 'Time taken : '+ IntToStr(elapsed DIV 1000);;
       // If the user has pasted an expected hash value, since the last hash computation,
       // then check if it matches the newly computed hash
       lbleExpectedHashChange(self);
@@ -3474,18 +3539,30 @@ end;
 function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 var
   TabRadioGroup1: TRadioGroup;
+  test : TBytes;
+  HashInstanceBlake3 : IHash;
+  HashInstanceResultBlake3 : IHashResult;
 begin
   TabRadioGroup1 := AlgorithmChoiceRadioBox1;
   result := '';
   if Length(strToBeHashed) > 0 then
     begin
       case PageControl1.TabIndex of
+
+        0: TabRadioGroup1 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
+        1: TabRadioGroup1 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
+        2: TabRadioGroup1 := AlgorithmChoiceRadioBox3;  //RadioGroup for FileS.
+        3: TabRadioGroup1 := AlgorithmChoiceRadioBox4;  //RadioGroup for Copy.
+        4: TabRadioGroup1 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
+        5: TabRadioGroup1 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Two Folders.
+        7: TabRadioGroup1 := AlgorithmChoiceRadioBox7;  //RadioGroup for Base64
+        {
         0: TabRadioGroup1 := AlgorithmChoiceRadioBox1;  //RadioGroup on the 1st tab.
         1: TabRadioGroup1 := AlgorithmChoiceRadioBox2;  //RadioGroup on the 2nd tab.
         2: TabRadioGroup1 := AlgorithmChoiceRadioBox3;  //RadioGroup on the 3rd tab.
         3: TabRadioGroup1 := AlgorithmChoiceRadioBox4;  //RadioGroup on the 4th tab.
         4: TabRadioGroup1 := AlgorithmChoiceRadioBox6;  //RadioGroup on the 5th tab.
-        5: TabRadioGroup1 := AlgorithmChoiceRadioBox7;  //RadioGroup on the 6th tab.
+        5: TabRadioGroup1 := AlgorithmChoiceRadioBox7;  //RadioGroup on the 6th tab.}
       end;
 
       case TabRadioGroup1.ItemIndex of
@@ -3512,7 +3589,14 @@ begin
            {$endif}
            end;
         6: begin
-             result := THashFactory.TCrypto.CreateBlake2B_256.ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // SHA-3 (new as of v3.1.0)
+             result := THashFactory.TCrypto.CreateBlake2B_256.ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // Blake2B, added to v3.1.0
+           end;
+        7: begin                                                                                                        // Blake3, new as of v3.2.0
+             HashInstanceBlake3 := THashFactory.TCrypto.CreateBlake3_256(nil);
+             HashInstanceBlake3.Initialize();
+             HashInstanceBlake3.TransformString(strToBeHashed, TEncoding.UTF8);
+             HashInstanceResultBlake3 := HashInstanceBlake3.TransformFinal();
+             result := HashInstanceResultBlake3.ToString()
            end;
       end;  // end of case statement
     end; // End of string length check
@@ -3524,20 +3608,22 @@ const
 var
   TabRadioGroup2: TRadioGroup;
   fsFileToBeHashed: TFileStream;
-  // HashLib4Pascal types for MD5, SHA-1, SHA3-256, SHA256, SHA-512 and Blake2B
+  // HashLib4Pascal types for MD5, SHA-1, SHA3-256, SHA256, SHA-512, Blake2B and Blake3
   HashInstanceMD5,
   HashInstanceSHA1,
   HashInstanceSHA3,
   HashInstanceSHA256,
   HashInstanceSHA512,
-  HashInstanceBlake2B       : IHash;
+  HashInstanceBlake2B,
+  HashInstanceBlake3        : IHash;
 
   HashInstanceResultMD5,
   HashInstanceResultSHA1,
   HashInstanceResultSHA3,
   HashInstanceResultSHA256,
   HashInstanceResultSHA512,
-  HashInstanceResultBlake2B : IHashResult;
+  HashInstanceResultBlake2B,
+  HashInstanceResultBlake3  : IHashResult;
 
   // HashLib4Pascal types for xxHash. xxHash64 is crazy fast on 64, but if run on a 32-bit
   // system, performance is hindered considerably. So for this algorithm, CPU dependant
@@ -3843,6 +3929,36 @@ begin
         HashInstanceResultBlake2B := HashInstanceBlake2B.TransformFinal();
         result := HashInstanceResultBlake2B.ToString()
         end; // End of Blake2B
+
+       7: begin
+          // Blake3
+          HashInstanceBlake3 := THashFactory.TCrypto.CreateBlake3_256(nil);
+          HashInstanceBlake3.Initialize();
+            repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceBlake3.TransformUntyped(Buffer, i);
+                // If the File tab is the tab doing the hashing, refresh the interface
+                if PageControl1.ActivePage = TabSheet2 then
+                  begin
+                  inc(TotalBytesRead_B, i);
+                  inc(LoopCounter, 1);
+                  if LoopCounter = 40 then
+                    begin
+                    pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                    lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                    LoopCounter := 0;
+                    Application.ProcessMessages;
+                    end;
+                  end;
+              end;
+            until false;
+          HashInstanceResultBlake3 := HashInstanceBlake3.TransformFinal();
+          result := HashInstanceResultBlake3.ToString()
+          end; // End of Blake3
     end; // end of case statement
   end // end of FileSize greater than zero byte check
   else
@@ -4542,9 +4658,7 @@ begin
       EndTime := Now;
       lblTimeTaken6B.Caption  := FormatDateTime('YYYY/MM/DD HH:MM:SS', EndTime);
       TimeDifference          := EndTime - StartTime;
-      //strTimeDifference       := FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference);  // This way doesn't return days elapsed.
-      strTimeDifference := (Format('%d days %s', [trunc(TimeDifference), FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference)]));  // But this way does return days elapsed. Thanks WP in the forum!
-
+      strTimeDifference       := (Format('%d days %s', [trunc(TimeDifference), FormatDateTime('h" hrs, "n" min, "s" sec"', TimeDifference)]));  // But this way does return days elapsed. Thanks WP in the forum!
       lblTimeTaken6C.Caption  := strTimeDifference;
 
       // Now lets save the generated values to a CSV file.

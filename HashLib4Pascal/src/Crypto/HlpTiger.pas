@@ -5,15 +5,10 @@ unit HlpTiger;
 interface
 
 uses
-{$IFDEF HAS_UNITSCOPE}
-  System.SysUtils,
-{$ELSE}
   SysUtils,
-{$ENDIF HAS_UNITSCOPE}
 {$IFDEF DELPHI}
-  HlpBitConverter,
-  HlpHashBuffer,
   HlpHash,
+  HlpHashBuffer,
 {$ENDIF DELPHI}
   HlpHashLibTypes,
   HlpConverters,
@@ -38,7 +33,7 @@ type
     C1 = UInt64($A5A5A5A5A5A5A5A5);
     C2 = UInt64($0123456789ABCDEF);
 
-    s_T1: array [0 .. 255] of UInt64 = (UInt64($02AAB17CF7E90C5E),
+    ST1: array [0 .. 255] of UInt64 = (UInt64($02AAB17CF7E90C5E),
       UInt64($AC424B03E243A8EC), UInt64($72CD5BE30DD5FCD3),
       UInt64($6D019B93F6F97F3A), UInt64($CD9978FFD21F9193),
       UInt64($7573A1C9708029E2), UInt64($B164326B922A83C3),
@@ -168,7 +163,7 @@ type
       UInt64($E72B3BD61464D43D), UInt64($A6300F170BDC4820),
       UInt64($EBC18760ED78A77A));
 
-    s_T2: array [0 .. 255] of UInt64 = (UInt64($E6A6BE5A05A12138),
+    ST2: array [0 .. 255] of UInt64 = (UInt64($E6A6BE5A05A12138),
       UInt64($B5A122A5B4F87C98), UInt64($563C6089140B6990),
       UInt64($4C46CB2E391F5DD5), UInt64($D932ADDBC9B79434),
       UInt64($08EA70E42015AFF5), UInt64($D765A6673E478CF1),
@@ -298,7 +293,7 @@ type
       UInt64($4DF7F0B7B1498371), UInt64($D62A2EABC0977179),
       UInt64($22FAC097AA8D5C0E));
 
-    s_T3: array [0 .. 255] of UInt64 = (UInt64($F49FCC2FF1DAF39B),
+    ST3: array [0 .. 255] of UInt64 = (UInt64($F49FCC2FF1DAF39B),
       UInt64($487FD5C66FF29281), UInt64($E8A30667FCDCA83F),
       UInt64($2C9B4BE3D2FCCE63), UInt64($DA3FF74B93FBBBC2),
       UInt64($2FA165D2FE70BA66), UInt64($A103E279970E93D4),
@@ -428,7 +423,7 @@ type
       UInt64($419CF6496412691C), UInt64($D3DC3BEF265B0F70),
       UInt64($6D0E60F5C3578A9E));
 
-    s_T4: array [0 .. 255] of UInt64 = (UInt64($5B0E608526323C55),
+    ST4: array [0 .. 255] of UInt64 = (UInt64($5B0E608526323C55),
       UInt64($1A46C1A9FA1B59F5), UInt64($A9E245A17C4C8FFA),
       UInt64($65CA5159DB2955D7), UInt64($05DB0A76CE35AFC2),
       UInt64($81EAC77EA9113D45), UInt64($528EF88AB6AC0A0D),
@@ -560,16 +555,17 @@ type
 
 {$ENDREGION}
   strict protected
-    Fm_rounds: Int32;
-    Fm_hash: THashLibUInt64Array;
+  var
+    FRounds: Int32;
+    FHash: THashLibUInt64Array;
 
-    constructor Create(a_hash_size: Int32; a_rounds: THashRounds);
+    constructor Create(AHashSize: Int32; ARounds: THashRounds);
 
     function GetName: String; override;
     function GetResult(): THashLibByteArray; override;
     procedure Finish(); override;
-    procedure TransformBlock(a_data: PByte; a_data_length: Int32;
-      a_index: Int32); override;
+    procedure TransformBlock(AData: PByte; ADataLength: Int32;
+      AIndex: Int32); override;
 
     function GetHashRound(AHashRound: Int32): THashRounds; inline;
 
@@ -583,7 +579,7 @@ type
   TTiger_Base = class sealed(TTiger)
 
   public
-    constructor Create(a_hash_size: Int32; a_rounds: THashRounds);
+    constructor Create(AHashSize: Int32; ARounds: THashRounds);
     function Clone(): IHash; override;
 
   end;
@@ -646,383 +642,379 @@ begin
   end;
 end;
 
-constructor TTiger.Create(a_hash_size: Int32; a_rounds: THashRounds);
+constructor TTiger.Create(AHashSize: Int32; ARounds: THashRounds);
 begin
-  Inherited Create(a_hash_size, 64);
-  System.SetLength(Fm_hash, 3);
-  Fm_rounds := Int32(a_rounds);
+  Inherited Create(AHashSize, 64);
+  System.SetLength(FHash, 3);
+  FRounds := Int32(ARounds);
 end;
 
 procedure TTiger.Finish;
 var
-  bits: UInt64;
-  padindex: Int32;
-  pad: THashLibByteArray;
-
+  LBits: UInt64;
+  LPadIndex: Int32;
+  LPad: THashLibByteArray;
 begin
-  bits := Fm_processed_bytes * 8;
-  if Fm_buffer.Pos < 56 then
-    padindex := 56 - Fm_buffer.Pos
+  LBits := FProcessedBytesCount * 8;
+  if FBuffer.Position < 56 then
+  begin
+    LPadIndex := 56 - FBuffer.Position
+  end
   else
-    padindex := 120 - Fm_buffer.Pos;
-  System.SetLength(pad, padindex + 8);
+  begin
+    LPadIndex := 120 - FBuffer.Position;
+  end;
+  System.SetLength(LPad, LPadIndex + 8);
 
-  pad[0] := 1;
+  LPad[0] := 1;
 
-  bits := TConverters.le2me_64(bits);
+  LBits := TConverters.le2me_64(LBits);
 
-  TConverters.ReadUInt64AsBytesLE(bits, pad, padindex);
+  TConverters.ReadUInt64AsBytesLE(LBits, LPad, LPadIndex);
 
-  padindex := padindex + 8;
+  LPadIndex := LPadIndex + 8;
 
-  TransformBytes(pad, 0, padindex);
-
+  TransformBytes(LPad, 0, LPadIndex);
 end;
 
 function TTiger.GetName: String;
 begin
-  Result := Format('%s_%u_%u', [Self.ClassParent.ClassName, Fm_rounds,
+  Result := Format('%s_%u_%u', [Self.ClassParent.ClassName, FRounds,
     Self.HashSize * 8]);
 end;
 
 function TTiger.GetResult: THashLibByteArray;
 begin
   System.SetLength(Result, HashSize);
-  TConverters.le64_copy(PUInt64(Fm_hash), 0, PByte(Result), 0,
+  TConverters.le64_copy(PUInt64(FHash), 0, PByte(Result), 0,
     System.Length(Result));
 end;
 
 procedure TTiger.Initialize;
 begin
-
-  Fm_hash[0] := $0123456789ABCDEF;
-  Fm_hash[1] := UInt64($FEDCBA9876543210);
-  Fm_hash[2] := UInt64($F096A5B4C3B2E187);
-
+  FHash[0] := $0123456789ABCDEF;
+  FHash[1] := UInt64($FEDCBA9876543210);
+  FHash[2] := UInt64($F096A5B4C3B2E187);
   Inherited Initialize();
-
 end;
 
-procedure TTiger.TransformBlock(a_data: PByte; a_data_length: Int32;
-  a_index: Int32);
+procedure TTiger.TransformBlock(AData: PByte; ADataLength: Int32;
+  AIndex: Int32);
 var
-  a, b, c, temp_a: UInt64;
-  rounds: Int32;
-  data: array [0 .. 7] of UInt64;
+  LA, LB, LC, LTempA: UInt64;
+  LRounds: Int32;
+  LData: array [0 .. 7] of UInt64;
 begin
+  TConverters.le64_copy(AData, AIndex, @(LData[0]), 0, ADataLength);
 
-  TConverters.le64_copy(a_data, a_index, @(data[0]), 0, a_data_length);
+  LA := FHash[0];
+  LB := FHash[1];
+  LC := FHash[2];
 
-  a := Fm_hash[0];
-  b := Fm_hash[1];
-  c := Fm_hash[2];
+  LC := LC xor LData[0];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 5;
 
-  c := c xor data[0];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 5;
+  LA := LA xor LData[1];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 5;
 
-  a := a xor data[1];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 5;
+  LB := LB xor LData[2];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 5;
 
-  b := b xor data[2];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 5;
+  LC := LC xor LData[3];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 5;
 
-  c := c xor data[3];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 5;
+  LA := LA xor LData[4];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 5;
 
-  a := a xor data[4];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 5;
+  LB := LB xor LData[5];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 5;
 
-  b := b xor data[5];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 5;
+  LC := LC xor LData[6];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 5;
 
-  c := c xor data[6];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 5;
+  LA := LA xor LData[7];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 5;
 
-  a := a xor data[7];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 5;
+  LData[0] := LData[0] - (LData[7] xor C1);
+  LData[1] := LData[1] xor LData[0];
+  LData[2] := LData[2] + LData[1];
+  LData[3] := LData[3] - (LData[2] xor (not LData[1] shl 19));
+  LData[4] := LData[4] xor LData[3];
+  LData[5] := LData[5] + LData[4];
+  LData[6] := LData[6] - (LData[5] xor (not LData[4] shr 23));
+  LData[7] := LData[7] xor LData[6];
+  LData[0] := LData[0] + LData[7];
+  LData[1] := LData[1] - (LData[0] xor (not LData[7] shl 19));
+  LData[2] := LData[2] xor LData[1];
+  LData[3] := LData[3] + LData[2];
+  LData[4] := LData[4] - (LData[3] xor (not LData[2] shr 23));
+  LData[5] := LData[5] xor LData[4];
+  LData[6] := LData[6] + LData[5];
+  LData[7] := LData[7] - (LData[6] xor C2);
 
-  data[0] := data[0] - (data[7] xor C1);
-  data[1] := data[1] xor data[0];
-  data[2] := data[2] + data[1];
-  data[3] := data[3] - (data[2] xor (not data[1] shl 19));
-  data[4] := data[4] xor data[3];
-  data[5] := data[5] + data[4];
-  data[6] := data[6] - (data[5] xor (not data[4] shr 23));
-  data[7] := data[7] xor data[6];
-  data[0] := data[0] + data[7];
-  data[1] := data[1] - (data[0] xor (not data[7] shl 19));
-  data[2] := data[2] xor data[1];
-  data[3] := data[3] + data[2];
-  data[4] := data[4] - (data[3] xor (not data[2] shr 23));
-  data[5] := data[5] xor data[4];
-  data[6] := data[6] + data[5];
-  data[7] := data[7] - (data[6] xor C2);
+  LB := LB xor LData[0];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 7;
 
-  b := b xor data[0];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 7;
+  LC := LC xor LData[1];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 7;
 
-  c := c xor data[1];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 7;
+  LA := LA xor LData[2];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 7;
 
-  a := a xor data[2];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 7;
+  LB := LB xor LData[3];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 7;
 
-  b := b xor data[3];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 7;
+  LC := LC xor LData[4];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 7;
 
-  c := c xor data[4];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 7;
+  LA := LA xor LData[5];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 7;
 
-  a := a xor data[5];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 7;
+  LB := LB xor LData[6];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 7;
 
-  b := b xor data[6];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 7;
+  LC := LC xor LData[7];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 7;
 
-  c := c xor data[7];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 7;
+  LData[0] := LData[0] - (LData[7] xor C1);
+  LData[1] := LData[1] xor LData[0];
+  LData[2] := LData[2] + LData[1];
+  LData[3] := LData[3] - (LData[2] xor (not LData[1] shl 19));
+  LData[4] := LData[4] xor LData[3];
+  LData[5] := LData[5] + LData[4];
+  LData[6] := LData[6] - (LData[5] xor (not LData[4] shr 23));
+  LData[7] := LData[7] xor LData[6];
+  LData[0] := LData[0] + LData[7];
+  LData[1] := LData[1] - (LData[0] xor (not LData[7] shl 19));
+  LData[2] := LData[2] xor LData[1];
+  LData[3] := LData[3] + LData[2];
+  LData[4] := LData[4] - (LData[3] xor (not LData[2] shr 23));
+  LData[5] := LData[5] xor LData[4];
+  LData[6] := LData[6] + LData[5];
+  LData[7] := LData[7] - (LData[6] xor C2);
 
-  data[0] := data[0] - (data[7] xor C1);
-  data[1] := data[1] xor data[0];
-  data[2] := data[2] + data[1];
-  data[3] := data[3] - (data[2] xor (not data[1] shl 19));
-  data[4] := data[4] xor data[3];
-  data[5] := data[5] + data[4];
-  data[6] := data[6] - (data[5] xor (not data[4] shr 23));
-  data[7] := data[7] xor data[6];
-  data[0] := data[0] + data[7];
-  data[1] := data[1] - (data[0] xor (not data[7] shl 19));
-  data[2] := data[2] xor data[1];
-  data[3] := data[3] + data[2];
-  data[4] := data[4] - (data[3] xor (not data[2] shr 23));
-  data[5] := data[5] xor data[4];
-  data[6] := data[6] + data[5];
-  data[7] := data[7] - (data[6] xor C2);
+  LA := LA xor LData[0];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 9;
 
-  a := a xor data[0];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 9;
+  LB := LB xor LData[1];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 9;
 
-  b := b xor data[1];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 9;
+  LC := LC xor LData[2];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 9;
 
-  c := c xor data[2];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 9;
+  LA := LA xor LData[3];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 9;
 
-  a := a xor data[3];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 9;
+  LB := LB xor LData[4];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 9;
 
-  b := b xor data[4];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 9;
+  LC := LC xor LData[5];
+  LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+    ] xor ST4[Byte(LC shr 48)]);
+  LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+    ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+  LB := LB * 9;
 
-  c := c xor data[5];
-  a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-    ] xor s_T4[Byte(c shr 48)]);
-  b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-    ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-  b := b * 9;
+  LA := LA xor LData[6];
+  LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+    ] xor ST4[Byte(LA shr 48)]);
+  LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+    ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+  LC := LC * 9;
 
-  a := a xor data[6];
-  b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-    ] xor s_T4[Byte(a shr 48)]);
-  c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2[Byte(a shr 40)
-    ] xor s_T1[Byte(a shr 56)]);
-  c := c * 9;
+  LB := LB xor LData[7];
+  LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+    ] xor ST4[Byte(LB shr 48)]);
+  LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+    ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+  LA := LA * 9;
 
-  b := b xor data[7];
-  c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-    ] xor s_T4[Byte(b shr 48)]);
-  a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2[Byte(b shr 40)
-    ] xor s_T1[Byte(b shr 56)]);
-  a := a * 9;
-
-  rounds := 3;
-  while rounds < Fm_rounds do
+  LRounds := 3;
+  while LRounds < FRounds do
   begin
+    LData[0] := LData[0] - (LData[7] xor C1);
+    LData[1] := LData[1] xor LData[0];
+    LData[2] := LData[2] + LData[1];
+    LData[3] := LData[3] - (LData[2] xor (not LData[1] shl 19));
+    LData[4] := LData[4] xor LData[3];
+    LData[5] := LData[5] + LData[4];
+    LData[6] := LData[6] - (LData[5] xor (not LData[4] shr 23));
+    LData[7] := LData[7] xor LData[6];
+    LData[0] := LData[0] + LData[7];
+    LData[1] := LData[1] - (LData[0] xor (not LData[7] shl 19));
+    LData[2] := LData[2] xor LData[1];
+    LData[3] := LData[3] + LData[2];
+    LData[4] := LData[4] - (LData[3] xor (not LData[2] shr 23));
+    LData[5] := LData[5] xor LData[4];
+    LData[6] := LData[6] + LData[5];
+    LData[7] := LData[7] - (LData[6] xor C2);
 
-    data[0] := data[0] - (data[7] xor C1);
-    data[1] := data[1] xor data[0];
-    data[2] := data[2] + data[1];
-    data[3] := data[3] - (data[2] xor (not data[1] shl 19));
-    data[4] := data[4] xor data[3];
-    data[5] := data[5] + data[4];
-    data[6] := data[6] - (data[5] xor (not data[4] shr 23));
-    data[7] := data[7] xor data[6];
-    data[0] := data[0] + data[7];
-    data[1] := data[1] - (data[0] xor (not data[7] shl 19));
-    data[2] := data[2] xor data[1];
-    data[3] := data[3] + data[2];
-    data[4] := data[4] - (data[3] xor (not data[2] shr 23));
-    data[5] := data[5] xor data[4];
-    data[6] := data[6] + data[5];
-    data[7] := data[7] - (data[6] xor C2);
+    LC := LC xor LData[0];
+    LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+      ] xor ST4[Byte(LC shr 48)]);
+    LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+      ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+    LB := LB * 9;
 
-    c := c xor data[0];
-    a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-      ] xor s_T4[Byte(c shr 48)]);
-    b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-      ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-    b := b * 9;
+    LA := LA xor LData[1];
+    LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+      ] xor ST4[Byte(LA shr 48)]);
+    LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+      ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+    LC := LC * 9;
 
-    a := a xor data[1];
-    b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-      ] xor s_T4[Byte(a shr 48)]);
-    c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2
-      [Byte(a shr 40)] xor s_T1[Byte(a shr 56)]);
-    c := c * 9;
+    LB := LB xor LData[2];
+    LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+      ] xor ST4[Byte(LB shr 48)]);
+    LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+      ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+    LA := LA * 9;
 
-    b := b xor data[2];
-    c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-      ] xor s_T4[Byte(b shr 48)]);
-    a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2
-      [Byte(b shr 40)] xor s_T1[Byte(b shr 56)]);
-    a := a * 9;
+    LC := LC xor LData[3];
+    LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+      ] xor ST4[Byte(LC shr 48)]);
+    LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+      ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+    LB := LB * 9;
 
-    c := c xor data[3];
-    a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-      ] xor s_T4[Byte(c shr 48)]);
-    b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-      ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-    b := b * 9;
+    LA := LA xor LData[4];
+    LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+      ] xor ST4[Byte(LA shr 48)]);
+    LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+      ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+    LC := LC * 9;
 
-    a := a xor data[4];
-    b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-      ] xor s_T4[Byte(a shr 48)]);
-    c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2
-      [Byte(a shr 40)] xor s_T1[Byte(a shr 56)]);
-    c := c * 9;
+    LB := LB xor LData[5];
+    LC := LC - (ST1[Byte(LB)] xor ST2[Byte(LB shr 16)] xor ST3[Byte(LB shr 32)
+      ] xor ST4[Byte(LB shr 48)]);
+    LA := LA + (ST4[Byte(LB shr 8)] xor ST3[Byte(LB shr 24)
+      ] xor ST2[Byte(LB shr 40)] xor ST1[Byte(LB shr 56)]);
+    LA := LA * 9;
 
-    b := b xor data[5];
-    c := c - (s_T1[Byte(b)] xor s_T2[Byte(b shr 16)] xor s_T3[Byte(b shr 32)
-      ] xor s_T4[Byte(b shr 48)]);
-    a := a + (s_T4[Byte(b shr 8)] xor s_T3[Byte(b shr 24)] xor s_T2
-      [Byte(b shr 40)] xor s_T1[Byte(b shr 56)]);
-    a := a * 9;
+    LC := LC xor LData[6];
+    LA := LA - (ST1[Byte(LC)] xor ST2[Byte(LC shr 16)] xor ST3[Byte(LC shr 32)
+      ] xor ST4[Byte(LC shr 48)]);
+    LB := LB + (ST4[Byte(LC shr 8) and $FF] xor ST3[Byte(LC shr 24)
+      ] xor ST2[Byte(LC shr 40)] xor ST1[Byte(LC shr 56)]);
+    LB := LB * 9;
 
-    c := c xor data[6];
-    a := a - (s_T1[Byte(c)] xor s_T2[Byte(c shr 16)] xor s_T3[Byte(c shr 32)
-      ] xor s_T4[Byte(c shr 48)]);
-    b := b + (s_T4[Byte(c shr 8) and $FF] xor s_T3[Byte(c shr 24)
-      ] xor s_T2[Byte(c shr 40)] xor s_T1[Byte(c shr 56)]);
-    b := b * 9;
+    LA := LA xor LData[7];
+    LB := LB - (ST1[Byte(LA)] xor ST2[Byte(LA shr 16)] xor ST3[Byte(LA shr 32)
+      ] xor ST4[Byte(LA shr 48)]);
+    LC := LC + (ST4[Byte(LA shr 8)] xor ST3[Byte(LA shr 24)
+      ] xor ST2[Byte(LA shr 40)] xor ST1[Byte(LA shr 56)]);
+    LC := LC * 9;
 
-    a := a xor data[7];
-    b := b - (s_T1[Byte(a)] xor s_T2[Byte(a shr 16)] xor s_T3[Byte(a shr 32)
-      ] xor s_T4[Byte(a shr 48)]);
-    c := c + (s_T4[Byte(a shr 8)] xor s_T3[Byte(a shr 24)] xor s_T2
-      [Byte(a shr 40)] xor s_T1[Byte(a shr 56)]);
-    c := c * 9;
+    LTempA := LA;
+    LA := LC;
+    LC := LB;
+    LB := LTempA;
 
-    temp_a := a;
-    a := c;
-    c := b;
-    b := temp_a;
-
-    System.Inc(rounds);
+    System.Inc(LRounds);
   end;
 
-  Fm_hash[0] := Fm_hash[0] xor a;
-  Fm_hash[1] := b - Fm_hash[1];
-  Fm_hash[2] := Fm_hash[2] + c;
+  FHash[0] := FHash[0] xor LA;
+  FHash[1] := LB - FHash[1];
+  FHash[2] := FHash[2] + LC;
 
-  System.FillChar(data, System.SizeOf(data), UInt64(0));
-
+  System.FillChar(LData, System.SizeOf(LData), UInt64(0));
 end;
 
 { TTiger_128 }
 
 function TTiger_128.Clone(): IHash;
 var
-  HashInstance: TTiger_128;
+  LHashInstance: TTiger_128;
 begin
-  HashInstance := TTiger_128.Create(HashSize, GetHashRound(Fm_rounds));
-  HashInstance.Fm_hash := System.Copy(Fm_hash);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  Result := HashInstance as IHash;
+  LHashInstance := TTiger_128.Create(HashSize, GetHashRound(FRounds));
+  LHashInstance.FHash := System.Copy(FHash);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  Result := LHashInstance as IHash;
   Result.BufferSize := BufferSize;
 end;
 
@@ -1045,13 +1037,13 @@ end;
 
 function TTiger_160.Clone(): IHash;
 var
-  HashInstance: TTiger_160;
+  LHashInstance: TTiger_160;
 begin
-  HashInstance := TTiger_160.Create(HashSize, GetHashRound(Fm_rounds));
-  HashInstance.Fm_hash := System.Copy(Fm_hash);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  Result := HashInstance as IHash;
+  LHashInstance := TTiger_160.Create(HashSize, GetHashRound(FRounds));
+  LHashInstance.FHash := System.Copy(FHash);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  Result := LHashInstance as IHash;
   Result.BufferSize := BufferSize;
 end;
 
@@ -1074,13 +1066,13 @@ end;
 
 function TTiger_192.Clone(): IHash;
 var
-  HashInstance: TTiger_192;
+  LHashInstance: TTiger_192;
 begin
-  HashInstance := TTiger_192.Create(HashSize, GetHashRound(Fm_rounds));
-  HashInstance.Fm_hash := System.Copy(Fm_hash);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  Result := HashInstance as IHash;
+  LHashInstance := TTiger_192.Create(HashSize, GetHashRound(FRounds));
+  LHashInstance.FHash := System.Copy(FHash);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  Result := LHashInstance as IHash;
   Result.BufferSize := BufferSize;
 end;
 
@@ -1103,19 +1095,19 @@ end;
 
 function TTiger_Base.Clone(): IHash;
 var
-  HashInstance: TTiger_Base;
+  LHashInstance: TTiger_Base;
 begin
-  HashInstance := TTiger_Base.Create(HashSize, GetHashRound(Fm_rounds));
-  HashInstance.Fm_hash := System.Copy(Fm_hash);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  Result := HashInstance as IHash;
+  LHashInstance := TTiger_Base.Create(HashSize, GetHashRound(FRounds));
+  LHashInstance.FHash := System.Copy(FHash);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  Result := LHashInstance as IHash;
   Result.BufferSize := BufferSize;
 end;
 
-constructor TTiger_Base.Create(a_hash_size: Int32; a_rounds: THashRounds);
+constructor TTiger_Base.Create(AHashSize: Int32; ARounds: THashRounds);
 begin
-  Inherited Create(a_hash_size, a_rounds);
+  Inherited Create(AHashSize, ARounds);
 end;
 
 end.

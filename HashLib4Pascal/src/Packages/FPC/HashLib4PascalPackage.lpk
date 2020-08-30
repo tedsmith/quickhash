@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\Include"/>
-        <OtherUnitFiles Value="..\..\Base;..\..\Checksum;..\..\Crypto;..\..\Hash128;..\..\Hash32;..\..\Hash64;..\..\Interfaces;..\..\Nullable;..\..\Utils;..\..\KDF;..\..\Crypto\Blake2BConfigurations;..\..\Crypto\Blake2SConfigurations;..\..\Interfaces\IBlake2BConfigurations;..\..\Interfaces\IBlake2SConfigurations;..\..\NullDigest"/>
+        <OtherUnitFiles Value="..\..\Base;..\..\Checksum;..\..\Crypto;..\..\Hash128;..\..\Hash32;..\..\Hash64;..\..\Interfaces;..\..\Nullable;..\..\Utils;..\..\KDF;..\..\Crypto\Blake2BConfigurations;..\..\Crypto\Blake2SConfigurations;..\..\Interfaces\IBlake2BConfigurations;..\..\Interfaces\IBlake2SConfigurations;..\..\NullDigest;..\..\Crypto\Blake2SParams;..\..\Crypto\Blake2BParams;..\..\Interfaces\IBlake2SParams;..\..\Interfaces\IBlake2BParams"/>
         <UnitOutputDirectory Value="lib\HashLib4Pascal\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <CodeGeneration>
@@ -22,8 +22,8 @@
     <Description Value="HashLib4Pascal is a Delphi/FPC compatible library that provides an easy to use interface for computing hashes and checksums of strings (with a specified encoding), files, streams, byte arrays and untyped data to mention but a few.
 "/>
     <License Value="MIT License"/>
-    <Version Major="3" Minor="7"/>
-    <Files Count="107">
+    <Version Major="4" Minor="1"/>
+    <Files Count="105">
       <Item1>
         <Filename Value="..\..\Base\HlpHash.pas"/>
         <UnitName Value="HlpHash"/>
@@ -389,69 +389,61 @@
         <UnitName Value="HlpBlake2S"/>
       </Item91>
       <Item92>
-        <Filename Value="..\..\Crypto\Blake2BConfigurations\HlpBlake2BConfig.pas"/>
-        <UnitName Value="HlpBlake2BConfig"/>
-      </Item92>
-      <Item93>
-        <Filename Value="..\..\Crypto\Blake2BConfigurations\HlpBlake2BIvBuilder.pas"/>
-        <UnitName Value="HlpBlake2BIvBuilder"/>
-      </Item93>
-      <Item94>
-        <Filename Value="..\..\Crypto\Blake2BConfigurations\HlpBlake2BTreeConfig.pas"/>
-        <UnitName Value="HlpBlake2BTreeConfig"/>
-      </Item94>
-      <Item95>
-        <Filename Value="..\..\Crypto\Blake2SConfigurations\HlpBlake2SConfig.pas"/>
-        <UnitName Value="HlpBlake2SConfig"/>
-      </Item95>
-      <Item96>
-        <Filename Value="..\..\Crypto\Blake2SConfigurations\HlpBlake2SIvBuilder.pas"/>
-        <UnitName Value="HlpBlake2SIvBuilder"/>
-      </Item96>
-      <Item97>
-        <Filename Value="..\..\Crypto\Blake2SConfigurations\HlpBlake2STreeConfig.pas"/>
-        <UnitName Value="HlpBlake2STreeConfig"/>
-      </Item97>
-      <Item98>
-        <Filename Value="..\..\Interfaces\IBlake2BConfigurations\HlpIBlake2BConfig.pas"/>
-        <UnitName Value="HlpIBlake2BConfig"/>
-      </Item98>
-      <Item99>
-        <Filename Value="..\..\Interfaces\IBlake2BConfigurations\HlpIBlake2BTreeConfig.pas"/>
-        <UnitName Value="HlpIBlake2BTreeConfig"/>
-      </Item99>
-      <Item100>
-        <Filename Value="..\..\Interfaces\IBlake2SConfigurations\HlpIBlake2SConfig.pas"/>
-        <UnitName Value="HlpIBlake2SConfig"/>
-      </Item100>
-      <Item101>
-        <Filename Value="..\..\Interfaces\IBlake2SConfigurations\HlpIBlake2STreeConfig.pas"/>
-        <UnitName Value="HlpIBlake2STreeConfig"/>
-      </Item101>
-      <Item102>
         <Filename Value="..\..\Crypto\HlpGOST3411_2012.pas"/>
         <UnitName Value="HlpGOST3411_2012"/>
-      </Item102>
-      <Item103>
+      </Item92>
+      <Item93>
         <Filename Value="..\..\Checksum\HlpCRC32Fast.pas"/>
         <UnitName Value="HlpCRC32Fast"/>
-      </Item103>
-      <Item104>
+      </Item93>
+      <Item94>
         <Filename Value="..\..\KDF\HlpArgon2TypeAndVersion.pas"/>
         <UnitName Value="HlpArgon2TypeAndVersion"/>
-      </Item104>
-      <Item105>
+      </Item94>
+      <Item95>
         <Filename Value="..\..\KDF\HlpPBKDF_Argon2NotBuildInAdapter.pas"/>
         <UnitName Value="HlpPBKDF_Argon2NotBuildInAdapter"/>
-      </Item105>
-      <Item106>
+      </Item95>
+      <Item96>
         <Filename Value="..\..\KDF\HlpPBKDF_ScryptNotBuildInAdapter.pas"/>
         <UnitName Value="HlpPBKDF_ScryptNotBuildInAdapter"/>
-      </Item106>
-      <Item107>
+      </Item96>
+      <Item97>
         <Filename Value="..\..\Utils\HlpArrayUtils.pas"/>
         <UnitName Value="HlpArrayUtils"/>
-      </Item107>
+      </Item97>
+      <Item98>
+        <Filename Value="..\..\Crypto\HlpBlake2BP.pas"/>
+        <UnitName Value="HlpBlake2BP"/>
+      </Item98>
+      <Item99>
+        <Filename Value="..\..\Crypto\HlpBlake2SP.pas"/>
+        <UnitName Value="HlpBlake2SP"/>
+      </Item99>
+      <Item100>
+        <Filename Value="..\..\Hash128\HlpSipHash128.pas"/>
+        <UnitName Value="HlpSipHash128"/>
+      </Item100>
+      <Item101>
+        <Filename Value="..\..\Crypto\Blake2SParams\HlpBlake2SParams.pas"/>
+        <UnitName Value="HlpBlake2SParams"/>
+      </Item101>
+      <Item102>
+        <Filename Value="..\..\Crypto\Blake2BParams\HlpBlake2BParams.pas"/>
+        <UnitName Value="HlpBlake2BParams"/>
+      </Item102>
+      <Item103>
+        <Filename Value="..\..\Interfaces\IBlake2SParams\HlpIBlake2SParams.pas"/>
+        <UnitName Value="HlpIBlake2SParams"/>
+      </Item103>
+      <Item104>
+        <Filename Value="..\..\Interfaces\IBlake2BParams\HlpIBlake2BParams.pas"/>
+        <UnitName Value="HlpIBlake2BParams"/>
+      </Item104>
+      <Item105>
+        <Filename Value="..\..\Crypto\HlpBlake3.pas"/>
+        <UnitName Value="HlpBlake3"/>
+      </Item105>
     </Files>
     <LazDoc PackageName="(default)"/>
     <RequiredPkgs Count="1">

@@ -5,7 +5,7 @@ unit diskmodule;
    Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
                      and generating hash values for them.
 
-   Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
+   Copyright (C) 2011-2020  Ted Smith www.quickhash-gui.org
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ type
     btnStartHashing: TButton;
     cbdisks: TComboBox;
     cbLogFile: TCheckBox;
+    ledtComputedHashF: TLabeledEdit;
     lblDiskHashSchedulerStatus: TLabel;
     lblschedulertickboxDiskModule: TCheckBox;
     comboHashChoice: TComboBox;
@@ -169,16 +170,17 @@ procedure TfrmDiskHashingModule.FormCreate(Sender: TObject);
 begin
   Stop := false;
   ExecutionCount := 0;
-  ledtComputedHashA.Enabled := false;
-  ledtComputedHashB.Enabled := false;
-  ledtComputedHashC.Enabled := false;
-  ledtComputedHashD.Enabled := false;
-  ledtComputedHashE.Enabled := false;
+  ledtComputedHashA.Enabled := false;   // MD5
+  ledtComputedHashB.Enabled := false;   // SHA-1
+  ledtComputedHashC.Enabled := false;   // SHA256
+  ledtComputedHashD.Enabled := false;   // SHA512
+  ledtComputedHashE.Enabled := false;   // xxHash
   {$ifdef CPU64}
   comboHashChoice.Items.Strings[6] := 'xxHash64';
   {$else if CPU32}
   comboHashChoice.Items.Strings[6] := 'xxHash32';
   {$endif}
+  ledtComputedHashF.Enabled := false;   // Blake 3
 
   {$ifdef Windows}
   // These are the Linux centric elements, so disable them on Windows
@@ -243,8 +245,6 @@ begin
   end;
   {$endif}
 end;
-
-
 
 procedure TfrmDiskHashingModule.btnStartHashingClick(Sender: TObject);
 begin
@@ -842,7 +842,11 @@ begin
                           begin
                             result := 7;
                           end
-                            else result := 8;
+                            else if comboHashChoice.Text = 'Blake3' then
+                            begin
+                              result := 8;
+                            end
+                            else result := 9;
 end;
 
 // Get the technical disk data for a specifically selected disk. Returns 1 on success
@@ -1076,6 +1080,7 @@ const
     {$ifdef Windows}
     BytesReturned   := 0;
     {$endif}
+    hSelectedDisk   := -1;
     ExactDiskSize   := 0;
     HashResult      := 0;
     HashChoice      := -1;
@@ -1087,13 +1092,13 @@ const
 
     // Determine what hash algorithm to use.
     // MD5 = 1, SHA-1 = 2, MD5 & SHA-1 = 3, SHA256 = 4,
-    // SHA512 = 5, SHA-1 & SHA256 = 6, Use Non = 7. -1 is false
+    // SHA512 = 5, SHA-1 & SHA256 = 6, xxHash = 7, Blake3 = 8. Use non = 9. -1 is false
     HashChoice := frmDiskHashingModule.InitialiseHashChoice(nil);
     if HashChoice = -1 then abort;
 
     // Create handle to source disk in the most graceful of ways.
     // -1 returned if fails
-    hSelectedDisk := FileOpen(SourceDevice, fmOpenRead OR fmShareDenyNone);
+    hSelectedDisk := SysUtils.FileOpen(SourceDevice, fmOpenRead OR fmShareDenyWrite);
 
     // Check if handle is valid before doing anything else
     if hSelectedDisk = -1 then
@@ -1138,9 +1143,7 @@ const
 
         // Now we can assign a sector count based on sector size and disk size
         //SectorCount := ExactDiskSize DIV ExactSectorSize;
-
         frmProgress.lblTotalBytesSource.Caption := ' bytes hashed of ' + IntToStr(ExactDiskSize);
-
         // Now hash the chosen device, passing the exact size and
         // hash selection and Image name.
         StartedAt := Now;
@@ -1198,7 +1201,8 @@ const
                         ' SHA-1:  ' + ledtComputedHashB.Text + #13#10 +
                         ' SHA256: ' + ledtComputedHashC.Text + #13#10 +
                         ' SHA512: ' + ledtComputedHashD.Text + #13#10 +
-                        ' xxHash: ' + ledtComputedHashE.Text + #13#10);
+                        ' xxHash: ' + ledtComputedHashE.Text + #13#10 +
+                        ' Blake3: ' + ledtComputedHashE.Text + #13#10);
           slHashLog.Add('=======================');
         finally
         // Save the logfile
@@ -1247,8 +1251,8 @@ var
   TotalBytesRead           : Int64;
   // New HashLib4Pascal hash digests for disk reading in v2.8.0 upwards.
   // DCPCrypt digests deprecated.
-  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512: IHash;
-  HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256, HashInstanceResultSHA512 : IHashResult;
+  HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512, HashInstanceBlake3: IHash;
+  HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256, HashInstanceResultSHA512, HashInstanceResultBlake3 : IHashResult;
 
   {$ifdef CPU64}
     HashInstancexxHash64       : IHash;
@@ -1318,10 +1322,15 @@ begin
                           HashInstancexxHash32.Initialize();
                          {$endif}
                         end
-                          else if HashChoice = 8 then
-                            begin
-                             // No hashing initiliased
-                            end;
+                          else if HashChoice = 8 then // Blake3
+                          begin
+                            HashInstanceBlake3 := THashFactory.TCrypto.CreateBlake3_256(nil);
+                            HashInstanceBlake3.Initialize();
+                          end
+                            else if HashChoice = 9 then
+                              begin
+                               // No hashing initiliased
+                              end;
     // Now to seek to start of device
     FileSeek(hDiskHandle, 0, 0);
       repeat
@@ -1354,7 +1363,7 @@ begin
 
         // Hash the bytes read and\or written using the algorithm required
         // If the user selected no hashing, break the loop immediately; faster
-        if HashChoice = 7 then
+        if HashChoice = 9 then
           begin
            // No hashing initiliased
           end
@@ -1391,7 +1400,11 @@ begin
                                     {$else if CPU32}
                                      HashInstancexxHash32.TransformUntyped(Buffer, BytesRead);
                                     {$endif}
-                                  end;
+                                  end
+                                    else if HashChoice = 8 then
+                                    begin
+                                     HashInstanceBlake3.TransformUntyped(Buffer, BytesRead);
+                                    end;
       // Only refresh the interface when a few loops have gone by
       inc(LoopItterator, 1);
       if LoopItterator = 150 then
@@ -1570,7 +1583,32 @@ begin
                   {$endif}
                 end;
               end
-            else if HashChoice = 8 then
+              else if HashChoice = 8 then
+              begin
+                // Blake3 hash only
+                HashInstanceResultBlake3 := HashInstanceBlake3.TransformFinal();
+                begin
+                  frmDiskHashingModule.ledtComputedHashA.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashA.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashA.Clear;
+                  frmDiskHashingModule.ledtComputedHashB.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashB.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashB.Clear;
+                  frmDiskHashingModule.ledtComputedHashC.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashC.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashC.Clear;
+                  frmDiskHashingModule.ledtComputedHashD.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashD.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashD.Clear;
+                  frmDiskHashingModule.ledtComputedHashE.Enabled := false;
+                  frmDiskHashingModule.ledtComputedHashE.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashE.Clear;
+                  frmDiskHashingModule.ledtComputedHashF.Text := Uppercase(HashInstanceResultBlake3.ToString()); // Blake3
+                  frmDiskHashingModule.ledtComputedHashF.Visible := true;
+                  frmDiskHashingModule.ledtComputedHashF.Enabled := true;
+                end;
+              end
+            else if HashChoice = 9 then
                 begin
                  frmDiskHashingModule.ledtComputedHashA.Text    := Uppercase('No hash computed');
                  frmDiskHashingModule.ledtComputedHashB.Text    := Uppercase('No hash computed');
@@ -1587,6 +1625,8 @@ begin
                  frmDiskHashingModule.ledtComputedHashD.Visible := true;
                  frmDiskHashingModule.ledtComputedHashE.Enabled := true;
                  frmDiskHashingModule.ledtComputedHashE.Visible := true;
+                 frmDiskHashingModule.ledtComputedHashF.Visible := true;
+                 frmDiskHashingModule.ledtComputedHashF.Enabled := true;
                  frmProgress.lblStatus.Caption      := 'No verification conducted';
                 end;
       end;

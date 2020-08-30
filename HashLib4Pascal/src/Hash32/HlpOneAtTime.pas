@@ -15,14 +15,14 @@ uses
 type
   TOneAtTime = class sealed(THash, IHash32, ITransformBlock)
   strict private
-
-    Fm_hash: UInt32;
+  var
+    FHash: UInt32;
 
   public
     constructor Create();
     procedure Initialize(); override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function TransformFinal(): IHashResult; override;
     function Clone(): IHash; override;
   end;
@@ -33,11 +33,11 @@ implementation
 
 function TOneAtTime.Clone(): IHash;
 var
-  HashInstance: TOneAtTime;
+  LHashInstance: TOneAtTime;
 begin
-  HashInstance := TOneAtTime.Create();
-  HashInstance.Fm_hash := Fm_hash;
-  result := HashInstance as IHash;
+  LHashInstance := TOneAtTime.Create();
+  LHashInstance.FHash := FHash;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
@@ -48,38 +48,37 @@ end;
 
 procedure TOneAtTime.Initialize;
 begin
-  Fm_hash := 0;
+  FHash := 0;
 end;
 
-procedure TOneAtTime.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TOneAtTime.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 var
-  i: Int32;
+  LIdx: Int32;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_index >= 0);
-  System.Assert(a_length >= 0);
-  System.Assert(a_index + a_length <= System.Length(a_data));
+  System.Assert(AIndex >= 0);
+  System.Assert(ALength >= 0);
+  System.Assert(AIndex + ALength <= System.Length(AData));
 {$ENDIF DEBUG}
-  i := a_index;
-  while a_length > 0 do
+  LIdx := AIndex;
+  while ALength > 0 do
   begin
-    Fm_hash := Fm_hash + a_data[i];
-    Fm_hash := Fm_hash + (Fm_hash shl 10);
-    Fm_hash := Fm_hash xor (Fm_hash shr 6);
-    System.Inc(i);
-    System.Dec(a_length);
+    FHash := FHash + AData[LIdx];
+    FHash := FHash + (FHash shl 10);
+    FHash := FHash xor (FHash shr 6);
+    System.Inc(LIdx);
+    System.Dec(ALength);
   end;
-
 end;
 
 function TOneAtTime.TransformFinal: IHashResult;
 begin
-  Fm_hash := Fm_hash + (Fm_hash shl 3);
-  Fm_hash := Fm_hash xor (Fm_hash shr 11);
-  Fm_hash := Fm_hash + (Fm_hash shl 15);
+  FHash := FHash + (FHash shl 3);
+  FHash := FHash xor (FHash shr 11);
+  FHash := FHash + (FHash shl 15);
 
-  result := THashResult.Create(Fm_hash);
+  result := THashResult.Create(FHash);
   Initialize();
 end;
 

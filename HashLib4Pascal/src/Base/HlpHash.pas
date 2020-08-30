@@ -5,13 +5,8 @@ unit HlpHash;
 interface
 
 uses
-{$IFDEF HAS_UNITSCOPE}
-  System.Classes,
-  System.SysUtils,
-{$ELSE}
   Classes,
   SysUtils,
-{$ENDIF HAS_UNITSCOPE}
   HlpHashLibTypes,
   HlpConverters,
   HlpIHash,
@@ -28,8 +23,8 @@ type
   THash = class abstract(TInterfacedObject, IHash)
 
   strict private
-
-    Fm_buffer_size, Fm_block_size, Fm_hash_size: Int32;
+  var
+    FBufferSize, FBlockSize, FHashSize: Int32;
 
   const
     BUFFER_SIZE = Int32(64 * 1024); // 64Kb
@@ -37,47 +32,49 @@ type
   strict protected
 
     function GetBlockSize: Int32; virtual;
-    procedure SetBlockSize(value: Int32); virtual;
+    procedure SetBlockSize(AValue: Int32); virtual;
 
     function GetHashSize: Int32; virtual;
-    procedure SetHashSize(value: Int32); virtual;
+    procedure SetHashSize(AValue: Int32); virtual;
 
     function GetBufferSize: Int32; inline;
-    procedure SetBufferSize(value: Int32); inline;
+    procedure SetBufferSize(AValue: Int32); inline;
 
     function GetName: String; virtual;
 
   public
 
-    constructor Create(a_hash_size, a_block_size: Int32);
-    property Name: String read GetName;
-    property BlockSize: Int32 read GetBlockSize write SetBlockSize;
-    property HashSize: Int32 read GetHashSize write SetHashSize;
-    function ComputeString(const a_data: String; a_encoding: TEncoding)
-      : IHashResult; virtual;
-    function ComputeBytes(const a_data: THashLibByteArray)
-      : IHashResult; virtual;
-    function ComputeUntyped(const a_data; a_length: Int64): IHashResult;
-    function ComputeStream(const a_stream: TStream; a_length: Int64 = -1)
-      : IHashResult;
-    function ComputeFile(const a_file_name: String; a_from: Int64 = 0;
-      a_length: Int64 = -1): IHashResult;
-    procedure TransformString(const a_data: String;
-      const a_encoding: TEncoding);
-    procedure TransformBytes(const a_data: THashLibByteArray); overload;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index: Int32); overload;
-    procedure TransformBytes(const a_data: THashLibByteArray; a_index: Int32;
-      a_length: Int32); overload; virtual; abstract;
-    procedure TransformUntyped(const a_data; a_length: Int64);
-    procedure TransformStream(const a_stream: TStream; a_length: Int64 = -1);
-    procedure TransformFile(const a_file_name: String; a_from: Int64 = 0;
-      a_length: Int64 = -1);
+    constructor Create(AHashSize, ABlockSize: Int32);
+
     procedure Initialize(); virtual; abstract;
+
+    procedure TransformString(const AData: String; const AEncoding: TEncoding);
+    procedure TransformBytes(const AData: THashLibByteArray); overload;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex: Int32); overload;
+    procedure TransformBytes(const AData: THashLibByteArray; AIndex: Int32;
+      ALength: Int32); overload; virtual; abstract;
+    procedure TransformUntyped(const AData; ALength: Int64);
+    procedure TransformStream(const AStream: TStream; ALength: Int64 = -1);
+    procedure TransformFile(const AFileName: String; AFrom: Int64 = 0;
+      ALength: Int64 = -1);
+
     function TransformFinal(): IHashResult; virtual; abstract;
+
+    function ComputeString(const AData: String; AEncoding: TEncoding)
+      : IHashResult; virtual;
+    function ComputeBytes(const AData: THashLibByteArray): IHashResult; virtual;
+    function ComputeUntyped(const AData; ALength: Int64): IHashResult;
+    function ComputeStream(const AStream: TStream; ALength: Int64 = -1)
+      : IHashResult;
+    function ComputeFile(const AFileName: String; AFrom: Int64 = 0;
+      ALength: Int64 = -1): IHashResult;
 
     function Clone(): IHash; virtual;
 
+    property Name: String read GetName;
+    property BlockSize: Int32 read GetBlockSize write SetBlockSize;
+    property HashSize: Int32 read GetHashSize write SetHashSize;
     property BufferSize: Int32 read GetBufferSize write SetBufferSize;
   end;
 
@@ -85,16 +82,16 @@ implementation
 
 { THash }
 
-constructor THash.Create(a_hash_size, a_block_size: Int32);
+constructor THash.Create(AHashSize, ABlockSize: Int32);
 begin
   Inherited Create();
 {$IFDEF DEBUG}
-  System.Assert((a_block_size > 0) or (a_block_size = -1));
-  System.Assert((a_hash_size > 0) or (a_hash_size = -1));
+  System.Assert((ABlockSize > 0) or (ABlockSize = -1));
+  System.Assert((AHashSize > 0) or (AHashSize = -1));
 {$ENDIF DEBUG}
-  Fm_block_size := a_block_size;
-  Fm_hash_size := a_hash_size;
-  Fm_buffer_size := BUFFER_SIZE;
+  FBlockSize := ABlockSize;
+  FHashSize := AHashSize;
+  FBufferSize := BUFFER_SIZE;
 end;
 
 function THash.GetName: String;
@@ -104,14 +101,14 @@ end;
 
 function THash.GetBufferSize: Int32;
 begin
-  result := Fm_buffer_size;
+  result := FBufferSize;
 end;
 
-procedure THash.SetBufferSize(value: Int32);
+procedure THash.SetBufferSize(AValue: Int32);
 begin
-  if value > 0 then
+  if AValue > 0 then
   begin
-    Fm_buffer_size := value;
+    FBufferSize := AValue;
   end
   else
   begin
@@ -121,49 +118,46 @@ end;
 
 function THash.GetBlockSize: Int32;
 begin
-  result := Fm_block_size;
+  result := FBlockSize;
 end;
 
-procedure THash.SetBlockSize(value: Int32);
+procedure THash.SetBlockSize(AValue: Int32);
 begin
-  Fm_block_size := value;
+  FBlockSize := AValue;
 end;
 
 function THash.GetHashSize: Int32;
 begin
-  result := Fm_hash_size;
+  result := FHashSize;
 end;
 
-procedure THash.SetHashSize(value: Int32);
+procedure THash.SetHashSize(AValue: Int32);
 begin
-  Fm_hash_size := value;
+  FHashSize := AValue;
 end;
 
-function THash.ComputeString(const a_data: String; a_encoding: TEncoding)
+function THash.ComputeString(const AData: String; AEncoding: TEncoding)
   : IHashResult;
 begin
-  result := ComputeBytes(TConverters.ConvertStringToBytes(a_data, a_encoding));
+  result := ComputeBytes(TConverters.ConvertStringToBytes(AData, AEncoding));
 end;
 
-function THash.ComputeUntyped(const a_data; a_length: Int64): IHashResult;
-
+function THash.ComputeUntyped(const AData; ALength: Int64): IHashResult;
 begin
-
   Initialize();
-  TransformUntyped(a_data, a_length);
+  TransformUntyped(AData, ALength);
   result := TransformFinal();
-
 end;
 
-procedure THash.TransformUntyped(const a_data; a_length: Int64);
+procedure THash.TransformUntyped(const AData; ALength: Int64);
 var
-  PtrBuffer, PtrEnd: PByte;
-  ArrBuffer: THashLibByteArray;
+  LPtrStart, LPtrEnd: PByte;
+  LBuffer: THashLibByteArray;
   LBufferSize: Int32;
 begin
-  PtrBuffer := @a_data;
+  LPtrStart := @AData;
 
-  if BufferSize > a_length then // Sanity Check
+  if BufferSize > ALength then // Sanity Check
   begin
     LBufferSize := BUFFER_SIZE;
   end
@@ -172,25 +166,25 @@ begin
     LBufferSize := BufferSize;
   end;
 
-  if PtrBuffer <> Nil then
+  if LPtrStart <> Nil then
   begin
-    System.SetLength(ArrBuffer, LBufferSize);
-    PtrEnd := (PtrBuffer) + a_length;
+    System.SetLength(LBuffer, LBufferSize);
+    LPtrEnd := LPtrStart + ALength;
 
-    while PtrBuffer < PtrEnd do
+    while LPtrStart < LPtrEnd do
     begin
 
-      if (PtrEnd - PtrBuffer) >= LBufferSize then
+      if (LPtrEnd - LPtrStart) >= LBufferSize then
       begin
-        System.Move(PtrBuffer^, ArrBuffer[0], LBufferSize);
-        TransformBytes(ArrBuffer);
-        System.Inc(PtrBuffer, LBufferSize);
+        System.Move(LPtrStart^, LBuffer[0], LBufferSize);
+        TransformBytes(LBuffer);
+        System.Inc(LPtrStart, LBufferSize);
       end
       else
       begin
-        System.SetLength(ArrBuffer, PtrEnd - PtrBuffer);
-        System.Move(PtrBuffer^, ArrBuffer[0], System.Length(ArrBuffer));
-        TransformBytes(ArrBuffer);
+        System.SetLength(LBuffer, LPtrEnd - LPtrStart);
+        System.Move(LPtrStart^, LBuffer[0], System.Length(LBuffer));
+        TransformBytes(LBuffer);
         break;
       end;
 
@@ -199,22 +193,20 @@ begin
   end;
 end;
 
-function THash.ComputeStream(const a_stream: TStream; a_length: Int64)
+function THash.ComputeStream(const AStream: TStream; ALength: Int64)
   : IHashResult;
 begin
   Initialize();
-  TransformStream(a_stream, a_length);
+  TransformStream(AStream, ALength);
   result := TransformFinal();
-
 end;
 
-function THash.ComputeFile(const a_file_name: String; a_from, a_length: Int64)
+function THash.ComputeFile(const AFileName: String; AFrom, ALength: Int64)
   : IHashResult;
 begin
   Initialize();
-  TransformFile(a_file_name, a_from, a_length);
+  TransformFile(AFileName, AFrom, ALength);
   result := TransformFinal();
-
 end;
 
 function THash.Clone(): IHash;
@@ -223,61 +215,60 @@ begin
     (@SCloneNotYetImplemented, [Name]);
 end;
 
-function THash.ComputeBytes(const a_data: THashLibByteArray): IHashResult;
+function THash.ComputeBytes(const AData: THashLibByteArray): IHashResult;
 begin
   Initialize();
-  TransformBytes(a_data);
+  TransformBytes(AData);
   result := TransformFinal();
-
 end;
 
-procedure THash.TransformString(const a_data: String;
-  const a_encoding: TEncoding);
+procedure THash.TransformString(const AData: String;
+  const AEncoding: TEncoding);
 begin
-  TransformBytes(TConverters.ConvertStringToBytes(a_data, a_encoding));
+  TransformBytes(TConverters.ConvertStringToBytes(AData, AEncoding));
 end;
 
-procedure THash.TransformBytes(const a_data: THashLibByteArray);
+procedure THash.TransformBytes(const AData: THashLibByteArray);
 begin
-  TransformBytes(a_data, 0, System.Length(a_data));
+  TransformBytes(AData, 0, System.Length(AData));
 end;
 
-procedure THash.TransformBytes(const a_data: THashLibByteArray; a_index: Int32);
+procedure THash.TransformBytes(const AData: THashLibByteArray; AIndex: Int32);
 var
-  &Length: Int32;
+  LLength: Int32;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_index >= 0);
+  System.Assert(AIndex >= 0);
 {$ENDIF DEBUG}
-  Length := System.Length(a_data) - a_index;
+  LLength := System.Length(AData) - AIndex;
 
 {$IFDEF DEBUG}
-  System.Assert(Length >= 0);
+  System.Assert(LLength >= 0);
 {$ENDIF DEBUG}
-  TransformBytes(a_data, a_index, Length);
+  TransformBytes(AData, AIndex, LLength);
 end;
 
-procedure THash.TransformStream(const a_stream: TStream; a_length: Int64);
+procedure THash.TransformStream(const AStream: TStream; ALength: Int64);
 var
-  data: THashLibByteArray;
-  readed, LBufferSize: Int32;
-  total: Int64;
+  LData: THashLibByteArray;
+  LRead, LBufferSize: Int32;
+  LTotal: Int64;
 begin
 {$IFDEF DEBUG}
-  System.Assert((a_length = -1) or (a_length > 0));
+  System.Assert((ALength = -1) or (ALength > 0));
 {$ENDIF DEBUG}
-  total := 0;
-  if (a_stream <> Nil) then
+  LTotal := 0;
+  if (AStream <> Nil) then
   begin
-    if (a_length > -1) then
+    if (ALength > -1) then
     begin
-      if ((a_stream.Position + a_length) > a_stream.Size) then
+      if ((AStream.Position + ALength) > AStream.Size) then
       begin
         raise EIndexOutOfRangeHashLibException.CreateRes(@SIndexOutOfRange);
       end;
     end;
 
-    if (a_stream.Position >= a_stream.Size) then
+    if (AStream.Position >= AStream.Size) then
     begin
       Exit;
     end;
@@ -287,7 +278,7 @@ begin
     raise EArgumentNilHashLibException.CreateRes(@SUnAssignedStream);
   end;
 
-  if BufferSize > a_stream.Size then // Sanity Check
+  if BufferSize > AStream.Size then // Sanity Check
   begin
     LBufferSize := BUFFER_SIZE;
   end
@@ -296,24 +287,24 @@ begin
     LBufferSize := BufferSize;
   end;
 
-  System.SetLength(data, LBufferSize);
+  System.SetLength(LData, LBufferSize);
 
-  if (a_length = -1) then
+  if (ALength = -1) then
   begin
 
     while true do
     begin
 
-      readed := a_stream.Read(data[0], LBufferSize);
+      LRead := AStream.Read(LData[0], LBufferSize);
 
-      if (readed <> LBufferSize) then
+      if (LRead <> LBufferSize) then
       begin
-        TransformBytes(data, 0, readed);
+        TransformBytes(LData, 0, LRead);
         break;
       end
       else
       begin
-        TransformBytes(data, 0, readed);
+        TransformBytes(LData, 0, LRead);
       end;
     end;
 
@@ -323,17 +314,17 @@ begin
     while true do
     begin
 
-      readed := a_stream.Read(data[0], LBufferSize);
+      LRead := AStream.Read(LData[0], LBufferSize);
 
-      if ((total + Int64(readed)) >= a_length) then
+      if ((LTotal + Int64(LRead)) >= ALength) then
       begin
-        TransformBytes(data, 0, Int32(a_length - total));
+        TransformBytes(LData, 0, Int32(ALength - LTotal));
         break;
       end
       else
       begin
-        TransformBytes(data, 0, readed);
-        total := total + readed;
+        TransformBytes(LData, 0, LRead);
+        LTotal := LTotal + LRead;
       end;
     end;
 
@@ -341,28 +332,26 @@ begin
 
 end;
 
-procedure THash.TransformFile(const a_file_name: String;
-  a_from, a_length: Int64);
+procedure THash.TransformFile(const AFileName: String; AFrom, ALength: Int64);
 var
-  MyFileStream: TFileStream;
+  LFileStream: TFileStream;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_from >= 0);
-  System.Assert((a_length = -1) or (a_length > 0));
+  System.Assert(AFrom >= 0);
+  System.Assert((ALength = -1) or (ALength > 0));
 {$ENDIF DEBUG}
-  if not FileExists(a_file_name) then
+  if not FileExists(AFileName) then
   begin
     raise EArgumentHashLibException.CreateRes(@SFileNotExist);
   end;
 
-  MyFileStream := TFileStream.Create(a_file_name, fmOpenRead or
-    fmShareDenyWrite);
+  LFileStream := TFileStream.Create(AFileName, fmOpenRead or fmShareDenyWrite);
 
   try
-    MyFileStream.Seek(a_from, TSeekOrigin.soBeginning);
-    TransformStream(MyFileStream, a_length);
+    LFileStream.Seek(AFrom, TSeekOrigin.soBeginning);
+    TransformStream(LFileStream, ALength);
   finally
-    MyFileStream.Free;
+    LFileStream.Free;
   end;
 end;
 

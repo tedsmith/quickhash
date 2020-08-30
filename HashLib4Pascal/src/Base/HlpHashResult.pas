@@ -5,25 +5,17 @@ unit HlpHashResult;
 interface
 
 uses
-
-{$IFDEF HAS_UNITSCOPE}
-  System.SysUtils,
-{$IFDEF DELPHIXE7_UP}
-  System.NetEncoding,
-{$ELSE}
-  System.Classes,
-  Soap.EncdDecd,
-{$ENDIF DELPHIXE7_UP}
-{$ELSE}
   SysUtils,
-{$IFDEF DELPHI}
-  Classes,
-  EncdDecd,
-{$ENDIF DELPHI}
 {$IFDEF FPC}
   base64,
+{$ELSE}
+{$IFDEF HAS_DELPHI_NET_ENCODING}
+  System.NetEncoding,
+{$ELSE}
+  Classes,
+  EncdDecd,
+{$ENDIF HAS_DELPHI_NET_ENCODING}
 {$ENDIF FPC}
-{$ENDIF HAS_UNITSCOPE}
   HlpBits,
   HlpHashLibTypes,
   HlpIHashResult,
@@ -46,17 +38,17 @@ type
   THashResult = class sealed(TInterfacedObject, IHashResult)
 
   strict private
-
-    Fm_hash: THashLibByteArray;
+  var
+    FHash: THashLibByteArray;
 
   public
 
-    constructor Create(a_hash: Int32); overload;
-    constructor Create(a_hash: UInt8); overload;
-    constructor Create(a_hash: UInt16); overload;
-    constructor Create(a_hash: UInt32); overload;
-    constructor Create(a_hash: UInt64); overload;
-    constructor Create(const a_hash: THashLibByteArray); overload;
+    constructor Create(AHash: Int32); overload;
+    constructor Create(AHash: UInt8); overload;
+    constructor Create(AHash: UInt16); overload;
+    constructor Create(AHash: UInt32); overload;
+    constructor Create(AHash: UInt64); overload;
+    constructor Create(const AHash: THashLibByteArray); overload;
 
     function GetBytes(): THashLibByteArray;
     function GetUInt8(): UInt8;
@@ -64,8 +56,8 @@ type
     function GetUInt32(): UInt32;
     function GetInt32(): Int32;
     function GetUInt64(): UInt64;
-    function ToString(a_group: Boolean = false): String; reintroduce;
-    function Equals(const a_hashResult: IHashResult): Boolean; reintroduce;
+    function ToString(AGroup: Boolean = False): String; reintroduce;
+    function Equals(const AHashResult: IHashResult): Boolean; reintroduce;
     function GetHashCode(): {$IFDEF DELPHI}Int32; {$ELSE}PtrInt;
 {$ENDIF DELPHI}override;
 
@@ -75,54 +67,53 @@ implementation
 
 { THashResult }
 
-constructor THashResult.Create(a_hash: UInt64);
+constructor THashResult.Create(AHash: UInt64);
 begin
   Inherited Create();
-  Fm_hash := THashLibByteArray.Create(Byte(a_hash shr 56), Byte(a_hash shr 48),
-    Byte(a_hash shr 40), Byte(a_hash shr 32), Byte(a_hash shr 24),
-    Byte(a_hash shr 16), Byte(a_hash shr 8), Byte(a_hash));
+  System.SetLength(FHash, System.SizeOf(UInt64));
+  TConverters.ReadUInt64AsBytesBE(AHash, FHash, 0);
 end;
 
-constructor THashResult.Create(const a_hash: THashLibByteArray);
+constructor THashResult.Create(const AHash: THashLibByteArray);
 begin
   Inherited Create();
-  Fm_hash := a_hash;
+  FHash := AHash;
 end;
 
-constructor THashResult.Create(a_hash: UInt32);
+constructor THashResult.Create(AHash: UInt32);
 begin
   Inherited Create();
-  Fm_hash := THashLibByteArray.Create(Byte(a_hash shr 24), Byte(a_hash shr 16),
-    Byte(a_hash shr 8), Byte(a_hash));
+  System.SetLength(FHash, System.SizeOf(UInt32));
+  TConverters.ReadUInt32AsBytesBE(AHash, FHash, 0);
 end;
 
-constructor THashResult.Create(a_hash: UInt8);
+constructor THashResult.Create(AHash: UInt8);
 begin
   Inherited Create();
-  Fm_hash := THashLibByteArray.Create(a_hash);
+  FHash := THashLibByteArray.Create(AHash);
 end;
 
-constructor THashResult.Create(a_hash: UInt16);
+constructor THashResult.Create(AHash: UInt16);
 begin
   Inherited Create();
-  Fm_hash := THashLibByteArray.Create(Byte(a_hash shr 8), Byte(a_hash));
+  FHash := THashLibByteArray.Create(Byte(AHash shr 8), Byte(AHash));
 end;
 
-constructor THashResult.Create(a_hash: Int32);
+constructor THashResult.Create(AHash: Int32);
 begin
   Inherited Create();
-  Fm_hash := THashLibByteArray.Create(Byte(TBits.Asr32(a_hash, 24)),
-    Byte(TBits.Asr32(a_hash, 16)), Byte(TBits.Asr32(a_hash, 8)), Byte(a_hash));
+  FHash := THashLibByteArray.Create(Byte(TBits.Asr32(AHash, 24)),
+    Byte(TBits.Asr32(AHash, 16)), Byte(TBits.Asr32(AHash, 8)), Byte(AHash));
 end;
 
-function THashResult.Equals(const a_hashResult: IHashResult): Boolean;
+function THashResult.Equals(const AHashResult: IHashResult): Boolean;
 begin
-  result := TArrayUtils.ConstantTimeAreEqual(a_hashResult.GetBytes(), Fm_hash);
+  result := TArrayUtils.ConstantTimeAreEqual(AHashResult.GetBytes(), FHash);
 end;
 
 function THashResult.GetBytes: THashLibByteArray;
 begin
-  result := Fm_hash;
+  result := FHash;
 end;
 
 function THashResult.GetHashCode: {$IFDEF DELPHI}Int32; {$ELSE}PtrInt;
@@ -130,63 +121,62 @@ function THashResult.GetHashCode: {$IFDEF DELPHI}Int32; {$ELSE}PtrInt;
 
 var
   LResult: UInt32;
-  I, Top: Int32;
-  Temp: string;
-{$IFDEF DELPHIXE7_UP}
-  TempHolder: THashLibByteArray;
+  LIdx, LTop: Int32;
+  LTemp: String;
+{$IFDEF HAS_DELPHI_NET_ENCODING}
+  LTempHolder: THashLibByteArray;
 {$ELSE}
 {$IFDEF DELPHI}
-  TempHolder: TBytesStream;
+  LTempHolder: TBytesStream;
 {$ENDIF DELPHI}
-{$ENDIF DELPHIXE7_UP}
+{$ENDIF HAS_DELPHI_NET_ENCODING}
 {$IFDEF FPC}
-  TempHolder: String;
+  LTempHolder: String;
 {$ENDIF FPC}
 begin
 
-{$IFDEF DELPHIXE7_UP}
-  TempHolder := Self.Fm_hash;
+{$IFDEF HAS_DELPHI_NET_ENCODING}
+  LTempHolder := Self.FHash;
 {$ELSE}
 {$IFDEF DELPHI}
-  TempHolder := TBytesStream.Create(Self.Fm_hash);
+  LTempHolder := TBytesStream.Create(Self.FHash);
 {$ENDIF DELPHI}
-{$ENDIF DELPHIXE7_UP}
+{$ENDIF HAS_DELPHI_NET_ENCODING}
 {$IFDEF FPC}
-  TempHolder := EncodeStringBase64
-    (TConverters.ConvertBytesToString(Self.Fm_hash, TEncoding.UTF8));
+  LTempHolder := EncodeStringBase64(TConverters.ConvertBytesToString(Self.FHash,
+    TEncoding.UTF8));
 {$ENDIF FPC}
-{$IFDEF DELPHIXE7_UP}
-  Temp := StringReplace(TNetEncoding.base64.EncodeBytesToString(TempHolder),
+{$IFDEF HAS_DELPHI_NET_ENCODING}
+  LTemp := StringReplace(TNetEncoding.base64.EncodeBytesToString(LTempHolder),
     sLineBreak, '', [rfReplaceAll]);
 {$ELSE}
 {$IFDEF DELPHI}
   try
-    Temp := StringReplace(String(EncodeBase64(TempHolder.Memory,
-      TempHolder.Size)), sLineBreak, '', [rfReplaceAll]);
+    LTemp := StringReplace(String(EncodeBase64(LTempHolder.Memory,
+      LTempHolder.Size)), sLineBreak, '', [rfReplaceAll]);
   finally
-    TempHolder.Free;
+    LTempHolder.Free;
   end;
 {$ENDIF DELPHI}
-{$ENDIF DELPHIXE7_UP}
+{$ENDIF HAS_DELPHI_NET_ENCODING}
 {$IFDEF FPC}
-  Temp := TempHolder;
+  LTemp := LTempHolder;
 {$ENDIF FPC}
-  Temp := AnsiUpperCase(Temp);
+  LTemp := AnsiUpperCase(LTemp);
 
   LResult := 0;
 {$IFDEF DELPHIXE3_UP}
-  I := System.Low(Temp);
-  Top := System.High(Temp);
+  LIdx := System.Low(LTemp);
+  LTop := System.High(LTemp);
 {$ELSE}
-  I := 1;
-  Top := System.Length(Temp);
+  LIdx := 1;
+  LTop := System.Length(LTemp);
 {$ENDIF DELPHIXE3_UP}
-  while I <= Top do
+  while LIdx <= LTop do
   begin
-
     LResult := TBits.RotateLeft32(LResult, 5);
-    LResult := LResult xor UInt32(Temp[I]);
-    System.Inc(I);
+    LResult := LResult xor UInt32(LTemp[LIdx]);
+    System.Inc(LIdx);
   end;
 
   result := LResult;
@@ -194,61 +184,58 @@ end;
 
 function THashResult.GetInt32: Int32;
 begin
-  if (System.Length(Fm_hash) <> 4) then
+  if (System.Length(FHash) <> 4) then
+  begin
     raise EInvalidOperationHashLibException.CreateRes
       (@SImpossibleRepresentationInt32);
-
-  result := Int32((Int32(Fm_hash[0]) shl 24) or (Int32(Fm_hash[1]) shl 16) or
-    (Int32(Fm_hash[2]) shl 8) or (Int32(Fm_hash[3])));
-
+  end;
+  result := Int32((Int32(FHash[0]) shl 24) or (Int32(FHash[1]) shl 16) or
+    (Int32(FHash[2]) shl 8) or (Int32(FHash[3])));
 end;
 
 function THashResult.GetUInt8: UInt8;
 begin
-  if (System.Length(Fm_hash) <> 1) then
+  if (System.Length(FHash) <> 1) then
+  begin
     raise EInvalidOperationHashLibException.CreateRes
       (@SImpossibleRepresentationUInt8);
-
-  result := (UInt8(Fm_hash[0]));
+  end;
+  result := (UInt8(FHash[0]));
 end;
 
 function THashResult.GetUInt16: UInt16;
 begin
-  if (System.Length(Fm_hash) <> 2) then
+  if (System.Length(FHash) <> 2) then
+  begin
     raise EInvalidOperationHashLibException.CreateRes
       (@SImpossibleRepresentationUInt16);
-
-  result := (UInt16(Fm_hash[0]) shl 8) or (UInt16(Fm_hash[1]));
-
+  end;
+  result := (UInt16(FHash[0]) shl 8) or (UInt16(FHash[1]));
 end;
 
 function THashResult.GetUInt32: UInt32;
 begin
-  if (System.Length(Fm_hash) <> 4) then
+  if (System.Length(FHash) <> 4) then
+  begin
     raise EInvalidOperationHashLibException.CreateRes
       (@SImpossibleRepresentationUInt32);
-
-  result := (UInt32(Fm_hash[0]) shl 24) or (UInt32(Fm_hash[1]) shl 16) or
-    (UInt32(Fm_hash[2]) shl 8) or (UInt32(Fm_hash[3]));
-
+  end;
+  result := TConverters.ReadBytesAsUInt32BE(PByte(FHash), 0);
 end;
 
 function THashResult.GetUInt64: UInt64;
 begin
-  if (System.Length(Fm_hash) <> 8) then
+  if (System.Length(FHash) <> 8) then
+  begin
     raise EInvalidOperationHashLibException.CreateRes
       (@SImpossibleRepresentationUInt64);
-
-  result := (UInt64(Fm_hash[0]) shl 56) or (UInt64(Fm_hash[1]) shl 48) or
-    (UInt64(Fm_hash[2]) shl 40) or (UInt64(Fm_hash[3]) shl 32) or
-    (UInt64(Fm_hash[4]) shl 24) or (UInt64(Fm_hash[5]) shl 16) or
-    (UInt64(Fm_hash[6]) shl 8) or (UInt64(Fm_hash[7]));
-
+  end;
+  result := TConverters.ReadBytesAsUInt64BE(PByte(FHash), 0);
 end;
 
-function THashResult.ToString(a_group: Boolean): String;
+function THashResult.ToString(AGroup: Boolean): String;
 begin
-  result := TConverters.ConvertBytesToHexString(Fm_hash, a_group);
+  result := TConverters.ConvertBytesToHexString(FHash, AGroup);
 end;
 
 end.

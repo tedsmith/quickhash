@@ -2,19 +2,19 @@ object frmSQLiteDBases: TfrmSQLiteDBases
   Left = 1387
   Height = 562
   Top = 109
-  Width = 252
+  Width = 460
   Caption = 'frmSQLiteDBases'
   ClientHeight = 562
-  ClientWidth = 252
+  ClientWidth = 460
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '2.0.4.0'
   object lblConnectionStatus: TLabel
     Left = 32
-    Height = 15
+    Height = 16
     Top = 32
-    Width = 81
+    Width = 91
     Caption = 'Not Connected'
     ParentColor = False
   end
@@ -74,21 +74,34 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Enabled = False
     ConnectionType = 'SQLite3'
     LibraryName = 'sqlite3.dll'
-    left = 160
-    top = 240
+    left = 224
+    top = 224
   end
   object SQLDBLibraryLoaderOSX: TSQLDBLibraryLoader
     Enabled = False
     ConnectionType = 'SQLite3'
     LibraryName = 'libsqlite3.dylib'
-    left = 160
-    top = 312
+    left = 224
+    top = 296
   end
   object SQLDBLibraryLoaderLinux: TSQLDBLibraryLoader
     Enabled = False
     ConnectionType = 'SQLite3'
     LibraryName = 'libsqlite3.so'
-    left = 160
+    left = 224
     top = 376
+  end
+  object sqlCOMPARETWOFOLDERS: TSQLQuery
+    FieldDefs = <>
+    Database = SQLite3Connection1
+    Transaction = SQLTransaction1
+    Params = <>
+    left = 296
+    top = 80
+  end
+  object DataSource3: TDataSource
+    DataSet = sqlCOMPARETWOFOLDERS
+    left = 296
+    top = 144
   end
 end
