@@ -19,13 +19,13 @@ type
   TMD2 = class sealed(TBlockHash, ICryptoNotBuildIn, ITransformBlock)
 
   strict private
-    Fm_state, Fm_checksum: THashLibByteArray;
+  var
+    FState, FChecksum: THashLibByteArray;
 
 {$REGION 'Consts'}
 
   const
-
-    s_pi: array [0 .. 255] of Byte = (41, 46, 67, 201, 162, 216, 124, 1, 61, 54,
+    SPi: array [0 .. 255] of Byte = (41, 46, 67, 201, 162, 216, 124, 1, 61, 54,
       84, 161, 236, 240, 6, 19,
 
       98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188, 76, 130, 202,
@@ -65,8 +65,8 @@ type
   strict protected
     procedure Finish(); override;
     function GetResult(): THashLibByteArray; override;
-    procedure TransformBlock(a_data: PByte; a_data_length: Int32;
-      a_index: Int32); override;
+    procedure TransformBlock(AData: PByte; ADataLength: Int32;
+      AIndex: Int32); override;
 
   public
     constructor Create();
@@ -81,104 +81,95 @@ implementation
 
 function TMD2.Clone(): IHash;
 var
-  HashInstance: TMD2;
+  LHashInstance: TMD2;
 begin
-  HashInstance := TMD2.Create();
-  HashInstance.Fm_state := System.Copy(Fm_state);
-  HashInstance.Fm_checksum := System.Copy(Fm_checksum);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  result := HashInstance as IHash;
+  LHashInstance := TMD2.Create();
+  LHashInstance.FState := System.Copy(FState);
+  LHashInstance.FChecksum := System.Copy(FChecksum);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
 constructor TMD2.Create;
 begin
   Inherited Create(16, 16);
-  System.SetLength(Fm_state, 16);
-  System.SetLength(Fm_checksum, 16);
-
+  System.SetLength(FState, 16);
+  System.SetLength(FChecksum, 16);
 end;
 
 procedure TMD2.Finish;
 var
-  padLen, i: Int32;
-  pad: THashLibByteArray;
+  LPadLength, LIdx: Int32;
+  LPad: THashLibByteArray;
 begin
-  padLen := 16 - Fm_buffer.Pos;
-  System.SetLength(pad, padLen);
+  LPadLength := 16 - FBuffer.Position;
+  System.SetLength(LPad, LPadLength);
 
-  i := 0;
-  while i < padLen do
+  LIdx := 0;
+  while LIdx < LPadLength do
   begin
-    pad[i] := Byte(padLen);
-    System.Inc(i);
+    LPad[LIdx] := Byte(LPadLength);
+    System.Inc(LIdx);
   end;
 
-  TransformBytes(pad, 0, padLen);
-  TransformBytes(Fm_checksum, 0, 16);
+  TransformBytes(LPad, 0, LPadLength);
+  TransformBytes(FChecksum, 0, 16);
 end;
 
 function TMD2.GetResult: THashLibByteArray;
 begin
-  result := System.Copy(Fm_state);
+  result := System.Copy(FState);
 end;
 
 procedure TMD2.Initialize;
 begin
-
-  TArrayUtils.ZeroFill(Fm_state);
-  TArrayUtils.ZeroFill(Fm_checksum);
-
+  TArrayUtils.ZeroFill(FState);
+  TArrayUtils.ZeroFill(FChecksum);
   Inherited Initialize();
-
 end;
 
-procedure TMD2.TransformBlock(a_data: PByte; a_data_length: Int32;
-  a_index: Int32);
+procedure TMD2.TransformBlock(AData: PByte; ADataLength: Int32; AIndex: Int32);
 var
-  i, j: Int32;
-  t: UInt32;
-  temp: array [0 .. 47] of Byte;
-
+  LIdx, LJdx: Int32;
+  LT: UInt32;
+  LTemp: array [0 .. 47] of Byte;
 begin
+  System.Move(FState[0], LTemp[0], ADataLength);
 
-  System.Move(Fm_state[0], temp[0], a_data_length);
+  System.Move(AData[AIndex], LTemp[ADataLength], ADataLength);
 
-  System.Move(a_data[a_index], temp[a_data_length], a_data_length);
-
-  for i := 0 to 15 do
+  for LIdx := 0 to 15 do
   begin
-    temp[i + 32] := Byte(Fm_state[i] xor a_data[i + a_index]);
+    LTemp[LIdx + 32] := Byte(FState[LIdx] xor AData[LIdx + AIndex]);
   end;
 
-  t := 0;
+  LT := 0;
 
-  for i := 0 to 17 do
+  for LIdx := 0 to 17 do
   begin
 
-    for j := 0 to 47 do
+    for LJdx := 0 to 47 do
     begin
-      temp[j] := Byte(temp[j] xor s_pi[t]);
-      t := temp[j];
+      LTemp[LJdx] := Byte(LTemp[LJdx] xor SPi[LT]);
+      LT := LTemp[LJdx];
     end;
 
-    t := Byte(t + UInt32(i));
+    LT := Byte(LT + UInt32(LIdx));
   end;
 
-  System.Move(temp[0], Fm_state[0], 16);
+  System.Move(LTemp[0], FState[0], 16);
 
-  t := Fm_checksum[15];
+  LT := FChecksum[15];
 
-  for i := 0 to 15 do
+  for LIdx := 0 to 15 do
   begin
-
-    Fm_checksum[i] := Fm_checksum[i] xor (s_pi[a_data[i + a_index] xor t]);
-    t := Fm_checksum[i];
+    FChecksum[LIdx] := FChecksum[LIdx] xor (SPi[AData[LIdx + AIndex] xor LT]);
+    LT := FChecksum[LIdx];
   end;
 
-  System.FillChar(temp, System.SizeOf(temp), Byte(0));
-
+  System.FillChar(LTemp, System.SizeOf(LTemp), Byte(0));
 end;
 
 end.

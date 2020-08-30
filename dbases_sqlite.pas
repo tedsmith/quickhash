@@ -1,7 +1,7 @@
 {   Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
                      and generating hash values for them.
 
-    Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2020  Ted Smith www.quickhash-gui.org
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
     Use of the name 'QuickHash GUI' must refer to this utility
     only and must not be re-used in another tool if based upon this code.
-    The code is Copyright of Ted Smith 2011 - 2019 (www.quickhash-gui.org)
+    The code is Copyright of Ted Smith 2011 - 2020 (www.quickhash-gui.org)
 }
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
@@ -43,6 +43,7 @@ type
     CSVExporter1: TCSVExporter; // We use this for users who want to clipboard the results. Works fine if not too many values.
     DataSource1: TDataSource;
     DataSource2: TDataSource;
+    DataSource3: TDataSource;
     lblConnectionStatus: TLabel;
     SQLDBLibraryLoaderLinux: TSQLDBLibraryLoader;
     SQLDBLibraryLoaderOSX: TSQLDBLibraryLoader;
@@ -50,18 +51,27 @@ type
     SQLite3Connection1: TSQLite3Connection;
     sqlFILES: TSQLQuery;
     sqlCOPY: TSQLQuery;
+    sqlCOMPARETWOFOLDERS : TSQLQuery;
     SQLTransaction1: TSQLTransaction;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure CreateDatabase(DBaseName : string);
     procedure WriteFILESValuesToDatabase(Filename, Filepath, HashValue, FileSize : string; KnownHash : boolean);
     procedure WriteCOPYValuesToDatabase(Col1, Col2, Col3, Col4, Col5 : string);
+    procedure Write_INSERT_All_Rows_Required(RowCount : integer);
+    procedure Write_COMPARE_TWO_FOLDERS_FolderA(Col1, Col2 : string; Counter : integer);
+    procedure Write_COMPARE_TWO_FOLDERS_FolderB(Col3, Col4 : string; Counter : integer);
     procedure EmptyDBTable(TableName : string; DBGrid : TDBGrid);
+    procedure EmptyDBTableCOPY(TableName : string; DBGrid : TDBGrid);
+    procedure EmptyDBTableC2F(TableName : string; DBGrid : TDBGrid);
     procedure UpdateGridFILES(Sender: TObject);
     procedure UpdateGridCOPYTAB(Sender: TObject);
+    procedure UpdateGridCOMPARETWOFOLDERSTAB(Sender: TObject);
     procedure SaveDBToCSV(DBGrid : TDBGrid; Filename : string);
+    procedure SaveC2FDBToCSV(DBGrid : TDBGrid; Filename : string);
     procedure SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : string);
     procedure SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
+    procedure SaveC2FWindowToHTML(DBGrid : TDBGrid; Filename : string);
     procedure DatasetToClipBoard(DBGrid : TDBGrid);
     procedure ShowDuplicates(DBGrid : TDBGrid);
     procedure DeleteDuplicates(DBGrid : TDBGrid);
@@ -74,12 +84,14 @@ type
     procedure FilterOutHashListYES(DBGrid : TDBGrid);
     procedure ShowAll(DBGrid : TDBGrid);
     procedure ShowAllCOPYGRID(DBGrid : TDBGrid);
+    procedure ShowAllC2FGRID(DBGrid : TDBGrid);
     procedure CopyFileNameOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyFilePathOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyHashOfSelectedCell(DBGrid : TDBGrid);
     procedure CopyAllHashesFILESTAB(DBGrid : TDBGrid; UseFileFlag : Boolean);
     procedure CopySelectedRowFILESTAB(DBGrid : TDBGrid);
     procedure CopySelectedRowCOPYTAB(DBGrid : TDBGrid);
+    procedure CopySelectedRowC2FTAB(DBGrid : TDBGrid);
     procedure SortBySourceFilename(DBGrid : TDBGrid);
     procedure SortByDestinationFilename(DBGrid : TDBGrid);
     procedure SortBySourceHash(DBGrid : TDBGrid);
@@ -107,7 +119,7 @@ implementation
 { TfrmSQLiteDBases }
 
   uses
-    Unit2, uDisplayGrid;
+    Unit2, uDisplayGrid, udisplaygrid3;
 
 
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
@@ -279,6 +291,18 @@ begin
       // Creating an index based upon id in the TBL_COPY Table
       SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COPIED_FILES_id_idx" ON "TBL_COPY"( "id" );');
 
+      // New to v3.2.0 to enable a display grid for the comparison of two folders
+      // Here we're setting up a table named "TBL_COMPARE_TWO_FOLDERS" in the new database for Comapre Two Folders tab
+      // VARCHAR is set as 32767 to ensure max length of NFTS based filename and paths can be utilised
+      SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COMPARE_TWO_FOLDERS"('+
+                  ' "id" Integer NOT NULL PRIMARY KEY,'+
+                  ' "FolderAndFileNameA" VARCHAR(32767) NULL,'+
+                  ' "FolderAndFileNameAHash" VARCHAR NULL,'+
+                  ' "FolderAndFileNameB" VARCHAR(32767) NULL,'+
+                  ' "FolderAndFileNameBHash" VARCHAR NULL);');
+      // Creating an index based upon id in the TBL_COMPARE_TWO_FOLDERS Table
+      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COMPARE_TWO_FOLDERS_id_idx" ON "TBL_COMPARE_TWO_FOLDERS"( "id" );');
+
       // Now write to the new database
       SQLTransaction1.CommitRetaining;
     except
@@ -324,6 +348,25 @@ begin
   DateAttr         := DBGrid.DataSource.DataSet.Fields[5].Value;
   // and just add them all together :-)
   AllRowCells := SourceFileNameCell + ',' + SourceHash  + ',' + DestinationFilenameCell + ',' + DestinationHash + ',' + DateAttr;
+  Clipboard.AsText := AllRowCells;
+end;
+
+// Copies selected row to clipboard of "Compare Two Folders" tab
+procedure TfrmSQLiteDBases.CopySelectedRowC2FTAB(DBGrid : TDBGrid);
+var
+  AllRowCells, FolderAFileNameCell, FolderAFileHash,
+    FolderBFileNameCell, FolderBFileHash : string;
+begin
+  // Get the data from the source filename cell that the user has selected
+  FolderAFileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
+  // Get the source file hash cell that the user has selected
+  FolderAFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+  // Get the destination filename
+  FolderBFileNameCell := DBGrid.DataSource.DataSet.Fields[3].Value;
+  // Get the destination hash
+  FolderBFileHash  := DBGrid.DataSource.DataSet.Fields[4].Value;
+  // and just add them all together :-)
+  AllRowCells := FolderAFileNameCell + ',' + FolderAFileHash  + ',' + FolderBFileNameCell + ',' + FolderBFileHash;
   Clipboard.AsText := AllRowCells;
 end;
 
@@ -523,6 +566,62 @@ begin
   end;
 end;
 
+// Deletes a DB table from the COPY DB
+procedure TfrmSQLiteDBases.EmptyDBTableCOPY(TableName : string; DBGrid : TDBGrid);
+var
+  DynamicSQLQuery: TSQLQuery;
+begin
+  DynamicSQLQuery := TSQLQuery.Create(nil);
+  try
+    try
+      DynamicSQLQuery.DataBase := sqlCOPY.Database;
+      DynamicSQLQuery.Transaction := sqlCOPY.Transaction;
+      DynamicSQLQuery.SQL.Text := 'DELETE FROM ' + TableName;
+      if SQLite3Connection1.Connected then
+      begin
+        SQLTransaction1.Active := True;
+        DynamicSQLQuery.ExecSQL;
+        SQLTransaction1.CommitRetaining; // Retain transaction is important here
+      end;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+  finally
+    DynamicSQLQuery.Free;
+  end;
+end;
+
+// Empties table of Compare Two Folders
+procedure TfrmSQLiteDBases.EmptyDBTableC2F(TableName : string; DBGrid : TDBGrid);
+var
+  DynamicSQLQuery: TSQLQuery;
+begin
+  DynamicSQLQuery := TSQLQuery.Create(nil);
+  try
+    try
+      DynamicSQLQuery.DataBase := sqlCOMPARETWOFOLDERS.Database;
+      DynamicSQLQuery.Transaction := sqlCOMPARETWOFOLDERS.Transaction;
+      DynamicSQLQuery.SQL.Text := 'DELETE FROM ' + TableName;
+      if SQLite3Connection1.Connected then
+      begin
+        SQLTransaction1.Active := True;
+        DynamicSQLQuery.ExecSQL;
+        SQLTransaction1.CommitRetaining; // Retain transaction is important here
+      end;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+  finally
+    DynamicSQLQuery.Free;
+  end;
+end;
+
 // SaveDBToCSV exports the DBGrid (DBGridName) to a CSV file (filename) for the user
 // Based on example in FPC\3.0.2\source\packages\fcl-db\tests\testdbexport.pas
 // Requires the lazdbexport package be installed in Lazarus IDE
@@ -567,6 +666,46 @@ begin
                          (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
                          (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
         end;
+     n := 0;
+     n := Length(linetowrite);
+     try
+       CSVFileToWrite.Write(linetowrite[1], n);
+     finally
+       DBGrid.DataSource.DataSet.Next;
+     end;
+    end;
+  finally
+    CSVFileToWrite.Free;
+  end;
+  Mainform.StatusBar2.SimpleText := 'DONE';
+  ShowMessage('Grid data now in ' + Filename);
+end;
+
+procedure TfrmSQLiteDBases.SaveC2FDBToCSV(DBGrid : TDBGrid; Filename : string);
+var
+  linetowrite : ansistring;
+  n : integer;
+  CSVFileToWrite : TFilestreamUTF8;
+
+begin
+  Mainform.StatusBar2.SimpleText := 'Writing results to file...please wait';
+  Application.ProcessMessages;
+  linetowrite := '';
+  n := 0;
+
+  try
+    CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+    // Now add all the hash strings
+    DBGrid.DataSource.DataSet.First;
+
+    while not DBGrid.DataSource.DataSet.EOF do
+    begin
+      // Include all columns
+      linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
+                     (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
+                     (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
+                     (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+
      n := 0;
      n := Length(linetowrite);
      try
@@ -1079,6 +1218,86 @@ begin
   end;
 end;
 
+// *** Start of COMPARE TWO FOLDERS tab related functions ***
+
+// Populate the database table with empty rows first, to then be populated using UPDATE
+procedure TfrmSQLiteDBases.Write_INSERT_All_Rows_Required(RowCount : integer);
+var
+  i : integer;
+begin
+  for i:= 0 to RowCount -1 do
+    begin
+      try
+        sqlCOMPARETWOFOLDERS.Close;
+        sqlCOMPARETWOFOLDERS.SQL.Text := 'INSERT into TBL_COMPARE_TWO_FOLDERS (FolderAndFileNameA, FolderAndFileNameAHash, FolderAndFileNameB, FolderAndFileNameBHash) values (:FolderAFilename,:FolderAFileHash,:FolderBFilename,:FolderBFileHash)';
+        SQLTransaction1.Active := True;
+        sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderAFilename').AsString := '';
+        sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderAFileHash').AsString := '';
+        sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFilename').AsString := '';
+        sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFileHash').AsString := '';
+        sqlCOMPARETWOFOLDERS.ExecSQL;
+        //SQLTransaction1.CommitRetaining;
+      except
+          on E: EDatabaseError do
+          begin
+            MessageDlg('Error','Unable to create all rows required for comparison. Technical error message: ' + E.Message,mtError,[mbOK],0);
+          end;
+      end;
+    end;
+end;
+
+procedure TfrmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(Col1, Col2 : string; Counter : integer);
+{ Col3 : Filename from Folder B
+  Col4 : Hashvalue from FileB in FolderB
+}
+begin
+  try
+    sqlCOMPARETWOFOLDERS.Close;       // UPDATE only works if rows already exist. If count is different need to work out how to insert into Cols 3 and 4
+    sqlCOMPARETWOFOLDERS.SQL.Text := 'UPDATE TBL_COMPARE_TWO_FOLDERS SET FolderAndFileNameA =:FolderAFilename, FolderAndFileNameAHash =:FolderAFileHash WHERE Id=:Counter';
+    SQLTransaction1.Active := True;
+    sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderAFilename').AsString := Col1;
+    sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderAFileHash').AsString := Col2;
+    sqlCOMPARETWOFOLDERS.Params.ParamByName('Counter').AsString := IntToStr(Counter);
+    sqlCOMPARETWOFOLDERS.ExecSQL;
+    //SQLTransaction1.CommitRetaining;
+
+    //TODO : Consider creating a new DBGrid for this tab
+    // Or, work out how to ensure it gets refreshed if used for Copy tab
+    // Use DBGrid.DataSource.DataSet.EnableControls; via popup menu options when adding the various capabilities
+  except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+  end;
+end;
+
+procedure TfrmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(Col3, Col4 : string; Counter : integer);
+{ Col3 : Filename from Folder B
+  Col4 : Hashvalue from FileB in FolderB
+}
+begin
+  try
+    sqlCOMPARETWOFOLDERS.Close;       // UPDATE only works if rows already exist. If count is different need to work out how to insert into Cols 3 and 4
+    sqlCOMPARETWOFOLDERS.SQL.Text := 'UPDATE TBL_COMPARE_TWO_FOLDERS SET FolderAndFileNameB =:FolderBFilename, FolderAndFileNameBHash =:FolderBFileHash WHERE Id=:Counter';
+    SQLTransaction1.Active := True;
+    sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFilename').AsString := Col3;
+    sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFileHash').AsString := Col4;
+    sqlCOMPARETWOFOLDERS.Params.ParamByName('Counter').AsString := IntToStr(Counter);
+    sqlCOMPARETWOFOLDERS.ExecSQL;
+    //SQLTransaction1.CommitRetaining;
+
+    //TODO : Consider creating a new DBGrid for this tab
+    // Or, work out how to ensure it gets refreshed if used for Copy tab
+    // Use DBGrid.DataSource.DataSet.EnableControls; via popup menu options when adding the various capabilities
+  except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+  end;
+end;
+
 // *** Start of COPY tab related functions ***
 
 // Write computed values from the COPY tab to the database table TBL_COPY
@@ -1189,11 +1408,28 @@ end;
 procedure TfrmSQLiteDBases.ShowAllCOPYGRID(DBGrid : TDBGrid);
 begin
   try
-    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlCOPY but the query connected to the grid
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COPY';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+  except
+    on E: EDatabaseError do
+    begin
+      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+    end;
+  end;
+end;
+
+procedure TfrmSQLiteDBases.ShowAllC2FGRID(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlCOMPARETWOFOLDERS but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -1359,6 +1595,155 @@ begin
     finally
       fs.free;
       MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
+      Showmessage('Data saved to HTML file ' + Filename);
+      Application.ProcessMessages;
+    end;
+  DBGrid.DataSource.DataSet.EnableControls;
+end;
+
+// Saves the "Compare Two Folders" grid to HTML. If small volume of records, uses a stringlist.
+// If big volume, uses file stream.
+procedure TfrmSQLiteDBases.SaveC2FWindowToHTML(DBGrid : TDBGrid; Filename : string);
+var
+   strTitle, FolderAFilenameA, FolderAFilenameAHash, FolderBFilenameB, FolderBFilenameBHash : string;
+  NoOfRowsInGrid    : integer;
+  sl                : TStringList;
+  fs                : TFileStreamUTF8;
+
+  const
+    strHTMLHeader      = '<HTML>'  ;
+    strTITLEHeader     = '<TITLE>QuickHash HTML Output' ;
+    strBODYHeader      = '<BODY>'  ;
+    strTABLEROWStart   = '<TR>'    ;
+    strTABLEDATAStart  = '<TD>'    ;
+    strTABLEDataEnd    = '</TD>'   ;
+    strTABLEROWEnd     = '</TR>'   ;
+    strTABLEFooter     = '</TABLE>';
+    strBODYFooter      = '</BODY>' ;
+    strTITLEFooter     = '</TITLE>';
+    strHTMLFooter      = '</HTML>' ;
+
+begin
+  NoOfRowsInGrid := 0;
+  // If database volume not too big, use memory and stringlists. Otherwise, use file writes
+  NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
+  if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
+  try
+    MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+    Application.ProcessMessages;
+    // Write the grid to a stringlist
+    sl := TStringList.Create;
+    sl.add('<HTML>');
+    sl.add('<TITLE>QuickHash HTML Output</TITLE>');
+    sl.add('<BODY>');
+    sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
+    sl.add('<table border=1>');
+    DBGrid.DataSource.DataSet.DisableControls;
+    DBGrid.DataSource.DataSet.First;
+    while not DBGrid.DataSource.DataSet.EOF do
+      begin
+          sl.add('<tr>');
+          FolderAFilenameA := DBGrid.DataSource.DataSet.Fields[1].Value;
+          sl.add('<td>'+FolderAFilenameA+'</td>');
+          FolderAFilenameAHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+          sl.add('<td>'+FolderAFilenameAHash+'</td>');
+          FolderBFilenameB := DBGrid.DataSource.DataSet.Fields[3].Value;
+          sl.add('<td>'+FolderBFilenameB+'</td>');
+          FolderBFilenameBHash := DBGrid.DataSource.DataSet.Fields[4].Value;
+          sl.add('<td>'+FolderBFilenameBHash+'</td>');
+          sl.add('</tr>');
+          DBGrid.DataSource.DataSet.Next;
+        end;
+    sl.add('</TABLE>');
+    sl.add('</BODY> ');
+    sl.add('</HTML> ');
+    DBGrid.DataSource.DataSet.EnableControls;
+    sl.SaveToFile(Filename);
+  finally
+    sl.free;
+    MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
+    Application.ProcessMessages;
+  end
+  else // Use filestream method because there's more than 10K rows. Too many to add HTML tags and store in memory
+    try
+    if not FileExists(filename) then
+      begin
+        fs := TFileStreamUTF8.Create(Filename, fmCreate);
+      end
+    else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
+
+    MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+    strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
+    Application.ProcessMessages;
+
+    fs.Write(strHTMLHeader[1], Length(strHTMLHeader));
+    fs.Write(#13#10, 2);
+    fs.Write(strTITLEHeader[1], Length(strTITLEHeader));
+    fs.Write(strTITLEFooter[1], Length(strTITLEFooter));
+    fs.Write(#13#10, 2);
+    fs.Write(strBODYHeader[1], Length(strBODYHeader));
+    fs.Write(strTitle[1], Length(strTitle));
+    fs.Write(#13#10, 2);
+    fs.Write('<table border=1>', 16);
+
+    { strTABLEROWStart   = '<TR>'      = 4 bytes
+      strTABLEDATAStart  = '<TD>'      = 4 bytes
+      strTABLEDataEnd    = '</TD>'     = 5 bytes
+      strTABLEROWEnd     = '</TR>'     = 5 bytes
+      strTABLEFooter     = '</TABLE>'  = 8 bytes
+      strBODYFooter      = '</BODY>'   = 7 bytes
+      strTITLEFooter     = '</TITLE>'  = 8 bytes
+      strHTMLFooter      = '</HTML>'   = 7 bytes}
+      DBGrid.DataSource.DataSet.DisableControls;
+      DBGrid.DataSource.DataSet.First;
+    while not DBGrid.DataSource.DataSet.EOF do
+      begin
+        // Start new row
+        fs.Write(strTABLEROWStart[1], 4);
+        // Get the Folder A Filename A filename
+        FolderAFilenameA := DBGrid.DataSource.DataSet.Fields[1].Value;
+        // Write Folder A Filename A to row
+        fs.Write(strTABLEDATAStart[1], 4);
+        fs.Write(FolderAFilenameA[1], Length(FolderAFilenameA));
+        fs.Write(strTABLEDataEnd[1], 5);
+
+        // Get the Folder A Filename hash
+        FolderAFilenameAHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+        // Write Folder A Filename hash to row
+        fs.Write(strTABLEDATAStart[1], 4);
+        fs.Write(FolderAFilenameAHash[1], Length(FolderAFilenameAHash));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // Get the Folder B Filename B filename
+        FolderBFilenameB := DBGrid.DataSource.DataSet.Fields[3].Value;
+        // Write the Filename B
+        fs.Write(strTABLEDATAStart[1], 4) ;
+        fs.Write(FolderBFilenameB[1], Length(Trim(FolderBFilenameB)));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // Get the Folder B Filename B hash
+        FolderBFilenameBHash := DBGrid.DataSource.DataSet.Fields[4].Value;
+        // Write the Folder B Filename B hash
+        fs.Write(strTABLEDATAStart[1], 4) ;
+        fs.Write(FolderBFilenameBHash[1], Length(Trim(FolderBFilenameBHash)));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // End the row
+        fs.Write(strTABLEROWEnd[1], 5);
+        fs.Write(#13#10, 2);
+        DBGrid.DataSource.DataSet.Next;
+      end;
+    fs.Write(strTABLEFooter, 8);
+    fs.Write(#13#10, 2);
+    fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
+    fs.Write(strBODYFooter, 7);
+    fs.Write(#13#10, 2);
+    fs.Write(strHTMLFooter, 7);
+    fs.Write(#13#10, 2);
+    finally
+      fs.free;
+      MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
+      Showmessage('Data saved to HTML file ' + Filename);
       Application.ProcessMessages;
     end;
   DBGrid.DataSource.DataSet.EnableControls;
@@ -1395,6 +1780,24 @@ procedure TfrmSQLiteDBases.UpdateGridCOPYTAB(Sender: TObject);
     SQLTransaction1.Active := True;
     sqlCOPY.Open;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+    except
+    on E: EDatabaseError do
+    begin
+      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+    end;
+  end;
+end;
+
+// COMPARE TWO FOLDERS tab update grid routine
+procedure TfrmSQLiteDBases.UpdateGridCOMPARETWOFOLDERSTAB(Sender: TObject);
+  begin
+    try
+    sqlCOMPARETWOFOLDERS.Close;
+    sqlCOMPARETWOFOLDERS.SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    sqlCOMPARETWOFOLDERS.Open;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
     except
     on E: EDatabaseError do
     begin

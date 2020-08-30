@@ -5,43 +5,36 @@ unit HlpHMACNotBuildInAdapter;
 interface
 
 uses
-{$IFDEF HAS_UNITSCOPE}
-  System.SysUtils,
-{$ELSE}
   SysUtils,
-{$ENDIF HAS_UNITSCOPE}
   HlpHashLibTypes,
   HlpHash,
   HlpIHash,
   HlpIHashInfo,
   HlpIHashResult,
-  HlpArrayUtils,
-  HlpNullable;
+  HlpArrayUtils;
 
 type
 
-  THMACNotBuildInAdapter = class sealed(THash, IHMAC, IHMACNotBuildIn, IWithKey,
-    ICrypto, ICryptoNotBuildIn)
+  THMACNotBuildInAdapter = class sealed(THash, IHMAC, IHMACNotBuildIn, ICrypto,
+    ICryptoNotBuildIn)
 
   strict private
+  var
+    FHash: IHash;
+    FOpad, FIpad, FKey: THashLibByteArray;
 
-    Fm_hash: IHash;
-    Fm_opad, Fm_ipad, Fm_key: THashLibByteArray;
-    Fm_blocksize: Int32;
+    constructor Create(const AUnderlyingHash: IHash;
+      const AHMACKey: THashLibByteArray);
 
   strict protected
 
     function GetName: String; override;
 
     function GetKey(): THashLibByteArray;
-    function GetKeyLength(): TNullableInteger;
-    procedure SetKey(const value: THashLibByteArray);
+    procedure SetKey(const AValue: THashLibByteArray);
     procedure UpdatePads();
 
   public
-
-    constructor Create(const a_underlyingHash: IHash;
-      const a_hmacKey: THashLibByteArray = Nil);
 
     destructor Destroy; override;
 
@@ -49,15 +42,14 @@ type
 
     procedure Initialize(); override;
     function TransformFinal(): IHashResult; override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function Clone(): IHash; override;
     property Key: THashLibByteArray read GetKey write SetKey;
     property Name: String read GetName;
-    property KeyLength: TNullableInteger read GetKeyLength;
 
-    class function CreateHMAC(const a_hash: IHash;
-      const a_hmacKey: THashLibByteArray): IHMAC; static;
+    class function CreateHMAC(const AHash: IHash;
+      const AHMACKey: THashLibByteArray): IHMAC; static;
 
   end;
 
@@ -67,30 +59,28 @@ implementation
 
 procedure THMACNotBuildInAdapter.Clear();
 begin
-  TArrayUtils.ZeroFill(Fm_key);
+  TArrayUtils.ZeroFill(FKey);
 end;
 
 function THMACNotBuildInAdapter.Clone(): IHash;
 var
   HmacInstance: THMACNotBuildInAdapter;
 begin
-  HmacInstance := THMACNotBuildInAdapter.Create(Fm_hash.Clone(), Fm_key);
-  HmacInstance.Fm_opad := System.Copy(Fm_opad);
-  HmacInstance.Fm_ipad := System.Copy(Fm_ipad);
-  HmacInstance.Fm_blocksize := Fm_blocksize;
+  HmacInstance := THMACNotBuildInAdapter.Create(FHash.Clone(), FKey);
+  HmacInstance.FOpad := System.Copy(FOpad);
+  HmacInstance.FIpad := System.Copy(FIpad);
   result := HmacInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
-constructor THMACNotBuildInAdapter.Create(const a_underlyingHash: IHash;
-  const a_hmacKey: THashLibByteArray);
+constructor THMACNotBuildInAdapter.Create(const AUnderlyingHash: IHash;
+  const AHMACKey: THashLibByteArray);
 begin
-  Inherited Create(a_underlyingHash.HashSize, a_underlyingHash.BlockSize);
-  Fm_hash := a_underlyingHash;
-  Fm_blocksize := Fm_hash.BlockSize;
-  SetKey(a_hmacKey);
-  System.SetLength(Fm_ipad, Fm_blocksize);
-  System.SetLength(Fm_opad, Fm_blocksize);
+  Inherited Create(AUnderlyingHash.HashSize, AUnderlyingHash.BlockSize);
+  FHash := AUnderlyingHash;
+  SetKey(AHMACKey);
+  System.SetLength(FIpad, FHash.BlockSize);
+  System.SetLength(FOpad, FHash.BlockSize);
 end;
 
 destructor THMACNotBuildInAdapter.Destroy;
@@ -101,102 +91,92 @@ end;
 
 function THMACNotBuildInAdapter.GetKey: THashLibByteArray;
 begin
-  result := System.Copy(Fm_key);
+  result := System.Copy(FKey);
 end;
 
-function THMACNotBuildInAdapter.GetKeyLength: TNullableInteger;
+procedure THMACNotBuildInAdapter.SetKey(const AValue: THashLibByteArray);
 begin
-  result := Nil;
-end;
-
-procedure THMACNotBuildInAdapter.SetKey(const value: THashLibByteArray);
-begin
-  if (value = Nil) then
+  if (AValue = Nil) then
   begin
-    System.SetLength(Fm_key, 0);
+    FKey := Nil;
   end
   else
   begin
-    Fm_key := System.Copy(value);
+    FKey := System.Copy(AValue);
   end;
 end;
 
 procedure THMACNotBuildInAdapter.UpdatePads;
 var
   LKey: THashLibByteArray;
-  Idx, LBlockSize: Int32;
+  LIdx, LBlockSize: Int32;
 begin
-  LBlockSize := Fm_blocksize;
+  LBlockSize := FHash.BlockSize;
   if (System.Length(Key) > LBlockSize) then
   begin
-    LKey := Fm_hash.ComputeBytes(Key).GetBytes();
+    LKey := FHash.ComputeBytes(Key).GetBytes();
   end
   else
   begin
     LKey := Key;
   end;
 
-  TArrayUtils.Fill(Fm_ipad, 0, LBlockSize, Byte($36));
-  TArrayUtils.Fill(Fm_opad, 0, LBlockSize, Byte($5C));
+  TArrayUtils.Fill(FIpad, 0, LBlockSize, Byte($36));
+  TArrayUtils.Fill(FOpad, 0, LBlockSize, Byte($5C));
 
-  Idx := 0;
-  while (Idx < System.Length(LKey)) and (Idx < LBlockSize) do
+  LIdx := 0;
+  while (LIdx < System.Length(LKey)) and (LIdx < LBlockSize) do
   begin
-    Fm_ipad[Idx] := Fm_ipad[Idx] xor LKey[Idx];
-    Fm_opad[Idx] := Fm_opad[Idx] xor LKey[Idx];
-    System.Inc(Idx);
+    FIpad[LIdx] := FIpad[LIdx] xor LKey[LIdx];
+    FOpad[LIdx] := FOpad[LIdx] xor LKey[LIdx];
+    System.Inc(LIdx);
   end;
 
 end;
 
 procedure THMACNotBuildInAdapter.Initialize;
 begin
-  Fm_hash.Initialize();
+  FHash.Initialize();
   UpdatePads();
-  Fm_hash.TransformBytes(Fm_ipad);
+  FHash.TransformBytes(FIpad);
 end;
 
 function THMACNotBuildInAdapter.TransformFinal: IHashResult;
 begin
-  result := Fm_hash.TransformFinal();
-  Fm_hash.TransformBytes(Fm_opad);
-  Fm_hash.TransformBytes(result.GetBytes());
-  result := Fm_hash.TransformFinal();
+  result := FHash.TransformFinal();
+  FHash.TransformBytes(FOpad);
+  FHash.TransformBytes(result.GetBytes());
+  result := FHash.TransformFinal();
   Initialize();
-
 end;
 
-procedure THMACNotBuildInAdapter.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure THMACNotBuildInAdapter.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_index >= 0);
-  System.Assert(a_length >= 0);
-  System.Assert(a_index + a_length <= System.Length(a_data));
+  System.Assert(AIndex >= 0);
+  System.Assert(ALength >= 0);
+  System.Assert(AIndex + ALength <= System.Length(AData));
 {$ENDIF}
-  Fm_hash.TransformBytes(a_data, a_index, a_length);
+  FHash.TransformBytes(AData, AIndex, ALength);
 end;
 
 function THMACNotBuildInAdapter.GetName: String;
 begin
-  result := Format('%s(%s)', ['THMAC', Fm_hash.Name]);
+  result := Format('%s(%s)', ['THMAC', FHash.Name]);
 end;
 
-class function THMACNotBuildInAdapter.CreateHMAC(const a_hash: IHash;
-  const a_hmacKey: THashLibByteArray): IHMAC;
+class function THMACNotBuildInAdapter.CreateHMAC(const AHash: IHash;
+  const AHMACKey: THashLibByteArray): IHMAC;
 begin
-
-  if Supports(a_hash, IHMAC) then
+  if Supports(AHash, IHMAC) then
   begin
-    result := (a_hash) as IHMAC;
-    Exit;
+    result := AHash as IHMAC;
   end
   else
   begin
-    result := THMACNotBuildInAdapter.Create(a_hash, a_hmacKey);
-    Exit;
+    result := THMACNotBuildInAdapter.Create(AHash, AHMACKey);
   end;
-
 end;
 
 end.

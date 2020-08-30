@@ -24,13 +24,11 @@ uses
   HlpMurmur2_64, HlpSipHash, HlpXXHash64, HlpIHash, HlpIHashInfo, 
   HlpIHashResult, HlpNullable, HlpConverters, HlpBitConverter, HlpBits, 
   HlpHashLibTypes, HlpMurmurHash3_x86_128, HlpPBKDF2_HMACNotBuildInAdapter, 
-  HlpIKDF, HlpKDF, HlpICRC, HlpBlake2B, HlpBlake2S, HlpBlake2BConfig, 
-  HlpBlake2BIvBuilder, HlpBlake2BTreeConfig, HlpBlake2SConfig, 
-  HlpBlake2SIvBuilder, HlpBlake2STreeConfig, HlpIBlake2BConfig, 
-  HlpIBlake2BTreeConfig, HlpIBlake2SConfig, HlpIBlake2STreeConfig, 
-  HlpGOST3411_2012, HlpCRC32Fast, HlpArgon2TypeAndVersion, 
-  HlpPBKDF_Argon2NotBuildInAdapter, HlpPBKDF_ScryptNotBuildInAdapter, 
-  HlpArrayUtils;
+  HlpIKDF, HlpKDF, HlpICRC, HlpBlake2B, HlpBlake2S, HlpGOST3411_2012, 
+  HlpCRC32Fast, HlpArgon2TypeAndVersion, HlpPBKDF_Argon2NotBuildInAdapter, 
+  HlpPBKDF_ScryptNotBuildInAdapter, HlpArrayUtils, HlpBlake2BP, HlpBlake2SP, 
+  HlpSipHash128, HlpBlake2SParams, HlpBlake2BParams, HlpIBlake2SParams, 
+  HlpIBlake2BParams, HlpBlake3;
 
 implementation
 

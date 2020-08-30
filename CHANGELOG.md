@@ -1,7 +1,39 @@
 ﻿Version History
 ===============
 
-v3.1.0 Branch
+v3.2.0
+New : Blake3 hash algorithm added for text strings, a file, Files recursively, Compare Two Folders and Compare Two Files. 
+New : Blake3 hash algorithm added to disk hashing module
+Fix : Hashing of physical disks in Linux via the "Hash Disk" module is re-enabled after "Access Violations" reported for earlier versions. 
+Fix : In the 'Compare Two Folders' tab, if the "Log Results" was unticked, it generated an access violation. That was fixed. 
+Fix : In the "Copy" tab, when the results are shown in the display grid, the navigation buttons were not clickable. That was fixed. 
+Fix : In the "FileS" tab, when the results are shown in the display grid, the navigation buttons were not clickable either. That was fixed. 
+Fix : "Time Taken" in the "File" tab was showing a 24hr clock instead of showing as the number of seconds elapsed, as intended. That was fixed by utilising GetTickCount. 
+Fix : In the "Compare Two Files" tab, the "Result: Match" value was only showing if the timed scheduler was invoked (though the actual hashes were still being displayed). This was caused due to a loop error where the result only displayed inside the scheduler loop. This has been fixed by moving it out of the loop, so that the result is shown either immediately with no scheduler being used, or following the scheduled invoke. 
+Update : "LCL Scaling" is now incorporated which will hopefully better enable the GUI display on variously sized resolution settings. User feedback will confirm in due course. 
+New : In the 'Compare Two Folders' tab, users have asked for a grid view of the files compared rather than just a text file output. That has been added with many of usual right click menu options such as copy to clipboard, save as HTML, etc.  
+Update : In the 'Compare Two Folders' tab, the option "Cont. if count differs?" has now been removed for several reasons:
+  1) Users were frustrated at analysing often millions of files only to realise after the event that in order to continue if the file count differed they had to do it all over again with the option checked
+  2) More users than I anticipated when I first added that feature use the "Compare Two Folders" comparison to not check that both folders do indeed match but in fact to determine in what way they differ. 
+  3) It is more thorough, allbeit slower, to itteratively check the hashes of both folders both ways rather than checking based merely on count. 
+Fix : In the 'Compare Two Folders' tab, if the user selects "Log Results" (which is enabled by default), then in Linux and OSX, the text log file was only being populated with the hash values and not the filenames too. That was fixed. 
+Important Fix : In the 'Compare Two Folders' tab, the comparison was not sufficiently two way, meaning that if Folder 2 matched Folder 1 it would report a match, but if Folder 1 did not match Folder 2, it might still report a match when it should report a mismatch. THis has now been modified to a 3-way comparison. First it checks the file count, then is compares both hash lists against each other; HashListA against HashListB, then HashListB against HashListA. It has obviously made the comparison slightly slower for millions of files, but hopefully not too significantly, and accuracy is more critical than speed. 
+
+Here is a copy of the bug report, provided for full transparancy : 
+
+  "The folders were set up like this:
+  Folder 1: File A, File A (copy)
+  Folder 2: File A, File B
+
+  When running the compare feature, selecting Folder 1 and then Folder 2, the tool reported a match, "The files in both folders are the same. MATCH!" I had expected a mis-match. Yes, all of the files in Folder 1 are in Folder 2, but  not all of the files in Folder 2 are in Folder 1. If I re-ran the compare feature in reverse, selecting Folder 2 and then Folder 1, a mis-match was reported, "The files of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!" This seemed odd because if I ran this features with the following situation:
+  Folder 1: File A
+  Folder 2: File A, File B
+  I would receive a mis-match message, but the situation is basically the same, all Folder 1 files are within Folder 2, just like if two copies of File A were in Folder 1, which reported a match.
+  I had expected a back and forth comparison, but it appears to be a one-way comparison. "
+
+I thank the reportee who brought this to my attention and it should now be resolved in v3.2.0. 
+ 
+v3.1.0 (July 2019)
 
 Update : HashLib4Pascal library updated to master version available as of 18th July 2019.
 New : Added SHA-3 (256) hash algorithm 

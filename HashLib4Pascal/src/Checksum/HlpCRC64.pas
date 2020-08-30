@@ -28,16 +28,17 @@ type
   TCRC64 = class(THash, IChecksum, IHash64, ITransformBlock)
 
   strict private
-
+  var
     FCRCAlgorithm: ICRC;
 
   public
-    constructor Create(_poly, _Init: UInt64; _refIn, _refOut: Boolean;
-      _XorOut, _check: UInt64; const _Names: THashLibStringArray);
+    constructor Create(APolynomial, AInitial: UInt64;
+      AIsInputReflected, AIsOutputReflected: Boolean;
+      AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray);
 
     procedure Initialize(); override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function TransformFinal(): IHashResult; override;
     function Clone(): IHash; override;
 
@@ -59,12 +60,13 @@ begin
   result := FCRCAlgorithm.Clone();
 end;
 
-constructor TCRC64.Create(_poly, _Init: UInt64; _refIn, _refOut: Boolean;
-  _XorOut, _check: UInt64; const _Names: THashLibStringArray);
+constructor TCRC64.Create(APolynomial, AInitial: UInt64;
+  AIsInputReflected, AIsOutputReflected: Boolean;
+  AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray);
 begin
   Inherited Create(8, 1);
-  FCRCAlgorithm := TCRC.Create(64, _poly, _Init, _refIn, _refOut, _XorOut,
-    _check, _Names);
+  FCRCAlgorithm := TCRC.Create(64, APolynomial, AInitial, AIsInputReflected,
+    AIsOutputReflected, AOutputXor, ACheckValue, ANames);
 end;
 
 procedure TCRC64.Initialize;
@@ -72,10 +74,10 @@ begin
   FCRCAlgorithm.Initialize;
 end;
 
-procedure TCRC64.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TCRC64.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 begin
-  FCRCAlgorithm.TransformBytes(a_data, a_index, a_length);
+  FCRCAlgorithm.TransformBytes(AData, AIndex, ALength);
 end;
 
 function TCRC64.TransformFinal: IHashResult;
@@ -88,8 +90,8 @@ end;
 constructor TCRC64_ECMA_182.Create;
 begin
   Inherited Create(TCRC64Polynomials.ECMA_182, $0000000000000000, false, false,
-    $0000000000000000, $6C40DF5F0B497347,
-    THashLibStringArray.Create('CRC-64/ECMA'));
+    $0000000000000000, $6C40DF5F0B497347, THashLibStringArray.Create('CRC-64',
+    'CRC-64/ECMA-182'));
 end;
 
 end.

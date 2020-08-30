@@ -41,11 +41,51 @@ type
     ['{DD5E0FE4-3573-4051-B7CF-F23BABE982D8}']
 
     function GetKey(): THashLibByteArray;
-    procedure SetKey(const value: THashLibByteArray);
+    procedure SetKey(const AValue: THashLibByteArray);
     property Key: THashLibByteArray read GetKey write SetKey;
     function GetKeyLength(): TNullableInteger;
     property KeyLength: TNullableInteger read GetKeyLength;
 
+  end;
+
+  IMAC = Interface(IHash)
+    ['{C75C99A1-B7D3-475F-AC39-03386EECC095}']
+    procedure Clear();
+    function GetKey(): THashLibByteArray;
+    procedure SetKey(const AValue: THashLibByteArray);
+    property Key: THashLibByteArray read GetKey write SetKey;
+  end;
+
+  IHMAC = Interface(IMAC)
+    ['{A6D4DCC6-F6C3-4110-8CA2-FBE85227676E}']
+  end;
+
+  IHMACNotBuildIn = Interface(IHMAC)
+    ['{A44E01D3-164E-4E3F-9551-3EFFDE95A36C}']
+  end;
+
+  IKMAC = Interface(IMAC)
+    ['{49309B2F-20C3-4631-BFDD-06373D14CCE0}']
+  end;
+
+  IKMACNotBuildIn = Interface(IKMAC)
+    ['{FC7AF5A9-BD6A-4DBD-B1DD-B6E110B44A20}']
+  end;
+
+  IBlake2BMAC = Interface(IMAC)
+    ['{F6E0B1CA-1497-43C6-9CD9-2628F70E8451}']
+  end;
+
+  IBlake2BMACNotBuildIn = Interface(IBlake2BMAC)
+    ['{20B33EE5-48B4-4F7E-B1B8-1FD7B45E256E}']
+  end;
+
+  IBlake2SMAC = Interface(IMAC)
+    ['{7354FC5C-775C-42E9-9A25-274F62BF2CCE}']
+  end;
+
+  IBlake2SMACNotBuildIn = Interface(IBlake2SMAC)
+    ['{FFB17B7A-86A1-40D7-A5E7-60366FF8513C}']
   end;
 
   IPBKDF2_HMAC = Interface(IKDF)
@@ -72,15 +112,6 @@ type
     ['{7DD70C4D-FBF6-4629-B587-C6A7CC047D35}']
   end;
 
-  IHMAC = Interface(IWithKey)
-    ['{A6D4DCC6-F6C3-4110-8CA2-FBE85227676E}']
-    procedure Clear();
-  end;
-
-  IHMACNotBuildIn = Interface(IHMAC)
-    ['{A44E01D3-164E-4E3F-9551-3EFFDE95A36C}']
-  end;
-
   IHash16 = Interface(IHash)
     ['{C15AF648-C9F7-460D-9F74-B68CA593C2F8}']
   end;
@@ -103,9 +134,11 @@ type
 
   IXOF = Interface(IHash)
     ['{944ED7F0-D033-4489-A5DD-9C83353F23F0}']
-    function GetXOFSizeInBits: UInt32;
-    procedure SetXOFSizeInBits(a_xof_size_in_bits: UInt32);
-    property XOFSizeInBits: UInt32 read GetXOFSizeInBits write SetXOFSizeInBits;
+    function GetXOFSizeInBits: UInt64;
+    procedure SetXOFSizeInBits(AXofSizeInBits: UInt64);
+    property XOFSizeInBits: UInt64 read GetXOFSizeInBits write SetXOFSizeInBits;
+    procedure DoOutput(const ADestination: THashLibByteArray;
+      ADestinationOffset, AOutputLength: UInt64);
   end;
 
 type

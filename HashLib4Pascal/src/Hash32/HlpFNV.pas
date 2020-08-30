@@ -15,14 +15,14 @@ uses
 type
   TFNV = class sealed(THash, IHash32, ITransformBlock)
   strict private
-
-    Fm_hash: UInt32;
+  var
+    FHash: UInt32;
 
   public
     constructor Create();
     procedure Initialize(); override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function TransformFinal(): IHashResult; override;
     function Clone(): IHash; override;
   end;
@@ -33,48 +33,46 @@ implementation
 
 function TFNV.Clone(): IHash;
 var
-  HashInstance: TFNV;
+  LHashInstance: TFNV;
 begin
-  HashInstance := TFNV.Create();
-  HashInstance.Fm_hash := Fm_hash;
-  result := HashInstance as IHash;
+  LHashInstance := TFNV.Create();
+  LHashInstance.FHash := FHash;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
 constructor TFNV.Create;
 begin
   Inherited Create(4, 1);
-
 end;
 
 procedure TFNV.Initialize;
 begin
-  Fm_hash := 0;
+  FHash := 0;
 end;
 
-procedure TFNV.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TFNV.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 var
-  i: Int32;
+  LIdx: Int32;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_index >= 0);
-  System.Assert(a_length >= 0);
-  System.Assert(a_index + a_length <= System.Length(a_data));
+  System.Assert(AIndex >= 0);
+  System.Assert(ALength >= 0);
+  System.Assert(AIndex + ALength <= System.Length(AData));
 {$ENDIF DEBUG}
-  i := a_index;
-  while a_length > 0 do
+  LIdx := AIndex;
+  while ALength > 0 do
   begin
-    Fm_hash := (Fm_hash * 16777619) xor a_data[i];
-    System.Inc(i);
-    System.Dec(a_length);
+    FHash := (FHash * 16777619) xor AData[LIdx];
+    System.Inc(LIdx);
+    System.Dec(ALength);
   end;
-
 end;
 
 function TFNV.TransformFinal: IHashResult;
 begin
-  result := THashResult.Create(Fm_hash);
+  result := THashResult.Create(FHash);
   Initialize();
 end;
 

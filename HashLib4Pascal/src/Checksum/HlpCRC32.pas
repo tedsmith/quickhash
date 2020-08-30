@@ -30,17 +30,18 @@ type
   TCRC32 = class(THash, IChecksum, IHash32, ITransformBlock)
 
   strict private
-
+  var
     FCRCAlgorithm: ICRC;
 
   public
 
-    constructor Create(_poly, _Init: UInt64; _refIn, _refOut: Boolean;
-      _XorOut, _check: UInt64; const _Names: THashLibStringArray);
+    constructor Create(APolynomial, AInitial: UInt64;
+      AIsInputReflected, AIsOutputReflected: Boolean;
+      AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray);
 
     procedure Initialize(); override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function TransformFinal(): IHashResult; override;
     function Clone(): IHash; override;
 
@@ -69,12 +70,13 @@ begin
   Result := FCRCAlgorithm.Clone();
 end;
 
-constructor TCRC32.Create(_poly, _Init: UInt64; _refIn, _refOut: Boolean;
-  _XorOut, _check: UInt64; const _Names: THashLibStringArray);
+constructor TCRC32.Create(APolynomial, AInitial: UInt64;
+  AIsInputReflected, AIsOutputReflected: Boolean;
+  AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray);
 begin
   Inherited Create(4, 1);
-  FCRCAlgorithm := TCRC.Create(32, _poly, _Init, _refIn, _refOut, _XorOut,
-    _check, _Names);
+  FCRCAlgorithm := TCRC.Create(32, APolynomial, AInitial, AIsInputReflected,
+    AIsOutputReflected, AOutputXor, ACheckValue, ANames);
 end;
 
 procedure TCRC32.Initialize;
@@ -82,10 +84,10 @@ begin
   FCRCAlgorithm.Initialize;
 end;
 
-procedure TCRC32.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TCRC32.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 begin
-  FCRCAlgorithm.TransformBytes(a_data, a_index, a_length);
+  FCRCAlgorithm.TransformBytes(AData, AIndex, ALength);
 end;
 
 function TCRC32.TransformFinal: IHashResult;
@@ -98,7 +100,8 @@ end;
 constructor TCRC32_PKZIP.Create;
 begin
   Inherited Create(TCRC32Polynomials.PKZIP, $FFFFFFFF, true, true, $FFFFFFFF,
-    $CBF43926, THashLibStringArray.Create('CRC-32', 'CRC-32/ADCCP', 'PKZIP'));
+    $CBF43926, THashLibStringArray.Create('CRC-32', 'CRC-32/ADCCP',
+    'CRC-32/V-42', 'CRC-32/XZ', 'PKZIP', 'CRC-32/ISO-HDLC'));
 
 end;
 
@@ -107,8 +110,9 @@ end;
 constructor TCRC32_CASTAGNOLI.Create;
 begin
   Inherited Create(TCRC32Polynomials.Castagnoli, $FFFFFFFF, true, true,
-    $FFFFFFFF, $E3069283, THashLibStringArray.Create('CRC-32C', 'CRC-32/ISCSI',
-    'CRC-32/CASTAGNOLI'));
+    $FFFFFFFF, $E3069283, THashLibStringArray.Create('CRC-32C',
+    'CRC-32/BASE91-C', 'CRC-32/CASTAGNOLI', 'CRC-32/INTERLAKEN',
+    'CRC-32/ISCSI'));
 
 end;
 

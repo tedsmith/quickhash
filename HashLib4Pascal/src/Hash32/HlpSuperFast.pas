@@ -21,7 +21,7 @@ type
     ITransformBlock)
 
   strict protected
-    function ComputeAggregatedBytes(const a_data: THashLibByteArray)
+    function ComputeAggregatedBytes(const AData: THashLibByteArray)
       : IHashResult; override;
   public
     constructor Create();
@@ -40,95 +40,92 @@ end;
 
 function TSuperFast.Clone(): IHash;
 var
-  HashInstance: TSuperFast;
+  LHashInstance: TSuperFast;
 begin
-  HashInstance := TSuperFast.Create();
+  LHashInstance := TSuperFast.Create();
   FBuffer.Position := 0;
-  HashInstance.FBuffer.CopyFrom(FBuffer, FBuffer.Size);
-  result := HashInstance as IHash;
+  LHashInstance.FBuffer.CopyFrom(FBuffer, FBuffer.Size);
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
-function TSuperFast.ComputeAggregatedBytes(const a_data: THashLibByteArray)
+function TSuperFast.ComputeAggregatedBytes(const AData: THashLibByteArray)
   : IHashResult;
 var
-  hash, tmp, u1: UInt32;
-  &length, currentIndex, i1, i2: Int32;
+  LHash, LTemp, U1: UInt32;
+  LLength, LCurrentIndex, I1, I2: Int32;
 begin
-  length := System.length(a_data);
+  LLength := System.length(AData);
 
-  if (length = 0) then
+  if (LLength = 0) then
   begin
     result := THashResult.Create(Int32(0));
     Exit;
   end;
 
-  hash := UInt32(length);
+  LHash := UInt32(LLength);
 
-  currentIndex := 0;
+  LCurrentIndex := 0;
 
-  while (length >= 4) do
+  while (LLength >= 4) do
   begin
-    i1 := a_data[currentIndex];
-    System.Inc(currentIndex);
-    i2 := a_data[currentIndex] shl 8;
-    System.Inc(currentIndex);
-    hash := UInt16(hash + UInt32(i1 or i2));
-    u1 := UInt32(a_data[currentIndex]);
-    System.Inc(currentIndex);
-    tmp := UInt32((Byte(u1) or a_data[currentIndex] shl 8) shl 11) xor hash;
-    System.Inc(currentIndex);
-    hash := (hash shl 16) xor tmp;
-    hash := hash + (hash shr 11);
+    I1 := AData[LCurrentIndex];
+    System.Inc(LCurrentIndex);
+    I2 := AData[LCurrentIndex] shl 8;
+    System.Inc(LCurrentIndex);
+    LHash := UInt16(LHash + UInt32(I1 or I2));
+    U1 := UInt32(AData[LCurrentIndex]);
+    System.Inc(LCurrentIndex);
+    LTemp := UInt32((Byte(U1) or AData[LCurrentIndex] shl 8) shl 11) xor LHash;
+    System.Inc(LCurrentIndex);
+    LHash := (LHash shl 16) xor LTemp;
+    LHash := LHash + (LHash shr 11);
 
-    System.Dec(length, 4);
+    System.Dec(LLength, 4);
   end;
 
-  case length of
+  case LLength of
     3:
       begin
-        i1 := a_data[currentIndex];
-        System.Inc(currentIndex);
-        i2 := a_data[currentIndex];
-        System.Inc(currentIndex);
-        hash := hash + UInt16(i1 or i2 shl 8);
-        hash := hash xor (hash shl 16);
-        hash := hash xor (UInt32(a_data[currentIndex]) shl 18);
-        hash := hash + (hash shr 11);
-
+        I1 := AData[LCurrentIndex];
+        System.Inc(LCurrentIndex);
+        I2 := AData[LCurrentIndex];
+        System.Inc(LCurrentIndex);
+        LHash := LHash + UInt16(I1 or I2 shl 8);
+        LHash := LHash xor (LHash shl 16);
+        LHash := LHash xor (UInt32(AData[LCurrentIndex]) shl 18);
+        LHash := LHash + (LHash shr 11);
       end;
 
     2:
       begin
-        i1 := a_data[currentIndex];
-        System.Inc(currentIndex);
-        i2 := a_data[currentIndex];
-        hash := hash + UInt16(i1 or i2 shl 8);
-        hash := hash xor (hash shl 11);
-        hash := hash + (hash shr 17);
-
+        I1 := AData[LCurrentIndex];
+        System.Inc(LCurrentIndex);
+        I2 := AData[LCurrentIndex];
+        LHash := LHash + UInt16(I1 or I2 shl 8);
+        LHash := LHash xor (LHash shl 11);
+        LHash := LHash + (LHash shr 17);
       end;
 
     1:
       begin
-        i1 := a_data[currentIndex];
+        I1 := AData[LCurrentIndex];
 
-        hash := hash + UInt32(i1);
-        hash := hash xor (hash shl 10);
-        hash := hash + (hash shr 1);
-
+        LHash := LHash + UInt32(I1);
+        LHash := LHash xor (LHash shl 10);
+        LHash := LHash + (LHash shr 1);
       end;
 
   end;
 
-  hash := hash xor (hash shl 3);
-  hash := hash + (hash shr 5);
-  hash := hash xor (hash shl 4);
-  hash := hash + (hash shr 17);
-  hash := hash xor (hash shl 25);
-  hash := hash + (hash shr 6);
+  LHash := LHash xor (LHash shl 3);
+  LHash := LHash + (LHash shr 5);
+  LHash := LHash xor (LHash shl 4);
+  LHash := LHash + (LHash shr 17);
+  LHash := LHash xor (LHash shl 25);
+  LHash := LHash + (LHash shr 6);
 
-  result := THashResult.Create(hash);
+  result := THashResult.Create(LHash);
 end;
 
 end.

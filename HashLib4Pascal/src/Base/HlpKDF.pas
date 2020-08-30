@@ -28,11 +28,11 @@ type
     /// <summary>
     /// Returns the pseudo-random bytes for this object.
     /// </summary>
-    /// <param name="bc">The number of pseudo-random key bytes to generate.</param>
+    /// <param name="AByteCount">The number of pseudo-random key bytes to generate.</param>
     /// <returns>A byte array filled with pseudo-random key bytes.</returns>
     /// <exception cref="EArgumentOutOfRangeHashLibException">bc must be greater than zero.</exception>
     /// <exception cref="EArgumentHashLibException">invalid start index or end index of internal buffer.</exception>
-    function GetBytes(bc: Int32): THashLibByteArray; virtual; abstract;
+    function GetBytes(AByteCount: Int32): THashLibByteArray; virtual; abstract;
 
   end;
 

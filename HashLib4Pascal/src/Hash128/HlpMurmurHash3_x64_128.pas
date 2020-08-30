@@ -8,9 +8,6 @@ uses
 {$IFDEF DELPHI2010}
   SysUtils, // to get rid of compiler hint "not inlined" on Delphi 2010.
 {$ENDIF DELPHI2010}
-{$IFDEF DELPHI}
-  HlpBitConverter,
-{$ENDIF DELPHI}
   HlpHashLibTypes,
   HlpConverters,
   HlpIHashInfo,
@@ -29,13 +26,13 @@ type
     ITransformBlock)
 
   strict private
+  var
+    FH1, FH2, FTotalLength: UInt64;
+    FKey: UInt32;
+    FIdx: Int32;
+    FBuffer: THashLibByteArray;
 
-    Fm_h1, Fm_h2, Fm_total_length: UInt64;
-    Fm_key: UInt32;
-    Fm_idx: Int32;
-    Fm_buf: THashLibByteArray;
-
-    procedure ByteUpdate(a_b: Byte); inline;
+    procedure ByteUpdate(AByte: Byte); inline;
     procedure Finish();
     procedure ProcessPendings();
 
@@ -62,13 +59,13 @@ type
 {$ENDREGION}
     function GetKeyLength(): TNullableInteger;
     function GetKey: THashLibByteArray; inline;
-    procedure SetKey(const value: THashLibByteArray); inline;
+    procedure SetKey(const AValue: THashLibByteArray); inline;
 
   public
     constructor Create();
     procedure Initialize(); override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function TransformFinal: IHashResult; override;
     function Clone(): IHash; override;
     property KeyLength: TNullableInteger read GetKeyLength;
@@ -81,319 +78,304 @@ implementation
 
 procedure TMurmurHash3_x64_128.ProcessPendings;
 var
-  k1, k2: UInt64;
-  ptr_Fm_buf: PByte;
+  LK1, LK2: UInt64;
+  LPtrBuffer: PByte;
 begin
-  if Fm_idx >= 16 then
+  if FIdx >= 16 then
   begin
-    ptr_Fm_buf := PByte(Fm_buf);
-    k1 := TConverters.ReadBytesAsUInt64LE(ptr_Fm_buf, 0);
-    k2 := TConverters.ReadBytesAsUInt64LE(ptr_Fm_buf, 8);
+    LPtrBuffer := PByte(FBuffer);
+    LK1 := TConverters.ReadBytesAsUInt64LE(LPtrBuffer, 0);
+    LK2 := TConverters.ReadBytesAsUInt64LE(LPtrBuffer, 8);
 
-    k1 := k1 * C1;
-    k1 := TBits.RotateLeft64(k1, 31);
-    k1 := k1 * C2;
-    Fm_h1 := Fm_h1 xor k1;
+    LK1 := LK1 * C1;
+    LK1 := TBits.RotateLeft64(LK1, 31);
+    LK1 := LK1 * C2;
+    FH1 := FH1 xor LK1;
 
-    Fm_h1 := TBits.RotateLeft64(Fm_h1, 27);
-    Fm_h1 := Fm_h1 + Fm_h2;
-    Fm_h1 := Fm_h1 * 5 + C3;
+    FH1 := TBits.RotateLeft64(FH1, 27);
+    FH1 := FH1 + FH2;
+    FH1 := FH1 * 5 + C3;
 
-    k2 := k2 * C2;
-    k2 := TBits.RotateLeft64(k2, 33);
-    k2 := k2 * C1;
-    Fm_h2 := Fm_h2 xor k2;
+    LK2 := LK2 * C2;
+    LK2 := TBits.RotateLeft64(LK2, 33);
+    LK2 := LK2 * C1;
+    FH2 := FH2 xor LK2;
 
-    Fm_h2 := TBits.RotateLeft64(Fm_h2, 31);
-    Fm_h2 := Fm_h2 + Fm_h1;
-    Fm_h2 := Fm_h2 * 5 + C4;
+    FH2 := TBits.RotateLeft64(FH2, 31);
+    FH2 := FH2 + FH1;
+    FH2 := FH2 * 5 + C4;
 
-    Fm_idx := 0;
+    FIdx := 0;
   end;
 end;
 
-procedure TMurmurHash3_x64_128.ByteUpdate(a_b: Byte);
+procedure TMurmurHash3_x64_128.ByteUpdate(AByte: Byte);
 begin
-  Fm_buf[Fm_idx] := a_b;
-  System.Inc(Fm_idx);
+  FBuffer[FIdx] := AByte;
+  System.Inc(FIdx);
   ProcessPendings();
 end;
 
 function TMurmurHash3_x64_128.Clone(): IHash;
 var
-  HashInstance: TMurmurHash3_x64_128;
+  LHashInstance: TMurmurHash3_x64_128;
 begin
-  HashInstance := TMurmurHash3_x64_128.Create();
-  HashInstance.Fm_h1 := Fm_h1;
-  HashInstance.Fm_h2 := Fm_h2;
-  HashInstance.Fm_total_length := Fm_total_length;
-  HashInstance.Fm_key := Fm_key;
-  HashInstance.Fm_idx := Fm_idx;
-  HashInstance.Fm_buf := System.Copy(Fm_buf);
-  result := HashInstance as IHash;
+  LHashInstance := TMurmurHash3_x64_128.Create();
+  LHashInstance.FH1 := FH1;
+  LHashInstance.FH2 := FH2;
+  LHashInstance.FTotalLength := FTotalLength;
+  LHashInstance.FKey := FKey;
+  LHashInstance.FIdx := FIdx;
+  LHashInstance.FBuffer := System.Copy(FBuffer);
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
 constructor TMurmurHash3_x64_128.Create;
 begin
   Inherited Create(16, 16);
-  Fm_key := CKEY;
-  System.SetLength(Fm_buf, 16);
-
+  FKey := CKEY;
+  System.SetLength(FBuffer, 16);
 end;
 
 procedure TMurmurHash3_x64_128.Finish;
 var
-  &length: Int32;
-  k2, k1: UInt64;
+  LLength: Int32;
+  LK1, LK2: UInt64;
 begin
 
   // tail
 
-  k1 := 0;
-  k2 := 0;
+  LK1 := 0;
+  LK2 := 0;
 
-  length := Fm_idx;
+  LLength := FIdx;
 
-  if (length <> 0) then
+  if (LLength <> 0) then
   begin
 
-    case length of
+    case LLength of
       15:
         begin
-
-          k2 := k2 xor (UInt64(Fm_buf[14]) shl 48);
-          k2 := k2 xor (UInt64(Fm_buf[13]) shl 40);
-          k2 := k2 xor (UInt64(Fm_buf[12]) shl 32);
-          k2 := k2 xor (UInt64(Fm_buf[11]) shl 24);
-          k2 := k2 xor (UInt64(Fm_buf[10]) shl 16);
-          k2 := k2 xor (UInt64(Fm_buf[9]) shl 8);
-          k2 := k2 xor (UInt64(Fm_buf[8]) shl 0);
-          k2 := k2 * C2;
-          k2 := TBits.RotateLeft64(k2, 33);
-          k2 := k2 * C1;
-          Fm_h2 := Fm_h2 xor k2;
+          LK2 := LK2 xor (UInt64(FBuffer[14]) shl 48);
+          LK2 := LK2 xor (UInt64(FBuffer[13]) shl 40);
+          LK2 := LK2 xor (UInt64(FBuffer[12]) shl 32);
+          LK2 := LK2 xor (UInt64(FBuffer[11]) shl 24);
+          LK2 := LK2 xor (UInt64(FBuffer[10]) shl 16);
+          LK2 := LK2 xor (UInt64(FBuffer[9]) shl 8);
+          LK2 := LK2 xor (UInt64(FBuffer[8]) shl 0);
+          LK2 := LK2 * C2;
+          LK2 := TBits.RotateLeft64(LK2, 33);
+          LK2 := LK2 * C1;
+          FH2 := FH2 xor LK2;
         end;
 
       14:
         begin
-
-          k2 := k2 xor (UInt64(Fm_buf[13]) shl 40);
-          k2 := k2 xor (UInt64(Fm_buf[12]) shl 32);
-          k2 := k2 xor (UInt64(Fm_buf[11]) shl 24);
-          k2 := k2 xor (UInt64(Fm_buf[10]) shl 16);
-          k2 := k2 xor (UInt64(Fm_buf[9]) shl 8);
-          k2 := k2 xor (UInt64(Fm_buf[8]) shl 0);
-          k2 := k2 * C2;
-          k2 := TBits.RotateLeft64(k2, 33);
-          k2 := k2 * C1;
-          Fm_h2 := Fm_h2 xor k2;
+          LK2 := LK2 xor (UInt64(FBuffer[13]) shl 40);
+          LK2 := LK2 xor (UInt64(FBuffer[12]) shl 32);
+          LK2 := LK2 xor (UInt64(FBuffer[11]) shl 24);
+          LK2 := LK2 xor (UInt64(FBuffer[10]) shl 16);
+          LK2 := LK2 xor (UInt64(FBuffer[9]) shl 8);
+          LK2 := LK2 xor (UInt64(FBuffer[8]) shl 0);
+          LK2 := LK2 * C2;
+          LK2 := TBits.RotateLeft64(LK2, 33);
+          LK2 := LK2 * C1;
+          FH2 := FH2 xor LK2;
         end;
 
       13:
         begin
-
-          k2 := k2 xor (UInt64(Fm_buf[12]) shl 32);
-          k2 := k2 xor (UInt64(Fm_buf[11]) shl 24);
-          k2 := k2 xor (UInt64(Fm_buf[10]) shl 16);
-          k2 := k2 xor (UInt64(Fm_buf[9]) shl 8);
-          k2 := k2 xor (UInt64(Fm_buf[8]) shl 0);
-          k2 := k2 * C2;
-          k2 := TBits.RotateLeft64(k2, 33);
-          k2 := k2 * C1;
-          Fm_h2 := Fm_h2 xor k2;
+          LK2 := LK2 xor (UInt64(FBuffer[12]) shl 32);
+          LK2 := LK2 xor (UInt64(FBuffer[11]) shl 24);
+          LK2 := LK2 xor (UInt64(FBuffer[10]) shl 16);
+          LK2 := LK2 xor (UInt64(FBuffer[9]) shl 8);
+          LK2 := LK2 xor (UInt64(FBuffer[8]) shl 0);
+          LK2 := LK2 * C2;
+          LK2 := TBits.RotateLeft64(LK2, 33);
+          LK2 := LK2 * C1;
+          FH2 := FH2 xor LK2;
         end;
 
       12:
         begin
-
-          k2 := k2 xor (UInt64(Fm_buf[11]) shl 24);
-          k2 := k2 xor (UInt64(Fm_buf[10]) shl 16);
-          k2 := k2 xor (UInt64(Fm_buf[9]) shl 8);
-          k2 := k2 xor (UInt64(Fm_buf[8]) shl 0);
-          k2 := k2 * C2;
-          k2 := TBits.RotateLeft64(k2, 33);
-          k2 := k2 * C1;
-          Fm_h2 := Fm_h2 xor k2;
+          LK2 := LK2 xor (UInt64(FBuffer[11]) shl 24);
+          LK2 := LK2 xor (UInt64(FBuffer[10]) shl 16);
+          LK2 := LK2 xor (UInt64(FBuffer[9]) shl 8);
+          LK2 := LK2 xor (UInt64(FBuffer[8]) shl 0);
+          LK2 := LK2 * C2;
+          LK2 := TBits.RotateLeft64(LK2, 33);
+          LK2 := LK2 * C1;
+          FH2 := FH2 xor LK2;
         end;
 
       11:
         begin
-
-          k2 := k2 xor (UInt64(Fm_buf[10]) shl 16);
-          k2 := k2 xor (UInt64(Fm_buf[9]) shl 8);
-          k2 := k2 xor (UInt64(Fm_buf[8]) shl 0);
-          k2 := k2 * C2;
-          k2 := TBits.RotateLeft64(k2, 33);
-          k2 := k2 * C1;
-          Fm_h2 := Fm_h2 xor k2;
+          LK2 := LK2 xor (UInt64(FBuffer[10]) shl 16);
+          LK2 := LK2 xor (UInt64(FBuffer[9]) shl 8);
+          LK2 := LK2 xor (UInt64(FBuffer[8]) shl 0);
+          LK2 := LK2 * C2;
+          LK2 := TBits.RotateLeft64(LK2, 33);
+          LK2 := LK2 * C1;
+          FH2 := FH2 xor LK2;
         end;
 
       10:
         begin
-
-          k2 := k2 xor (UInt64(Fm_buf[9]) shl 8);
-          k2 := k2 xor (UInt64(Fm_buf[8]) shl 0);
-          k2 := k2 * C2;
-          k2 := TBits.RotateLeft64(k2, 33);
-          k2 := k2 * C1;
-          Fm_h2 := Fm_h2 xor k2;
+          LK2 := LK2 xor (UInt64(FBuffer[9]) shl 8);
+          LK2 := LK2 xor (UInt64(FBuffer[8]) shl 0);
+          LK2 := LK2 * C2;
+          LK2 := TBits.RotateLeft64(LK2, 33);
+          LK2 := LK2 * C1;
+          FH2 := FH2 xor LK2;
         end;
 
       9:
         begin
-
-          k2 := k2 xor (UInt64(Fm_buf[8]) shl 0);
-          k2 := k2 * C2;
-          k2 := TBits.RotateLeft64(k2, 33);
-          k2 := k2 * C1;
-          Fm_h2 := Fm_h2 xor k2;
+          LK2 := LK2 xor (UInt64(FBuffer[8]) shl 0);
+          LK2 := LK2 * C2;
+          LK2 := TBits.RotateLeft64(LK2, 33);
+          LK2 := LK2 * C1;
+          FH2 := FH2 xor LK2;
         end;
 
     end;
 
-    if (length > 8) then
-      length := 8;
+    if (LLength > 8) then
+    begin
+      LLength := 8;
+    end;
 
-    case length of
+    case LLength of
       8:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[7]) shl 56);
-          k1 := k1 xor (UInt64(Fm_buf[6]) shl 48);
-          k1 := k1 xor (UInt64(Fm_buf[5]) shl 40);
-          k1 := k1 xor (UInt64(Fm_buf[4]) shl 32);
-          k1 := k1 xor (UInt64(Fm_buf[3]) shl 24);
-          k1 := k1 xor (UInt64(Fm_buf[2]) shl 16);
-          k1 := k1 xor (UInt64(Fm_buf[1]) shl 8);
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[7]) shl 56);
+          LK1 := LK1 xor (UInt64(FBuffer[6]) shl 48);
+          LK1 := LK1 xor (UInt64(FBuffer[5]) shl 40);
+          LK1 := LK1 xor (UInt64(FBuffer[4]) shl 32);
+          LK1 := LK1 xor (UInt64(FBuffer[3]) shl 24);
+          LK1 := LK1 xor (UInt64(FBuffer[2]) shl 16);
+          LK1 := LK1 xor (UInt64(FBuffer[1]) shl 8);
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
       7:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[6]) shl 48);
-          k1 := k1 xor (UInt64(Fm_buf[5]) shl 40);
-          k1 := k1 xor (UInt64(Fm_buf[4]) shl 32);
-          k1 := k1 xor (UInt64(Fm_buf[3]) shl 24);
-          k1 := k1 xor (UInt64(Fm_buf[2]) shl 16);
-          k1 := k1 xor (UInt64(Fm_buf[1]) shl 8);
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[6]) shl 48);
+          LK1 := LK1 xor (UInt64(FBuffer[5]) shl 40);
+          LK1 := LK1 xor (UInt64(FBuffer[4]) shl 32);
+          LK1 := LK1 xor (UInt64(FBuffer[3]) shl 24);
+          LK1 := LK1 xor (UInt64(FBuffer[2]) shl 16);
+          LK1 := LK1 xor (UInt64(FBuffer[1]) shl 8);
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
       6:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[5]) shl 40);
-          k1 := k1 xor (UInt64(Fm_buf[4]) shl 32);
-          k1 := k1 xor (UInt64(Fm_buf[3]) shl 24);
-          k1 := k1 xor (UInt64(Fm_buf[2]) shl 16);
-          k1 := k1 xor (UInt64(Fm_buf[1]) shl 8);
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[5]) shl 40);
+          LK1 := LK1 xor (UInt64(FBuffer[4]) shl 32);
+          LK1 := LK1 xor (UInt64(FBuffer[3]) shl 24);
+          LK1 := LK1 xor (UInt64(FBuffer[2]) shl 16);
+          LK1 := LK1 xor (UInt64(FBuffer[1]) shl 8);
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
       5:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[4]) shl 32);
-          k1 := k1 xor (UInt64(Fm_buf[3]) shl 24);
-          k1 := k1 xor (UInt64(Fm_buf[2]) shl 16);
-          k1 := k1 xor (UInt64(Fm_buf[1]) shl 8);
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[4]) shl 32);
+          LK1 := LK1 xor (UInt64(FBuffer[3]) shl 24);
+          LK1 := LK1 xor (UInt64(FBuffer[2]) shl 16);
+          LK1 := LK1 xor (UInt64(FBuffer[1]) shl 8);
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
       4:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[3]) shl 24);
-          k1 := k1 xor (UInt64(Fm_buf[2]) shl 16);
-          k1 := k1 xor (UInt64(Fm_buf[1]) shl 8);
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[3]) shl 24);
+          LK1 := LK1 xor (UInt64(FBuffer[2]) shl 16);
+          LK1 := LK1 xor (UInt64(FBuffer[1]) shl 8);
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
       3:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[2]) shl 16);
-          k1 := k1 xor (UInt64(Fm_buf[1]) shl 8);
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[2]) shl 16);
+          LK1 := LK1 xor (UInt64(FBuffer[1]) shl 8);
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
       2:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[1]) shl 8);
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[1]) shl 8);
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
       1:
         begin
-
-          k1 := k1 xor (UInt64(Fm_buf[0]) shl 0);
-          k1 := k1 * C1;
-          k1 := TBits.RotateLeft64(k1, 31);
-          k1 := k1 * C2;
-          Fm_h1 := Fm_h1 xor k1;
+          LK1 := LK1 xor (UInt64(FBuffer[0]) shl 0);
+          LK1 := LK1 * C1;
+          LK1 := TBits.RotateLeft64(LK1, 31);
+          LK1 := LK1 * C2;
+          FH1 := FH1 xor LK1;
         end;
 
     end;
 
   end;
 
-  Fm_h1 := Fm_h1 xor Fm_total_length;
-  Fm_h2 := Fm_h2 xor Fm_total_length;
+  FH1 := FH1 xor FTotalLength;
+  FH2 := FH2 xor FTotalLength;
 
-  Fm_h1 := Fm_h1 + Fm_h2;
-  Fm_h2 := Fm_h2 + Fm_h1;
+  FH1 := FH1 + FH2;
+  FH2 := FH2 + FH1;
 
-  Fm_h1 := Fm_h1 xor (Fm_h1 shr 33);
-  Fm_h1 := Fm_h1 * C5;
-  Fm_h1 := Fm_h1 xor (Fm_h1 shr 33);
-  Fm_h1 := Fm_h1 * C6;
-  Fm_h1 := Fm_h1 xor (Fm_h1 shr 33);
+  FH1 := FH1 xor (FH1 shr 33);
+  FH1 := FH1 * C5;
+  FH1 := FH1 xor (FH1 shr 33);
+  FH1 := FH1 * C6;
+  FH1 := FH1 xor (FH1 shr 33);
 
-  Fm_h2 := Fm_h2 xor (Fm_h2 shr 33);
-  Fm_h2 := Fm_h2 * C5;
-  Fm_h2 := Fm_h2 xor (Fm_h2 shr 33);
-  Fm_h2 := Fm_h2 * C6;
-  Fm_h2 := Fm_h2 xor (Fm_h2 shr 33);
+  FH2 := FH2 xor (FH2 shr 33);
+  FH2 := FH2 * C5;
+  FH2 := FH2 xor (FH2 shr 33);
+  FH2 := FH2 * C6;
+  FH2 := FH2 xor (FH2 shr 33);
 
-  Fm_h1 := Fm_h1 + Fm_h2;
-  Fm_h2 := Fm_h2 + Fm_h1;
-
+  FH1 := FH1 + FH2;
+  FH2 := FH2 + FH1;
 end;
 
 function TMurmurHash3_x64_128.GetKey: THashLibByteArray;
 begin
-  result := TConverters.ReadUInt32AsBytesLE(Fm_key);
+  result := TConverters.ReadUInt32AsBytesLE(FKey);
 end;
 
 function TMurmurHash3_x64_128.GetKeyLength: TNullableInteger;
@@ -403,138 +385,132 @@ end;
 
 procedure TMurmurHash3_x64_128.Initialize;
 begin
-  Fm_h1 := Fm_key;
-  Fm_h2 := Fm_key;
+  FH1 := FKey;
+  FH2 := FKey;
 
-  Fm_total_length := 0;
-  Fm_idx := 0;
-
+  FTotalLength := 0;
+  FIdx := 0;
 end;
 
-procedure TMurmurHash3_x64_128.SetKey(const value: THashLibByteArray);
+procedure TMurmurHash3_x64_128.SetKey(const AValue: THashLibByteArray);
 begin
-  if (value = Nil) then
+  if (AValue = Nil) then
   begin
-    Fm_key := CKEY;
+    FKey := CKEY;
   end
-
   else
   begin
-    if System.length(value) <> KeyLength.value then
+    if System.length(AValue) <> KeyLength.value then
+    begin
       raise EArgumentHashLibException.CreateResFmt(@SInvalidKeyLength,
         [KeyLength.value]);
-
-    Fm_key := TConverters.ReadBytesAsUInt32LE(PByte(value), 0);
-
+    end;
+    FKey := TConverters.ReadBytesAsUInt32LE(PByte(AValue), 0);
   end;
 end;
 
-procedure TMurmurHash3_x64_128.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TMurmurHash3_x64_128.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 var
-  len, nBlocks, i, offset, lIdx: Int32;
-  k1, k2: UInt64;
-  ptr_a_data: PByte;
+  LLength, LNBlocks, LIndex, LOffset, LIdx: Int32;
+  LK1, LK2, LH1, LH2: UInt64;
+  LPtrData: PByte;
+  LPtrDataUInt64: PUInt64;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_index >= 0);
-  System.Assert(a_length >= 0);
-  System.Assert(a_index + a_length <= System.length(a_data));
+  System.Assert(AIndex >= 0);
+  System.Assert(ALength >= 0);
+  System.Assert(AIndex + ALength <= System.length(AData));
 {$ENDIF DEBUG}
-  len := a_length;
-  i := a_index;
-  lIdx := 0;
-  System.Inc(Fm_total_length, len);
-  ptr_a_data := PByte(a_data);
+  LLength := ALength;
+  LIndex := AIndex;
+  LIdx := 0;
+  System.Inc(FTotalLength, LLength);
+  LPtrData := PByte(AData);
 
   // consume last pending bytes
 
-  if ((Fm_idx <> 0) and (a_length <> 0)) then
+  if ((FIdx <> 0) and (ALength <> 0)) then
   begin
-
 {$IFDEF DEBUG}
-    System.Assert(a_index = 0); // nothing would work anyways if a_index is !=0
+    System.Assert(AIndex = 0); // nothing would work anyways if AIndex <> 0
 {$ENDIF DEBUG}
-    while ((Fm_idx < 16) and (len <> 0)) do
+    while ((FIdx < 16) and (LLength <> 0)) do
     begin
-      Fm_buf[Fm_idx] := (ptr_a_data + a_index)^;
-      System.Inc(Fm_idx);
-      System.Inc(a_index);
-      System.Dec(len);
+      FBuffer[FIdx] := (LPtrData + AIndex)^;
+      System.Inc(FIdx);
+      System.Inc(AIndex);
+      System.Dec(LLength);
     end;
-    if (Fm_idx = 16) then
+    if (FIdx = 16) then
     begin
       ProcessPendings;
     end;
   end
   else
   begin
-    i := 0;
+    LIndex := 0;
   end;
 
-  nBlocks := len shr 4;
+  LNBlocks := LLength shr 4;
 
   // body
 
-  while i < nBlocks do
+  LH1 := FH1;
+  LH2 := FH2;
+  LPtrDataUInt64 := PUInt64(LPtrData + AIndex);
+  while LIndex < LNBlocks do
   begin
 
-    k1 := TConverters.ReadBytesAsUInt64LE(ptr_a_data, a_index + lIdx);
+    LK1 := TConverters.ReadPUInt64AsUInt64LE(LPtrDataUInt64 + LIdx);
+    System.Inc(LIdx);
+    LK2 := TConverters.ReadPUInt64AsUInt64LE(LPtrDataUInt64 + LIdx);
+    System.Inc(LIdx);
 
-    System.Inc(lIdx, 8);
+    LK1 := LK1 * C1;
+    LK1 := TBits.RotateLeft64(LK1, 31);
+    LK1 := LK1 * C2;
+    LH1 := LH1 xor LK1;
 
-    k2 := TConverters.ReadBytesAsUInt64LE(ptr_a_data, a_index + lIdx);
+    LH1 := TBits.RotateLeft64(LH1, 27);
+    LH1 := LH1 + LH2;
+    LH1 := LH1 * 5 + C3;
 
-    System.Inc(lIdx, 8);
+    LK2 := LK2 * C2;
+    LK2 := TBits.RotateLeft64(LK2, 33);
+    LK2 := LK2 * C1;
+    LH2 := LH2 xor LK2;
 
-    k1 := k1 * C1;
-    k1 := TBits.RotateLeft64(k1, 31);
-    k1 := k1 * C2;
-    Fm_h1 := Fm_h1 xor k1;
+    LH2 := TBits.RotateLeft64(LH2, 31);
+    LH2 := LH2 + LH1;
+    LH2 := LH2 * 5 + C4;
 
-    Fm_h1 := TBits.RotateLeft64(Fm_h1, 27);
-    Fm_h1 := Fm_h1 + Fm_h2;
-    Fm_h1 := Fm_h1 * 5 + C3;
-
-    k2 := k2 * C2;
-    k2 := TBits.RotateLeft64(k2, 33);
-    k2 := k2 * C1;
-    Fm_h2 := Fm_h2 xor k2;
-
-    Fm_h2 := TBits.RotateLeft64(Fm_h2, 31);
-    Fm_h2 := Fm_h2 + Fm_h1;
-    Fm_h2 := Fm_h2 * 5 + C4;
-
-    System.Inc(i);
+    System.Inc(LIndex);
   end;
 
-  offset := a_index + (i * 16);
+  FH1 := LH1;
+  FH2 := LH2;
 
-  while (offset < (a_index + len)) do
+  LOffset := AIndex + (LIndex * 16);
+
+  while (LOffset < (AIndex + LLength)) do
   begin
-
-    ByteUpdate(a_data[offset]);
-    System.Inc(offset);
-
+    ByteUpdate(AData[LOffset]);
+    System.Inc(LOffset);
   end;
-
 end;
 
 function TMurmurHash3_x64_128.TransformFinal: IHashResult;
 var
-  tempBufByte: THashLibByteArray;
-  tempBufUInt64: THashLibUInt64Array;
+  LBufferBytes: THashLibByteArray;
 begin
   Finish();
 
-  tempBufUInt64 := THashLibUInt64Array.Create(Fm_h1, Fm_h2);
-  System.SetLength(tempBufByte, System.length(tempBufUInt64) *
-    System.SizeOf(UInt64));
-  TConverters.be64_copy(PUInt64(tempBufUInt64), 0, PByte(tempBufByte), 0,
-    System.length(tempBufByte));
+  System.SetLength(LBufferBytes, HashSize);
+  TConverters.ReadUInt64AsBytesBE(FH1, LBufferBytes, 0);
+  TConverters.ReadUInt64AsBytesBE(FH2, LBufferBytes, 8);
 
-  result := THashResult.Create(tempBufByte);
-
+  result := THashResult.Create(LBufferBytes);
   Initialize();
 end;
 

@@ -18,7 +18,7 @@ type
 
       FIsLittleEndian: Boolean;
 
-    class function GetHexValue(i: Int32): Char; static; inline;
+    class function GetHexValue(AValue: Int32): Char; static; inline;
     class function GetIsLittleEndian(): Boolean; static; inline;
     class constructor BitConverter();
 
@@ -28,58 +28,58 @@ type
 
     { ==================================================================== }
 
-    class function GetBytes(value: Boolean): THashLibByteArray; overload;
+    class function GetBytes(AValue: Boolean): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: Char): THashLibByteArray; overload;
+    class function GetBytes(AValue: Char): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: Double): THashLibByteArray; overload;
+    class function GetBytes(AValue: Double): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: Int16): THashLibByteArray; overload;
+    class function GetBytes(AValue: Int16): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: Int32): THashLibByteArray; overload;
+    class function GetBytes(AValue: Int32): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: Int64): THashLibByteArray; overload;
+    class function GetBytes(AValue: Int64): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: Single): THashLibByteArray; overload;
+    class function GetBytes(AValue: Single): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: UInt8): THashLibByteArray; overload;
+    class function GetBytes(AValue: UInt8): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: UInt16): THashLibByteArray; overload;
+    class function GetBytes(AValue: UInt16): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: UInt32): THashLibByteArray; overload;
+    class function GetBytes(AValue: UInt32): THashLibByteArray; overload;
       static; inline;
-    class function GetBytes(value: UInt64): THashLibByteArray; overload;
+    class function GetBytes(AValue: UInt64): THashLibByteArray; overload;
       static; inline;
 
     { ==================================================================== }
 
-    class function ToBoolean(const value: THashLibByteArray; StartIndex: Int32)
-      : Boolean; static; inline;
-    class function ToChar(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToBoolean(const AValue: THashLibByteArray;
+      AStartIndex: Int32): Boolean; static; inline;
+    class function ToChar(const AValue: THashLibByteArray; AStartIndex: Int32)
       : Char; static; inline;
-    class function ToDouble(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToDouble(const AValue: THashLibByteArray; AStartIndex: Int32)
       : Double; static; inline;
-    class function ToInt16(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToInt16(const AValue: THashLibByteArray; AStartIndex: Int32)
       : Int16; static; inline;
-    class function ToInt32(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToInt32(const AValue: THashLibByteArray; AStartIndex: Int32)
       : Int32; static; inline;
-    class function ToInt64(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToInt64(const AValue: THashLibByteArray; AStartIndex: Int32)
       : Int64; static; inline;
-    class function ToSingle(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToSingle(const AValue: THashLibByteArray; AStartIndex: Int32)
       : Single; static; inline;
-    class function ToString(const value: THashLibByteArray): String;
+    class function ToString(const AValue: THashLibByteArray): String;
       reintroduce; overload; static;
-    class function ToString(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToString(const AValue: THashLibByteArray; AStartIndex: Int32)
       : String; reintroduce; overload; static;
-    class function ToString(const value: THashLibByteArray;
-      StartIndex, &Length: Int32): String; reintroduce; overload; static;
-    class function ToUInt8(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToString(const AValue: THashLibByteArray;
+      AStartIndex, ALength: Int32): String; reintroduce; overload; static;
+    class function ToUInt8(const AValue: THashLibByteArray; AStartIndex: Int32)
       : UInt8; static; inline;
-    class function ToUInt16(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToUInt16(const AValue: THashLibByteArray; AStartIndex: Int32)
       : UInt16; static; inline;
-    class function ToUInt32(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToUInt32(const AValue: THashLibByteArray; AStartIndex: Int32)
       : UInt32; static; inline;
-    class function ToUInt64(const value: THashLibByteArray; StartIndex: Int32)
+    class function ToUInt64(const AValue: THashLibByteArray; AStartIndex: Int32)
       : UInt64; static; inline;
 
   end;
@@ -90,127 +90,114 @@ implementation
 
 class constructor TBitConverter.BitConverter;
 var
-  IntValue: Int32;
-  PIIntValueAddress: PInteger;
-  PBIntValueAddress: PByte;
-  ByteValue: Byte;
+  LInt32Value: Int32;
 begin
-  IntValue := 1;
-  PIIntValueAddress := @IntValue;
-  PBIntValueAddress := PByte(PIIntValueAddress);
-  ByteValue := PBIntValueAddress^;
-  FIsLittleEndian := ByteValue = 1;
+  LInt32Value := 1;
+  FIsLittleEndian := (PByte((@LInt32Value))^) = 1;
 end;
 
 { ==================================================================== }
 
-class function TBitConverter.GetBytes(value: Int16): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: Int16): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PSmallInt(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PSmallInt(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: Int32): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: Int32): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PInteger(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
-
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PInteger(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: Double): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: Double): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PDouble(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PDouble(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: Boolean): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: Boolean): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PBoolean(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PBoolean(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: Char): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: Char): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PChar(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PChar(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: UInt8): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: UInt8): THashLibByteArray;
 begin
-  // System.SetLength(result, System.SizeOf(value));
-  // PByte(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PByte(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: UInt16): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: UInt16): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PWord(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PWord(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: Int64): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: Int64): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PInt64(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PInt64(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: Single): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: Single): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PSingle(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PSingle(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: UInt32): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: UInt32): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PCardinal(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PCardinal(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
-class function TBitConverter.GetBytes(value: UInt64): THashLibByteArray;
+class function TBitConverter.GetBytes(AValue: UInt64): THashLibByteArray;
 begin
-
-  // System.SetLength(result, System.SizeOf(value));
-  // PUInt64(@result[0])^ := value;
-  System.SetLength(result, System.SizeOf(value));
-  System.Move(value, result[0], System.SizeOf(value));
+  // System.SetLength(result, System.SizeOf(AValue));
+  // PUInt64(@result[0])^ := AValue;
+  System.SetLength(result, System.SizeOf(AValue));
+  System.Move(AValue, result[0], System.SizeOf(AValue));
 end;
 
 { ==================================================================== }
 
-class function TBitConverter.GetHexValue(i: Int32): Char;
+class function TBitConverter.GetHexValue(AValue: Int32): Char;
 begin
-  if i < 10 then
-    result := Char(i + System.Ord('0'))
+  if AValue < 10 then
+  begin
+    result := Char(AValue + System.Ord('0'))
+  end
   else
-    result := Char((i - 10) + System.Ord('A'));
+  begin
+    result := Char((AValue - 10) + System.Ord('A'));
+  end;
 end;
 
 class function TBitConverter.GetIsLittleEndian: Boolean;
@@ -220,278 +207,228 @@ end;
 
 { ==================================================================== }
 
-class function TBitConverter.ToBoolean(const value: THashLibByteArray;
-  StartIndex: Int32): Boolean;
+class function TBitConverter.ToBoolean(const AValue: THashLibByteArray;
+  AStartIndex: Int32): Boolean;
 begin
-  // result := PBoolean(@value[StartIndex])^;
-  System.Move(value[StartIndex], result, System.SizeOf(result));
-
+  // result := PBoolean(@AValue[AStartIndex])^;
+  System.Move(AValue[AStartIndex], result, System.SizeOf(result));
 end;
 
-class function TBitConverter.ToChar(const value: THashLibByteArray;
-  StartIndex: Int32): Char;
+class function TBitConverter.ToChar(const AValue: THashLibByteArray;
+  AStartIndex: Int32): Char;
 begin
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
-
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
   if (IsLittleEndian) then
   begin
-    result := Char(value[StartIndex] or (value[StartIndex + 1] shl 8));
-    Exit;
+    result := Char(AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8));
   end
   else
   begin
-
-    result := Char((value[StartIndex] shl 8) or value[StartIndex + 1]);
-    Exit;
+    result := Char((AValue[AStartIndex] shl 8) or AValue[AStartIndex + 1]);
   end;
-
 end;
 
-class function TBitConverter.ToDouble(const value: THashLibByteArray;
-  StartIndex: Int32): Double;
+class function TBitConverter.ToDouble(const AValue: THashLibByteArray;
+  AStartIndex: Int32): Double;
 var
   i1, i2: Int32;
-  val: Int64;
+  LValue: Int64;
 begin
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
-
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
   if (IsLittleEndian) then
   begin
-    i1 := value[StartIndex] or (value[StartIndex + 1] shl 8) or
-      (value[StartIndex + 2] shl 16) or (value[StartIndex + 3] shl 24);
-    i2 := (value[StartIndex + 4]) or (value[StartIndex + 5] shl 8) or
-      (value[StartIndex + 6] shl 16) or (value[StartIndex + 7] shl 24);
-    val := UInt32(i1) or (Int64(i2) shl 32);
-    result := PDouble(@val)^;
-    Exit;
+    i1 := AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8) or
+      (AValue[AStartIndex + 2] shl 16) or (AValue[AStartIndex + 3] shl 24);
+    i2 := (AValue[AStartIndex + 4]) or (AValue[AStartIndex + 5] shl 8) or
+      (AValue[AStartIndex + 6] shl 16) or (AValue[AStartIndex + 7] shl 24);
+    LValue := UInt32(i1) or (Int64(i2) shl 32);
+    result := PDouble(@LValue)^;
   end
   else
   begin
-
-    i1 := (value[StartIndex] shl 24) or (value[StartIndex + 1] shl 16) or
-      (value[StartIndex + 2] shl 8) or (value[StartIndex + 3]);
-    i2 := (value[StartIndex + 4] shl 24) or (value[StartIndex + 5] shl 16) or
-      (value[StartIndex + 6] shl 8) or (value[StartIndex + 7]);
-    val := UInt32(i2) or (Int64(i1) shl 32);
-    result := PDouble(@val)^;
-    Exit;
+    i1 := (AValue[AStartIndex] shl 24) or (AValue[AStartIndex + 1] shl 16) or
+      (AValue[AStartIndex + 2] shl 8) or (AValue[AStartIndex + 3]);
+    i2 := (AValue[AStartIndex + 4] shl 24) or (AValue[AStartIndex + 5] shl 16)
+      or (AValue[AStartIndex + 6] shl 8) or (AValue[AStartIndex + 7]);
+    LValue := UInt32(i2) or (Int64(i1) shl 32);
+    result := PDouble(@LValue)^;
   end;
-
 end;
 
-class function TBitConverter.ToInt16(const value: THashLibByteArray;
-  StartIndex: Int32): Int16;
+class function TBitConverter.ToInt16(const AValue: THashLibByteArray;
+  AStartIndex: Int32): Int16;
 begin
-
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
-
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
   if (IsLittleEndian) then
   begin
-    result := SmallInt(value[StartIndex] or (value[StartIndex + 1] shl 8));
-    Exit;
+    result := SmallInt(AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8));
   end
   else
   begin
-
-    result := SmallInt((value[StartIndex] shl 8) or value[StartIndex + 1]);
-    Exit;
+    result := SmallInt((AValue[AStartIndex] shl 8) or AValue[AStartIndex + 1]);
   end;
-
 end;
 
-class function TBitConverter.ToInt32(const value: THashLibByteArray;
-  StartIndex: Int32): Int32;
+class function TBitConverter.ToInt32(const AValue: THashLibByteArray;
+  AStartIndex: Int32): Int32;
 begin
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
-
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
   if (IsLittleEndian) then
   begin
-    result := value[StartIndex] or (value[StartIndex + 1] shl 8) or
-      (value[StartIndex + 2] shl 16) or (value[StartIndex + 3] shl 24);
-    Exit;
+    result := AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8) or
+      (AValue[AStartIndex + 2] shl 16) or (AValue[AStartIndex + 3] shl 24);
   end
   else
   begin
-
-    result := (value[StartIndex] shl 24) or (value[StartIndex + 1] shl 16) or
-      (value[StartIndex + 2] shl 8) or (value[StartIndex + 3]);
-    Exit;
+    result := (AValue[AStartIndex] shl 24) or (AValue[AStartIndex + 1] shl 16)
+      or (AValue[AStartIndex + 2] shl 8) or (AValue[AStartIndex + 3]);
   end;
-
 end;
 
-class function TBitConverter.ToInt64(const value: THashLibByteArray;
-  StartIndex: Int32): Int64;
+class function TBitConverter.ToInt64(const AValue: THashLibByteArray;
+  AStartIndex: Int32): Int64;
 var
   i1, i2: Int32;
 begin
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
   if (IsLittleEndian) then
   begin
-    i1 := value[StartIndex] or (value[StartIndex + 1] shl 8) or
-      (value[StartIndex + 2] shl 16) or (value[StartIndex + 3] shl 24);
-    i2 := (value[StartIndex + 4]) or (value[StartIndex + 5] shl 8) or
-      (value[StartIndex + 6] shl 16) or (value[StartIndex + 7] shl 24);
+    i1 := AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8) or
+      (AValue[AStartIndex + 2] shl 16) or (AValue[AStartIndex + 3] shl 24);
+    i2 := (AValue[AStartIndex + 4]) or (AValue[AStartIndex + 5] shl 8) or
+      (AValue[AStartIndex + 6] shl 16) or (AValue[AStartIndex + 7] shl 24);
     result := UInt32(i1) or (Int64(i2) shl 32);
-    Exit;
   end
   else
   begin
-
-    i1 := (value[StartIndex] shl 24) or (value[StartIndex + 1] shl 16) or
-      (value[StartIndex + 2] shl 8) or (value[StartIndex + 3]);
-    i2 := (value[StartIndex + 4] shl 24) or (value[StartIndex + 5] shl 16) or
-      (value[StartIndex + 6] shl 8) or (value[StartIndex + 7]);
+    i1 := (AValue[AStartIndex] shl 24) or (AValue[AStartIndex + 1] shl 16) or
+      (AValue[AStartIndex + 2] shl 8) or (AValue[AStartIndex + 3]);
+    i2 := (AValue[AStartIndex + 4] shl 24) or (AValue[AStartIndex + 5] shl 16)
+      or (AValue[AStartIndex + 6] shl 8) or (AValue[AStartIndex + 7]);
     result := UInt32(i2) or (Int64(i1) shl 32);
-    Exit;
   end;
 end;
 
-class function TBitConverter.ToSingle(const value: THashLibByteArray;
-  StartIndex: Int32): Single;
+class function TBitConverter.ToSingle(const AValue: THashLibByteArray;
+  AStartIndex: Int32): Single;
 var
-  val: Int32;
+  LValue: Int32;
 begin
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
   if (IsLittleEndian) then
   begin
-    val := (value[StartIndex] or (value[StartIndex + 1] shl 8) or
-      (value[StartIndex + 2] shl 16) or (value[StartIndex + 3] shl 24));
-    result := PSingle(@val)^;
-    Exit;
+    LValue := (AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8) or
+      (AValue[AStartIndex + 2] shl 16) or (AValue[AStartIndex + 3] shl 24));
+    result := PSingle(@LValue)^;
   end
   else
   begin
-    val := (value[StartIndex] shl 24) or (value[StartIndex + 1] shl 16) or
-      (value[StartIndex + 2] shl 8) or (value[StartIndex + 3]);
-    result := PSingle(@val)^;
-    Exit;
+    LValue := (AValue[AStartIndex] shl 24) or (AValue[AStartIndex + 1] shl 16)
+      or (AValue[AStartIndex + 2] shl 8) or (AValue[AStartIndex + 3]);
+    result := PSingle(@LValue)^;
   end;
-
 end;
 
-class function TBitConverter.ToString(const value: THashLibByteArray): String;
-var
-  LowVal: Int32;
+class function TBitConverter.ToUInt8(const AValue: THashLibByteArray;
+  AStartIndex: Int32): UInt8;
 begin
-  LowVal := System.Low(value);
-  result := ToString(value, LowVal);
+  // result := PByte(@AValue[AStartIndex])^;
+  System.Move(AValue[AStartIndex], result, System.SizeOf(result));
 end;
 
-class function TBitConverter.ToString(const value: THashLibByteArray;
-  StartIndex: Int32): String;
+class function TBitConverter.ToUInt16(const AValue: THashLibByteArray;
+  AStartIndex: Int32): UInt16;
 begin
-  result := ToString(value, StartIndex, System.Length(value) - StartIndex);
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
+  if (IsLittleEndian) then
+  begin
+    result := Word(AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8));
+  end
+  else
+  begin
+    result := Word((AValue[AStartIndex] shl 8) or AValue[AStartIndex + 1]);
+  end;
 end;
 
-class function TBitConverter.ToString(const value: THashLibByteArray;
-  StartIndex, &Length: Int32): String;
+class function TBitConverter.ToUInt32(const AValue: THashLibByteArray;
+  AStartIndex: Int32): UInt32;
+begin
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
+  if (IsLittleEndian) then
+  begin
+    result := UInt32(AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8) or
+      (AValue[AStartIndex + 2] shl 16) or (AValue[AStartIndex + 3] shl 24));
+  end
+  else
+  begin
+    result := UInt32((AValue[AStartIndex] shl 24) or
+      (AValue[AStartIndex + 1] shl 16) or (AValue[AStartIndex + 2] shl 8) or
+      (AValue[AStartIndex + 3]));
+  end;
+end;
 
+class function TBitConverter.ToUInt64(const AValue: THashLibByteArray;
+  AStartIndex: Int32): UInt64;
 var
-  Idx, Index, chArrayLength, LowVal: Int32;
-  chArray: THashLibCharArray;
-  b: Byte;
+  i1, i2: Int32;
+begin
+  // System.Move(AValue[AStartIndex], result, System.SizeOf(result));
+  if (IsLittleEndian) then
+  begin
+    i1 := AValue[AStartIndex] or (AValue[AStartIndex + 1] shl 8) or
+      (AValue[AStartIndex + 2] shl 16) or (AValue[AStartIndex + 3] shl 24);
+    i2 := (AValue[AStartIndex + 4]) or (AValue[AStartIndex + 5] shl 8) or
+      (AValue[AStartIndex + 6] shl 16) or (AValue[AStartIndex + 7] shl 24);
+    result := UInt64(UInt32(i1) or (Int64(i2) shl 32));
+  end
+  else
+  begin
+    i1 := (AValue[AStartIndex] shl 24) or (AValue[AStartIndex + 1] shl 16) or
+      (AValue[AStartIndex + 2] shl 8) or (AValue[AStartIndex + 3]);
+    i2 := (AValue[AStartIndex + 4] shl 24) or (AValue[AStartIndex + 5] shl 16)
+      or (AValue[AStartIndex + 6] shl 8) or (AValue[AStartIndex + 7]);
+    result := UInt64(UInt32(i2) or (Int64(i1) shl 32));
+  end;
+end;
 
+class function TBitConverter.ToString(const AValue: THashLibByteArray): String;
+begin
+  result := ToString(AValue, System.Low(AValue));
+end;
+
+class function TBitConverter.ToString(const AValue: THashLibByteArray;
+  AStartIndex: Int32): String;
+begin
+  result := ToString(AValue, AStartIndex, System.Length(AValue) - AStartIndex);
+end;
+
+class function TBitConverter.ToString(const AValue: THashLibByteArray;
+  AStartIndex, ALength: Int32): String;
+var
+  LIdx, LIndex, LCharArrayLength: Int32;
+  LCharArray: THashLibCharArray;
+  LByte: Byte;
 begin
   result := '';
 
-  chArrayLength := &Length * 3;
+  LCharArrayLength := ALength * 3;
 
-  System.SetLength(chArray, chArrayLength);
-  Idx := 0;
-  Index := StartIndex;
-  while Idx < chArrayLength do
+  System.SetLength(LCharArray, LCharArrayLength);
+  LIdx := 0;
+  LIndex := AStartIndex;
+  while LIdx < LCharArrayLength do
   begin
-    b := value[Index];
-    System.Inc(Index);
+    LByte := AValue[LIndex];
+    System.Inc(LIndex);
 
-    chArray[Idx] := GetHexValue(b shr 4);
-    chArray[Idx + 1] := GetHexValue(b and 15);
-    chArray[Idx + 2] := '-';
+    LCharArray[LIdx] := GetHexValue(LByte shr 4);
+    LCharArray[LIdx + 1] := GetHexValue(LByte and 15);
+    LCharArray[LIdx + 2] := '-';
 
-    System.Inc(Idx, 3);
+    System.Inc(LIdx, 3);
   end;
-
-  LowVal := System.Low(chArray);
-
-  System.SetString(result, PChar(@chArray[LowVal]), System.Length(chArray) - 1);
-
-end;
-
-class function TBitConverter.ToUInt8(const value: THashLibByteArray;
-  StartIndex: Int32): UInt8;
-begin
-  // result := PByte(@value[StartIndex])^;
-  System.Move(value[StartIndex], result, System.SizeOf(result));
-end;
-
-class function TBitConverter.ToUInt16(const value: THashLibByteArray;
-  StartIndex: Int32): UInt16;
-begin
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
-
-  if (IsLittleEndian) then
-  begin
-    result := Word(value[StartIndex] or (value[StartIndex + 1] shl 8));
-    Exit;
-  end
-  else
-  begin
-
-    result := Word((value[StartIndex] shl 8) or value[StartIndex + 1]);
-    Exit;
-  end;
-end;
-
-class function TBitConverter.ToUInt32(const value: THashLibByteArray;
-  StartIndex: Int32): UInt32;
-begin
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
-
-  if (IsLittleEndian) then
-  begin
-    result := UInt32(value[StartIndex] or (value[StartIndex + 1] shl 8) or
-      (value[StartIndex + 2] shl 16) or (value[StartIndex + 3] shl 24));
-    Exit;
-  end
-  else
-  begin
-
-    result := UInt32((value[StartIndex] shl 24) or
-      (value[StartIndex + 1] shl 16) or (value[StartIndex + 2] shl 8) or
-      (value[StartIndex + 3]));
-    Exit;
-  end;
-end;
-
-class function TBitConverter.ToUInt64(const value: THashLibByteArray;
-  StartIndex: Int32): UInt64;
-var
-  i1, i2: Int32;
-begin
-
-  // System.Move(value[StartIndex], result, System.SizeOf(result));
-
-  if (IsLittleEndian) then
-  begin
-    i1 := value[StartIndex] or (value[StartIndex + 1] shl 8) or
-      (value[StartIndex + 2] shl 16) or (value[StartIndex + 3] shl 24);
-    i2 := (value[StartIndex + 4]) or (value[StartIndex + 5] shl 8) or
-      (value[StartIndex + 6] shl 16) or (value[StartIndex + 7] shl 24);
-    result := UInt64(UInt32(i1) or (Int64(i2) shl 32));
-    Exit;
-  end
-  else
-  begin
-
-    i1 := (value[StartIndex] shl 24) or (value[StartIndex + 1] shl 16) or
-      (value[StartIndex + 2] shl 8) or (value[StartIndex + 3]);
-    i2 := (value[StartIndex + 4] shl 24) or (value[StartIndex + 5] shl 16) or
-      (value[StartIndex + 6] shl 8) or (value[StartIndex + 7]);
-    result := UInt64(UInt32(i2) or (Int64(i1) shl 32));
-    Exit;
-  end;
-
+  System.SetString(result, PChar(@LCharArray[System.Low(LCharArray)]),
+    System.Length(LCharArray) - 1);
 end;
 
 end.

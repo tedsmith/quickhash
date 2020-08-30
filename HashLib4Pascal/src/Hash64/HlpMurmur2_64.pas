@@ -21,16 +21,16 @@ resourcestring
   SInvalidKeyLength = 'KeyLength Must Be Equal to %d';
 
 type
-
+  // MurmurHash64A (64-bit) algorithm by Austin Appleby.
   TMurmur2_64 = class sealed(TMultipleTransformNonBlock, IHash64, IHashWithKey,
     ITransformBlock)
 
   strict private
-
-    Fm_key, Fm_working_key: UInt32;
+  var
+    FKey, FWorkingKey: UInt64;
 
   const
-    CKEY = UInt32($0);
+    CKEY = UInt64($0);
 {$IFDEF FPC}
     // to bypass Internal error (200706094) on FPC, We use "Typed Constant".
 
@@ -43,10 +43,10 @@ type
 
     function GetKeyLength(): TNullableInteger;
     function GetKey: THashLibByteArray; inline;
-    procedure SetKey(const value: THashLibByteArray); inline;
+    procedure SetKey(const AValue: THashLibByteArray); inline;
 
   strict protected
-    function ComputeAggregatedBytes(const a_data: THashLibByteArray)
+    function ComputeAggregatedBytes(const AData: THashLibByteArray)
       : IHashResult; override;
 
   public
@@ -64,220 +64,191 @@ implementation
 
 function TMurmur2_64.Clone(): IHash;
 var
-  HashInstance: TMurmur2_64;
+  LHashInstance: TMurmur2_64;
 begin
-  HashInstance := TMurmur2_64.Create();
-  HashInstance.Fm_key := Fm_key;
-  HashInstance.Fm_working_key := Fm_working_key;
+  LHashInstance := TMurmur2_64.Create();
+  LHashInstance.FKey := FKey;
+  LHashInstance.FWorkingKey := FWorkingKey;
   FBuffer.Position := 0;
-  HashInstance.FBuffer.CopyFrom(FBuffer, FBuffer.Size);
-  result := HashInstance as IHash;
+  LHashInstance.FBuffer.CopyFrom(FBuffer, FBuffer.Size);
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
-function TMurmur2_64.ComputeAggregatedBytes(const a_data: THashLibByteArray)
+function TMurmur2_64.ComputeAggregatedBytes(const AData: THashLibByteArray)
   : IHashResult;
 var
-  &length, current_index: Int32;
-  h, k: UInt64;
-  ptr_a_data: PByte;
+  LLength, LCurrentIndex, LNBlocks, LIdx: Int32;
+  LH, LK: UInt64;
+  LPtrData: PByte;
+  LPtrDataUInt64: PUInt64;
 begin
+  LLength := System.length(AData);
+  LPtrData := PByte(AData);
 
-  length := System.length(a_data);
-  ptr_a_data := PByte(a_data);
-
-  if (length = 0) then
+  if (LLength = 0) then
   begin
     result := THashResult.Create(UInt64(0));
     Exit;
   end;
 
-  h := Fm_working_key xor UInt64(length);
-  current_index := 0;
+  LH := FWorkingKey xor (UInt64(LLength) * M);
+  LCurrentIndex := 0;
+  LIdx := 0;
+  LPtrDataUInt64 := PUInt64(LPtrData);
+  LNBlocks := LLength shr 3;
 
-  while (length >= 8) do
+  while LIdx < LNBlocks do
   begin
+    LK := TConverters.ReadPUInt64AsUInt64LE(LPtrDataUInt64 + LIdx);
 
-    k := TConverters.ReadBytesAsUInt64LE(ptr_a_data, current_index);
+    LK := LK * M;
+    LK := LK xor (LK shr R);
+    LK := LK * M;
 
-    k := k * M;
-    k := k xor (k shr R);
-    k := k * M;
+    LH := LH xor LK;
+    LH := LH * M;
 
-    h := h xor k;
-    h := h * M;
-
-    System.Inc(current_index, 8);
-    System.Dec(length, 8);
-
+    System.Inc(LIdx);
+    System.Inc(LCurrentIndex, 8);
+    System.Dec(LLength, 8);
   end;
 
-  case length of
+  case LLength of
     7:
       begin
+        LH := LH xor ((UInt64(AData[LCurrentIndex + 6]) shl 48));
 
-        h := h xor ((UInt64(a_data[current_index]) shl 48));
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 5]) shl 40);
 
-        h := h xor (UInt64(a_data[current_index]) shl 40);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 4]) shl 32);
 
-        h := h xor (UInt64(a_data[current_index]) shl 32);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 3]) shl 24);
 
-        h := h xor (UInt64(a_data[current_index]) shl 24);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 2]) shl 16);
 
-        h := h xor (UInt64(a_data[current_index]) shl 16);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 1]) shl 8);
 
-        h := h xor (UInt64(a_data[current_index]) shl 8);
-        System.Inc(current_index);
+        LH := LH xor UInt64(AData[LCurrentIndex]);
 
-        h := h xor UInt64(a_data[current_index]);
-
-        h := h * M;
+        LH := LH * M;
       end;
 
     6:
       begin
+        LH := LH xor (UInt64(AData[LCurrentIndex + 5]) shl 40);
 
-        h := h xor (UInt64(a_data[current_index]) shl 40);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 4]) shl 32);
 
-        h := h xor (UInt64(a_data[current_index]) shl 32);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 3]) shl 24);
 
-        h := h xor (UInt64(a_data[current_index]) shl 24);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 2]) shl 16);
 
-        h := h xor (UInt64(a_data[current_index]) shl 16);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 1]) shl 8);
 
-        h := h xor (UInt64(a_data[current_index]) shl 8);
-        System.Inc(current_index);
+        LH := LH xor UInt64(AData[LCurrentIndex]);
 
-        h := h xor UInt64(a_data[current_index]);
-
-        h := h * M;
+        LH := LH * M;
       end;
 
     5:
       begin
+        LH := LH xor (UInt64(AData[LCurrentIndex + 4]) shl 32);
 
-        h := h xor (UInt64(a_data[current_index]) shl 32);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 3]) shl 24);
 
-        h := h xor (UInt64(a_data[current_index]) shl 24);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 2]) shl 16);
 
-        h := h xor (UInt64(a_data[current_index]) shl 16);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 1]) shl 8);
 
-        h := h xor (UInt64(a_data[current_index]) shl 8);
-        System.Inc(current_index);
-
-        h := h xor UInt64(a_data[current_index]);
-        h := h * M;
+        LH := LH xor UInt64(AData[LCurrentIndex]);
+        LH := LH * M;
       end;
 
     4:
       begin
+        LH := LH xor (UInt64(AData[LCurrentIndex + 3]) shl 24);
 
-        h := h xor (UInt64(a_data[current_index]) shl 24);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 2]) shl 16);
 
-        h := h xor (UInt64(a_data[current_index]) shl 16);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 1]) shl 8);
 
-        h := h xor (UInt64(a_data[current_index]) shl 8);
-        System.Inc(current_index);
-
-        h := h xor UInt64(a_data[current_index]);
-        h := h * M;
+        LH := LH xor UInt64(AData[LCurrentIndex]);
+        LH := LH * M;
       end;
 
     3:
       begin
+        LH := LH xor (UInt64(AData[LCurrentIndex + 2]) shl 16);
 
-        h := h xor (UInt64(a_data[current_index]) shl 16);
-        System.Inc(current_index);
+        LH := LH xor (UInt64(AData[LCurrentIndex + 1]) shl 8);
 
-        h := h xor (UInt64(a_data[current_index]) shl 8);
-        System.Inc(current_index);
-
-        h := h xor UInt64(a_data[current_index]);
-        h := h * M;
+        LH := LH xor UInt64(AData[LCurrentIndex]);
+        LH := LH * M;
       end;
 
     2:
       begin
+        LH := LH xor (UInt64(AData[LCurrentIndex + 1]) shl 8);
 
-        h := h xor (UInt64(a_data[current_index]) shl 8);
-        System.Inc(current_index);
+        LH := LH xor UInt64(AData[LCurrentIndex]);
 
-        h := h xor UInt64(a_data[current_index]);
-
-        h := h * M;
+        LH := LH * M;
       end;
 
     1:
       begin
+        LH := LH xor UInt64(AData[LCurrentIndex]);
 
-        h := h xor UInt64(a_data[current_index]);
-
-        h := h * M;
+        LH := LH * M;
       end;
 
   end;
 
-  h := h xor (h shr R);
-  h := h * M;
-  h := h xor (h shr R);
+  LH := LH xor (LH shr R);
+  LH := LH * M;
+  LH := LH xor (LH shr R);
 
-  result := THashResult.Create(h);
-
+  result := THashResult.Create(LH);
 end;
 
 constructor TMurmur2_64.Create;
 begin
   Inherited Create(8, 8);
-  Fm_key := CKEY;
-
+  FKey := CKEY;
 end;
 
 function TMurmur2_64.GetKey: THashLibByteArray;
 begin
-  result := TConverters.ReadUInt32AsBytesLE(Fm_key);
+  result := TConverters.ReadUInt64AsBytesLE(FKey);
 end;
 
 function TMurmur2_64.GetKeyLength: TNullableInteger;
 begin
-  result := 4;
+  result := 8;
 end;
 
 procedure TMurmur2_64.Initialize;
 begin
-  Fm_working_key := Fm_key;
-
+  FWorkingKey := FKey;
   Inherited Initialize();
-
 end;
 
-procedure TMurmur2_64.SetKey(const value: THashLibByteArray);
+procedure TMurmur2_64.SetKey(const AValue: THashLibByteArray);
 begin
-  if (value = Nil) then
+  if (AValue = Nil) then
   begin
-    Fm_key := CKEY;
+    FKey := CKEY;
   end
   else
   begin
-    if System.length(value) <> KeyLength.value then
+    if System.length(AValue) <> KeyLength.value then
+    begin
       raise EArgumentHashLibException.CreateResFmt(@SInvalidKeyLength,
         [KeyLength.value]);
-    Fm_key := TConverters.ReadBytesAsUInt32LE(PByte(value), 0);
+    end;
+    FKey := TConverters.ReadBytesAsUInt64LE(PByte(AValue), 0);
   end;
-
 end;
 
 end.

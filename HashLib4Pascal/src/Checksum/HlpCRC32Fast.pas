@@ -10,7 +10,8 @@ uses
   HlpIHash,
   HlpIHashInfo,
   HlpHashResult,
-  HlpIHashResult;
+  HlpIHashResult,
+  HlpConverters;
 
 type
 
@@ -20,11 +21,11 @@ type
   var
     FCurrentCRC: UInt32;
 
-    procedure LocalCRCCompute(const ACRCTable: THashLibUInt32Array;
+    procedure LocalCRCCompute(const ACRCTable: THashLibMatrixUInt32Array;
       const AData: THashLibByteArray; AIndex, ALength: Int32);
 
     class function Init_CRC_Table(APolynomial: UInt32)
-      : THashLibUInt32Array; static;
+      : THashLibMatrixUInt32Array; static;
 
   public
 
@@ -44,14 +45,14 @@ type
     CRC32_PKZIP_Polynomial = UInt32($EDB88320);
     class var
 
-      FCRC32_PKZIP_Table: THashLibUInt32Array;
+      FCRC32_PKZIP_Table: THashLibMatrixUInt32Array;
 
     class constructor CRC32_PKZIP();
 
   public
     constructor Create();
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function Clone(): IHash; override;
 
   end;
@@ -64,14 +65,14 @@ type
     CRC32_CASTAGNOLI_Polynomial = UInt32($82F63B78); // Polynomial Reversed
     class var
 
-      FCRC32_CASTAGNOLI_Table: THashLibUInt32Array;
+      FCRC32_CASTAGNOLI_Table: THashLibMatrixUInt32Array;
 
     class constructor CRC32_CASTAGNOLI();
 
   public
     constructor Create();
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function Clone(): IHash; override;
 
   end;
@@ -81,12 +82,16 @@ implementation
 { TCRC32Fast }
 
 class function TCRC32Fast.Init_CRC_Table(APolynomial: UInt32)
-  : THashLibUInt32Array;
+  : THashLibMatrixUInt32Array;
 var
   LIdx, LJIdx, LKIdx: Int32;
   LRes: UInt32;
 begin
-  System.SetLength(Result, 16 * 256);
+  System.SetLength(Result, 16);
+  for LIdx := System.Low(Result) to System.High(Result) do
+  begin
+    System.SetLength(Result[LIdx], 256);
+  end;
   for LIdx := 0 to System.Pred(256) do
   begin
     LRes := LIdx;
@@ -112,55 +117,79 @@ begin
           * }
         // faster branchless variant
         LRes := (LRes shr 1) xor (-Int32(LRes and 1) and APolynomial);
-        Result[(LJIdx * 256) + LIdx] := LRes;
+        Result[LJIdx][LIdx] := LRes;
         System.Inc(LKIdx);
       end;
     end;
   end;
 end;
 
-procedure TCRC32Fast.LocalCRCCompute(const ACRCTable: THashLibUInt32Array;
+procedure TCRC32Fast.LocalCRCCompute(const ACRCTable: THashLibMatrixUInt32Array;
   const AData: THashLibByteArray; AIndex, ALength: Int32);
+const
+  Unroll = Int32(4);
+  BytesAtOnce = Int32(16 * Unroll);
 var
-  LCRC, LA, LB, LC, LD: UInt32;
-  LCRCTable: THashLibUInt32Array;
+  LCRC, LOne, LTwo, LThree, LFour: UInt32;
+  LCRCTable: THashLibMatrixUInt32Array;
+  LCurrent: PCardinal;
+  LUnrolling: Int32;
+  LCurrentPtr: PByte;
 begin
   LCRC := not FCurrentCRC; // LCRC := System.High(UInt32) xor FCurrentCRC;
   LCRCTable := ACRCTable;
-  while ALength >= 16 do
+  LCurrent := PCardinal(PByte(AData) + AIndex);
+  while ALength >= BytesAtOnce do
   begin
+    LUnrolling := 0;
 
-    LA := LCRCTable[(3 * 256) + AData[AIndex + 12]] xor LCRCTable
-      [(2 * 256) + AData[AIndex + 13]] xor LCRCTable
-      [(1 * 256) + AData[AIndex + 14]] xor LCRCTable
-      [(0 * 256) + AData[AIndex + 15]];
+    while LUnrolling < Unroll do
+    begin
+      LOne := TConverters.ReadPCardinalAsUInt32(LCurrent)
+        xor TConverters.le2me_32(LCRC);
+      System.Inc(LCurrent);
+      LTwo := TConverters.ReadPCardinalAsUInt32(LCurrent);
+      System.Inc(LCurrent);
+      LThree := TConverters.ReadPCardinalAsUInt32(LCurrent);
+      System.Inc(LCurrent);
+      LFour := TConverters.ReadPCardinalAsUInt32(LCurrent);
+      System.Inc(LCurrent);
 
-    LB := LCRCTable[(7 * 256) + AData[AIndex + 8]] xor LCRCTable
-      [(6 * 256) + AData[AIndex + 9]] xor LCRCTable
-      [(5 * 256) + AData[AIndex + 10]] xor LCRCTable
-      [(4 * 256) + AData[AIndex + 11]];
+{$IFDEF HASHLIB_LITTLE_ENDIAN}
+      LCRC := LCRCTable[0][(LFour shr 24) and $FF] xor LCRCTable[1]
+        [(LFour shr 16) and $FF] xor LCRCTable[2][(LFour shr 8) and $FF]
+        xor LCRCTable[3][LFour and $FF] xor LCRCTable[4]
+        [(LThree shr 24) and $FF] xor LCRCTable[5][(LThree shr 16) and $FF]
+        xor LCRCTable[6][(LThree shr 8) and $FF] xor LCRCTable[7]
+        [LThree and $FF] xor LCRCTable[8][(LTwo shr 24) and $FF] xor LCRCTable
+        [9][(LTwo shr 16) and $FF] xor LCRCTable[10][(LTwo shr 8) and $FF]
+        xor LCRCTable[11][LTwo and $FF] xor LCRCTable[12][(LOne shr 24) and $FF]
+        xor LCRCTable[13][(LOne shr 16) and $FF] xor LCRCTable[14]
+        [(LOne shr 8) and $FF] xor LCRCTable[15][LOne and $FF];
+{$ELSE}
+      LCRC := LCRCTable[0][LFour and $FF] xor LCRCTable[1]
+        [(LFour shr 8) and $FF] xor LCRCTable[2][(LFour shr 16) and $FF]
+        xor LCRCTable[3][(LFour shr 24) and $FF] xor LCRCTable[4]
+        [LThree and $FF] xor LCRCTable[5][(LThree shr 8) and $FF] xor LCRCTable
+        [6][(LThree shr 16) and $FF] xor LCRCTable[7][(LThree shr 24) and $FF]
+        xor LCRCTable[8][LTwo and $FF] xor LCRCTable[9][(LTwo shr 8) and $FF]
+        xor LCRCTable[10][(LTwo shr 16) and $FF] xor LCRCTable[11]
+        [(LTwo shr 24) and $FF] xor LCRCTable[12][LOne and $FF] xor LCRCTable
+        [13][(LOne shr 8) and $FF] xor LCRCTable[14][(LOne shr 16) and $FF]
+        xor LCRCTable[15][(LOne shr 24) and $FF];
+{$ENDIF HASHLIB_LITTLE_ENDIAN}
+      System.Inc(LUnrolling);
+    end;
 
-    LC := LCRCTable[(11 * 256) + AData[AIndex + 4]] xor LCRCTable
-      [(10 * 256) + AData[AIndex + 5]] xor LCRCTable
-      [(9 * 256) + AData[AIndex + 6]] xor LCRCTable
-      [(8 * 256) + AData[AIndex + 7]];
-
-    LD := LCRCTable[(15 * 256) + ((LCRC and $FF) xor AData[AIndex])
-      ] xor LCRCTable[(14 * 256) + (((LCRC shr 8) and $FF) xor AData[AIndex + 1]
-      )] xor LCRCTable[(13 * 256) + (((LCRC shr 16) and $FF) xor AData
-      [AIndex + 2])] xor LCRCTable
-      [(12 * 256) + ((LCRC shr 24) xor AData[AIndex + 3])];
-
-    LCRC := LD xor LC xor LB xor LA;
-    System.Inc(AIndex, 16);
-    System.Dec(ALength, 16);
+    System.Dec(ALength, BytesAtOnce);
   end;
 
-  System.Dec(ALength);
-  while (ALength >= 0) do
+  LCurrentPtr := PByte(LCurrent);
+  // remaining 1 to 63 bytes (standard algorithm)
+  while (ALength <> 0) do
   begin
-    LCRC := LCRCTable[Byte(LCRC xor AData[AIndex])] xor (LCRC shr 8);
-    System.Inc(AIndex);
+    LCRC := (LCRC shr 8) xor LCRCTable[0][(LCRC and $FF) xor LCurrentPtr^];
+    System.Inc(LCurrentPtr);
     System.Dec(ALength);
   end;
 
@@ -178,8 +207,13 @@ begin
 end;
 
 function TCRC32Fast.TransformFinal: IHashResult;
+var
+  LBufferBytes: THashLibByteArray;
 begin
-  Result := THashResult.Create(FCurrentCRC);
+  System.SetLength(LBufferBytes, HashSize);
+  TConverters.ReadUInt32AsBytesBE(FCurrentCRC, LBufferBytes, 0);
+
+  Result := THashResult.Create(LBufferBytes);
   Initialize();
 end;
 
@@ -187,11 +221,11 @@ end;
 
 function TCRC32_PKZIP.Clone(): IHash;
 var
-  HashInstance: TCRC32_PKZIP;
+  LHashInstance: TCRC32_PKZIP;
 begin
-  HashInstance := TCRC32_PKZIP.Create();
-  HashInstance.FCurrentCRC := FCurrentCRC;
-  Result := HashInstance as IHash;
+  LHashInstance := TCRC32_PKZIP.Create();
+  LHashInstance.FCurrentCRC := FCurrentCRC;
+  Result := LHashInstance as IHash;
   Result.BufferSize := BufferSize;
 end;
 
@@ -200,10 +234,10 @@ begin
   Inherited Create();
 end;
 
-procedure TCRC32_PKZIP.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TCRC32_PKZIP.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 begin
-  LocalCRCCompute(FCRC32_PKZIP_Table, a_data, a_index, a_length);
+  LocalCRCCompute(FCRC32_PKZIP_Table, AData, AIndex, ALength);
 end;
 
 class constructor TCRC32_PKZIP.CRC32_PKZIP();
@@ -215,11 +249,11 @@ end;
 
 function TCRC32_CASTAGNOLI.Clone(): IHash;
 var
-  HashInstance: TCRC32_CASTAGNOLI;
+  LHashInstance: TCRC32_CASTAGNOLI;
 begin
-  HashInstance := TCRC32_CASTAGNOLI.Create();
-  HashInstance.FCurrentCRC := FCurrentCRC;
-  Result := HashInstance as IHash;
+  LHashInstance := TCRC32_CASTAGNOLI.Create();
+  LHashInstance.FCurrentCRC := FCurrentCRC;
+  Result := LHashInstance as IHash;
   Result.BufferSize := BufferSize;
 end;
 
@@ -228,10 +262,10 @@ begin
   Inherited Create();
 end;
 
-procedure TCRC32_CASTAGNOLI.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TCRC32_CASTAGNOLI.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 begin
-  LocalCRCCompute(FCRC32_CASTAGNOLI_Table, a_data, a_index, a_length);
+  LocalCRCCompute(FCRC32_CASTAGNOLI_Table, AData, AIndex, ALength);
 end;
 
 class constructor TCRC32_CASTAGNOLI.CRC32_CASTAGNOLI();
@@ -240,4 +274,3 @@ begin
 end;
 
 end.
-

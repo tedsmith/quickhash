@@ -19,8 +19,8 @@ type
     property Width: Int32 read GetWidth;
     function GetPolynomial: UInt64;
     property Polynomial: UInt64 read GetPolynomial;
-    function GetInitial: UInt64;
-    property Initial: UInt64 read GetInitial;
+    function GetInitialValue: UInt64;
+    property InitialVlaue: UInt64 read GetInitialValue;
     function GetIsInputReflected: Boolean;
     property IsInputReflected: Boolean read GetIsInputReflected;
     function GetIsOutputReflected: Boolean;

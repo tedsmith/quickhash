@@ -5,16 +5,11 @@ unit HlpSnefru;
 interface
 
 uses
-{$IFDEF HAS_UNITSCOPE}
-  System.SysUtils,
-{$ELSE}
   SysUtils,
-{$ENDIF HAS_UNITSCOPE}
   HlpHashLibTypes,
 {$IFDEF DELPHI}
   HlpHash,
   HlpHashBuffer,
-  HlpBitConverter,
 {$ENDIF DELPHI}
   HlpBits,
   HlpHashSize,
@@ -36,16 +31,16 @@ type
   TSnefru = class sealed(TBlockHash, ICryptoNotBuildIn, ITransformBlock)
 
   strict private
-
-    Fm_state: THashLibUInt32Array;
-    Fm_security_level, FHashSize, FBlockSize: Int32;
+  var
+    FState: THashLibUInt32Array;
+    FSecurityLevel: Int32;
 
   const
-    s_shifts: array [0 .. 3] of Int32 = (16, 8, 16, 24);
+    SShifts: array [0 .. 3] of Int32 = (16, 8, 16, 24);
 
     class var
 
-      Fs_boxes: THashLibMatrixUInt32Array;
+      FSBoxes: THashLibMatrixUInt32Array;
 
     class constructor Snefru();
 
@@ -55,17 +50,17 @@ type
     function GetName: String; override;
     function GetResult(): THashLibByteArray; override;
     procedure Finish(); override;
-    procedure TransformBlock(a_data: PByte; a_data_length: Int32;
-      a_index: Int32); override;
+    procedure TransformBlock(AData: PByte; ADataLength: Int32;
+      AIndex: Int32); override;
 
   public
     /// <summary>
     ///
     /// </summary>
-    /// <param name="a_security_level">any Integer value greater than 0. Standard is 8. </param>
-    /// <param name="a_hash_size">128bit, 256bit</param>
+    /// <param name="ASecurityLevel">any Integer value greater than 0. Standard is 8. </param>
+    /// <param name="AHashSize">128bit, 256bit</param>
     /// <returns></returns>
-    constructor Create(a_security_level: Int32; a_hash_size: THashSize);
+    constructor Create(ASecurityLevel: Int32; AHashSize: THashSize);
     procedure Initialize(); override;
     function Clone(): IHash; override;
 
@@ -92,171 +87,163 @@ end;
 
 function TSnefru.Clone(): IHash;
 var
-  HashInstance: TSnefru;
+  LHashInstance: TSnefru;
 begin
-  HashInstance := TSnefru.Create(Fm_security_level,
-    GetSnefruHashSize(FHashSize));
-  HashInstance.Fm_state := System.Copy(Fm_state);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  Result := HashInstance as IHash;
+  LHashInstance := TSnefru.Create(FSecurityLevel, GetSnefruHashSize(HashSize));
+  LHashInstance.FState := System.Copy(FState);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  Result := LHashInstance as IHash;
   Result.BufferSize := BufferSize;
 end;
 
-constructor TSnefru.Create(a_security_level: Int32; a_hash_size: THashSize);
+constructor TSnefru.Create(ASecurityLevel: Int32; AHashSize: THashSize);
 begin
-
-  Inherited Create(Int32(a_hash_size), 64 - (Int32(a_hash_size)));
-  Fm_security_level := Int32(a_security_level);
-  FHashSize := HashSize;
-  FBlockSize := BlockSize;
-  System.SetLength(Fm_state, FHashSize shr 2);
-
+  Inherited Create(Int32(AHashSize), 64 - (Int32(AHashSize)));
+  FSecurityLevel := Int32(ASecurityLevel);
+  System.SetLength(FState, HashSize shr 2);
 end;
 
 procedure TSnefru.Finish;
 var
-  bits: UInt64;
-  padindex: Int32;
-  pad: THashLibByteArray;
+  LBits: UInt64;
+  LPadIndex: Int32;
+  LPad: THashLibByteArray;
 begin
-  bits := Fm_processed_bytes * 8;
-  if Fm_buffer.Pos > 0 then
-    padindex := 2 * FBlockSize - Fm_buffer.Pos - 8
+  LBits := FProcessedBytesCount * 8;
+  if FBuffer.Position > 0 then
+  begin
+    LPadIndex := 2 * BlockSize - FBuffer.Position - 8
+  end
   else
-    padindex := FBlockSize - Fm_buffer.Pos - 8;
+  begin
+    LPadIndex := BlockSize - FBuffer.Position - 8;
+  end;
 
-  System.SetLength(pad, padindex + 8);
+  System.SetLength(LPad, LPadIndex + 8);
 
-  bits := TConverters.be2me_64(bits);
+  LBits := TConverters.be2me_64(LBits);
 
-  TConverters.ReadUInt64AsBytesLE(bits, pad, padindex);
+  TConverters.ReadUInt64AsBytesLE(LBits, LPad, LPadIndex);
 
-  padindex := padindex + 8;
+  LPadIndex := LPadIndex + 8;
 
-  TransformBytes(pad, 0, padindex);
-
+  TransformBytes(LPad, 0, LPadIndex);
 end;
 
 function TSnefru.GetName: String;
 begin
-  Result := Format('%s_%u_%u', [Self.ClassName, Fm_security_level,
+  Result := Format('%s_%u_%u', [Self.ClassName, FSecurityLevel,
     Self.HashSize * 8]);
 end;
 
 function TSnefru.GetResult: THashLibByteArray;
 begin
-  System.SetLength(Result, System.Length(Fm_state) * System.SizeOf(UInt32));
-  TConverters.be32_copy(PCardinal(Fm_state), 0, PByte(Result), 0,
+  System.SetLength(Result, System.Length(FState) * System.SizeOf(UInt32));
+  TConverters.be32_copy(PCardinal(FState), 0, PByte(Result), 0,
     System.Length(Result));
 end;
 
 procedure TSnefru.Initialize;
 begin
-  TArrayUtils.ZeroFill(Fm_state);
+  TArrayUtils.ZeroFill(FState);
   Inherited Initialize();
 end;
 
-procedure TSnefru.TransformBlock(a_data: PByte; a_data_length: Int32;
-  a_index: Int32);
+procedure TSnefru.TransformBlock(AData: PByte; ADataLength: Int32;
+  AIndex: Int32);
 var
-  sbox0, sbox1: THashLibUInt32Array;
-  i, j, k, shift: Int32;
-  work: array [0 .. 15] of UInt32;
-  ptr_work: PCardinal;
+  LSBox0, LSBox1: THashLibUInt32Array;
+  LIdx, LJdx, LKdx, LShift: Int32;
+  LWork: array [0 .. 15] of UInt32;
+  LPtrWork: PCardinal;
 begin
-
-  ptr_work := @(work[0]);
-  System.Move(Fm_state[0], work[0], System.Length(Fm_state) *
+  LPtrWork := @(LWork[0]);
+  System.Move(FState[0], LWork[0], System.Length(FState) *
     System.SizeOf(UInt32));
 
-  TConverters.be32_copy(a_data, a_index, ptr_work + System.Length(Fm_state), 0,
-    a_data_length);
+  TConverters.be32_copy(AData, AIndex, LPtrWork + System.Length(FState), 0,
+    ADataLength);
 
-  i := 0;
+  LIdx := 0;
 
-  while i < Fm_security_level do
-
+  while LIdx < FSecurityLevel do
   begin
-    sbox0 := Fs_boxes[i * 2 + 0];
-    sbox1 := Fs_boxes[i * 2 + 1];
+    LSBox0 := FSBoxes[LIdx * 2 + 0];
+    LSBox1 := FSBoxes[LIdx * 2 + 1];
 
-    j := 0;
-    while j < 4 do
-
+    LJdx := 0;
+    while LJdx < 4 do
     begin
+      LWork[15] := LWork[15] xor LSBox0[Byte(LWork[0])];
+      LWork[1] := LWork[1] xor LSBox0[Byte(LWork[0])];
+      LWork[0] := LWork[0] xor LSBox0[Byte(LWork[1])];
+      LWork[2] := LWork[2] xor LSBox0[Byte(LWork[1])];
+      LWork[1] := LWork[1] xor LSBox1[Byte(LWork[2])];
+      LWork[3] := LWork[3] xor LSBox1[Byte(LWork[2])];
+      LWork[2] := LWork[2] xor LSBox1[Byte(LWork[3])];
+      LWork[4] := LWork[4] xor LSBox1[Byte(LWork[3])];
+      LWork[3] := LWork[3] xor LSBox0[Byte(LWork[4])];
+      LWork[5] := LWork[5] xor LSBox0[Byte(LWork[4])];
+      LWork[4] := LWork[4] xor LSBox0[Byte(LWork[5])];
+      LWork[6] := LWork[6] xor LSBox0[Byte(LWork[5])];
+      LWork[5] := LWork[5] xor LSBox1[Byte(LWork[6])];
+      LWork[7] := LWork[7] xor LSBox1[Byte(LWork[6])];
+      LWork[6] := LWork[6] xor LSBox1[Byte(LWork[7])];
+      LWork[8] := LWork[8] xor LSBox1[Byte(LWork[7])];
+      LWork[7] := LWork[7] xor LSBox0[Byte(LWork[8])];
+      LWork[9] := LWork[9] xor LSBox0[Byte(LWork[8])];
+      LWork[8] := LWork[8] xor LSBox0[Byte(LWork[9])];
+      LWork[10] := LWork[10] xor LSBox0[Byte(LWork[9])];
+      LWork[9] := LWork[9] xor LSBox1[Byte(LWork[10])];
+      LWork[11] := LWork[11] xor LSBox1[Byte(LWork[10])];
+      LWork[10] := LWork[10] xor LSBox1[Byte(LWork[11])];
+      LWork[12] := LWork[12] xor LSBox1[Byte(LWork[11])];
+      LWork[11] := LWork[11] xor LSBox0[Byte(LWork[12])];
+      LWork[13] := LWork[13] xor LSBox0[Byte(LWork[12])];
+      LWork[12] := LWork[12] xor LSBox0[Byte(LWork[13])];
+      LWork[14] := LWork[14] xor LSBox0[Byte(LWork[13])];
+      LWork[13] := LWork[13] xor LSBox1[Byte(LWork[14])];
+      LWork[15] := LWork[15] xor LSBox1[Byte(LWork[14])];
+      LWork[14] := LWork[14] xor LSBox1[Byte(LWork[15])];
+      LWork[0] := LWork[0] xor LSBox1[Byte(LWork[15])];
 
-      work[15] := work[15] xor sbox0[Byte(work[0])];
-      work[1] := work[1] xor sbox0[Byte(work[0])];
-      work[0] := work[0] xor sbox0[Byte(work[1])];
-      work[2] := work[2] xor sbox0[Byte(work[1])];
-      work[1] := work[1] xor sbox1[Byte(work[2])];
-      work[3] := work[3] xor sbox1[Byte(work[2])];
-      work[2] := work[2] xor sbox1[Byte(work[3])];
-      work[4] := work[4] xor sbox1[Byte(work[3])];
-      work[3] := work[3] xor sbox0[Byte(work[4])];
-      work[5] := work[5] xor sbox0[Byte(work[4])];
-      work[4] := work[4] xor sbox0[Byte(work[5])];
-      work[6] := work[6] xor sbox0[Byte(work[5])];
-      work[5] := work[5] xor sbox1[Byte(work[6])];
-      work[7] := work[7] xor sbox1[Byte(work[6])];
-      work[6] := work[6] xor sbox1[Byte(work[7])];
-      work[8] := work[8] xor sbox1[Byte(work[7])];
-      work[7] := work[7] xor sbox0[Byte(work[8])];
-      work[9] := work[9] xor sbox0[Byte(work[8])];
-      work[8] := work[8] xor sbox0[Byte(work[9])];
-      work[10] := work[10] xor sbox0[Byte(work[9])];
-      work[9] := work[9] xor sbox1[Byte(work[10])];
-      work[11] := work[11] xor sbox1[Byte(work[10])];
-      work[10] := work[10] xor sbox1[Byte(work[11])];
-      work[12] := work[12] xor sbox1[Byte(work[11])];
-      work[11] := work[11] xor sbox0[Byte(work[12])];
-      work[13] := work[13] xor sbox0[Byte(work[12])];
-      work[12] := work[12] xor sbox0[Byte(work[13])];
-      work[14] := work[14] xor sbox0[Byte(work[13])];
-      work[13] := work[13] xor sbox1[Byte(work[14])];
-      work[15] := work[15] xor sbox1[Byte(work[14])];
-      work[14] := work[14] xor sbox1[Byte(work[15])];
-      work[0] := work[0] xor sbox1[Byte(work[15])];
+      LShift := SShifts[LJdx];
 
-      shift := s_shifts[j];
+      LKdx := 0;
 
-      k := 0;
-
-      while k < 16 do
+      while LKdx < 16 do
       begin
-        work[k] := TBits.RotateRight32(work[k], shift);
-        System.Inc(k);
+        LWork[LKdx] := TBits.RotateRight32(LWork[LKdx], LShift);
+        System.Inc(LKdx);
       end;
 
-      System.Inc(j);
+      System.Inc(LJdx);
     end;
 
-    System.Inc(i);
+    System.Inc(LIdx);
   end;
 
-  Fm_state[0] := Fm_state[0] xor work[15];
-  Fm_state[1] := Fm_state[1] xor work[14];
-  Fm_state[2] := Fm_state[2] xor work[13];
-  Fm_state[3] := Fm_state[3] xor work[12];
+  FState[0] := FState[0] xor LWork[15];
+  FState[1] := FState[1] xor LWork[14];
+  FState[2] := FState[2] xor LWork[13];
+  FState[3] := FState[3] xor LWork[12];
 
-  if (FHashSize = 32) then
+  if (HashSize = 32) then
   begin
-    Fm_state[4] := Fm_state[4] xor work[11];
-    Fm_state[5] := Fm_state[5] xor work[10];
-    Fm_state[6] := Fm_state[6] xor work[9];
-    Fm_state[7] := Fm_state[7] xor work[8];
+    FState[4] := FState[4] xor LWork[11];
+    FState[5] := FState[5] xor LWork[10];
+    FState[6] := FState[6] xor LWork[9];
+    FState[7] := FState[7] xor LWork[8];
   end;
 
-  System.FillChar(work, System.SizeOf(work), UInt32(0));
-
+  System.FillChar(LWork, System.SizeOf(LWork), UInt32(0));
 end;
 
 class constructor TSnefru.Snefru;
 begin
-
 {$REGION 'Consts'}
-  Fs_boxes := THashLibMatrixUInt32Array.Create
+  FSBoxes := THashLibMatrixUInt32Array.Create
     (THashLibUInt32Array.Create($64F9001B, $FEDDCDF6, $7C8FF1E2, $11D71514,
     $8B8C18D3, $DDDF881E, $6EAB5056, $88CED8E1, $49148959, $69C56FD5, $B7994F03,
     $0FBCEE3E, $3C264940, $21557E58, $E14B3FC2, $2E5CF591, $DCEFF8CE, $092A1648,

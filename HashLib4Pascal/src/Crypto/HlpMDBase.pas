@@ -11,7 +11,6 @@ uses
   HlpHashLibTypes,
 {$IFDEF DELPHI}
   HlpHashBuffer,
-  HlpBitConverter,
 {$ENDIF DELPHI}
   HlpIHashInfo,
   HlpHashCryptoNotBuildIn,
@@ -21,7 +20,8 @@ type
   TMDBase = class abstract(TBlockHash, ICryptoNotBuildIn)
 
   strict protected
-    Fm_state: THashLibUInt32Array;
+  var
+    FState: THashLibUInt32Array;
 
   const
 
@@ -34,7 +34,7 @@ type
     C7 = UInt32($7A6D76E9);
     C8 = UInt32($A953FD4E);
 
-    constructor Create(a_state_length, a_hash_size: Int32);
+    constructor Create(AStateLength, AHashSize: Int32);
 
     function GetResult(): THashLibByteArray; override;
     procedure Finish(); override;
@@ -48,55 +48,54 @@ implementation
 
 { TMDBase }
 
-constructor TMDBase.Create(a_state_length, a_hash_size: Int32);
+constructor TMDBase.Create(AStateLength, AHashSize: Int32);
 begin
-  Inherited Create(a_hash_size, 64);
-  System.SetLength(Fm_state, a_state_length);
+  Inherited Create(AHashSize, 64);
+  System.SetLength(FState, AStateLength);
 end;
 
 procedure TMDBase.Finish;
 var
-  bits: UInt64;
-  padindex: Int32;
-  pad: THashLibByteArray;
+  LBits: UInt64;
+  LPadIndex: Int32;
+  LPad: THashLibByteArray;
 begin
-  bits := Fm_processed_bytes * 8;
-  if (Fm_buffer.Pos < 56) then
-    padindex := 56 - Fm_buffer.Pos
+  LBits := FProcessedBytesCount * 8;
+  if (FBuffer.Position < 56) then
+  begin
+    LPadIndex := 56 - FBuffer.Position
+  end
   else
-    padindex := 120 - Fm_buffer.Pos;
-  System.SetLength(pad, padindex + 8);
+  begin
+    LPadIndex := 120 - FBuffer.Position;
+  end;
+  System.SetLength(LPad, LPadIndex + 8);
 
-  pad[0] := $80;
+  LPad[0] := $80;
 
-  bits := TConverters.le2me_64(bits);
+  LBits := TConverters.le2me_64(LBits);
 
-  TConverters.ReadUInt64AsBytesLE(bits, pad, padindex);
+  TConverters.ReadUInt64AsBytesLE(LBits, LPad, LPadIndex);
 
-  padindex := padindex + 8;
+  LPadIndex := LPadIndex + 8;
 
-  TransformBytes(pad, 0, padindex);
-
+  TransformBytes(LPad, 0, LPadIndex);
 end;
 
 function TMDBase.GetResult: THashLibByteArray;
 begin
-
-  System.SetLength(result, System.Length(Fm_state) * System.SizeOf(UInt32));
-
-  TConverters.le32_copy(PCardinal(Fm_state), 0, PByte(result), 0,
+  System.SetLength(result, System.Length(FState) * System.SizeOf(UInt32));
+  TConverters.le32_copy(PCardinal(FState), 0, PByte(result), 0,
     System.Length(result));
-
 end;
 
 procedure TMDBase.Initialize;
 begin
-  Fm_state[0] := $67452301;
-  Fm_state[1] := $EFCDAB89;
-  Fm_state[2] := $98BADCFE;
-  Fm_state[3] := $10325476;
+  FState[0] := $67452301;
+  FState[1] := $EFCDAB89;
+  FState[2] := $98BADCFE;
+  FState[3] := $10325476;
   inherited Initialize();
-
 end;
 
 end.

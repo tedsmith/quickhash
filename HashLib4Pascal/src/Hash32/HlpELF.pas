@@ -15,14 +15,14 @@ uses
 type
   TELF = class sealed(THash, IHash32, ITransformBlock)
   strict private
-
-    Fm_hash: UInt32;
+  var
+    FHash: UInt32;
 
   public
     constructor Create();
     procedure Initialize(); override;
-    procedure TransformBytes(const a_data: THashLibByteArray;
-      a_index, a_length: Int32); override;
+    procedure TransformBytes(const AData: THashLibByteArray;
+      AIndex, ALength: Int32); override;
     function TransformFinal(): IHashResult; override;
     function Clone(): IHash; override;
   end;
@@ -33,11 +33,11 @@ implementation
 
 function TELF.Clone(): IHash;
 var
-  HashInstance: TELF;
+  LHashInstance: TELF;
 begin
-  HashInstance := TELF.Create();
-  HashInstance.Fm_hash := Fm_hash;
-  result := HashInstance as IHash;
+  LHashInstance := TELF.Create();
+  LHashInstance.FHash := FHash;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
@@ -48,39 +48,40 @@ end;
 
 procedure TELF.Initialize;
 begin
-  Fm_hash := 0;
+  FHash := 0;
 end;
 
-procedure TELF.TransformBytes(const a_data: THashLibByteArray;
-  a_index, a_length: Int32);
+procedure TELF.TransformBytes(const AData: THashLibByteArray;
+  AIndex, ALength: Int32);
 var
-  i: Int32;
-  g: UInt32;
+  LIdx: Int32;
+  LG: UInt32;
 begin
 {$IFDEF DEBUG}
-  System.Assert(a_index >= 0);
-  System.Assert(a_length >= 0);
-  System.Assert(a_index + a_length <= System.Length(a_data));
+  System.Assert(AIndex >= 0);
+  System.Assert(ALength >= 0);
+  System.Assert(AIndex + ALength <= System.Length(AData));
 {$ENDIF DEBUG}
-  i := a_index;
-  while a_length > 0 do
+  LIdx := AIndex;
+  while ALength > 0 do
   begin
-    Fm_hash := (Fm_hash shl 4) + a_data[i];
-    g := Fm_hash and $F0000000;
+    FHash := (FHash shl 4) + AData[LIdx];
+    LG := FHash and $F0000000;
 
-    if (g <> 0) then
-      Fm_hash := Fm_hash xor (g shr 24);
+    if (LG <> 0) then
+    begin
+      FHash := FHash xor (LG shr 24);
+    end;
 
-    Fm_hash := Fm_hash and (not g);
-    System.Inc(i);
-    System.Dec(a_length);
+    FHash := FHash and (not LG);
+    System.Inc(LIdx);
+    System.Dec(ALength);
   end;
-
 end;
 
 function TELF.TransformFinal: IHashResult;
 begin
-  result := THashResult.Create(Fm_hash);
+  result := THashResult.Create(FHash);
   Initialize();
 end;
 

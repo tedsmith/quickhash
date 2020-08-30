@@ -47,6 +47,7 @@ uses
   HlpFNV1a64,
   HlpMurmur2_64,
   HlpSipHash,
+  HlpSipHash128,
   HlpXXHash64,
   // Hash128 Units //
   HlpMurmurHash3_x86_128,
@@ -83,13 +84,14 @@ uses
   HlpRIPEMD320,
   HlpSHA3,
   HlpBlake2B,
-  HlpIBlake2BConfig,
-  HlpBlake2BConfig,
-  HlpIBlake2BTreeConfig,
+  HlpIBlake2BParams,
+  HlpBlake2BParams,
   HlpBlake2S,
-  HlpBlake2SConfig,
-  HlpIBlake2SConfig,
-  HlpIBlake2STreeConfig,
+  HlpIBlake2SParams,
+  HlpBlake2SParams,
+  HlpBlake2BP,
+  HlpBlake2SP,
+  HlpBlake3,
   // HMAC Unit
   HlpHMACNotBuildInAdapter,
   // PBKDF2_HMAC Unit
@@ -112,59 +114,60 @@ type
 
     end;
 
-    // ====================== TCRC ====================== //
-
-  type
-    TCRC = class sealed(TObject)
-
-    public
-
-      class function CreateCRC(_Width: Int32; _poly, _Init: UInt64;
-        _refIn, _refOut: Boolean; _XorOut, _check: UInt64;
-        const _Names: THashLibStringArray): IHash; overload; static;
-
-      class function CreateCRC(_value: TCRCStandard): IHash; overload; static;
-
-      class function CreateCRC16(_poly, _Init: UInt64; _refIn, _refOut: Boolean;
-        _XorOut, _check: UInt64; const _Names: THashLibStringArray)
-        : IHash; static;
-
-      class function CreateCRC32(_poly, _Init: UInt64; _refIn, _refOut: Boolean;
-        _XorOut, _check: UInt64; const _Names: THashLibStringArray)
-        : IHash; static;
-
-      class function CreateCRC64(_poly, _Init: UInt64; _refIn, _refOut: Boolean;
-        _XorOut, _check: UInt64; const _Names: THashLibStringArray)
-        : IHash; static;
-
-      /// <summary>
-      /// BUYPASS, polynomial = $8005
-      /// </summary>
-      /// <returns></returns>
-      class function CreateCRC16_BUYPASS(): IHash; static;
-
-      /// <summary>
-      /// PKZIP, polynomial = $04C11DB7, reversed = $EDB88320
-      /// </summary>
-      /// <returns></returns>
-      class function CreateCRC32_PKZIP(): IHash; static;
-      /// <summary>
-      /// Castagnoli, polynomial = $1EDC6F41, reversed = $82F63B78
-      /// </summary>
-      /// <returns></returns>
-      class function CreateCRC32_CASTAGNOLI(): IHash; static;
-      /// <summary>
-      /// ECMA-182, polynomial = $42F0E1EBA9EA3693
-      /// </summary>
-      /// <returns></returns>
-      class function CreateCRC64_ECMA_182(): IHash; static;
-
-    end;
-
     // ====================== TChecksum ====================== //
 
   type
     TChecksum = class sealed(TObject)
+
+      // ====================== TCRC ====================== //
+
+    type
+      TCRC = class sealed(TObject)
+
+      public
+
+        class function CreateCRC(AWidth: Int32;
+          APolynomial, AInitialValue: UInt64; AReflectIn, AReflectOut: Boolean;
+          AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray)
+          : IHash; overload; static;
+
+        class function CreateCRC(AValue: TCRCStandard): IHash; overload; static;
+
+        class function CreateCRC16(APolynomial, AInitialValue: UInt64;
+          AReflectIn, AReflectOut: Boolean; AOutputXor, ACheckValue: UInt64;
+          const ANames: THashLibStringArray): IHash; static;
+
+        class function CreateCRC32(APolynomial, AInitialValue: UInt64;
+          AReflectIn, AReflectOut: Boolean; AOutputXor, ACheckValue: UInt64;
+          const ANames: THashLibStringArray): IHash; static;
+
+        class function CreateCRC64(APolynomial, AInitialValue: UInt64;
+          AReflectIn, AReflectOut: Boolean; AOutputXor, ACheckValue: UInt64;
+          const ANames: THashLibStringArray): IHash; static;
+
+        /// <summary>
+        /// BUYPASS, polynomial = $8005
+        /// </summary>
+        /// <returns></returns>
+        class function CreateCRC16_BUYPASS(): IHash; static;
+
+        /// <summary>
+        /// PKZIP, polynomial = $04C11DB7, reversed = $EDB88320
+        /// </summary>
+        /// <returns></returns>
+        class function CreateCRC32_PKZIP(): IHash; static;
+        /// <summary>
+        /// Castagnoli, polynomial = $1EDC6F41, reversed = $82F63B78
+        /// </summary>
+        /// <returns></returns>
+        class function CreateCRC32_CASTAGNOLI(): IHash; static;
+        /// <summary>
+        /// ECMA-182, polynomial = $42F0E1EBA9EA3693
+        /// </summary>
+        /// <returns></returns>
+        class function CreateCRC64_ECMA_182(): IHash; static;
+
+      end;
 
     public
 
@@ -244,6 +247,7 @@ type
 
     public
 
+      class function CreateSipHash128_2_4(): IHashWithKey; static;
       class function CreateMurmurHash3_x86_128(): IHashWithKey; static;
       class function CreateMurmurHash3_x64_128(): IHashWithKey; static;
 
@@ -259,10 +263,10 @@ type
       /// <summary>
       ///
       /// </summary>
-      /// <param name="a_hash_size">16, 20 or 24 bytes. </param>
-      /// <param name="a_rounds">no of rounds (standard rounds are 3, 4 and 5)</param>
+      /// <param name="AHashSize">16, 20 or 24 bytes. </param>
+      /// <param name="ARounds">no of rounds (standard rounds are 3, 4 and 5)</param>
       /// <returns></returns>
-      class function CreateTiger(a_hash_size: Int32; a_rounds: THashRounds)
+      class function CreateTiger(AHashSize: Int32; ARounds: THashRounds)
         : IHash; static;
       class function CreateTiger_3_128(): IHash; static;
       class function CreateTiger_3_160(): IHash; static;
@@ -279,10 +283,10 @@ type
       /// <summary>
       ///
       /// </summary>
-      /// <param name="a_hash_size">16, 20 or 24 bytes. </param>
-      /// <param name="a_rounds">no of rounds (standard rounds are 3, 4 and 5)</param>
+      /// <param name="AHashSize">16, 20 or 24 bytes. </param>
+      /// <param name="ARounds">no of rounds (standard rounds are 3, 4 and 5)</param>
       /// <returns></returns>
-      class function CreateTiger2(a_hash_size: Int32; a_rounds: THashRounds)
+      class function CreateTiger2(AHashSize: Int32; ARounds: THashRounds)
         : IHash; static;
 
       class function CreateTiger2_3_128(): IHash; static;
@@ -324,21 +328,21 @@ type
       /// <summary>
       ///
       /// </summary>
-      /// <param name="a_security_level">any Integer value greater than 0. Standard is 8. </param>
-      /// <param name="a_hash_size">128bit, 256bit</param>
+      /// <param name="ASecurityLevel">any Integer value greater than 0. Standard is 8. </param>
+      /// <param name="AHashSize">128bit, 256bit</param>
       /// <returns></returns>
-      class function CreateSnefru(a_security_level: Int32;
-        a_hash_size: THashSize): IHash; static;
+      class function CreateSnefru(ASecurityLevel: Int32; AHashSize: THashSize)
+        : IHash; static;
       class function CreateSnefru_8_128(): IHash; static;
       class function CreateSnefru_8_256(): IHash; static;
 
       /// <summary>
       ///
       /// </summary>
-      /// <param name="a_rounds">3, 4, 5</param>
-      /// <param name="a_hash_size">128, 160, 192, 224, 256</param>
+      /// <param name="ARounds">3, 4, 5</param>
+      /// <param name="AHashSize">128, 160, 192, 224, 256</param>
       /// <returns></returns>
-      class function CreateHaval(a_rounds: THashRounds; a_hash_size: THashSize)
+      class function CreateHaval(ARounds: THashRounds; AHashSize: THashSize)
         : IHash; static;
 
       class function CreateHaval_3_128(): IHash; static;
@@ -388,21 +392,30 @@ type
       class function CreateKeccak_384(): IHash; static;
       class function CreateKeccak_512(): IHash; static;
 
-      class function CreateBlake2B(const config: IBlake2BConfig = Nil;
-        const treeConfig: IBlake2BTreeConfig = Nil): IHash; static;
+      class function CreateBlake2B(const AConfig: IBlake2BConfig = Nil;
+        const ATreeConfig: IBlake2BTreeConfig = Nil): IHash; static;
 
       class function CreateBlake2B_160(): IHash; static;
       class function CreateBlake2B_256(): IHash; static;
       class function CreateBlake2B_384(): IHash; static;
       class function CreateBlake2B_512(): IHash; static;
 
-      class function CreateBlake2S(const config: IBlake2SConfig = Nil;
-        const treeConfig: IBlake2STreeConfig = Nil): IHash; static;
+      class function CreateBlake2S(const AConfig: IBlake2SConfig = Nil;
+        const ATreeConfig: IBlake2STreeConfig = Nil): IHash; static;
 
       class function CreateBlake2S_128(): IHash; static;
       class function CreateBlake2S_160(): IHash; static;
       class function CreateBlake2S_224(): IHash; static;
       class function CreateBlake2S_256(): IHash; static;
+
+      class function CreateBlake2BP(AHashSize: Int32;
+        const AKey: THashLibByteArray): IHash; static;
+
+      class function CreateBlake2SP(AHashSize: Int32;
+        const AKey: THashLibByteArray): IHash; static;
+
+      class function CreateBlake3_256(const AKey: THashLibByteArray)
+        : IHash; static;
 
     end;
 
@@ -411,10 +424,42 @@ type
   type
     TXOF = class sealed(TObject)
 
+    type
+      TBlake2XSConfig = HlpBlake2S.TBlake2XSConfig;
+
+    type
+      TBlake2XBConfig = HlpBlake2B.TBlake2XBConfig;
+
     public
 
-      class function CreateShake_128(a_xof_size_in_bits: UInt32): IHash; static;
-      class function CreateShake_256(a_xof_size_in_bits: UInt32): IHash; static;
+      class function CreateShake_128(AXofSizeInBits: UInt64): IHash; static;
+      class function CreateShake_256(AXofSizeInBits: UInt64): IHash; static;
+
+      class function CreateCShake_128(const AN, &AS: THashLibByteArray;
+        AXofSizeInBits: UInt64): IHash; static;
+      class function CreateCShake_256(const AN, &AS: THashLibByteArray;
+        AXofSizeInBits: UInt64): IHash; static;
+
+      class function CreateBlake2XS(const ABlake2XSConfig: TBlake2XSConfig;
+        AXofSizeInBits: UInt64): IHash; overload; static;
+
+      class function CreateBlake2XS(const AKey: THashLibByteArray;
+        AXofSizeInBits: UInt64): IHash; overload; static;
+
+      class function CreateBlake2XB(const ABlake2XBConfig: TBlake2XBConfig;
+        AXofSizeInBits: UInt64): IHash; overload; static;
+
+      class function CreateBlake2XB(const AKey: THashLibByteArray;
+        AXofSizeInBits: UInt64): IHash; overload; static;
+
+      class function CreateKMAC128XOF(const AKMACKey, ACustomization
+        : THashLibByteArray; AXofSizeInBits: UInt64): IHash; static;
+
+      class function CreateKMAC256XOF(const AKMACKey, ACustomization
+        : THashLibByteArray; AXofSizeInBits: UInt64): IHash; static;
+
+      class function CreateBlake3XOF(const AKey: THashLibByteArray;
+        AXofSizeInBits: UInt64): IHash; overload; static;
 
     end;
 
@@ -426,7 +471,46 @@ type
     public
 
       class function CreateHMAC(const AHash: IHash;
-        const AHmacKey: THashLibByteArray = Nil): IHMAC; static;
+        const AHMACKey: THashLibByteArray = Nil): IHMAC; static;
+
+    end;
+
+    // ====================== TKMAC ====================== //
+
+  type
+    TKMAC = class sealed(TObject)
+
+    public
+
+      class function CreateKMAC128(const AKMACKey, ACustomization
+        : THashLibByteArray; AOutputLengthInBits: UInt64): IKMAC; static;
+
+      class function CreateKMAC256(const AKMACKey, ACustomization
+        : THashLibByteArray; AOutputLengthInBits: UInt64): IKMAC; static;
+
+    end;
+
+    // ====================== TBlake2BMAC ====================== //
+
+  type
+    TBlake2BMAC = class sealed(TObject)
+
+    public
+
+      class function CreateBlake2BMAC(const ABlake2BKey, ASalt, APersonalisation
+        : THashLibByteArray; AOutputLengthInBits: Int32): IBlake2BMAC; static;
+
+    end;
+
+    // ====================== TBlake2SMAC ====================== //
+
+  type
+    TBlake2SMAC = class sealed(TObject)
+
+    public
+
+      class function CreateBlake2SMAC(const ABlake2SKey, ASalt, APersonalisation
+        : THashLibByteArray; AOutputLengthInBits: Int32): IBlake2SMAC; static;
 
     end;
 
@@ -551,61 +635,62 @@ begin
   Result := TNullDigest.Create();
 end;
 
-{ THashFactory.TCRC }
+{ THashFactory.TChecksum.TCRC }
 
-class function THashFactory.TCRC.CreateCRC(_Width: Int32; _poly, _Init: UInt64;
-  _refIn, _refOut: Boolean; _XorOut, _check: UInt64;
-  const _Names: THashLibStringArray): IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC(AWidth: Int32;
+  APolynomial, AInitialValue: UInt64; AReflectIn, AReflectOut: Boolean;
+  AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray): IHash;
 begin
-  Result := HlpCRC.TCRC.Create(_Width, _poly, _Init, _refIn, _refOut, _XorOut,
-    _check, _Names);
+  Result := HlpCRC.TCRC.Create(AWidth, APolynomial, AInitialValue, AReflectIn,
+    AReflectOut, AOutputXor, ACheckValue, ANames);
 end;
 
-class function THashFactory.TCRC.CreateCRC(_value: TCRCStandard): IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC
+  (AValue: TCRCStandard): IHash;
 begin
-  Result := HlpCRC.TCRC.CreateCRCObject(_value);
+  Result := HlpCRC.TCRC.CreateCRCObject(AValue);
 end;
 
-class function THashFactory.TCRC.CreateCRC16(_poly, _Init: UInt64;
-  _refIn, _refOut: Boolean; _XorOut, _check: UInt64;
-  const _Names: THashLibStringArray): IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC16(APolynomial,
+  AInitialValue: UInt64; AReflectIn, AReflectOut: Boolean;
+  AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray): IHash;
 begin
-  Result := TCRC16.Create(_poly, _Init, _refIn, _refOut, _XorOut,
-    _check, _Names);
+  Result := TCRC16.Create(APolynomial, AInitialValue, AReflectIn, AReflectOut,
+    AOutputXor, ACheckValue, ANames);
 end;
 
-class function THashFactory.TCRC.CreateCRC16_BUYPASS: IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC16_BUYPASS: IHash;
 begin
   Result := TCRC16_BUYPASS.Create();
 end;
 
-class function THashFactory.TCRC.CreateCRC32(_poly, _Init: UInt64;
-  _refIn, _refOut: Boolean; _XorOut, _check: UInt64;
-  const _Names: THashLibStringArray): IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC32(APolynomial,
+  AInitialValue: UInt64; AReflectIn, AReflectOut: Boolean;
+  AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray): IHash;
 begin
-  Result := TCRC32.Create(_poly, _Init, _refIn, _refOut, _XorOut,
-    _check, _Names);
+  Result := TCRC32.Create(APolynomial, AInitialValue, AReflectIn, AReflectOut,
+    AOutputXor, ACheckValue, ANames);
 end;
 
-class function THashFactory.TCRC.CreateCRC32_CASTAGNOLI: IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC32_CASTAGNOLI: IHash;
 begin
   Result := HlpCRC32Fast.TCRC32_CASTAGNOLI.Create();
 end;
 
-class function THashFactory.TCRC.CreateCRC32_PKZIP: IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC32_PKZIP: IHash;
 begin
   Result := HlpCRC32Fast.TCRC32_PKZIP.Create();
 end;
 
-class function THashFactory.TCRC.CreateCRC64(_poly, _Init: UInt64;
-  _refIn, _refOut: Boolean; _XorOut, _check: UInt64;
-  const _Names: THashLibStringArray): IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC64(APolynomial,
+  AInitialValue: UInt64; AReflectIn, AReflectOut: Boolean;
+  AOutputXor, ACheckValue: UInt64; const ANames: THashLibStringArray): IHash;
 begin
-  Result := TCRC64.Create(_poly, _Init, _refIn, _refOut, _XorOut,
-    _check, _Names);
+  Result := TCRC64.Create(APolynomial, AInitialValue, AReflectIn, AReflectOut,
+    AOutputXor, ACheckValue, ANames);
 end;
 
-class function THashFactory.TCRC.CreateCRC64_ECMA_182: IHash;
+class function THashFactory.TChecksum.TCRC.CreateCRC64_ECMA_182: IHash;
 begin
   Result := TCRC64_ECMA_182.Create();
 end;
@@ -758,6 +843,11 @@ begin
   Result := TMurmurHash3_x86_128.Create();
 end;
 
+class function THashFactory.THash128.CreateSipHash128_2_4: IHashWithKey;
+begin
+  Result := TSipHash128_2_4.Create();
+end;
+
 class function THashFactory.THash128.CreateMurmurHash3_x64_128: IHashWithKey;
 begin
   Result := TMurmurHash3_x64_128.Create();
@@ -795,12 +885,12 @@ begin
   Result := THAS160.Create();
 end;
 
-class function THashFactory.TCrypto.CreateHaval(a_rounds: THashRounds;
-  a_hash_size: THashSize): IHash;
+class function THashFactory.TCrypto.CreateHaval(ARounds: THashRounds;
+  AHashSize: THashSize): IHash;
 begin
-  case a_rounds of
+  case ARounds of
     THashRounds.hrRounds3:
-      case a_hash_size of
+      case AHashSize of
         THashSize.hsHashSize128:
           Result := CreateHaval_3_128();
         THashSize.hsHashSize160:
@@ -816,7 +906,7 @@ begin
       end;
 
     THashRounds.hrRounds4:
-      case a_hash_size of
+      case AHashSize of
         THashSize.hsHashSize128:
           Result := CreateHaval_4_128();
         THashSize.hsHashSize160:
@@ -832,7 +922,7 @@ begin
       end;
 
     THashRounds.hrRounds5:
-      case a_hash_size of
+      case AHashSize of
         THashSize.hsHashSize128:
           Result := CreateHaval_5_128();
         THashSize.hsHashSize160:
@@ -1067,89 +1157,107 @@ begin
   Result := TKeccak_512.Create();
 end;
 
-class function THashFactory.TCrypto.CreateBlake2B(const config: IBlake2BConfig;
-  const treeConfig: IBlake2BTreeConfig): IHash;
+class function THashFactory.TCrypto.CreateBlake2B(const AConfig: IBlake2BConfig;
+  const ATreeConfig: IBlake2BTreeConfig): IHash;
 var
   LConfig: IBlake2BConfig;
 begin
-  LConfig := config;
+  LConfig := AConfig;
   if (LConfig = Nil) then
   begin
     LConfig := TBlake2BConfig.Create();
   end;
-  Result := TBlake2B.Create(LConfig, treeConfig);
+  Result := TBlake2B.Create(LConfig, ATreeConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2B_160: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2B
-    (TBlake2BConfig.Create(THashSize.hsHashSize160));
+    (TBlake2BConfig.Create(THashSize.hsHashSize160) as IBlake2BConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2B_256: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2B
-    (TBlake2BConfig.Create(THashSize.hsHashSize256));
+    (TBlake2BConfig.Create(THashSize.hsHashSize256) as IBlake2BConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2B_384: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2B
-    (TBlake2BConfig.Create(THashSize.hsHashSize384));
+    (TBlake2BConfig.Create(THashSize.hsHashSize384) as IBlake2BConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2B_512: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2B
-    (TBlake2BConfig.Create(THashSize.hsHashSize512));
+    (TBlake2BConfig.Create(THashSize.hsHashSize512) as IBlake2BConfig);
 end;
 
-class function THashFactory.TCrypto.CreateBlake2S(const config: IBlake2SConfig;
-  const treeConfig: IBlake2STreeConfig): IHash;
+class function THashFactory.TCrypto.CreateBlake2S(const AConfig: IBlake2SConfig;
+  const ATreeConfig: IBlake2STreeConfig): IHash;
 var
   LConfig: IBlake2SConfig;
 begin
-  LConfig := config;
+  LConfig := AConfig;
   if (LConfig = Nil) then
   begin
     LConfig := TBlake2SConfig.Create();
   end;
-  Result := TBlake2S.Create(LConfig, treeConfig);
+  Result := TBlake2S.Create(LConfig, ATreeConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2S_128: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2S
-    (TBlake2SConfig.Create(THashSize.hsHashSize128));
+    (TBlake2SConfig.Create(THashSize.hsHashSize128) as IBlake2SConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2S_160: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2S
-    (TBlake2SConfig.Create(THashSize.hsHashSize160));
+    (TBlake2SConfig.Create(THashSize.hsHashSize160) as IBlake2SConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2S_224: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2S
-    (TBlake2SConfig.Create(THashSize.hsHashSize224));
+    (TBlake2SConfig.Create(THashSize.hsHashSize224) as IBlake2SConfig);
 end;
 
 class function THashFactory.TCrypto.CreateBlake2S_256: IHash;
 begin
   Result := THashFactory.TCrypto.CreateBlake2S
-    (TBlake2SConfig.Create(THashSize.hsHashSize256));
+    (TBlake2SConfig.Create(THashSize.hsHashSize256) as IBlake2SConfig);
 end;
 
-class function THashFactory.TCrypto.CreateSnefru(a_security_level: Int32;
-  a_hash_size: THashSize): IHash;
+class function THashFactory.TCrypto.CreateBlake2BP(AHashSize: Int32;
+  const AKey: THashLibByteArray): IHash;
 begin
-  if a_security_level < Int32(1) then
+  Result := TBlake2BP.Create(AHashSize, AKey);
+end;
+
+class function THashFactory.TCrypto.CreateBlake2SP(AHashSize: Int32;
+  const AKey: THashLibByteArray): IHash;
+begin
+  Result := TBlake2SP.Create(AHashSize, AKey);
+end;
+
+class function THashFactory.TCrypto.CreateBlake3_256
+  (const AKey: THashLibByteArray): IHash;
+begin
+  Result := TBlake3.Create(THashSize.hsHashSize256, AKey);
+end;
+
+class function THashFactory.TCrypto.CreateSnefru(ASecurityLevel: Int32;
+  AHashSize: THashSize): IHash;
+begin
+  if ASecurityLevel < Int32(1) then
     raise EArgumentHashLibException.CreateRes(@SInvalidSnefruLevel);
 
-  case a_hash_size of
+  case AHashSize of
     THashSize.hsHashSize128, THashSize.hsHashSize256:
-      Result := TSnefru.Create(a_security_level, a_hash_size);
+      Result := TSnefru.Create(ASecurityLevel, AHashSize);
   else
     raise EArgumentHashLibException.CreateRes(@SInvalidSnefruHashSize);
   end;
@@ -1216,23 +1324,23 @@ begin
   Result := TWhirlPool.Create();
 end;
 
-class function THashFactory.TCrypto.CreateTiger(a_hash_size: Int32;
-  a_rounds: THashRounds): IHash;
+class function THashFactory.TCrypto.CreateTiger(AHashSize: Int32;
+  ARounds: THashRounds): IHash;
 begin
-  case a_hash_size of
+  case AHashSize of
     16, 20, 24:
-      Result := TTiger_Base.Create(a_hash_size, a_rounds);
+      Result := TTiger_Base.Create(AHashSize, ARounds);
   else
     raise EArgumentHashLibException.CreateRes(@SInvalidTigerHashSize);
   end;
 end;
 
-class function THashFactory.TCrypto.CreateTiger2(a_hash_size: Int32;
-  a_rounds: THashRounds): IHash;
+class function THashFactory.TCrypto.CreateTiger2(AHashSize: Int32;
+  ARounds: THashRounds): IHash;
 begin
-  case a_hash_size of
+  case AHashSize of
     16, 20, 24:
-      Result := TTiger2_Base.Create(a_hash_size, a_rounds);
+      Result := TTiger2_Base.Create(AHashSize, ARounds);
   else
     raise EArgumentHashLibException.CreateRes(@SInvalidTiger2HashSize);
   end;
@@ -1285,32 +1393,152 @@ end;
 
 { THashFactory.TXOF }
 
-class function THashFactory.TXOF.CreateShake_128(a_xof_size_in_bits
-  : UInt32): IHash;
+class function THashFactory.TXOF.CreateShake_128(AXofSizeInBits: UInt64): IHash;
 var
   LXof: IXOF;
 begin
   LXof := (TShake_128.Create() as IXOF);
-  LXof.XOFSizeInBits := a_xof_size_in_bits;
+  LXof.XOFSizeInBits := AXofSizeInBits;
   Result := LXof as IHash;
 end;
 
-class function THashFactory.TXOF.CreateShake_256(a_xof_size_in_bits
-  : UInt32): IHash;
+class function THashFactory.TXOF.CreateShake_256(AXofSizeInBits: UInt64): IHash;
 var
   LXof: IXOF;
 begin
   LXof := (TShake_256.Create() as IXOF);
-  LXof.XOFSizeInBits := a_xof_size_in_bits;
+  LXof.XOFSizeInBits := AXofSizeInBits;
   Result := LXof as IHash;
+end;
+
+class function THashFactory.TXOF.CreateCShake_128(const AN,
+  &AS: THashLibByteArray; AXofSizeInBits: UInt64): IHash;
+var
+  LXof: IXOF;
+begin
+  LXof := (TCShake_128.Create(AN, &AS) as IXOF);
+  LXof.XOFSizeInBits := AXofSizeInBits;
+  Result := LXof as IHash;
+end;
+
+class function THashFactory.TXOF.CreateCShake_256(const AN,
+  &AS: THashLibByteArray; AXofSizeInBits: UInt64): IHash;
+var
+  LXof: IXOF;
+begin
+  LXof := (TCShake_256.Create(AN, &AS) as IXOF);
+  LXof.XOFSizeInBits := AXofSizeInBits;
+  Result := LXof as IHash;
+end;
+
+class function THashFactory.TXOF.CreateBlake2XS(const ABlake2XSConfig
+  : TBlake2XSConfig; AXofSizeInBits: UInt64): IHash;
+var
+  LXof: IXOF;
+begin
+  LXof := (TBlake2XS.Create(ABlake2XSConfig) as IXOF);
+  LXof.XOFSizeInBits := AXofSizeInBits;
+  Result := LXof as IHash;
+end;
+
+class function THashFactory.TXOF.CreateBlake2XS(const AKey: THashLibByteArray;
+  AXofSizeInBits: UInt64): IHash;
+var
+  LConfig: IBlake2SConfig;
+begin
+  LConfig := TBlake2SConfig.Create(32);
+  LConfig.Key := AKey;
+  Result := CreateBlake2XS(TBlake2XSConfig.Create(LConfig, Nil),
+    AXofSizeInBits);
+end;
+
+class function THashFactory.TXOF.CreateBlake2XB(const ABlake2XBConfig
+  : TBlake2XBConfig; AXofSizeInBits: UInt64): IHash;
+var
+  LXof: IXOF;
+begin
+  LXof := (TBlake2XB.Create(ABlake2XBConfig) as IXOF);
+  LXof.XOFSizeInBits := AXofSizeInBits;
+  Result := LXof as IHash;
+end;
+
+class function THashFactory.TXOF.CreateBlake2XB(const AKey: THashLibByteArray;
+  AXofSizeInBits: UInt64): IHash;
+var
+  LConfig: IBlake2BConfig;
+begin
+  LConfig := TBlake2BConfig.Create(64);
+  LConfig.Key := AKey;
+  Result := CreateBlake2XB(TBlake2XBConfig.Create(LConfig, Nil),
+    AXofSizeInBits);
+end;
+
+class function THashFactory.TXOF.CreateBlake3XOF(const AKey: THashLibByteArray;
+  AXofSizeInBits: UInt64): IHash;
+var
+  LXof: IXOF;
+begin
+  LXof := (TBlake3XOF.Create(32, AKey) as IXOF);
+  LXof.XOFSizeInBits := AXofSizeInBits;
+  Result := LXof as IHash;
+end;
+
+class function THashFactory.TXOF.CreateKMAC128XOF(const AKMACKey,
+  ACustomization: THashLibByteArray; AXofSizeInBits: UInt64): IHash;
+begin
+  Result := TKMAC128XOF.CreateKMAC128XOF(AKMACKey, ACustomization,
+    AXofSizeInBits);
+end;
+
+class function THashFactory.TXOF.CreateKMAC256XOF(const AKMACKey,
+  ACustomization: THashLibByteArray; AXofSizeInBits: UInt64): IHash;
+begin
+  Result := TKMAC256XOF.CreateKMAC256XOF(AKMACKey, ACustomization,
+    AXofSizeInBits);
 end;
 
 { THashFactory.THMAC }
 
 class function THashFactory.THMAC.CreateHMAC(const AHash: IHash;
-  const AHmacKey: THashLibByteArray): IHMAC;
+  const AHMACKey: THashLibByteArray): IHMAC;
 begin
-  Result := THMACNotBuildInAdapter.CreateHMAC(AHash, AHmacKey);
+  Result := THMACNotBuildInAdapter.CreateHMAC(AHash, AHMACKey);
+end;
+
+{ THashFactory.TKMAC }
+
+class function THashFactory.TKMAC.CreateKMAC128(const AKMACKey,
+  ACustomization: THashLibByteArray; AOutputLengthInBits: UInt64): IKMAC;
+begin
+  Result := TKMAC128.CreateKMAC128(AKMACKey, ACustomization,
+    AOutputLengthInBits);
+end;
+
+class function THashFactory.TKMAC.CreateKMAC256(const AKMACKey,
+  ACustomization: THashLibByteArray; AOutputLengthInBits: UInt64): IKMAC;
+begin
+  Result := TKMAC256.CreateKMAC256(AKMACKey, ACustomization,
+    AOutputLengthInBits);
+end;
+
+{ THashFactory.TBlake2BMAC }
+
+class function THashFactory.TBlake2BMAC.CreateBlake2BMAC(const ABlake2BKey,
+  ASalt, APersonalisation: THashLibByteArray; AOutputLengthInBits: Int32)
+  : IBlake2BMAC;
+begin
+  Result := TBlake2BMACNotBuildInAdapter.CreateBlake2BMAC(ABlake2BKey, ASalt,
+    APersonalisation, AOutputLengthInBits)
+end;
+
+{ THashFactory.TBlake2SMAC }
+
+class function THashFactory.TBlake2SMAC.CreateBlake2SMAC(const ABlake2SKey,
+  ASalt, APersonalisation: THashLibByteArray; AOutputLengthInBits: Int32)
+  : IBlake2SMAC;
+begin
+  Result := TBlake2SMACNotBuildInAdapter.CreateBlake2SMAC(ABlake2SKey, ASalt,
+    APersonalisation, AOutputLengthInBits)
 end;
 
 { TKDF.TPBKDF2_HMAC }

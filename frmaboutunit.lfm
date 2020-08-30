@@ -1,21 +1,21 @@
 object frmAbout: TfrmAbout
   Left = 523
-  Height = 597
-  Top = 138
-  Width = 509
+  Height = 577
+  Top = 158
+  Width = 840
   Caption = 'About QuickHash-GUI'
-  ClientHeight = 597
-  ClientWidth = 509
+  ClientHeight = 577
+  ClientWidth = 840
   Position = poMainFormCenter
   LCLVersion = '2.0.4.0'
   object memAbout: TMemo
     Left = 16
-    Height = 536
+    Height = 516
     Top = 16
-    Width = 479
+    Width = 810
     Anchors = [akTop, akLeft, akRight, akBottom]
     Lines.Strings = (
-      'v3.1.0, Developed by Ted Smith (c) 2011-2019'
+      'v3.2.0, Developed by Ted Smith (c) 2011-2020'
       ''
       'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''
@@ -35,7 +35,7 @@ object frmAbout: TfrmAbout
       ''
       'xxHash64 : https://github.com/Cyan4973/xxHash and http://cyan4973.github.io/xxHash/, Github user Cyan4973. Use of the library is also welcomed and acknowledged and very much appreciated'
       ''
-      'Blake2B : https://blake2.net/ : Use of the fast and secure Blake2B (256 bit) algorithm is acknowledged and welcomed. '
+      'Blake2B & Blake3 : https://blake2.net/ & https://github.com/BLAKE3-team/BLAKE3 : Use of the fast and secure Blake2B (256 bit) and Blake3 algorithms are acknowledged and welcomed. '
       '    '
       'QuickHash is open-source and released under the GPL2 license. '
     )
@@ -48,7 +48,7 @@ object frmAbout: TfrmAbout
     AnchorSideTop.Side = asrBottom
     Left = 32
     Height = 25
-    Top = 552
+    Top = 532
     Width = 147
     Caption = 'Close'
     OnClick = Button1Click

@@ -12,7 +12,6 @@ uses
 {$IFDEF DELPHI}
   HlpHash,
   HlpHashBuffer,
-  HlpBitConverter,
 {$ENDIF DELPHI}
   HlpConverters,
   HlpIHash,
@@ -23,20 +22,19 @@ type
   THAS160 = class sealed(TBlockHash, ICryptoNotBuildIn, ITransformBlock)
 
   strict private
-
-    Fm_hash: THashLibUInt32Array;
+  var
+    FHash: THashLibUInt32Array;
 
 {$REGION 'Consts'}
 
   const
-
-    s_rot: array [0 .. 19] of Int32 = (5, 11, 7, 15, 6, 13, 8, 14, 7, 12, 9, 11,
+    SRot: array [0 .. 19] of Int32 = (5, 11, 7, 15, 6, 13, 8, 14, 7, 12, 9, 11,
       8, 15, 6, 12, 9, 14, 5, 13);
 
-    s_tor: array [0 .. 19] of Int32 = (27, 21, 25, 17, 26, 19, 24, 18, 25, 20,
+    Stor: array [0 .. 19] of Int32 = (27, 21, 25, 17, 26, 19, 24, 18, 25, 20,
       23, 21, 24, 17, 26, 20, 23, 18, 27, 19);
 
-    s_index: array [0 .. 79] of Int32 = (18, 0, 1, 2, 3, 19, 4, 5, 6, 7, 16, 8,
+    SIndex: array [0 .. 79] of Int32 = (18, 0, 1, 2, 3, 19, 4, 5, 6, 7, 16, 8,
       9, 10, 11, 17, 12, 13, 14, 15, 18, 3, 6, 9, 12, 19, 15, 2, 5, 8, 16, 11,
       14, 1, 4, 17, 7, 10, 13, 0, 18, 12, 5, 14, 7, 19, 0, 9, 2, 11, 16, 4, 13,
       6, 15, 17, 8, 1, 10, 3, 18, 7, 2, 13, 8, 19, 3, 14, 9, 4, 16, 15, 10, 5,
@@ -46,8 +44,8 @@ type
   strict protected
     procedure Finish(); override;
     function GetResult(): THashLibByteArray; override;
-    procedure TransformBlock(a_data: PByte; a_data_length: Int32;
-      a_index: Int32); override;
+    procedure TransformBlock(AData: PByte; ADataLength: Int32;
+      AIndex: Int32); override;
 
   public
     constructor Create();
@@ -61,164 +59,162 @@ implementation
 
 function THAS160.Clone(): IHash;
 var
-  HashInstance: THAS160;
+  LHashInstance: THAS160;
 begin
-  HashInstance := THAS160.Create();
-  HashInstance.Fm_hash := System.Copy(Fm_hash);
-  HashInstance.Fm_buffer := Fm_buffer.Clone();
-  HashInstance.Fm_processed_bytes := Fm_processed_bytes;
-  result := HashInstance as IHash;
+  LHashInstance := THAS160.Create();
+  LHashInstance.FHash := System.Copy(FHash);
+  LHashInstance.FBuffer := FBuffer.Clone();
+  LHashInstance.FProcessedBytesCount := FProcessedBytesCount;
+  result := LHashInstance as IHash;
   result.BufferSize := BufferSize;
 end;
 
 constructor THAS160.Create;
 begin
   Inherited Create(20, 64);
-  System.SetLength(Fm_hash, 5);
+  System.SetLength(FHash, 5);
 end;
 
 procedure THAS160.Finish;
 var
-  pad_index: Int32;
-  bits: UInt64;
-  pad: THashLibByteArray;
+  LPadIndex: Int32;
+  LBits: UInt64;
+  LPad: THashLibByteArray;
 begin
-  bits := Fm_processed_bytes * 8;
-  if (Fm_buffer.Pos < 56) then
-    pad_index := (56 - Fm_buffer.Pos)
+  LBits := FProcessedBytesCount * 8;
+  if (FBuffer.Position < 56) then
+  begin
+    LPadIndex := (56 - FBuffer.Position)
+  end
   else
-    pad_index := (120 - Fm_buffer.Pos);
+  begin
+    LPadIndex := (120 - FBuffer.Position);
+  end;
 
-  System.SetLength(pad, pad_index + 8);
+  System.SetLength(LPad, LPadIndex + 8);
 
-  pad[0] := $80;
+  LPad[0] := $80;
 
-  bits := TConverters.le2me_64(bits);
+  LBits := TConverters.le2me_64(LBits);
 
-  TConverters.ReadUInt64AsBytesLE(bits, pad, pad_index);
+  TConverters.ReadUInt64AsBytesLE(LBits, LPad, LPadIndex);
 
-  pad_index := pad_index + 8;
+  LPadIndex := LPadIndex + 8;
 
-  TransformBytes(pad, 0, pad_index);
-
+  TransformBytes(LPad, 0, LPadIndex);
 end;
 
 function THAS160.GetResult: THashLibByteArray;
 begin
-
   System.SetLength(result, 5 * System.SizeOf(UInt32));
-
-  TConverters.le32_copy(PCardinal(Fm_hash), 0, PByte(result), 0,
+  TConverters.le32_copy(PCardinal(FHash), 0, PByte(result), 0,
     System.Length(result));
-
 end;
 
 procedure THAS160.Initialize;
 begin
-  Fm_hash[0] := $67452301;
-  Fm_hash[1] := $EFCDAB89;
-  Fm_hash[2] := $98BADCFE;
-  Fm_hash[3] := $10325476;
-  Fm_hash[4] := $C3D2E1F0;
-
+  FHash[0] := $67452301;
+  FHash[1] := $EFCDAB89;
+  FHash[2] := $98BADCFE;
+  FHash[3] := $10325476;
+  FHash[4] := $C3D2E1F0;
   Inherited Initialize();
 end;
 
-procedure THAS160.TransformBlock(a_data: PByte; a_data_length: Int32;
-  a_index: Int32);
+procedure THAS160.TransformBlock(AData: PByte; ADataLength: Int32;
+  AIndex: Int32);
 var
   A, B, C, D, E, T: UInt32;
-  r: Int32;
-  data: array [0 .. 19] of UInt32;
+  R: Int32;
+  LData: array [0 .. 19] of UInt32;
 begin
-  A := Fm_hash[0];
-  B := Fm_hash[1];
-  C := Fm_hash[2];
-  D := Fm_hash[3];
-  E := Fm_hash[4];
+  A := FHash[0];
+  B := FHash[1];
+  C := FHash[2];
+  D := FHash[3];
+  E := FHash[4];
 
-  TConverters.le32_copy(a_data, a_index, @(data[0]), 0, a_data_length);
+  TConverters.le32_copy(AData, AIndex, @(LData[0]), 0, ADataLength);
 
-  data[16] := data[0] xor data[1] xor data[2] xor data[3];
-  data[17] := data[4] xor data[5] xor data[6] xor data[7];
-  data[18] := data[8] xor data[9] xor data[10] xor data[11];
-  data[19] := data[12] xor data[13] xor data[14] xor data[15];
+  LData[16] := LData[0] xor LData[1] xor LData[2] xor LData[3];
+  LData[17] := LData[4] xor LData[5] xor LData[6] xor LData[7];
+  LData[18] := LData[8] xor LData[9] xor LData[10] xor LData[11];
+  LData[19] := LData[12] xor LData[13] xor LData[14] xor LData[15];
 
-  r := 0;
-  while r < 20 do
+  R := 0;
+  while R < 20 do
   begin
-    T := data[s_index[r]] + (A shl s_rot[r] or A shr s_tor[r]) +
+    T := LData[SIndex[R]] + (A shl SRot[R] or A shr Stor[R]) +
       ((B and C) or (not B and D)) + E;
     E := D;
     D := C;
     C := B shl 10 or B shr 22;
     B := A;
     A := T;
-    System.Inc(r);
+    System.Inc(R);
   end;
 
-  data[16] := data[3] xor data[6] xor data[9] xor data[12];
-  data[17] := data[2] xor data[5] xor data[8] xor data[15];
-  data[18] := data[1] xor data[4] xor data[11] xor data[14];
-  data[19] := data[0] xor data[7] xor data[10] xor data[13];
+  LData[16] := LData[3] xor LData[6] xor LData[9] xor LData[12];
+  LData[17] := LData[2] xor LData[5] xor LData[8] xor LData[15];
+  LData[18] := LData[1] xor LData[4] xor LData[11] xor LData[14];
+  LData[19] := LData[0] xor LData[7] xor LData[10] xor LData[13];
 
-  r := 20;
-  while r < 40 do
+  R := 20;
+  while R < 40 do
   begin
-    T := data[s_index[r]] + $5A827999 +
-      (A shl s_rot[r - 20] or A shr s_tor[r - 20]) + (B xor C xor D) + E;
+    T := LData[SIndex[R]] + $5A827999 +
+      (A shl SRot[R - 20] or A shr Stor[R - 20]) + (B xor C xor D) + E;
     E := D;
     D := C;
     C := B shl 17 or B shr 15;
     B := A;
     A := T;
-    System.Inc(r);
+    System.Inc(R);
   end;
 
-  data[16] := data[5] xor data[7] xor data[12] xor data[14];
-  data[17] := data[0] xor data[2] xor data[9] xor data[11];
-  data[18] := data[4] xor data[6] xor data[13] xor data[15];
-  data[19] := data[1] xor data[3] xor data[8] xor data[10];
+  LData[16] := LData[5] xor LData[7] xor LData[12] xor LData[14];
+  LData[17] := LData[0] xor LData[2] xor LData[9] xor LData[11];
+  LData[18] := LData[4] xor LData[6] xor LData[13] xor LData[15];
+  LData[19] := LData[1] xor LData[3] xor LData[8] xor LData[10];
 
-  r := 40;
-  while r < 60 do
+  R := 40;
+  while R < 60 do
   begin
-    T := data[s_index[r]] + $6ED9EBA1 +
-      (A shl s_rot[r - 40] or A shr s_tor[r - 40]) + (C xor (B or not D)) + E;
+    T := LData[SIndex[R]] + $6ED9EBA1 +
+      (A shl SRot[R - 40] or A shr Stor[R - 40]) + (C xor (B or not D)) + E;
     E := D;
     D := C;
     C := B shl 25 or B shr 7;
     B := A;
     A := T;
-    System.Inc(r);
+    System.Inc(R);
   end;
 
-  data[16] := data[2] xor data[7] xor data[8] xor data[13];
-  data[17] := data[3] xor data[4] xor data[9] xor data[14];
-  data[18] := data[0] xor data[5] xor data[10] xor data[15];
-  data[19] := data[1] xor data[6] xor data[11] xor data[12];
+  LData[16] := LData[2] xor LData[7] xor LData[8] xor LData[13];
+  LData[17] := LData[3] xor LData[4] xor LData[9] xor LData[14];
+  LData[18] := LData[0] xor LData[5] xor LData[10] xor LData[15];
+  LData[19] := LData[1] xor LData[6] xor LData[11] xor LData[12];
 
-  r := 60;
-  while r < 80 do
+  R := 60;
+  while R < 80 do
   begin
-    T := data[s_index[r]] + $8F1BBCDC +
-      (A shl s_rot[r - 60] or A shr s_tor[r - 60]) + (B xor C xor D) + E;
+    T := LData[SIndex[R]] + $8F1BBCDC +
+      (A shl SRot[R - 60] or A shr Stor[R - 60]) + (B xor C xor D) + E;
     E := D;
     D := C;
-    C := B shl 30 or B shr 2;
+    C := (B shl 30) or (B shr 2);
     B := A;
     A := T;
-    System.Inc(r);
+    System.Inc(R);
   end;
 
-  Fm_hash[0] := Fm_hash[0] + A;
-  Fm_hash[1] := Fm_hash[1] + B;
-  Fm_hash[2] := Fm_hash[2] + C;
-  Fm_hash[3] := Fm_hash[3] + D;
-  Fm_hash[4] := Fm_hash[4] + E;
+  FHash[0] := FHash[0] + A;
+  FHash[1] := FHash[1] + B;
+  FHash[2] := FHash[2] + C;
+  FHash[3] := FHash[3] + D;
+  FHash[4] := FHash[4] + E;
 
-  System.FillChar(data, System.SizeOf(data), UInt32(0));
-
+  System.FillChar(LData, System.SizeOf(LData), UInt32(0));
 end;
 
 end.
