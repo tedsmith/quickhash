@@ -8,7 +8,7 @@ LAZARUSDIR ?= /usr/share/lazarus/1.8.4/
 LAZBUILD := $(LAZARUSDIR)lazbuild
 LAZRES := $(LAZARUSDIR)tools/lazres
 
-RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs
+RESFILES = frmaboutunit.lrs udisplaygrid3.lrs
 
 PACKAGES := HashLib4Pascal/src/Packages/FPC/HashLib4PascalPackage.lpk \
  DateTimePicker/zvdatetimectrls.lpk \
@@ -28,9 +28,9 @@ all: $(BIN)
 
 clean:
 	rm -rf lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
-	rm -f $(BIN) quickhash_linux.ico *.o *.or *.ppu *.res *.compiled
+	rm -f $(BIN) *.o *.or *.ppu *.res *.compiled
 	rm -f DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
-	$(foreach FILE,$(RESFILES),\
+	$(foreach FILE,$(RESFILES) quickhash.ico,\
 	  test ! -f $(FILE).backup || mv -f $(FILE).backup $(FILE) ; ${\n})
 
 distclean: clean
@@ -39,7 +39,7 @@ $(BIN):
 	$(foreach FILE,$(RESFILES),\
 	  test -f $(FILE).backup || cp $(FILE) $(FILE).backup ; ${\n}\
 	  $(LAZRES) $(FILE) $(FILE:.lrs=.lfm) ; ${\n})
-	cp -f quickhash.ico quickhash_linux.ico
+	cp -f quickhash.ico quickhash.ico.backup
 	$(LAZBUILD) $(OPTIONS) $(PACKAGES) quickhash_linux.lpi
 
 install:

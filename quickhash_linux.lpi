@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="1"/>
+    <General>
+      <MainUnit Value="0"/>
+      <Title Value="QuickHash"/>
+      <Icon Value="quickhash_linux.ico"/>
+    </General>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <AutoIncrementBuild Value="False"/>
+      <MajorVersionNr Value="3"/>
+      <Language Value="0809"/>
+      <StringTable Comments="Free, cross platform, open-source file and disk hashing software"
+                   CompanyName="Ted Smith (Ted Technology on Sourceforge)"
+                   FileDescription="File hashing GUI for Linux &amp; Windows"
+                   LegalCopyright="2011 - 2020 (c) Ted Smith"
+                   ProductName="QuickHash (www.quickhash-gui.org)"
+                   />
+    </VersionInfo>
+    <BuildModes Count="1">
+      <Item1 Name="default" Default="True"/>
+    </BuildModes>
+    <RequiredPackages Count="6">
+      <Item1>
+        <PackageName Value="HashLib4PascalPackage"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="lazdbexport"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="SQLDBLaz"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="FCL"/>
+      </Item4>
+      <Item5>
+        <PackageName Value="ZVDateTimeCtrls"/>
+      </Item5>
+      <Item6>
+        <PackageName Value="LCL"/>
+      </Item6>
+    </RequiredPackages>
+    <Units Count="1">
+      <Unit0>
+        <Filename Value="quickhash.lpr"/>
+      </Unit0>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Target>
+      <Filename Value="quickhash"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <UseAnsiStrings Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <!--
+      <Checks>
+        <IOChecks Value="False"/>
+        <RangeChecks Value="False"/>
+        <OverflowChecks Value="False"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="False"/>
+      -->
+      <RelocatableUnit Value="True"/>
+      <Optimizations>
+        <OptimizationLevel Value="3"/>
+      </Optimizations>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf2Set"/>
+        <StripSymbols Value="True"/>
+      </Debugging>
+      <Options>
+        <PassLinkerOptions Value="True"/>
+        <LinkerOptions Value="-z relro -pie --as-needed"/>
+      </Options>
+    </Linking>
+    <Other>
+      <CompilerMessages>
+        <IgnoredMessages idx5024="True"/><!-- "Param XX is unused" -->
+      </CompilerMessages>
+      <CustomOptions Value="-OoREGVAR
+-OoPEEPHOLE"/>
+    </Other>
+  </CompilerOptions>
+</CONFIG>
