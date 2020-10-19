@@ -38,7 +38,7 @@ uses
     Process, Windows, ActiveX, ComObj, Variants,
     win32proc, GPTMBR, uGPT, // for the OS name detection : http://free-pascal-lazarus.989080.n3.nabble.com/Lazarus-WindowsVersion-td4032307.html
   {$endif}
-    diskspecification, uProgress, Classes, SysUtils, FileUtil,
+    uProgress, Classes, SysUtils, FileUtil,
     Forms, Controls, Graphics, LazUTF8, strutils,
     Dialogs, StdCtrls, ComCtrls, ExtCtrls, Menus, ZVDateTimePicker,
 
@@ -349,7 +349,7 @@ begin
   // Probe all attached disks and populate the interface
   DiskInfoProcess:=TProcess.Create(nil);
   DiskInfoProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskInfoProcess.CommandLine:='/sbin/udevadm info --query=property --name='+DiskDevName;  //get info about selected disk
+  DiskInfoProcess.CommandLine:='udevadm info --query=property --name='+DiskDevName;  //get info about selected disk
   DiskInfoProcess.Execute;
 
   diskinfo:=TStringList.Create;
@@ -417,7 +417,7 @@ begin
   // Probe all attached disks and populate the interface
   DiskInfoProcess:=TProcess.Create(nil);
   DiskInfoProcess.Options:=[poWaitOnExit, poUsePipes];
-  DiskInfoProcess.CommandLine:='/sbin/udevadm info --query=property --name='+cbdisks.Text;  //get info about selected disk
+  DiskInfoProcess.CommandLine:='udevadm info --query=property --name='+cbdisks.Text;  //get info about selected disk
   DiskInfoProcess.Execute;
 
   diskinfo:=TStringList.Create;
@@ -1039,9 +1039,6 @@ begin
 
   diskinfoUDISKS := TStringList.Create;
   diskinfoUDISKS.LoadFromStream(diskinfoProcessUDISKS.Output);
-
-  frmTechSpecs.Memo1.Lines.AddText(diskinfoUDISKS.Text);
-  frmTechSpecs.Show;
 
   // Free everything
   diskinfoUDISKS.Free;
