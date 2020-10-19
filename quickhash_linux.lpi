@@ -14,9 +14,9 @@
       <Language Value="0809"/>
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software"
                    CompanyName="Ted Smith (Ted Technology on Sourceforge)"
-                   FileDescription="File hashing GUI for Linux &amp; Windows"
+                   FileDescription="The easy and convenient way to hash data in Linux, OSX and Windows"
                    LegalCopyright="2011 - 2020 (c) Ted Smith"
-                   ProductName="QuickHash (www.quickhash-gui.org)"
+                   ProductName="QuickHash-GUI (www.quickhash-gui.org)"
                    />
     </VersionInfo>
     <BuildModes Count="1">
@@ -70,7 +70,6 @@
       </Checks>
       <VerifyObjMethodCallValidity Value="False"/>
       -->
-      <RelocatableUnit Value="True"/>
       <Optimizations>
         <OptimizationLevel Value="3"/>
       </Optimizations>
