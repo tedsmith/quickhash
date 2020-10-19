@@ -70,6 +70,7 @@
       </Checks>
       <VerifyObjMethodCallValidity Value="False"/>
       -->
+      <RelocatableUnit Value="True"/>
       <Optimizations>
         <OptimizationLevel Value="3"/>
       </Optimizations>
