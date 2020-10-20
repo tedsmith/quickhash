@@ -61,28 +61,22 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
-      <!--
-      <Checks>
+      <!--<Checks>
         <IOChecks Value="False"/>
         <RangeChecks Value="False"/>
         <OverflowChecks Value="False"/>
         <StackChecks Value="True"/>
-      </Checks>
+      </Checks>-->
       <VerifyObjMethodCallValidity Value="False"/>
-      -->
       <RelocatableUnit Value="True"/>
       <Optimizations>
         <OptimizationLevel Value="3"/>
       </Optimizations>
     </CodeGeneration>
     <Linking>
-      <Debugging>
-        <DebugInfoType Value="dsDwarf2Set"/>
-        <StripSymbols Value="True"/>
-      </Debugging>
       <Options>
         <PassLinkerOptions Value="True"/>
-        <LinkerOptions Value="-z relro -pie --as-needed"/>
+        <LinkerOptions Value="-z relro --as-needed -s"/>
       </Options>
     </Linking>
     <Other>
