@@ -5,7 +5,6 @@
     <General>
       <MainUnit Value="0"/>
       <Title Value="QuickHash"/>
-      <Icon Value="quickhash_linux.ico"/>
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
@@ -15,8 +14,8 @@
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software"
                    CompanyName="Ted Smith (Ted Technology on Sourceforge)"
                    FileDescription="The easy and convenient way to hash data in Linux, OSX and Windows"
-                   LegalCopyright="2011 - 2020 (c) Ted Smith"
-                   ProductName="QuickHash-GUI (www.quickhash-gui.org)"
+                   LegalCopyright="2011 - 2019 (c) Ted Smith"
+                   ProductName="QuickHash (www.quickhash-gui.org)"
                    />
     </VersionInfo>
     <BuildModes Count="1">
@@ -24,28 +23,64 @@
     </BuildModes>
     <RequiredPackages Count="6">
       <Item1>
-        <PackageName Value="HashLib4PascalPackage"/>
+        <PackageName Value="lazdbexport"/>
       </Item1>
       <Item2>
-        <PackageName Value="lazdbexport"/>
+        <PackageName Value="SQLDBLaz"/>
       </Item2>
       <Item3>
-        <PackageName Value="SQLDBLaz"/>
+        <PackageName Value="FCL"/>
       </Item3>
       <Item4>
-        <PackageName Value="FCL"/>
+        <PackageName Value="ZVDateTimeCtrls"/>
       </Item4>
       <Item5>
-        <PackageName Value="ZVDateTimeCtrls"/>
+        <PackageName Value="HashLib4PascalPackage"/>
       </Item5>
       <Item6>
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="1">
+    <Units Count="11">
       <Unit0>
         <Filename Value="quickhash.lpr"/>
       </Unit0>
+      <Unit1>
+        <Filename Value="unit2.pas"/>
+        <HasResources Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="udisplaygrid.pas"/>
+        <HasResources Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="diskmodule.pas"/>
+        <HasResources Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="diskmodule.lfm"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="diskspecification.lfm"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="diskspecification.pas"/>
+        <HasResources Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="GPTMBR.pas"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="uGPT.pas"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="uprogress.pas"/>
+        <HasResources Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="dbases_sqlite.pas"/>
+        <HasResources Value="True"/>
+      </Unit10>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -61,22 +96,27 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
-      <!--<Checks>
+      <RelocatableUnit Value="True"/>
+      <Checks>
         <IOChecks Value="False"/>
         <RangeChecks Value="False"/>
         <OverflowChecks Value="False"/>
         <StackChecks Value="True"/>
-      </Checks>-->
+      </Checks>
       <VerifyObjMethodCallValidity Value="False"/>
-      <RelocatableUnit Value="True"/>
       <Optimizations>
         <OptimizationLevel Value="3"/>
       </Optimizations>
     </CodeGeneration>
     <Linking>
+      <Debugging>
+        <GenerateDebugInfo Value="False"/>
+        <DebugInfoType Value="dsDwarf2Set"/>
+        <StripSymbols Value="True"/>
+      </Debugging>
       <Options>
         <PassLinkerOptions Value="True"/>
-        <LinkerOptions Value="-z relro --as-needed -s"/>
+        <LinkerOptions Value="-z relro -pie --as-needed"/>
       </Options>
     </Linking>
     <Other>

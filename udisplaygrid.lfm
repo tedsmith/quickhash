@@ -1,7 +1,7 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 808
+  Left = 286
   Height = 561
-  Top = 557
+  Top = 268
   Width = 1010
   Caption = 'QuickHash-GUI - Copy Results'
   ClientHeight = 561
@@ -9,7 +9,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.4.0'
+  LCLVersion = '2.0.10.0'
   object btnClipboardResultsCOPYTAB: TButton
     Left = 280
     Height = 25
@@ -56,8 +56,8 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast]
   end
   object frmDisplayGridPopupMenu: TPopupMenu
-    left = 400
-    top = 344
+    Left = 400
+    Top = 344
     object MenuItem_SortBySourceNameCOPYGRID: TMenuItem
       Caption = 'Sort by Source FileName'
       OnClick = MenuItem_SortBySourceNameCOPYGRIDClick
@@ -96,7 +96,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     end
   end
   object frmDisplayGridSaveDialog1: TSaveDialog
-    left = 616
-    top = 376
+    Left = 616
+    Top = 376
   end
 end

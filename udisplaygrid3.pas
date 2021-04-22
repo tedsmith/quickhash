@@ -17,6 +17,7 @@ type
     btnC2FClipboard: TButton;
     dbGridC2F: TDBGrid;
     DBNavigator_C2F: TDBNavigator;
+    MenuItem_C2F_ShowMismatches: TMenuItem;
     MenuItem_C2FToHTML: TMenuItem;
     MenuItem_C2F_SaveResultsCSV: TMenuItem;
     MenuItem_CopySelectedRowC2FGRID: TMenuItem;
@@ -25,6 +26,7 @@ type
     PopupMenu_C2FGrid: TPopupMenu;
     frmDisplayGrid3SaveDialog: TSaveDialog;
     procedure btnC2FClipboardClick(Sender: TObject);
+    procedure MenuItem_C2F_ShowMismatchesClick(Sender: TObject);
     procedure MenuItem_C2FToHTMLClick(Sender: TObject);
     procedure MenuItem_C2F_SaveResultsCSVClick(Sender: TObject);
     procedure MenuItem_ClipboardAllRowsClick(Sender: TObject);
@@ -83,6 +85,11 @@ begin
   end;
 end;
 
+// Show mis-matched values, where a hash was found in one folder but not the other
+procedure TfrmDisplayGrid3.MenuItem_C2F_ShowMismatchesClick(Sender: TObject);
+begin
+  frmSQLiteDBases.ShowMismatchesC2F(dbGridC2F);
+end;
 // Save the "Compare Two Folders" results pane to CSV File
 procedure TfrmDisplayGrid3.MenuItem_C2F_SaveResultsCSVClick(Sender: TObject);
 var

@@ -1,6 +1,16 @@
 ﻿Version History
 ===============
 
+v3.3.0
+Improvement : Column headers added to CSV and HTML output (achieved by right clicking the display grid result) when using the "Copy" tab. 
+Improvement : Removed the generation of a "QH_XXXXX" time stamp named parent folder in destination folder when copying as many users reported this was unhelpful.
+Improvement : SQLite DLL's for Windows replaced with stable version 3.35.5.0 as of April 2021 (replacing former version 3.21.0.0).
+Improvement : The "Compare Two Folders" now has a right click option in the results grid to 'Show Mismatches'. This will filter the results to show mis-matched hash computations, or files that exist in FolderA but not FolderB (or visa versa). Very useful if the user has spent hours comparings hundreds of thousands of files and one or more does not match - now the user can list them easily. 
+Fix : DisableControls and EnableControls used more extensively to expedite the "Save as CSV" and "Save as HTML" options for large volumes of data, as some user reported save efforts taking several hours for millions of rows of data. This makes sense because Quickhash was repaitning the display grid after each row file write.  
+Fix : Apples new OSX 'Big Sur' unhelpfully removed libraries, like the SQLite library. So a different method of lookup is needed. That has been applied so that Apple users can continue to enjoy the benefits of QuickHash on that most changing of operating system. You're welcome. 
+New : Button added to enable the user to easily make a copy of the backend SQLite database at any given point in time, for convenience. This can help users who may wish to load it into specific database tools, like SQLite Explorer or browser extensions like SQLite Manager. 
+Code: Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. 
+
 v3.2.0
 New : Blake3 hash algorithm added for text strings, a file, Files recursively, Compare Two Folders and Compare Two Files. 
 New : Blake3 hash algorithm added to disk hashing module

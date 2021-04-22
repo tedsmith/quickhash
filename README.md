@@ -30,6 +30,16 @@ Assuming it opens OK, when you go to compile it, Lazarus will report that the pr
 
 Now save your project (Project --> Save Project) which will create a new LPI file. Then you can compile QuickHash yourself using Lazarus.
 
+For Windows users wishing to compile SQLite DLL's themselves, you can do so by: 
+
+  Downloading and installing the MinGW compiler (for 32-bit) and the  MINGW64 Compiler for Windows, 
+  Downloading the SQLite "Amalgamation files" from here : https://sqlite.org/download.html
+  And finally by using the following syntax in either MinGW or MINGW64 :
+
+  gcc -shared sqlite3.c -o sqlite3.dll
+
+  (https://sqlite.org/howtocompile.html)
+  
 I am hopeful this guide might encourage collaborators and also help various Linux distributors include QuickHash into their package management platforms. 
 
 Ted Smith

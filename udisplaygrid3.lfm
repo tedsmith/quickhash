@@ -1,13 +1,13 @@
 object frmDisplayGrid3: TfrmDisplayGrid3
-  Left = 507
+  Left = 243
   Height = 559
-  Top = 178
+  Top = 210
   Width = 1008
   Caption = 'Compare Two Folders Results'
   ClientHeight = 559
   ClientWidth = 1008
   Position = poDesktopCenter
-  LCLVersion = '2.0.4.0'
+  LCLVersion = '2.0.10.0'
   object dbGridC2F: TDBGrid
     Left = 16
     Height = 472
@@ -55,8 +55,8 @@ object frmDisplayGrid3: TfrmDisplayGrid3
     TabOrder = 2
   end
   object PopupMenu_C2FGrid: TPopupMenu
-    left = 352
-    top = 288
+    Left = 352
+    Top = 288
     object MenuItem_ShowAll: TMenuItem
       Caption = 'Restore results view'
       OnClick = MenuItem_ShowAllClick
@@ -69,6 +69,10 @@ object frmDisplayGrid3: TfrmDisplayGrid3
       Caption = 'Clipboard selected row'
       OnClick = MenuItem_CopySelectedRowC2FGRIDClick
     end
+    object MenuItem_C2F_ShowMismatches: TMenuItem
+      Caption = 'Show mismatches'
+      OnClick = MenuItem_C2F_ShowMismatchesClick
+    end
     object MenuItem_C2F_SaveResultsCSV: TMenuItem
       Caption = 'Save as CSV File'
       OnClick = MenuItem_C2F_SaveResultsCSVClick
@@ -79,7 +83,7 @@ object frmDisplayGrid3: TfrmDisplayGrid3
     end
   end
   object frmDisplayGrid3SaveDialog: TSaveDialog
-    left = 520
-    top = 288
+    Left = 520
+    Top = 288
   end
 end

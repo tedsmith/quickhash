@@ -179,6 +179,8 @@ type
     btnFLBL                               : TButton;
     btnHashFile                           : TButton;
     btnLBL                                : TButton;
+    btnPreserveDB1: TButton;
+    btnPreserveDB2: TButton;
     btnRecursiveDirectoryHashing          : TButton;
     btnClipboardResults                   : TButton;
     btnCallDiskHasherModule               : TButton;
@@ -191,6 +193,7 @@ type
     btnMakeTextUpper                      : TButton;
     btnMakeTextLower                      : TButton;
     btnLoadHashList                       : TButton;
+    btnPreserveDB: TButton;
     Button8CopyAndHash                    : TButton;
     cbFlipCaseFILE                        : TCheckBox;
     cbToggleInputDataToOutputFile         : TCheckBox;
@@ -289,6 +292,7 @@ type
     pbFile                                : TProgressBar;
     FilesDBGrid_SaveCSVDialog             : TSaveDialog;
     FilesSaveAsHTMLDialog                 : TSaveDialog;
+    SaveDialog_PreserveDB: TSaveDialog;
     SaveDialog8_SaveJustHashes            : TSaveDialog;
     sdFileAndFolderListOnly               : TSaveDialog;
     sdHashListLookupResults               : TSaveDialog;
@@ -404,6 +408,7 @@ type
     procedure btnLoadHashListClick(Sender: TObject);
     procedure btnMakeTextLowerClick(Sender: TObject);
     procedure btnMakeTextUpperClick(Sender: TObject);
+    procedure btnPreserveDBClick(Sender: TObject);
     procedure cbFlipCaseFILEChange(Sender: TObject);
     procedure cbFlipCaseTEXTChange(Sender: TObject);
     procedure cbLoadHashListChange(Sender: TObject);
@@ -1330,7 +1335,7 @@ begin
       try
         SysUtils.DeleteFile(DatabaseFilename);
       except
-        Showmessage('Could not delete sqlite database ' + DataBasefilename + '. Please delete the manually.');
+        Showmessage('Could not delete sqlite database ' + DataBasefilename + '. Please delete the file manually.');
       end;
     end;
 
@@ -1347,7 +1352,7 @@ procedure TMainForm.lblDonateClick(Sender: TObject);
 var
   QuickHashDonateURL : string;
 begin
-  QuickHashDonateURL := 'https://paypal.me/quickhash';
+  QuickHashDonateURL := 'https://www.paypal.com/paypalme/quickhashGUI';
   OpenURL(QuickHashDonateURL);
 end;
 
@@ -1726,7 +1731,7 @@ end;
 procedure TMainForm.MenuItem_SortByHashListClick(Sender: TObject);
 begin
   RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.SoryByHashList(RecursiveDisplayGrid1);
+  frmSQLiteDBases.SortByHashList(RecursiveDisplayGrid1);
 end;
 
 procedure TMainForm.MenuItem_FilterOutNoClick(Sender: TObject);
@@ -1844,34 +1849,6 @@ begin
   lbleExpectedHash.Text:= '';
 end;
 
-// Attempts to validate if the source data is Base64 encoded, to reduce stream
-// read errors if the user gives QuickHash a load of non-encoded data
-// *** Not implemented, yet, as results not perfect and perhaps not necessary anyway ***
-{function TMainForm.CanBeValidBase64EncodedString(var Buf: array of byte): Boolean;
-const
-  // Base64 often ends with a padding character of one or two equal signs
-  // Though it doesn't have to necessarily. Spaces and carriage returns are not
-  // part of the B64 alphabet, but are needed for formatting.
-  Base64Alphabet = ['A'..'Z', 'a'..'z', '0'..'9', '+', '/', '=', ' '];
-var
-  I: Integer;
-begin
-  result := true;
-  for i := 0 to SizeOf(Buf) do
-    begin
-      // Is the byte NOT in the Base64 range?
-      if (not (Chr(Buf[I]) in Base64Alphabet)) then
-      begin
-        // Is the byte NOT a carriage return?
-        if (not Buf[i] = 13) or (not Buf[i] = 10) then
-        begin
-          // It's not in the Base64 range and its not a carriage return. So reject
-          Result := False;
-        end;
-      end;
-    end;
-end;
-}
 // Select, decode and then hash a Base64 encoded file
 procedure TMainForm.btnB64FileChooserClick(Sender: TObject);
 var
@@ -2139,6 +2116,40 @@ begin
   application.ProcessMessages;
 end;
 
+// Enables the user to capture a copy of the SQLite Database if they want to use
+// it with other, dedicated, SQLite tools. Note the DB is open.
+procedure TMainForm.btnPreserveDBClick(Sender: TObject);
+var
+  DBSavedOK   : boolean = Default(Boolean);
+  DBNameLocal : string  = Default(string);
+begin
+  ShowMessage('This will attempt create a copy of the SQLite database as it CURRENTLY exists, for convenience');
+  SaveDialog_PreserveDB.Title := 'Save backend SQLite Database As...';
+  SaveDialog_PreserveDB.InitialDir := GetCurrentDir;
+  SaveDialog_PreserveDB.Filter := 'SQLite files|*.sqlite;*.sqlite3';
+  HashListChooserDialog.DefaultExt:= 'sqlite';
+
+  if SaveDialog_PreserveDB.Execute then
+  begin
+    DBNameLocal := dbases_sqlite.frmSQLiteDBases.DBName;
+    {$ifdef Windows}
+    // As the Database is open, we have to use the Windows API call to copy it.
+    DBSavedOK := CopyFileExW(PWideChar(WideString(DBNameLocal)),
+                             PWideChar(WideString(SaveDialog_PreserveDB.FileName)),
+                             nil, nil, nil, 0) <> 0;
+    {$endif}
+    {$IFDEF Darwin}
+      // OSX and Linux will copy it OK anyway
+      DBSavedOK := CopyFile(DBNameLocal, SaveDialog_PreserveDB.FileName, true, false);
+    {$endif}
+    {$IFDEF UNIX}
+      // OSX and Linux will copy it OK anyway
+      DBSavedOK := CopyFile(DBNameLocal, SaveDialog_PreserveDB.FileName, true, false);
+    {$ENDIF}
+    if DBSavedOK then ShowMessage('SQLite Database was saved OK') else ShowMessage('SQLite Database could not be saved.');
+  end;
+end;
+
 procedure TMainForm.cbFlipCaseFILEChange(Sender: TObject);
 var
   i : integer;
@@ -2254,15 +2265,16 @@ begin
 end;
 {$ENDIF}
 
-// Procedure SaveOutputAsCSV
-// Save any given display grid to CSV with a timestamped header
+// Procedure SaveOutputAsCSV. Save any given display grid to CSV with a timestamped header
+// DEPRECATED since v3.0.0, where SQLite and DataSources became prominent, but left
+// here for now.
 procedure TMainForm.SaveOutputAsCSV(Filename : string; GridName : TStringGrid);
 begin
   // Here we insert the title line and version number of QuickHash, then save it
   // back to CSV.
   try
     Gridname.InsertRowWithValues(0, MainForm.Caption + '. Log generated: ' + DateTimeToStr(Now));
-    GridName.SaveToCSVFile(FileName);
+    GridName.SaveToCSVFile(FileName); // Uses comma as default delim
   finally
   end;
 end;
@@ -2564,15 +2576,13 @@ end;
 procedure TMainForm.btnCompareClick(Sender: TObject);
 
 var
-  FolderA, FolderB, RogueHash : string;
+  FolderA, FolderB : string;
 
   slFileListA, slFileListB, slMissingHashes  : TStringList;
 
   tfpHashListA, tfpHashListB : TFPHashList;
 
   NeedToSave : Boolean;
-
-  i, lenRogueHash : integer;
 
   FolderAFileCount, FolderBFileCount, FileCountDifference : integer;
 
@@ -4100,10 +4110,10 @@ var
 
   SizeOfFile2, TotalBytesRead2, NoFilesExamined, SizeOfCurrentFile: Int64;
 
-  SubDirStructure, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
+  ParentSource,  ParentDestination, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
     FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
     OutputDirDateFormatted, CrDateModDateAccDate,
-    CSVLogFile2, strNoOfFilesToExamine, SubDirStructureParent,
+    CSVLogFile2, strNoOfFilesToExamine,
     strTimeDifference,  FileMask,
     Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute: string;
 
@@ -4120,7 +4130,7 @@ var
   {$ENDIF}
 
 begin
-  SubDirStructure         := '';
+  ParentSource         := '';
   FinalisedDestDir        := '';
   SourceFileHasHash       := '';
   DestinationFileHasHash  := '';
@@ -4415,19 +4425,19 @@ begin
               // If he has, then just dump the files to the root of the destination dir
               if chkNoPathReconstruction.Checked = false then
                 begin
-                  SubDirStructure := IncludeTrailingPathDelimiter(ExtractFileDir(SourceDirectoryAndFileName));
+                  ParentSource := IncludeTrailingPathDelimiter(ExtractFileDir(SourceDirectoryAndFileName));
                   if chkUNCMode.Checked then
                     begin
-                      Delete(SubDirStructure, 1, 1); // remove one of two \ from the \\ prefix to form the slash of the directory split
+                      Delete(ParentSource, 1, 1); // remove one of two \ from the \\ prefix to form the slash of the directory split
                     end;
                 end
               else
                begin
-                  SubDirStructure := IncludeTrailingPathDelimiter(DestDir);
+                  ParentSource := IncludeTrailingPathDelimiter(DestDir);
                 end;
 
               // And also generate a timestamped parent directory for the output dir, named after the time of execution
-              SubDirStructureParent := ChompPathDelim(IncludeTrailingPathDelimiter(DestDir) + IncludeTrailingPathDelimiter('QH_' + OutputDirDateFormatted));
+              ParentDestination := ChompPathDelim(IncludeTrailingPathDelimiter(DestDir));
 
             { Now concatenate the original sub directory to the destination directory
               and the datestamped parent directory to form the total path, inc filename
@@ -4438,11 +4448,11 @@ begin
 
               if chkNoPathReconstruction.Checked = false then
                 begin
-                  FinalisedDestDir := SubDirStructureParent + SubDirStructure;
+                  FinalisedDestDir := ParentDestination + ParentSource;
                 end
               else
                 begin
-                   FinalisedDestDir := SubDirStructureParent;
+                   FinalisedDestDir := ParentDestination;
                 end;
 
             {$IFDEF Windows}

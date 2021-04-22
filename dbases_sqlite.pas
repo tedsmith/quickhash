@@ -79,7 +79,7 @@ type
     procedure SortByFileName(DBGrid : TDBGrid);
     procedure SortByFilePath(DBGrid : TDBGrid);
     procedure SortByHash(DBGrid : TDBGrid);
-    procedure SoryByHashList(DBGrid : TDBGrid);
+    procedure SortByHashList(DBGrid : TDBGrid);
     procedure FilterOutHashListNO(DBGrid : TDBGrid);
     procedure FilterOutHashListYES(DBGrid : TDBGrid);
     procedure ShowAll(DBGrid : TDBGrid);
@@ -96,17 +96,19 @@ type
     procedure SortByDestinationFilename(DBGrid : TDBGrid);
     procedure SortBySourceHash(DBGrid : TDBGrid);
     procedure SortByDestinationHash(DBGrid : TDBGrid);
+    procedure ShowMismatchesC2F(DBGrid : TDBGrid);
     function CountGridRows(DBGrid : TDBGrid) : integer;
 
   private
     { private declarations }
   public
+    DBName : string; // Used by PreserveDB button globally to enable the user to save the DB. New as of v3.3.0
     { public declarations }
   const
     // More information on the use of these values is below.
-    // They need not be set as constants in your application. They can be any valid value
-    application_id = 1189021115; // must be a 32-bit Unsigned Integer (Longword 0 .. 4294967295)
-    user_version = 23400001;     // must be a 32-bit Signed Integer (LongInt -2147483648 .. 2147483647)
+    // They need not be set as constants and can be any valid value
+    application_id = 1189021115; // must be a 32-bit Unsigned Integer (Longword 0 .. 4294967295)  https://www.sqlite.org/pragma.html#pragma_application_id
+    user_version = 23400001;     // must be a 32-bit Signed Integer (LongInt -2147483648 .. 2147483647)  https://www.sqlite.org/pragma.html#pragma_user_version
   end;
 
 var
@@ -121,7 +123,8 @@ implementation
   uses
     Unit2, uDisplayGrid, udisplaygrid3;
 
-
+// On creation we check for SQLite capability and load as we find it.
+// If it cant be found, QH will run with some tabs, but not those that need SQLIte backend
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 var
   guid : TGuid;
@@ -131,68 +134,140 @@ var
     Pdlinfo : Pdl_info;
     PtrSQLiteLibraryPath : PChar;
   {$endif}
-  {$ifdef Darwin}
-    LibHandle : Pointer;
-    Pdlinfo : Pdl_info;
-    PtrSQLiteLibraryPath : PChar;
+  {$ifdef darwin}
+     LibHandle : THandle = Default(THandle);
   {$endif}
 begin
-  // SQLiteDefaultLibrary is from the sqlite3dyn unit, new with FPC3.0
-  // but didn't seem to work with Linux.
-  // So SQLDBLibraryLoader instances created for each OS seperately
-  // and the LibraryName adjusted accordingly from the component default value
+  // Initiate calls to SQLite libraries for WINDOWS
   {$ifdef windows}
-    SQLDBLibraryLoaderWindows.ConnectionType := 'SQLite3';
-  {$ifdef CPU32}
-    SQLiteLibraryPath := 'sqlite3-win32.dll';
-  {$else ifdef CPU64}
-    SQLiteLibraryPath := 'sqlite3-win64.dll';
-  {$endif}
-  {$endif}
-  {$ifdef darwin}
-    SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '';
-    //LibHandle := dlopen('/usr/lib/libsqlite3.dylib', RTLD_LAZY);
-    LibHandle := dlopen('libsqlite3.dylib', RTLD_LAZY);
-    if LibHandle <> nil then
-    begin
-      Pdlinfo := LibHandle;
-      PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
-      SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
-      PtrSQLiteLibraryPath := nil;
-      dlclose(LibHandle);
-    end;
-  {$endif}
+  SQLDBLibraryLoaderWindows.ConnectionType := 'SQLite3';
+    {$ifdef CPU32}
+      SQLiteLibraryPath := 'sqlite3-win32.dll';
+    {$else ifdef CPU64}
+      SQLiteLibraryPath := 'sqlite3-win64.dll';
+    {$endif}
+
+  if FileExists(SQLiteLibraryPath) then
+  begin
+   SQLDBLibraryLoaderWindows.LibraryName := SQLiteLibraryPath;
+   SQLDBLibraryLoaderWindows.Enabled := true;
+   SQLDBLibraryLoaderWindows.LoadLibrary;
+
+   if CreateGUID(guid) = 0 then
+   begin
+     strFileNameRandomiser := GUIDToString(guid);
+   end
+   else
+     begin
+       strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
+     end;
+   // write the SQLite database file to system temp
+   SafePlaceForDB := GetTempDir;
+   if ForceDirectories(SafePlaceForDB) then
+   begin
+     SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
+     // Create the database
+     CreateDatabase(SQLite3Connection1.DatabaseName);
+     if SQLIte3Connection1.Connected then
+     begin
+       lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+       DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
+     end;
+   end
+   else
+     begin
+       Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
+     end;
+  end
+  else
+   begin
+     ShowMessage('Cannot create SQLite database. Probably SQLite libraries are not on your system.');
+     MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+     MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
+   end;
+  {$endif} // End of Windows compiler directive
+
+  // Initiate calls to SQLite libraries for LINUX
   {$ifdef linux}
-    SQLDBLibraryLoaderLinux.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '';
-    LibHandle := dlopen('libsqlite3.so.0', RTLD_LAZY);
-    if LibHandle <> nil then
+  SQLDBLibraryLoaderLinux.ConnectionType := 'SQLite3';
+  SQLiteLibraryPath := '';
+  LibHandle := dlopen('libsqlite3.so.0', RTLD_LAZY);
+  if LibHandle <> nil then
+  begin
+    Pdlinfo := LibHandle;
+    PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
+    SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
+    PtrSQLiteLibraryPath := nil;
+    dlclose(LibHandle);
+  end;
+
+  if FileExists(SQLiteLibraryPath) then
+  begin
+  SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath;
+  SQLDBLibraryLoaderLinux.Enabled := true;
+  SQLDBLibraryLoaderLinux.LoadLibrary;
+  if CreateGUID(guid) = 0 then
+   begin
+     strFileNameRandomiser := GUIDToString(guid);
+   end
+   else
+     begin
+       strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
+     end;
+   // write the SQLite database file to system temp
+   SafePlaceForDB := GetTempDir;
+   if ForceDirectories(SafePlaceForDB) then
+   begin
+     SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
+     // Create the database
+     CreateDatabase(SQLite3Connection1.DatabaseName);
+     if SQLIte3Connection1.Connected then
+     begin
+       lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+       DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
+     end;
+   end
+   else
+     begin
+       Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
+     end;
+  end
+  else
+   begin
+     ShowMessage('Cannot create SQLite database. Probably SQLite libraries are not on your system.');
+     MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+     MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
+   end;
+  {$endif}   // End of Linux compiler directive
+
+  // Initiate calls to SQLite libraries for APPLE OSX
+  {$ifdef darwin}
+  // Thanks to OSX being a total and utter pain, moving goal posts with every release of OSX,
+  // and since BigSur has removed libraries, more Skullduggery is required for
+  // that platform. Thanks Apple, from me.
+  SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
+  SQLiteLibraryPath := '';
+
+  // First check the SQLite lib can be loaded by calling the new dynamic cache of Big Sur
+  LibHandle := loadLibrary(PChar('libsqlite3.dylib'));
+
+  // check whether loading was possible and successful but then just unload it
+  // to allow the TSQLDBLibraryLoader to load it, later
+  if LibHandle <> 0 then
     begin
-      Pdlinfo := LibHandle;
-      PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
-      SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
-      PtrSQLiteLibraryPath := nil;
-      dlclose(LibHandle);
-    end;
-  {$endif}
-    if FileExists(SQLiteLibraryPath) then
+      // Nothing is needed here anymore
+    end
+  else ShowMessage('Cannot load SQLite libraries for backend use.' + SysErrorMessage(GetLastOSError));
+
+  // unload library and pass control to TSQLDBLibraryLoader
+  if LibHandle <> NilHandle then
     begin
-      {$ifdef windows}
-        SQLDBLibraryLoaderWindows.LibraryName := SQLiteLibraryPath;
-        SQLDBLibraryLoaderWindows.Enabled := true;
-        SQLDBLibraryLoaderWindows.LoadLibrary;
-      {$endif}
-      {$ifdef darwin}
-        SQLDBLibraryLoaderOSX.LibraryName := SQLiteLibraryPath;
-        SQLDBLibraryLoaderOSX.Enabled := true;
-        SQLDBLibraryLoaderOSX.LoadLibrary;
-      {$endif}
-      {$ifdef linux}
-        SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath;
-        SQLDBLibraryLoaderLinux.Enabled := true;
-        SQLDBLibraryLoaderLinux.LoadLibrary;
-      {$endif}
+      unloadLibrary(LibHandle);
+      SQLDBLibraryLoaderOSX.LibraryName := 'libsqlite3.dylib';
+      SQLDBLibraryLoaderOSX.Enabled := true;
+      SQLDBLibraryLoaderOSX.LoadLibrary;
+
+      // Generate a unique name for the DB
       if CreateGUID(guid) = 0 then
       begin
         strFileNameRandomiser := GUIDToString(guid);
@@ -201,6 +276,7 @@ begin
         begin
           strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
         end;
+
       // write the SQLite database file to system temp
       SafePlaceForDB := GetTempDir;
       if ForceDirectories(SafePlaceForDB) then
@@ -211,19 +287,26 @@ begin
         if SQLIte3Connection1.Connected then
         begin
           lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+          DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
         end;
       end
-      else
-        begin
-          Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
-        end;
-    end
-    else
-      begin
-        ShowMessage('Cannot create SQLite database. Probably SQLite is not installed on your system.');
-        MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
-        MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
-      end;
+    end;
+
+  LibHandle := NilHandle;
+
+  // Method used prior to v3.3.0, for info
+   { SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
+    SQLiteLibraryPath := '';
+    LibHandle := dlopen('libsqlite3.dylib', RTLD_LAZY);
+    if LibHandle <> nil then
+    begin
+      Pdlinfo := LibHandle;
+      PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
+      SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
+      PtrSQLiteLibraryPath := nil;
+      dlclose(LibHandle);
+    end;}
+  {$endif} // End of Apple OSC compiler directive
 end;
 
 
@@ -378,12 +461,14 @@ var
 begin
   result := -1;
   NoOfRows := -1;
+  DBGrid.DataSource.Dataset.DisableControls;
   DBGrid.DataSource.DataSet.First;
   while not DBGrid.DataSource.DataSet.EOF do
   begin
     inc(NoOfRows, 1);
     DBGrid.DataSource.DataSet.Next;
   end;
+  DBGrid.DataSource.Dataset.EnableControls;
   // Go to top of grid.
   DBGrid.DataSource.DataSet.First;
   // Return count
@@ -639,40 +724,49 @@ begin
   KnownHashFlagIsSet := false;
 
   try
+    // Create a filestream for the output CSV. Add a header row first.
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
-    // Now add all the hash strings
+    linetowrite := 'Source Filename, Source Hash, Destination Filename, Destination Hash' + #13#10;
+    n := Length(linetowrite);
+    CSVFileToWrite.Write(linetowrite[1], n);
+
+    // Now add all the hash strings to the CSV file stream
     DBGrid.DataSource.DataSet.First;
+
     // Write all columns, but dont try to include the Known Hash result if not computed to start with
     // This boolean check should be quicker instead of checking for every row whether the field is empty or not
     if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
       else KnownHashFlagIsSet := false;
 
-    while not DBGrid.DataSource.DataSet.EOF do
-    begin
-      if KnownHashFlagIsSet then
+    DBGrid.DataSource.Dataset.DisableControls;
+    try
+      DBGrid.DataSource.Dataset.First;
+      while not DBGrid.DataSource.Dataset.EoF do
       begin
-        // Include all columns except the row count. That's not needed for a CSV output.
-        linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
-                       (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
-                       (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
-                       (DBGrid.DataSource.DataSet.Fields[4].Text) + ',' +
-                       (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
-      end
-      else
+        if KnownHashFlagIsSet then
         begin
-          // Include all columns (except the row count) including the Known Hash Flag result.
+          // Include all columns, inc hash flag, but exclude the row count (not needed for a CSV output).
+          linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[4].Text) + ',' +
+                         (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
+        end
+        else
+          begin
+          // Include all columns, exc hash flag, but exclude the row count (not needed for a CSV output).
           linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
                          (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
                          (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
                          (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
-        end;
-     n := 0;
-     n := Length(linetowrite);
-     try
-       CSVFileToWrite.Write(linetowrite[1], n);
-     finally
-       DBGrid.DataSource.DataSet.Next;
-     end;
+          end;
+        n := 0;
+        n := Length(linetowrite);
+        CSVFileToWrite.Write(linetowrite[1], n);
+        DBGrid.DataSource.Dataset.Next;
+      end;
+    finally
+      DBGrid.DataSource.Dataset.EnableControls;
     end;
   finally
     CSVFileToWrite.Free;
@@ -695,24 +789,27 @@ begin
 
   try
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
-    // Now add all the hash strings
-    DBGrid.DataSource.DataSet.First;
+    linetowrite := 'FolderA Filename, FolderA File Hash, FolderB Filename, FolderB File Hash' + #13#10;
+    n := Length(linetowrite);
+    CSVFileToWrite.Write(linetowrite[1], n);
 
-    while not DBGrid.DataSource.DataSet.EOF do
-    begin
-      // Include all columns
-      linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
-                     (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
-                     (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
-                     (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+    DBGrid.DataSource.Dataset.DisableControls;
+    try
+      DBGrid.DataSource.Dataset.First;
+      while not DBGrid.DataSource.Dataset.EoF do
+      begin
+        linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[2].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[3].Text) + ',' +
+                       (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
 
-     n := 0;
-     n := Length(linetowrite);
-     try
-       CSVFileToWrite.Write(linetowrite[1], n);
-     finally
-       DBGrid.DataSource.DataSet.Next;
-     end;
+        n := 0;
+        n := Length(linetowrite);
+        CSVFileToWrite.Write(linetowrite[1], n);
+        DBGrid.DataSource.Dataset.Next;
+      end;
+    finally
+      DBGrid.DataSource.Dataset.EnableControls;
     end;
   finally
     CSVFileToWrite.Free;
@@ -720,26 +817,6 @@ begin
   Mainform.StatusBar2.SimpleText := 'DONE';
   ShowMessage('Grid data now in ' + Filename);
 end;
-
-  {// Go to start of grid
-  DBGrid.DataSource.DataSet.First;
-  // And export it
-  try
-    Exporter := TCSVExporter.Create(nil);
-    ExportSettings := TCSVFormatSettings.Create(true);
-    Exporter.FormatSettings := ExportSettings;
-    Exporter.Dataset := DBGrid.DataSource.DataSet;
-    Exporter.FileName := FileName;
-    if Exporter.Execute > 0 then
-      begin
-        ShowMessage('CSV saved as ' + Filename);
-      end
-    else Showmessage('Could not save to CSV file ' + Filename);
-  finally
-    Exporter.Free;
-    ExportSettings.Free;
-  end; }
-
 
 // Copies a DBGrid content to a temp text file then reads it into clipboard
 procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
@@ -827,7 +904,8 @@ begin
 
   slDuplicatesDeleted := TStringList.Create;
   slDuplicatesDeleted.Sorted := true;
-
+  DBGrid.DataSource.DataSet.DisableControls;
+  DBGrid.DataSource.Dataset.First;
   while not DBGrid.DataSource.DataSet.EOF do
     begin
       for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
@@ -855,6 +933,8 @@ begin
         DBGrid.DataSource.DataSet.Next;
       end;
     end;
+    DBGrid.DataSource.DataSet.EnableControls;
+
     // Allow user the choice to save results of the duplicate file deletions
     try
       if MessageDlg(IntToStr(FileDeletedCount) + ' duplicate files deleted. Save details to text file?', mtConfirmation,
@@ -1002,7 +1082,7 @@ begin
 end;
 
 // Used by the FILES tab display grid to sort by the Yes\No values of Known Hash import
-procedure TfrmSQLiteDBases.SoryByHashList(DBGrid : TDBGrid);
+procedure TfrmSQLiteDBases.SortByHashList(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
@@ -1178,6 +1258,7 @@ begin
         linetowrite := Header + #13#10;
         tempfile.Write(linetowrite[1], Length(linetowrite));
         // Now add all the hash strings
+        DBGrid.DataSource.DataSet.DisableControls;
         DBGrid.DataSource.DataSet.First;
         while not DBGrid.DataSource.DataSet.EOF do
         begin
@@ -1189,6 +1270,7 @@ begin
             DBGrid.DataSource.DataSet.Next;
           end;
         end;
+        DBGrid.DataSource.DataSet.EnableControls;
       finally
         tempfile.Free;
       end;
@@ -1203,12 +1285,14 @@ begin
     try
       slFileHashes := TStringList.Create;
       slFileHashes.Add(Header); // Give the list a header of the chosen hash algorithm
+      DBGrid.DataSource.DataSet.DisableControls;
       DBGrid.DataSource.DataSet.First;
       while not DBGrid.DataSource.DataSet.EOF do
       begin
         slFileHashes.Add(DBGrid.DataSource.DataSet.Fields[3].Text);
         DBGrid.DataSource.DataSet.Next;
       end;
+      DBGrid.DataSource.DataSet.EnableControls;
       Clipboard.AsText := slFileHashes.Text;
     finally
       slFileHashes.Free;
@@ -1236,7 +1320,6 @@ begin
         sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFilename').AsString := '';
         sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFileHash').AsString := '';
         sqlCOMPARETWOFOLDERS.ExecSQL;
-        //SQLTransaction1.CommitRetaining;
       except
           on E: EDatabaseError do
           begin
@@ -1259,7 +1342,6 @@ begin
     sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderAFileHash').AsString := Col2;
     sqlCOMPARETWOFOLDERS.Params.ParamByName('Counter').AsString := IntToStr(Counter);
     sqlCOMPARETWOFOLDERS.ExecSQL;
-    //SQLTransaction1.CommitRetaining;
 
     //TODO : Consider creating a new DBGrid for this tab
     // Or, work out how to ensure it gets refreshed if used for Copy tab
@@ -1283,9 +1365,8 @@ begin
     SQLTransaction1.Active := True;
     sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFilename').AsString := Col3;
     sqlCOMPARETWOFOLDERS.Params.ParamByName('FolderBFileHash').AsString := Col4;
-    sqlCOMPARETWOFOLDERS.Params.ParamByName('Counter').AsString := IntToStr(Counter);
+    sqlCOMPARETWOFOLDERS.Params.ParamByName('Counter').AsString         := IntToStr(Counter);
     sqlCOMPARETWOFOLDERS.ExecSQL;
-    //SQLTransaction1.CommitRetaining;
 
     //TODO : Consider creating a new DBGrid for this tab
     // Or, work out how to ensure it gets refreshed if used for Copy tab
@@ -1295,6 +1376,44 @@ begin
       begin
         MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
       end;
+  end;
+end;
+
+// Used by the COMPARE TWO FOLDERS grid to display mis-matched files and hashes to the user via right click option
+// New to v3.3.0
+procedure TfrmSQLiteDBases.ShowMismatchesC2F(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT ID, FolderAndFileNameA, FolderAndFileNameAHash, FolderAndFileNameB, FolderAndFileNameBHash ' +
+                          'FROM TBL_COMPARE_TWO_FOLDERS WHERE FolderAndFileNameAHash <> FolderAndFileNameBHash';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+end;
+
+// Used by the COMPARE TWO FOLDERS grid to show all items
+procedure TfrmSQLiteDBases.ShowAllC2FGRID(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlCOMPARETWOFOLDERS but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+  except
+    on E: EDatabaseError do
+    begin
+      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+    end;
   end;
 end;
 
@@ -1314,11 +1433,11 @@ begin
     sqlCOPY.Close;
     sqlCOPY.SQL.Text := 'INSERT into TBL_COPY (SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes) values (:SourceFilename,:SourceHash,:DestinationFilename,:DestinationHash,:DateAttributes)';
     SQLTransaction1.Active := True;
-    sqlCOPY.Params.ParamByName('SourceFilename').AsString := Col1;
-    sqlCOPY.Params.ParamByName('SourceHash').AsString := Col2;
+    sqlCOPY.Params.ParamByName('SourceFilename').AsString      := Col1;
+    sqlCOPY.Params.ParamByName('SourceHash').AsString          := Col2;
     sqlCOPY.Params.ParamByName('DestinationFilename').AsString := Col3;
-    sqlCOPY.Params.ParamByName('DestinationHash').AsString := Col4;
-    sqlCOPY.Params.ParamByName('DateAttributes').AsString := Col5;
+    sqlCOPY.Params.ParamByName('DestinationHash').AsString     := Col4;
+    sqlCOPY.Params.ParamByName('DateAttributes').AsString      := Col5;
     sqlCOPY.ExecSQL;
   except
     on E: EDatabaseError do
@@ -1422,28 +1541,12 @@ begin
   end;
 end;
 
-procedure TfrmSQLiteDBases.ShowAllC2FGRID(DBGrid : TDBGrid);
-begin
-  try
-    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlCOMPARETWOFOLDERS but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';
-    SQLite3Connection1.Connected := True;
-    SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
-    DBGrid.DataSource.Dataset.Open;
-  except
-    on E: EDatabaseError do
-    begin
-      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
-    end;
-  end;
-end;
-
 // Saves the grid in COPY window to HTML. If small volume of records, uses a stringlist.
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
 var
-   strTitle, SourceFilename, DestinationFileName, DateAttributes, SourceFileHash, DestinationFileHash : string;
+   strTitle, strTableHeader, SourceFilename, DestinationFileName, DateAttributes,
+     SourceFileHash, DestinationFileHash : string;
   NoOfRowsInGrid    : integer;
   sl                : TStringList;
   fs                : TFileStreamUTF8;
@@ -1454,6 +1557,11 @@ var
     strBODYHeader      = '<BODY>'  ;
     strTABLEROWStart   = '<TR>'    ;
     strTABLEDATAStart  = '<TD>'    ;
+    strSrcFilenameHead = '<td>Source Filename</td>';
+    strSrcHashHead     = '<td>Source Hash</td>';
+    strDestFilenameHead= '<td>Destination Filename</td>';
+    strDestHashHead    = '<td>Destination Hash</td>';
+    strDateAttr        = '<td>Original Date Attributes</td>';
     strTABLEDataEnd    = '</TD>'   ;
     strTABLEROWEnd     = '</TR>'   ;
     strTABLEFooter     = '</TABLE>';
@@ -1476,6 +1584,8 @@ begin
     sl.add('<BODY>');
     sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
     sl.add('<table border=1>');
+    sl.add('<tr><td>Source Filename</td><td>Source Hash</td><td>Destination Filename</td><td>Destination Hash</td><td>Original Date Attributes</td></tr>');
+
     DBGrid.DataSource.DataSet.DisableControls;
     DBGrid.DataSource.DataSet.First;
     while not DBGrid.DataSource.DataSet.EOF do
@@ -1517,6 +1627,7 @@ begin
       end
     else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
 
+    // Create HTML Header Data
     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
     strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
     Application.ProcessMessages;
@@ -1530,6 +1641,12 @@ begin
     fs.Write(strTitle[1], Length(strTitle));
     fs.Write(#13#10, 2);
     fs.Write('<table border=1>', 16);
+
+    // Add a header row to the HTML
+    strTableHeader := '<tr>'+ strSrcFilenameHead + strSrcHashHead + strDestFilenameHead + strDestHashHead + strDateAttr + '</tr>';
+    fs.Write(strTableHeader[1], Length(strTableHeader));
+
+    // Now write the main table content, row by row
 
     { strTABLEROWStart   = '<TR>'      = 4 bytes
       strTABLEDATAStart  = '<TD>'      = 4 bytes
@@ -1593,12 +1710,12 @@ begin
     fs.Write(strHTMLFooter, 7);
     fs.Write(#13#10, 2);
     finally
+      DBGrid.DataSource.DataSet.EnableControls;
       fs.free;
       MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
       Showmessage('Data saved to HTML file ' + Filename);
       Application.ProcessMessages;
     end;
-  DBGrid.DataSource.DataSet.EnableControls;
 end;
 
 // Saves the "Compare Two Folders" grid to HTML. If small volume of records, uses a stringlist.
@@ -1741,12 +1858,12 @@ begin
     fs.Write(strHTMLFooter, 7);
     fs.Write(#13#10, 2);
     finally
+      DBGrid.DataSource.DataSet.EnableControls;
       fs.free;
       MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
       Showmessage('Data saved to HTML file ' + Filename);
       Application.ProcessMessages;
     end;
-  DBGrid.DataSource.DataSet.EnableControls;
 end;
 
 // There is an UpdateGridXXX routine for each tab where a DBGrid is used.
