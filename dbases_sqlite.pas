@@ -1,23 +1,3 @@
-{   Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
-                     and generating hash values for them.
-
-    Copyright (C) 2011-2020  Ted Smith www.quickhash-gui.org
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    any later version. This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You can read a copy of the GNU General Public License at
-    http://www.gnu.org/licenses/>. Also, http://www.gnu.org/copyleft/gpl.html
-
-    Use of the name 'QuickHash GUI' must refer to this utility
-    only and must not be re-used in another tool if based upon this code.
-    The code is Copyright of Ted Smith 2011 - 2020 (www.quickhash-gui.org)
-}
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
 {$mode objfpc}{$H+} // {$H+} ensures all strings are of unlimited size, and set as ansistring
@@ -1330,8 +1310,8 @@ begin
 end;
 
 procedure TfrmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(Col1, Col2 : string; Counter : integer);
-{ Col3 : Filename from Folder B
-  Col4 : Hashvalue from FileB in FolderB
+{ Col1 : Filename from Folder A
+  Col2 : Hashvalue from FileA in FolderA
 }
 begin
   try
@@ -1343,9 +1323,6 @@ begin
     sqlCOMPARETWOFOLDERS.Params.ParamByName('Counter').AsString := IntToStr(Counter);
     sqlCOMPARETWOFOLDERS.ExecSQL;
 
-    //TODO : Consider creating a new DBGrid for this tab
-    // Or, work out how to ensure it gets refreshed if used for Copy tab
-    // Use DBGrid.DataSource.DataSet.EnableControls; via popup menu options when adding the various capabilities
   except
       on E: EDatabaseError do
       begin
@@ -1368,9 +1345,6 @@ begin
     sqlCOMPARETWOFOLDERS.Params.ParamByName('Counter').AsString         := IntToStr(Counter);
     sqlCOMPARETWOFOLDERS.ExecSQL;
 
-    //TODO : Consider creating a new DBGrid for this tab
-    // Or, work out how to ensure it gets refreshed if used for Copy tab
-    // Use DBGrid.DataSource.DataSet.EnableControls; via popup menu options when adding the various capabilities
   except
       on E: EDatabaseError do
       begin

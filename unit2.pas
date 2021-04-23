@@ -2711,8 +2711,7 @@ begin
             memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderA));
             {$ENDIF}
         {$endif}
-      slFileListA := TStringList.Create;
-      slFileListA.Sorted := true;
+
       slFileListA := RetrieveFileList(FolderA);
       FolderAFileCount := slFileListA.Count;
       lblTotalFileCountNumberA.Caption := IntToStr(FolderAFileCount);
@@ -2733,8 +2732,6 @@ begin
             {$ENDIF}
         {$endif}
 
-        slFileListB := TStringList.Create;
-        slFileListB.Sorted := true;
         slFileListB := RetrieveFileList(FolderB);
         FolderBFileCount := slFileListB.Count;
         lblTotalFileCountNumberB.Caption := IntToStr(FolderBFileCount);

@@ -9,12 +9,12 @@ object frmSQLiteDBases: TfrmSQLiteDBases
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
+  LCLVersion = '2.0.10.0'
   object lblConnectionStatus: TLabel
     Left = 32
-    Height = 16
+    Height = 15
     Top = 32
-    Width = 92
+    Width = 81
     Caption = 'Not Connected'
     ParentColor = False
   end

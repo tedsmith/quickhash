@@ -11,7 +11,7 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   OnCreate = FormCreate
   OnShow = btnRefreshDiskListClick
   Position = poDesktopCenter
-  LCLVersion = '2.0.4.0'
+  LCLVersion = '2.0.10.0'
   object Label2: TLabel
     Left = 16
     Height = 15
@@ -288,8 +288,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       TimeFormat = tf24
       TimeDisplay = tdHM
       DateMode = dmComboBox
-      Date = 1.7E308
-      Time = 1.7E308
+      Date = 1.79769313486232E308
+      Time = 1.79769313486232E308
       UseDefaultSeparators = True
       HideDateTimeParts = []
       MonthNames = 'Long'
@@ -318,8 +318,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
   object ImageList1: TImageList
     Height = 32
     Width = 32
-    left = 688
-    top = 24
+    Left = 688
+    Top = 24
     Bitmap = {
       4C69030000002000000020000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
@@ -709,8 +709,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     }
   end
   object PopupMenu1: TPopupMenu
-    left = 600
-    top = 24
+    Left = 600
+    Top = 24
     object menShowDiskManager: TMenuItem
       Caption = 'Show Disk Manager'
       OnClick = menShowDiskManagerClick
@@ -725,11 +725,11 @@ object frmDiskHashingModule: TfrmDiskHashingModule
     end
   end
   object sdLogFile: TSaveDialog
-    left = 616
-    top = 392
+    Left = 616
+    Top = 392
   end
   object DiskHashingTimer: TTimer
-    left = 712
-    top = 272
+    Left = 712
+    Top = 272
   end
 end
