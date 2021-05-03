@@ -904,8 +904,7 @@ begin
                          (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
                          (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
                          (DBGrid.DataSource.DataSet.Fields[3].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[4].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[5].Text));
+                         (DBGrid.DataSource.DataSet.Fields[4].Text));
           DBGrid.DataSource.Dataset.Next;
         end;
       finally
@@ -1758,7 +1757,7 @@ end;
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveC2FWindowToHTML(DBGrid : TDBGrid; Filename : string);
 var
-  strTitle, FolderAFilenameA, FolderAFilenameAHash, FolderBFilenameB, FolderBFilenameBHash : string;
+  strTitle, strFilename, FilepathA, FilePathB, FileHashA, FileHashB : string;
   NoOfRowsInGrid    : integer;
   sl                : TStringList;
   fs                : TFileStreamUTF8;
@@ -1796,14 +1795,16 @@ begin
     while not DBGrid.DataSource.DataSet.EOF do
       begin
           sl.add('<tr>');
-          FolderAFilenameA := DBGrid.DataSource.DataSet.Fields[1].Value;
-          sl.add('<td>'+FolderAFilenameA+'</td>');
-          FolderAFilenameAHash := DBGrid.DataSource.DataSet.Fields[2].Value;
-          sl.add('<td>'+FolderAFilenameAHash+'</td>');
-          FolderBFilenameB := DBGrid.DataSource.DataSet.Fields[3].Value;
-          sl.add('<td>'+FolderBFilenameB+'</td>');
-          FolderBFilenameBHash := DBGrid.DataSource.DataSet.Fields[4].Value;
-          sl.add('<td>'+FolderBFilenameBHash+'</td>');
+          strFileName := DBGrid.DataSource.DataSet.Fields[0].Value;
+          sl.add('<td>'+strFileName+'</td>');
+          FilepathA := DBGrid.DataSource.DataSet.Fields[1].Value;
+          sl.add('<td>'+FilepathA+'</td>');
+          FileHashA := DBGrid.DataSource.DataSet.Fields[2].Value;
+          sl.add('<td>'+FileHashA+'</td>');
+          FilepathB := DBGrid.DataSource.DataSet.Fields[3].Value;
+          sl.add('<td>'+FilepathB+'</td>');
+          FileHashB := DBGrid.DataSource.DataSet.Fields[4].Value;
+          sl.add('<td>'+FileHashB+'</td>');
           sl.add('</tr>');
           DBGrid.DataSource.DataSet.Next;
         end;
@@ -1853,32 +1854,40 @@ begin
       begin
         // Start new row
         fs.Write(strTABLEROWStart[1], 4);
-        // Get the Folder A Filename A filename
-        FolderAFilenameA := DBGrid.DataSource.DataSet.Fields[1].Value;
+
+        // Column1
+        strFileName := DBGrid.DataSource.DataSet.Fields[0].Value;
         // Write Folder A Filename A to row
         fs.Write(strTABLEDATAStart[1], 4);
-        fs.Write(FolderAFilenameA[1], Length(FolderAFilenameA));
+        fs.Write(strFileName[1], Length(strFileName));
         fs.Write(strTABLEDataEnd[1], 5);
 
-        // Get the Folder A Filename hash
-        FolderAFilenameAHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+        // Column2
+        FilepathA := DBGrid.DataSource.DataSet.Fields[1].Value;
         // Write Folder A Filename hash to row
         fs.Write(strTABLEDATAStart[1], 4);
-        fs.Write(FolderAFilenameAHash[1], Length(FolderAFilenameAHash));
+        fs.Write(FilepathA[1], Length(FilepathA));
         fs.Write(strTABLEDATAEnd[1], 5);
 
-        // Get the Folder B Filename B filename
-        FolderBFilenameB := DBGrid.DataSource.DataSet.Fields[3].Value;
+        // Column3
+        FileHashA := DBGrid.DataSource.DataSet.Fields[2].Value;
         // Write the Filename B
         fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(FolderBFilenameB[1], Length(Trim(FolderBFilenameB)));
+        fs.Write(FileHashA[1], Length(FileHashA));
         fs.Write(strTABLEDATAEnd[1], 5);
 
-        // Get the Folder B Filename B hash
-        FolderBFilenameBHash := DBGrid.DataSource.DataSet.Fields[4].Value;
+        // Column4
+        FilepathB := DBGrid.DataSource.DataSet.Fields[3].Value;
         // Write the Folder B Filename B hash
         fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(FolderBFilenameBHash[1], Length(Trim(FolderBFilenameBHash)));
+        fs.Write(FilepathB[1], Length(FilepathB));
+        fs.Write(strTABLEDATAEnd[1], 5);
+
+        // Column5
+        FileHashB := DBGrid.DataSource.DataSet.Fields[4].Value;
+        // Write the Folder B Filename B hash
+        fs.Write(strTABLEDATAStart[1], 4) ;
+        fs.Write(FileHashB[1], Length(FileHashB));
         fs.Write(strTABLEDATAEnd[1], 5);
 
         // End the row
