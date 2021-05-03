@@ -195,6 +195,7 @@ type
     btnLoadHashList                       : TButton;
     btnPreserveDB: TButton;
     Button8CopyAndHash                    : TButton;
+    FileSDelimiterComboBox: TComboBox;
     cbFlipCaseFILE                        : TCheckBox;
     cbToggleInputDataToOutputFile         : TCheckBox;
     b64ProgressFileS                      : TEdit;
@@ -202,9 +203,11 @@ type
     cbUNCModeCompFolders                  : TCheckBox;
     cbSaveComparisons                     : TCheckBox;
     cbLoadHashList                        : TCheckBox;
+    C2FDelimiterComboBox: TComboBox;
     edtUNCPathCompareA                    : TEdit;
     edtUNCPathCompareB                    : TEdit;
     FileSDBNavigator                      : TDBNavigator;
+    CopyDelimiterComboBox: TComboBox;
     lblTotalFileCountNumberA              : TLabel;
     lblTotalFileCountA                    : TLabel;
     lblCompareTwoFoldersInstruction1      : TLabel;
@@ -409,6 +412,9 @@ type
     procedure btnMakeTextLowerClick(Sender: TObject);
     procedure btnMakeTextUpperClick(Sender: TObject);
     procedure btnPreserveDBClick(Sender: TObject);
+    procedure C2FDelimiterComboBoxChange(Sender: TObject);
+    procedure FileSDelimiterComboBoxChange(Sender: TObject);
+    procedure CopyDelimiterComboBoxChange(Sender: TObject);
     procedure cbFlipCaseFILEChange(Sender: TObject);
     procedure cbFlipCaseTEXTChange(Sender: TObject);
     procedure cbLoadHashListChange(Sender: TObject);
@@ -564,17 +570,24 @@ type
 
    MultipleDirsChosen, StartHashing : boolean;
 
+   ChosenDelimiter : string;                // New to v3.3.0 for enabling user to set their own delimiter
+
    {$IFDEF WINDOWS}
-   // For copying better with 260 MAX_PATH limits of Windows. Instead we invoke Unicode
+   // For copying better with 255 MAX_PATH limits of Windows. Instead we invoke Unicode
    // variant of FindAllFiles by using '\\?\' and '\\?\UNC\' prefixes. LongPathOverride
-   // will always either be '\\?\' or '\\?\UNC\'
+   // will always either be '\\?\' or '\\?\UNC\'. This allows for potentially
+   // longer lengths that the FILESYSTEM allows, even if the OS does not.
+   // MAX_PATH is 4096 in Linux. 1024 in OSX so not needed for these systems
+   // Note that the filename length in BYTES cannot exceed 255, but, use of Unicode
+   // can trick the system because 1 char can equal 2 (UTF8), 3 or 4 (UTF16) bytes
+   // https://www.ibm.com/docs/en/spectrum-protect/8.1.9?topic=parameters-file-specification-syntax
 
    LongPathOverride : string;
 
    {$else}
     {$IFDEF Darwin}
       const
-        LongPathOverride : string = '';     // MAX_PATH is 4096 is Linux & Mac, so not needed
+        LongPathOverride : string = '';     // MAX_PATH is 4096 in Linux. 1024 in OSX, so not needed
         LongPathOverrideA : string = '';
         LongPathOverrideB : string = '';
         {$else}
@@ -651,7 +664,7 @@ begin
   StopScan2    := false;
 
   {$ifdef Windows}
-  // These are the default values to be prefixed before a path to invoke the 32K
+  // These are the default values to be prefixed before a path to invoke longer
   // NTFS filename length over the 260 MAX_PATH. Where the user opts for UNC paths
   // as well, it becomes '\\?\UNC\'
   LongPathOverride := '\\?\';
@@ -1689,7 +1702,7 @@ begin
   FilesDBGrid_SaveCSVDialog.DefaultExt := 'csv';
   if FilesDBGrid_SaveCSVDialog.Execute then
   begin
-    frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid1, FilesDBGrid_SaveCSVDialog.Filename);
+    frmSQLiteDBases.SaveFileSDBToCSV(RecursiveDisplayGrid1, FilesDBGrid_SaveCSVDialog.Filename);
   end;
 end;
 
@@ -2150,6 +2163,7 @@ begin
   end;
 end;
 
+
 procedure TMainForm.cbFlipCaseFILEChange(Sender: TObject);
 var
   i : integer;
@@ -2290,7 +2304,7 @@ var
   start, stop, elapsed         : TDateTime;
 
   begin
-  PageControl1.ActivePage := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
+  PageControl1.ActivePage       := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
   FileCounter                   := 1;
   TotalBytesRead                := 0;
   lblNoFilesInDir.Caption       := '...';
@@ -2309,6 +2323,24 @@ var
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
   frmSQLiteDBases.EmptyDBTable('TBL_FILES', RecursiveDisplayGrid1);
+
+  // Set any custom delimiter. Uses ',' by default, unless chosen otherwise
+  ChosenDelimiter := FileSDelimiterComboBox.Text;
+  if ChosenDelimiter = 'Set Delimiter' then
+  begin
+    ChosenDelimiter := ',';
+  end
+    else  // Tab is non-printable, so requires conversion to #9
+    if ChosenDelimiter = 'Tab' then
+    begin
+      ChosenDelimiter := #9;
+    end
+      else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+      if ChosenDelimiter = 'Space' then
+      begin
+        ChosenDelimiter := #32;
+      end;
+
   // Now get the user to choose his folder for hashing
   if SelectDirectoryDialog1.Execute then
     begin
@@ -2570,6 +2602,30 @@ begin
   result := sl;
 end;
 
+procedure TMainForm.C2FDelimiterComboBoxChange(Sender: TObject);
+begin
+  if C2FDelimiterComboBox.Text = 'Space' then
+  begin
+    ShowMessage('Using space is not wise. Are you sure?');
+  end;
+end;
+
+procedure TMainForm.FileSDelimiterComboBoxChange(Sender: TObject);
+begin
+if FileSDelimiterComboBox.Text = 'Space' then
+ begin
+   ShowMessage('Using space is not wise. Are you sure?');
+ end;
+end;
+
+procedure TMainForm.CopyDelimiterComboBoxChange(Sender: TObject);
+begin
+if CopyDelimiterComboBox.Text = 'Space' then
+ begin
+   ShowMessage('Using space is not wise. Are you sure?');
+ end;
+end;
+
  // btnCompareClick : Will compare the listings of two directories, inc hidden files
  // The user is not presented with a choice for hiddne files because a comparison
  // of directories must be an exacting process.
@@ -2591,7 +2647,6 @@ var
 
 begin
   // Initialise vars and display captions, to ensure any previous runs are cleared
-
   pbCompareDirA.Position := 0;
   pbCompareDirB.Position := 0;
   FolderA                := '';
@@ -2602,6 +2657,24 @@ begin
   lblTotalFileCountNumberA.Caption := '';
   lblTotalFileCountNumberB.Caption := '';
   memFolderCompareSummary.Clear;
+
+  // Set Delimiter to use. If the user does not choose one, just use comma as normal
+  // New to v3.3.0
+  ChosenDelimiter := C2FDelimiterComboBox.Text;
+  if ChosenDelimiter = 'Set Delimiter' then
+  begin
+    ChosenDelimiter := ',';
+  end
+    else  // Tab is non-printable, so requires conversion to #9
+    if ChosenDelimiter = 'Tab' then
+    begin
+      ChosenDelimiter := #9;
+    end
+      else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+      if ChosenDelimiter = 'Space' then
+      begin
+        ChosenDelimiter := #32;
+      end;
 
   // Empty database table TBL_COMPARE_TWO_FOLDERS from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
@@ -2738,7 +2811,7 @@ begin
 
         //Populate database with all rows required for the biggest of the two folders
         // If they match, just use the FolderA file count
-        if FolderAFileCount > FolderBFileCount then
+       { if FolderAFileCount > FolderBFileCount then
         begin
         frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderAFileCount);
         end
@@ -2750,7 +2823,7 @@ begin
             begin
             frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderAFileCount);
             end;
-
+        }
         // If the file counts match in both Folders
 
         if FolderAFileCount = FolderBFileCount then
@@ -2763,12 +2836,12 @@ begin
           if CompareHashLists(tfpHashListA, tfpHashListB) then
             begin
               memFolderCompareSummary.Lines.Add('Result : MATCH!');
-              StatusBar6.SimpleText := 'The file CONTENT of both folders are the same. MATCH!';
+              StatusBar6.SimpleText := 'The binary file CONTENT of both folders are the same (filenames not considered). MATCH!';
             end
           else
           begin
             memFolderCompareSummary.Lines.Add('Result : MIS-MATCH!');
-            StatusBar6.SimpleText := 'The file CONTENT of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!';
+            StatusBar6.SimpleText := 'The binary file CONTENT of both folders are NOT the same. File count is the same, but file hashes differ. MIS-MATCH!';
           end;
           tfpHashListA.Free;
           tfpHashListB.Free;
@@ -2837,6 +2910,8 @@ begin
    // Commit any final database values that may not have yet been comitted
    // and make the display grid of compared folder content visible
   frmSQLiteDBases.SQLTransaction1.CommitRetaining;
+  frmSQLiteDBases.FFilePathA:=RemoveLongPathOverrideChars(FolderA, LongPathOverride); //DS (new)
+  frmSQLiteDBases.FFilePathB:=RemoveLongPathOverrideChars(FolderB, LongPathOverride); //DS (new)
   frmSQLiteDBases.UpdateGridCOMPARETWOFOLDERSTAB(nil);
   frmDisplayGrid3.Visible := true;
   frmDisplayGrid3.Show;
@@ -2868,7 +2943,7 @@ begin
 
     // Create and initialise hash list
     HashListA := TFPHashList.Create;
-    HeaderLineA := 'Computed hashes from ' + Path + ' : ' + #13#10;
+    HeaderLineA := 'Computed hashes from ' + RemoveLongPathOverrideChars(Path, LongPathOverride)  + ' : ' + #13#10;
     HeaderLineB := '=====================' + #13#10;
 
     if SaveData then
@@ -2886,13 +2961,16 @@ begin
 
         // Write values to database. +1 because DB rowcount is not zero based
         {$ifdef Windows}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal); //DS (new)
         {$else}
         {$ifdef Darwin}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
         {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
         {$ENDIF}
         {$endif}
 
@@ -2900,13 +2978,13 @@ begin
           begin
             StringLength := -1;
             {$ifdef Windows}
-              StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+              StringToWrite := HashVal + ChosenDelimiter + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
             {$else}
               {$ifdef Darwin}
-                StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+                StringToWrite := HashVal + ChosenDelimiter + slFileListA.Strings[i] + #13#10;
             {$endif}
               {$IFDEF UNIX and !$ifdef Darwin}
-                StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+                StringToWrite := HashVal + ChosenDelimiter + slFileListA.Strings[i] + #13#10;
               {$ENDIF}
             {$endif}
             StringLength := Length(StringToWrite);
@@ -2921,13 +2999,16 @@ begin
         HashListA.Add(HashVal, @HashVal);
         // Write values to database
         {$ifdef Windows}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal); //DS (new)
         {$else}
         {$ifdef Darwin}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
         {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
         {$ENDIF}
         {$endif}
 
@@ -2935,13 +3016,13 @@ begin
          begin
           StringLength := -1;
           {$ifdef Windows}
-            StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
+            StringToWrite := HashVal + ChosenDelimiter + (RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride)) + #13#10;
           {$else}
             {$ifdef Darwin}
-              StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+              StringToWrite := HashVal + ChosenDelimiter + slFileListA.Strings[i] + #13#10;
           {$endif}
             {$IFDEF UNIX and !$ifdef Darwin}
-              StringToWrite := HashVal + ',' + slFileListA.Strings[i] + #13#10;
+              StringToWrite := HashVal + ChosenDelimiter + slFileListA.Strings[i] + #13#10;
             {$ENDIF}
           {$endif}
           StringLength := Length(StringToWrite);
@@ -2982,7 +3063,7 @@ begin
 
     // Create and initialise hash list
     HashListB := TFPHashList.Create;
-    HeaderLineA := 'Computed hashes from ' + Path + ' : ' + #13#10;
+    HeaderLineA := 'Computed hashes from ' + RemoveLongPathOverrideChars(Path, LongPathOverride) + ' : ' + #13#10;
     HeaderLineB := '=====================' + #13#10;
 
     if SaveData then
@@ -2999,13 +3080,16 @@ begin
           HashListB.Add(HashVal, @HashVal);
           // Write values to database  +1 because DB rowcount is not zero based
           {$ifdef Windows}
-          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
+          //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal); //DS (new)
           {$else}
           {$ifdef Darwin}
-          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+          //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
           {$endif}
           {$IFDEF UNIX and !$ifdef Darwin}
-          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+          //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
           {$ENDIF}
           {$endif}
 
@@ -3013,13 +3097,13 @@ begin
             begin
               StringLength := -1;
               {$ifdef Windows}
-               StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+               StringToWrite := HashVal + ChosenDelimiter + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
               {$else}
                {$ifdef Darwin}
-                 StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+                 StringToWrite := HashVal + ChosenDelimiter + slFileListB.Strings[j] + #13#10;
               {$endif}
                {$IFDEF UNIX and !$ifdef Darwin}
-                 StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+                 StringToWrite := HashVal + ChosenDelimiter + slFileListB.Strings[j] + #13#10;
                {$ENDIF}
               {$endif}
               StringLength := Length(StringToWrite);
@@ -3035,13 +3119,16 @@ begin
 
         // Write values to database
         {$ifdef Windows}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal); //DS (new)
         {$else}
         {$ifdef Darwin}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
         {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
         {$ENDIF}
         {$endif}
 
@@ -3049,13 +3136,13 @@ begin
           begin
             StringLength := -1;
             {$ifdef Windows}
-              StringToWrite := HashVal + ',' + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
+              StringToWrite := HashVal + ChosenDelimiter + (RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride)) + #13#10;
             {$else}
              {$ifdef Darwin}
-               StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+               StringToWrite := HashVal + ChosenDelimiter + slFileListB.Strings[j] + #13#10;
             {$endif}
              {$IFDEF UNIX and !$ifdef Darwin}
-               StringToWrite := HashVal + ',' + slFileListB.Strings[j] + #13#10;
+               StringToWrite := HashVal + ChosenDelimiter + slFileListB.Strings[j] + #13#10;
              {$ENDIF}
             {$endif}
             StringLength := Length(StringToWrite);
@@ -3137,6 +3224,23 @@ begin
   LoopCounter                      := 0;
   Button8CopyAndHash.Enabled       := false; // disable the go button until finished
   StopScan2                        := false;
+
+  ChosenDelimiter := CopyDelimiterComboBox.Text;
+  if ChosenDelimiter = 'Set Delimiter' then
+  begin
+    ChosenDelimiter := ',';
+  end
+    else  // Tab is non-printable, so requires conversion to #9
+    if ChosenDelimiter = 'Tab' then
+    begin
+      ChosenDelimiter := #9;
+    end
+      else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+      if ChosenDelimiter = 'Space' then
+      begin
+        ChosenDelimiter := #32;
+      end;
+
 
   // User just wants a sub-folder listing as text
   if CheckBoxListOfDirsOnly.Checked then
@@ -4708,7 +4812,7 @@ begin
         if SaveDialog3.Execute then
           begin
             CSVLogFile2 := SaveDialog3.FileName;
-            frmSQLiteDBases.SaveDBToCSV(frmDisplayGrid1.RecursiveDisplayGrid_COPY, CSVLogFile2);
+            frmSQLiteDBases.SaveFileSDBToCSV(frmDisplayGrid1.RecursiveDisplayGrid_COPY, CSVLogFile2);
           end;
       end;
 

@@ -17,6 +17,7 @@ type
     btnC2FClipboard: TButton;
     dbGridC2F: TDBGrid;
     DBNavigator_C2F: TDBNavigator;
+    MenuItem_C2F_SelectedRowsC2FGRID: TMenuItem;
     MenuItem_C2F_ShowMismatches: TMenuItem;
     MenuItem_C2FToHTML: TMenuItem;
     MenuItem_C2F_SaveResultsCSV: TMenuItem;
@@ -26,6 +27,7 @@ type
     PopupMenu_C2FGrid: TPopupMenu;
     frmDisplayGrid3SaveDialog: TSaveDialog;
     procedure btnC2FClipboardClick(Sender: TObject);
+    procedure MenuItem_C2F_SelectedRowsC2FGRIDClick(Sender: TObject);
     procedure MenuItem_C2F_ShowMismatchesClick(Sender: TObject);
     procedure MenuItem_C2FToHTMLClick(Sender: TObject);
     procedure MenuItem_C2F_SaveResultsCSVClick(Sender: TObject);
@@ -103,14 +105,14 @@ begin
 
   if FileExists(frmDisplayGrid3SaveDialog.FileName) = true then
   begin
-    ShowMessage('Chosen file already exists. Please specify different filename');
-  end
-  else
-    if frmDisplayGrid3SaveDialog.Execute then
-    begin
-      ExportFilename := frmDisplayGrid3SaveDialog.FileName;
-      frmSQLiteDBases.SaveC2FDBToCSV(dbGridC2F, ExportFilename);
-    end;
+    ShowMessage('Chosen file already exists. Maybe specify a different filename.');
+  end;
+
+  if frmDisplayGrid3SaveDialog.Execute then
+  begin
+    ExportFilename := frmDisplayGrid3SaveDialog.FileName;
+    frmSQLiteDBases.SaveC2FDBToCSV(dbGridC2F, ExportFilename);
+  end;
 end;
 
 // Copies the selected row of "Compare Two Folders" DB grid to clipboard via pop up menu option
@@ -118,6 +120,11 @@ procedure TfrmDisplayGrid3.MenuItem_CopySelectedRowC2FGRIDClick(Sender: TObject
   );
 begin
   frmSQLiteDBases.CopySelectedRowC2FTAB(dbGridC2F);
+end;
+
+procedure TfrmDisplayGrid3.MenuItem_C2F_SelectedRowsC2FGRIDClick(Sender: TObject);
+begin
+  frmSQLiteDBases.CopySelectedRowsC2FTAB(dbGridC2F);
 end;
 
 initialization

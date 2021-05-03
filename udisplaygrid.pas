@@ -121,7 +121,7 @@ begin
   if frmDisplayGridSaveDialog1.Execute then
   begin
     ExportFilename := frmDisplayGridSaveDialog1.FileName;
-    frmSQLiteDBases.SaveDBToCSV(RecursiveDisplayGrid_COPY, ExportFilename);
+    frmSQLiteDBases.SaveCopyDBToCSV(RecursiveDisplayGrid_COPY, ExportFilename);
   end;
 end;
 

@@ -17,7 +17,7 @@ object frmDisplayGrid3: TfrmDisplayGrid3
     Color = clWindow
     Columns = <>
     DataSource = frmSQLiteDBases.DataSource3
-    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgMultiselect]
     PopupMenu = PopupMenu_C2FGrid
     TabOrder = 0
   end
@@ -68,6 +68,10 @@ object frmDisplayGrid3: TfrmDisplayGrid3
     object MenuItem_CopySelectedRowC2FGRID: TMenuItem
       Caption = 'Clipboard selected row'
       OnClick = MenuItem_CopySelectedRowC2FGRIDClick
+    end
+    object MenuItem_C2F_SelectedRowsC2FGRID: TMenuItem
+      Caption = 'Clipboard all selected rows'
+      OnClick = MenuItem_C2F_SelectedRowsC2FGRIDClick
     end
     object MenuItem_C2F_ShowMismatches: TMenuItem
       Caption = 'Show mismatches'
