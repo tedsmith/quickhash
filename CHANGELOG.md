@@ -1,53 +1,53 @@
 ﻿Version History
 ===============
 
-v3.3.0
-Improvement : Column headers added to CSV and HTML output (achieved by right clicking the display grid result) when using the "Copy" tab. 
-Improvement : Removed the generation of a "QH_XXXXX" time stamp named parent folder in destination folder when copying as many users reported this was unhelpful.
-Improvement : SQLite DLL's for Windows replaced with stable version 3.35.5.0 as of April 2021 (replacing former version 3.21.0.0).
-Improvement : The "Compare Two Folders" now has a right click option in the results grid to 'Show Mismatches'. This will filter the results to show mis-matched hash computations, or files that exist in FolderA but not FolderB (or visa versa). Very useful if the user has spent hours comparings hundreds of thousands of files and one or more does not match - now the user can list them easily. 
-Improvement : The size of fields in SQLite was set to 32767 to account of crazily large filename and filepath combinations. But on reflection, that seems extreme use of memory for what must be one in a billion chances and very unlikely to be encountered. Instead, 4096 size is set in v3.3.0 to still enable QH to account for very long paths, but given that filenames alone can rarely exceed 255 (even where paths can) on any of the 3 OSes except for some UTF8 and UTF16 variances, where even with those the maximum is still 1020 bytes (4 bytes for every single char of the 255 max)
-Fix : DisableControls and EnableControls used more extensively to expedite the "Save as CSV" and "Save as HTML" options for large volumes of data, as some user reported save efforts taking several hours for millions of rows of data. This makes sense because Quickhash was repaitning the display grid after each row file write.  
-Fix : When saving results as CSV in Compare Two Folders, if the user selected an existing file to overwrite, it would o that, but the next run would result in an infinite loop telling the user it already exists and to choose another file, but not being able to actually do so. That was fixed. 
-Fix : Apples new OSX 'Big Sur' unhelpfully removed static libraries, like the SQLite library, so it could not be referenced by file path. So a different method of lookup is needed. That has been applied so that Apple users can continue to enjoy the benefits of QuickHash on that most changing of operating system. You're welcome. 
-Fix : Two stringlists are created in "Compare Two Folders" to store the list of files for analysis. I had introduced a memory leak here without realising it and that has been corrected (with thanks to an open-source developer who spotted that for me). 
-Fix : In the results txt file of Compare Two Folders, the selected folder names were prefixed with the LongPathOverride ("\\?\C:..."). That was corrected to just show "C:\...". 
-New : Button added to enable the user to easily make a copy of the backend SQLite database at any given point in time, for convenience. This can help users who may wish to load it into specific database tools, like SQLite Explorer or browser extensions like SQLite Manager. 
-New : Logo replaced with the newer Quickash logo. 
-New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, colon etc. If no character is chosen, a comma is assumed and used as before. 
-Code: Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. 
+v3.3.0<br>
+Improvement : Column headers added to CSV and HTML output (achieved by right clicking the display grid result) when using the "Copy" tab. <br>
+Improvement : Removed the generation of a "QH_XXXXX" time stamp named parent folder in destination folder when copying as many users reported this was unhelpful.<br>
+Improvement : SQLite DLL's for Windows replaced with stable version 3.35.5.0 as of April 2021 (replacing former version 3.21.0.0).<br>
+Improvement : The "Compare Two Folders" now has a right click option in the results grid to 'Show Mismatches'. This will filter the results to show mis-matched hash computations, or files that exist in FolderA but not FolderB (or visa versa). Very useful if the user has spent hours comparings hundreds of thousands of files and one or more does not match - now the user can list them easily. <br>
+Improvement : The size of fields in SQLite was set to 32767 to account of crazily large filename and filepath combinations. But on reflection, that seems extreme use of memory for what must be one in a billion chances and very unlikely to be encountered. Instead, 4096 size is set in v3.3.0 to still enable QH to account for very long paths, but given that filenames alone can rarely exceed 255 (even where paths can) on any of the 3 OSes except for some UTF8 and UTF16 variances, where even with those the maximum is still 1020 bytes (4 bytes for every single char of the 255 max)<br>
+Fix : DisableControls and EnableControls used more extensively to expedite the "Save as CSV" and "Save as HTML" options for large volumes of data, as some user reported save efforts taking several hours for millions of rows of data. This makes sense because Quickhash was repaitning the display grid after each row file write.  <br>
+Fix : When saving results as CSV in Compare Two Folders, if the user selected an existing file to overwrite, it would o that, but the next run would result in an infinite loop telling the user it already exists and to choose another file, but not being able to actually do so. That was fixed. <br>
+Fix : Apples new OSX 'Big Sur' unhelpfully removed static libraries, like the SQLite library, so it could not be referenced by file path. So a different method of lookup is needed. That has been applied so that Apple users can continue to enjoy the benefits of QuickHash on that most changing of operating system. You're welcome. <br>
+Fix : Two stringlists are created in "Compare Two Folders" to store the list of files for analysis. I had introduced a memory leak here without realising it and that has been corrected (with thanks to an open-source developer who spotted that for me). <br>
+Fix : In the results txt file of Compare Two Folders, the selected folder names were prefixed with the LongPathOverride ("\\?\C:..."). That was corrected to just show "C:\...". <br>
+New : Button added to enable the user to easily make a copy of the backend SQLite database at any given point in time, for convenience. This can help users who may wish to load it into specific database tools, like SQLite Explorer or browser extensions like SQLite Manager. <br>
+New : Logo replaced with the newer Quickash logo. <br>
+New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, colon etc. If no character is chosen, a comma is assumed and used as before. <br>
+Code: Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. <br>
 
-v3.2.0
-New : Blake3 hash algorithm added for text strings, a file, Files recursively, Compare Two Folders and Compare Two Files. 
-New : Blake3 hash algorithm added to disk hashing module
-Fix : Hashing of physical disks in Linux via the "Hash Disk" module is re-enabled after "Access Violations" reported for earlier versions. 
-Fix : In the "Compare Two Folders" tab, if the "Log Results" was unticked, it generated an access violation. That was fixed. 
-Fix : In the "Copy" tab, when the results are shown in the display grid, the navigation buttons were not clickable. That was fixed. 
-Fix : In the "FileS" tab, when the results are shown in the display grid, the navigation buttons were not clickable either. That was fixed. 
-Fix : "Time Taken" in the "File" tab was showing a 24hr clock instead of showing as the number of seconds elapsed, as intended. That was fixed by utilising GetTickCount. 
-Fix : In the "Compare Two Files" tab, the "Result: Match" value was only showing if the timed scheduler was invoked (though the actual hashes were still being displayed). This was caused due to a loop error where the result only displayed inside the scheduler loop. This has been fixed by moving it out of the loop, so that the result is shown either immediately with no scheduler being used, or following the scheduled invoke. 
-Update : "LCL Scaling" is now incorporated which will hopefully better enable the GUI display on variously sized resolution settings. User feedback will confirm in due course. 
-New : In the 'Compare Two Folders' tab, users have asked for a grid view of the files compared rather than just a text file output. That has been added with many of usual right click menu options such as copy to clipboard, save as HTML, etc.  
-Update : In the 'Compare Two Folders' tab, the option "Cont. if count differs?" has now been removed for several reasons:
-  1) Users were frustrated at analysing often millions of files only to realise after the event that in order to continue if the file count differed they had to do it all over again with the option checked
-  2) More users than I anticipated when I first added that feature use the "Compare Two Folders" comparison to not check that both folders do indeed match but in fact to determine in what way they differ. 
-  3) It is more thorough, allbeit slower, to itteratively check the hashes of both folders both ways rather than checking based merely on count. 
-Fix : In the 'Compare Two Folders' tab, if the user selects "Log Results" (which is enabled by default), then in Linux and OSX, the text log file was only being populated with the hash values and not the filenames too. That was fixed. 
-Important Fix : In the 'Compare Two Folders' tab, the comparison was not sufficiently two way, meaning that if Folder 2 matched Folder 1 it would report a match, but if Folder 1 did not match Folder 2, it might still report a match when it should report a mismatch. THis has now been modified to a 3-way comparison. First it checks the file count, then is compares both hash lists against each other; HashListA against HashListB, then HashListB against HashListA. It has obviously made the comparison slightly slower for millions of files, but hopefully not too significantly, and accuracy is more critical than speed. 
+v3.2.0<br>
+New : Blake3 hash algorithm added for text strings, a file, Files recursively, Compare Two Folders and Compare Two Files. <br>
+New : Blake3 hash algorithm added to disk hashing module<br>
+Fix : Hashing of physical disks in Linux via the "Hash Disk" module is re-enabled after "Access Violations" reported for earlier versions. <br>
+Fix : In the "Compare Two Folders" tab, if the "Log Results" was unticked, it generated an access violation. That was fixed. <br>
+Fix : In the "Copy" tab, when the results are shown in the display grid, the navigation buttons were not clickable. That was fixed. <br>
+Fix : In the "FileS" tab, when the results are shown in the display grid, the navigation buttons were not clickable either. That was fixed. <br>
+Fix : "Time Taken" in the "File" tab was showing a 24hr clock instead of showing as the number of seconds elapsed, as intended. That was fixed by utilising GetTickCount. <br>
+Fix : In the "Compare Two Files" tab, the "Result: Match" value was only showing if the timed scheduler was invoked (though the actual hashes were still being displayed). This was caused due to a loop error where the result only displayed inside the scheduler loop. This has been fixed by moving it out of the loop, so that the result is shown either immediately with no scheduler being used, or following the scheduled invoke. <br>
+Update : "LCL Scaling" is now incorporated which will hopefully better enable the GUI display on variously sized resolution settings. User feedback will confirm in due course. <br>
+New : In the 'Compare Two Folders' tab, users have asked for a grid view of the files compared rather than just a text file output. That has been added with many of usual right click menu options such as copy to clipboard, save as HTML, etc.  <br>
+Update : In the 'Compare Two Folders' tab, the option "Cont. if count differs?" has now been removed for several reasons:<br>
+  1) Users were frustrated at analysing often millions of files only to realise after the event that in order to continue if the file count differed they had to do it all over again with the option checked<br>
+  2) More users than I anticipated when I first added that feature use the "Compare Two Folders" comparison to not check that both folders do indeed match but in fact to determine in what way they differ. <br>
+  3) It is more thorough, allbeit slower, to itteratively check the hashes of both folders both ways rather than checking based merely on count. <br>
+Fix : In the 'Compare Two Folders' tab, if the user selects "Log Results" (which is enabled by default), then in Linux and OSX, the text log file was only being populated with the hash values and not the filenames too. That was fixed. <br>
+Important Fix : In the 'Compare Two Folders' tab, the comparison was not sufficiently two way, meaning that if Folder 2 matched Folder 1 it would report a match, but if Folder 1 did not match Folder 2, it might still report a match when it should report a mismatch. THis has now been modified to a 3-way comparison. First it checks the file count, then is compares both hash lists against each other; HashListA against HashListB, then HashListB against HashListA. It has obviously made the comparison slightly slower for millions of files, but hopefully not too significantly, and accuracy is more critical than speed. <br>
 
-Here is a copy of the bug report, provided for full transparancy : 
+Here is a copy of the bug report, provided for full transparancy : <br>
 
-  "The folders were set up like this:
-  Folder 1: File A, File A (copy)
-  Folder 2: File A, File B
+  "The folders were set up like this:<br>
+  Folder 1: File A, File A (copy)<br>
+  Folder 2: File A, File B<br>
 
-  When running the compare feature, selecting Folder 1 and then Folder 2, the tool reported a match, "The files in both folders are the same. MATCH!" I had expected a mis-match. Yes, all of the files in Folder 1 are in Folder 2, but  not all of the files in Folder 2 are in Folder 1. If I re-ran the compare feature in reverse, selecting Folder 2 and then Folder 1, a mis-match was reported, "The files of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!" This seemed odd because if I ran this features with the following situation:
-  Folder 1: File A
-  Folder 2: File A, File B
-  I would receive a mis-match message, but the situation is basically the same, all Folder 1 files are within Folder 2, just like if two copies of File A were in Folder 1, which reported a match.
-  I had expected a back and forth comparison, but it appears to be a one-way comparison. "
+  When running the compare feature, selecting Folder 1 and then Folder 2, the tool reported a match, "The files in both folders are the same. MATCH!" I had expected a mis-match. Yes, all of the files in Folder 1 are in Folder 2, but  not all of the files in Folder 2 are in Folder 1. If I re-ran the compare feature in reverse, selecting Folder 2 and then Folder 1, a mis-match was reported, "The files of both folders are NOT the same. The file count is the same, but file hashes differ. MIS-MATCH!" This seemed odd because if I ran this features with the following situation:<br>
+  Folder 1: File A<br>
+  Folder 2: File A, File B<br>
+  I would receive a mis-match message, but the situation is basically the same, all Folder 1 files are within Folder 2, just like if two copies of File A were in Folder 1, which reported a match.<br>
+  I had expected a back and forth comparison, but it appears to be a one-way comparison. "<br>
 
-I thank the reportee who brought this to my attention and it should now be resolved in v3.2.0. 
+I thank the reportee who brought this to my attention and it should now be resolved in v3.2.0. <br>
  
 v3.1.0 (July 2019)
 
