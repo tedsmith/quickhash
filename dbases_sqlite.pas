@@ -13,7 +13,7 @@ uses
 {$endif}
   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
   LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
-  sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes;
+  sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes, Variants;
 
 type
 
@@ -52,6 +52,7 @@ type
     procedure SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
     procedure SaveC2FWindowToHTML(DBGrid : TDBGrid; Filename : string);
     procedure DatasetToClipBoard(DBGrid : TDBGrid);
+    procedure DatasetToClipBoardCOPYTAB(DBGrid : TDBGrid);
     procedure ShowDuplicates(DBGrid : TDBGrid);
     procedure DeleteDuplicates(DBGrid : TDBGrid);
     procedure SortByID(DBGrid : TDBGrid);
@@ -92,6 +93,7 @@ type
     // They need not be set as constants and can be any valid value
     application_id = 1189021115; // must be a 32-bit Unsigned Integer (Longword 0 .. 4294967295)  https://www.sqlite.org/pragma.html#pragma_application_id
     user_version   = 23400001;   // must be a 32-bit Signed Integer (LongInt -2147483648 .. 2147483647)  https://www.sqlite.org/pragma.html#pragma_user_version
+    NullStrictConvert = False;
   end;
 
 var
@@ -739,7 +741,6 @@ var
 begin
   Mainform.StatusBar2.SimpleText := 'Writing data to file...please wait';
   Application.ProcessMessages;
-  linetowrite := '';
   n := 0;
   KnownHashFlagIsSet := false;
   ChosenDelimiter := MainForm.ChosenDelimiter;
@@ -747,49 +748,60 @@ begin
   try
     // Create a filestream for the output CSV.
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
-
-    // Write all columns, but dont try to include the Known Hash result if not computed to start with
-    // This boolean check should be quicker instead of checking for every row whether the field is empty or not
-    if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
-      else KnownHashFlagIsSet := false;
-
-    DBGrid.DataSource.Dataset.DisableControls;
-    try
-      DBGrid.DataSource.Dataset.First;
-      while not DBGrid.DataSource.Dataset.EoF do
+    if CSVFileToWrite.Handle > 0 then
       begin
-        if KnownHashFlagIsSet then
-        begin
-          // Include all columns, inc hash flag, but exclude the row count (not needed for a CSV output).
-          linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[4].Text) + ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
-        end
-        else
-          begin
-          // Include all columns, exc hash flag, but exclude the row count (not needed for a CSV output).
-          linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
-          end;
+        linetowrite := '';
+        linetowrite := ('Filename'  + ChosenDelimiter + 'FilePath' + ChosenDelimiter +
+                        'HashValue' + ChosenDelimiter + 'FileSize' + ChosenDelimiter +
+                        'KnownHashFlag' + #13#10);
         n := 0;
-        n := Length(linetowrite);
+        n := Length(LineToWrite);
         CSVFileToWrite.Write(linetowrite[1], n);
-        DBGrid.DataSource.Dataset.Next;
-      end;
+
+        // Write all columns, but dont try to include the Known Hash result if not computed to start with
+        // This boolean check should be quicker instead of checking for every row whether the field is empty or not
+        if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
+          else KnownHashFlagIsSet := false;
+
+        DBGrid.DataSource.Dataset.DisableControls;
+        try
+          DBGrid.DataSource.Dataset.First;
+          while not DBGrid.DataSource.Dataset.EoF do
+          begin
+            if KnownHashFlagIsSet then
+            begin
+              // Include all columns, inc hash flag, but exclude the row count (not needed for a CSV output).
+              linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
+                             (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
+                             (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
+                             (DBGrid.DataSource.DataSet.Fields[4].Text) + ChosenDelimiter+
+                             (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
+            end
+            else
+              begin
+              // Include all columns, exc hash flag, but exclude the row count (not needed for a CSV output).
+              linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
+                             (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
+                             (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
+                             (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+              end;
+            n := 0;
+            n := Length(linetowrite);
+            CSVFileToWrite.Write(linetowrite[1], n);
+            DBGrid.DataSource.Dataset.Next;
+          end;
+        finally
+          DBGrid.DataSource.Dataset.EnableControls;
+        end;
+      end; // End of CSVFileToWrite.Handle check
     finally
-      DBGrid.DataSource.Dataset.EnableControls;
+      CSVFileToWrite.Free;
     end;
-  finally
-    CSVFileToWrite.Free;
-  end;
-  Mainform.StatusBar2.SimpleText := 'DONE';
-  ShowMessage('Grid data now in ' + Filename);
+    Mainform.StatusBar2.SimpleText := 'DONE';
+    ShowMessage('Grid data now in ' + Filename);
 end;
 
+// Used by the COPY tab to save the display grid to CSV
 procedure TfrmSQLiteDBases.SaveCopyDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
   linetowrite : ansistring;
@@ -805,6 +817,15 @@ begin
    try
      // Create a filestream for the output CSV.
      CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+     // Add header
+     linetowrite := 'Source Filename'          +ChosenDelimiter+
+                    'Source Hash'              +ChosenDelimiter+
+                    'Destination Filename'     +ChosenDelimiter+
+                    'Destination Hash'         +ChosenDelimiter+
+                    'Original Date Attributes' + #13#10;
+
+     n := Length(linetowrite);
+     CSVFileToWrite.Write(linetowrite[1], n);
 
      DBGrid.DataSource.Dataset.DisableControls;
      try
@@ -846,42 +867,46 @@ begin
   ChosenDelimiter := MainForm.ChosenDelimiter;
   try
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
-    // Add header
-    linetowrite := 'Filename'  +ChosenDelimiter+
-                   'FilePathA' +ChosenDelimiter+
-                   'FileHashA' +ChosenDelimiter+
-                   'FileHathB' +ChosenDelimiter+
-                   'FileHashB' + #13#10;
-    n := Length(linetowrite);
-    CSVFileToWrite.Write(linetowrite[1], n);
-    // Add content of grid
-    DBGrid.DataSource.Dataset.DisableControls;
-    try
-      DBGrid.DataSource.Dataset.First;
-      while not DBGrid.DataSource.Dataset.EoF do
-      begin
-        linetowrite := (DBGrid.DataSource.DataSet.Fields[0].Text) +ChosenDelimiter+
-                       (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
-                       (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
-                       (DBGrid.DataSource.DataSet.Fields[3].Text) +ChosenDelimiter+
-                       (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+    if CSVFileToWrite.Handle > 0 then
+    begin
+      // Add header
+      linetowrite := 'Filename'  +ChosenDelimiter+
+                     'FilePathA' +ChosenDelimiter+
+                     'FileHashA' +ChosenDelimiter+
+                     'FilePathB' +ChosenDelimiter+
+                     'FileHashB' + #13#10;
+      n := Length(linetowrite);
+      CSVFileToWrite.Write(linetowrite[1], n);
 
-        n := 0;
-        n := Length(linetowrite);
-        CSVFileToWrite.Write(linetowrite[1], n);
-        DBGrid.DataSource.Dataset.Next;
+      // Add content of grid
+      DBGrid.DataSource.Dataset.DisableControls;
+      try
+        DBGrid.DataSource.Dataset.First;
+        while not DBGrid.DataSource.Dataset.EoF do
+        begin
+          linetowrite := (DBGrid.DataSource.DataSet.Fields[0].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[3].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+
+          n := 0;
+          n := Length(linetowrite);
+          CSVFileToWrite.Write(linetowrite[1], n);
+          DBGrid.DataSource.Dataset.Next;
+        end;
+      finally
+        DBGrid.DataSource.Dataset.EnableControls;
       end;
-    finally
-      DBGrid.DataSource.Dataset.EnableControls;
+      Mainform.StatusBar2.SimpleText := 'DONE';
     end;
   finally
     CSVFileToWrite.Free;
+    ShowMessage('Grid data now in ' + Filename);
   end;
-  Mainform.StatusBar2.SimpleText := 'DONE';
-  ShowMessage('Grid data now in ' + Filename);
 end;
 
-// Copies a DBGrid of FileS tab and Copy tab content to clipboard
+// Copies the FILES DBGrid content to clipboard
 procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
 var
   CSVClipboardList : TStringListUTF8;
@@ -889,14 +914,19 @@ var
 begin
   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
   Application.ProcessMessages;
+  ChosenDelimiter := MainForm.ChosenDelimiter;
   RowCount := CountGridRows(DBGrid);
   if RowCount < 20000 then
   begin
     try
-      ChosenDelimiter := MainForm.ChosenDelimiter;
       CSVClipboardList := TStringListUTF8.Create;
+      // Add the grid headers
+      CSVClipboardList.Add('ID'      + ChosenDelimiter + 'Filename'  + ChosenDelimiter +
+                           'FilePath'+ ChosenDelimiter + 'HashValue' + ChosenDelimiter +
+                           'FileSize'+ ChosenDelimiter + 'KnownHashFlag');
       DBGrid.DataSource.Dataset.DisableControls;
       try
+        // Add the grid content
         DBGrid.DataSource.Dataset.First;
         while not DBGrid.DataSource.Dataset.EoF do
         begin
@@ -922,6 +952,7 @@ begin
     Showmessage('Row count exceeds 20K. Please use "Save to CSV file" instead');
   end;
 end;
+
 
 // ShowDuplicates lists entries with duplicate hash values from the FILES tab,
 // by searching hash column for matches and then displays all rows fully
@@ -1576,6 +1607,57 @@ begin
   end;
 end;
 
+// Used by the COPY display grid to clipboard data from the grid
+procedure TfrmSQLiteDBases.DatasetToClipBoardCOPYTAB(DBGrid : TDBGrid);
+var
+  CSVClipboardList : TStringListUTF8;
+  RowCount : integer = Default(integer);
+begin
+  Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
+  Application.ProcessMessages;
+  ChosenDelimiter := MainForm.ChosenDelimiter;
+  RowCount := CountGridRows(DBGrid);
+  if RowCount < 20000 then
+  begin
+    try
+      CSVClipboardList := TStringListUTF8.Create;
+      // Add the grid headers
+      CSVClipboardList.Add('ID'                   + ChosenDelimiter +
+                           'Source Filename'      + ChosenDelimiter +
+                           'Source FileHash'      + ChosenDelimiter +
+                           'Destination Filename' + ChosenDelimiter +
+                           'Destination Hash'     + ChosenDelimiter +
+                           'Original Date Attributes');
+      DBGrid.DataSource.Dataset.DisableControls;
+      try
+        // Add the grid content
+        DBGrid.DataSource.Dataset.First;
+        while not DBGrid.DataSource.Dataset.EoF do
+        begin
+          CSVClipboardList.Add((DBGrid.DataSource.DataSet.Fields[0].Text) +ChosenDelimiter+
+                               (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
+                               (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
+                               (DBGrid.DataSource.DataSet.Fields[3].Text) +ChosenDelimiter+
+                               (DBGrid.DataSource.DataSet.Fields[4].Text) +ChosenDelimiter+
+                               (DBGrid.DataSource.DataSet.Fields[5].Text));
+          DBGrid.DataSource.Dataset.Next;
+        end;
+      finally
+        DBGrid.DataSource.Dataset.EnableControls;
+      end;
+    finally
+      Clipboard.AsText := CSVClipboardList.Text;
+    end;
+    Mainform.StatusBar2.SimpleText := 'DONE';
+    ShowMessage('Grid data now in clipboard ');
+  end
+  else
+  begin
+    Mainform.StatusBar2.SimpleText := 'Row count exceeded 20K. Use "Save to CSV file" instead';
+    Showmessage('Row count exceeds 20K. Please use "Save to CSV file" instead');
+  end;
+end;
+
 // Saves the grid in COPY window to HTML. If small volume of records, uses a stringlist.
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
@@ -1757,7 +1839,7 @@ end;
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveC2FWindowToHTML(DBGrid : TDBGrid; Filename : string);
 var
-  strTitle, strFilename, FilepathA, FilePathB, FileHashA, FileHashB : string;
+  strTitle, HeaderRow, strFilename, FilepathA, FilePathB, FileHashA, FileHashB : string;
   NoOfRowsInGrid    : integer;
   sl                : TStringList;
   fs                : TFileStreamUTF8;
@@ -1776,8 +1858,13 @@ var
     strHTMLFooter      = '</HTML>' ;
 
 begin
-  NoOfRowsInGrid := 0;
+  // Added to v3.3.0 to overcome null fields and avoid the exception error of
+  // could-not-convert-variant-of-type-null-into-type-string when saving large data sets as HTML
+  // See http://riversoftavg.com/blogs/index.php/2016/07/13/quick-tip-fixing-could-not-convert-variant-of-type-null-into-type/
+  Variants.NullStrictConvert := False;
+
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
+  NoOfRowsInGrid := 0;
   NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
   if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
   try
@@ -1790,6 +1877,8 @@ begin
     sl.add('<BODY>');
     sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
     sl.add('<table border=1>');
+    sl.add('<tr><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
+
     DBGrid.DataSource.DataSet.DisableControls;
     DBGrid.DataSource.DataSet.First;
     while not DBGrid.DataSource.DataSet.EOF do
@@ -1839,6 +1928,9 @@ begin
     fs.Write(strTitle[1], Length(strTitle));
     fs.Write(#13#10, 2);
     fs.Write('<table border=1>', 16);
+    HeaderRow := '';
+    HeaderRow := ('<tr><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
+    fs.Write(HeaderRow[1], Length(HeaderRow));
 
     { strTABLEROWStart   = '<TR>'      = 4 bytes
       strTABLEDATAStart  = '<TD>'      = 4 bytes
@@ -1856,39 +1948,79 @@ begin
         fs.Write(strTABLEROWStart[1], 4);
 
         // Column1
-        strFileName := DBGrid.DataSource.DataSet.Fields[0].Value;
-        // Write Folder A Filename A to row
-        fs.Write(strTABLEDATAStart[1], 4);
-        fs.Write(strFileName[1], Length(strFileName));
-        fs.Write(strTABLEDataEnd[1], 5);
+        if Length(DBGrid.DataSource.DataSet.Fields[0].Value) > 0 then
+        begin
+          strFileName := DBGrid.DataSource.DataSet.Fields[0].Value;
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Write(strFileName[1], Length(strFileName));
+          fs.Write(strTABLEDataEnd[1], 5);
+        end
+        else
+        begin
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Writeansistring('File not found');
+          fs.Write(strTABLEDataEnd[1], 5);
+        end;
 
         // Column2
-        FilepathA := DBGrid.DataSource.DataSet.Fields[1].Value;
-        // Write Folder A Filename hash to row
-        fs.Write(strTABLEDATAStart[1], 4);
-        fs.Write(FilepathA[1], Length(FilepathA));
-        fs.Write(strTABLEDATAEnd[1], 5);
+        if Length(DBGrid.DataSource.DataSet.Fields[1].Value) > 0 then
+        begin
+          FilepathA := DBGrid.DataSource.DataSet.Fields[1].Value;
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Write(FilepathA[1], Length(FilepathA));
+          fs.Write(strTABLEDATAEnd[1], 5);
+        end
+        else
+        begin
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Writeansistring('File not found in path');
+          fs.Write(strTABLEDataEnd[1], 5);
+        end;
 
         // Column3
-        FileHashA := DBGrid.DataSource.DataSet.Fields[2].Value;
-        // Write the Filename B
-        fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(FileHashA[1], Length(FileHashA));
-        fs.Write(strTABLEDATAEnd[1], 5);
+        if Length(DBGrid.DataSource.DataSet.Fields[2].Value) > 0 then
+        begin
+          FileHashA := DBGrid.DataSource.DataSet.Fields[2].Value;
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(FileHashA[1], Length(FileHashA));
+          fs.Write(strTABLEDATAEnd[1], 5);
+        end
+        else
+        begin
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Writeansistring('Hash not available');
+          fs.Write(strTABLEDataEnd[1], 5);
+        end;
 
         // Column4
-        FilepathB := DBGrid.DataSource.DataSet.Fields[3].Value;
-        // Write the Folder B Filename B hash
-        fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(FilepathB[1], Length(FilepathB));
-        fs.Write(strTABLEDATAEnd[1], 5);
+        if Length(DBGrid.DataSource.DataSet.Fields[3].Value) > 0 then
+        begin
+          FilepathB := DBGrid.DataSource.DataSet.Fields[3].Value;
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(FilepathB[1], Length(FilepathB));
+          fs.Write(strTABLEDATAEnd[1], 5);
+        end
+        else
+        begin
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Writeansistring('File not found in path');
+          fs.Write(strTABLEDataEnd[1], 5);
+        end;
 
         // Column5
-        FileHashB := DBGrid.DataSource.DataSet.Fields[4].Value;
-        // Write the Folder B Filename B hash
-        fs.Write(strTABLEDATAStart[1], 4) ;
-        fs.Write(FileHashB[1], Length(FileHashB));
-        fs.Write(strTABLEDATAEnd[1], 5);
+        if Length(DBGrid.DataSource.DataSet.Fields[4].Value) > 0 then
+        begin
+          FileHashB := DBGrid.DataSource.DataSet.Fields[4].Value;
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(FileHashB[1], Length(FileHashB));
+          fs.Write(strTABLEDATAEnd[1], 5);
+        end
+        else
+        begin
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Writeansistring('Hash not available');
+          fs.Write(strTABLEDataEnd[1], 5);
+        end;
 
         // End the row
         fs.Write(strTABLEROWEnd[1], 5);
@@ -1903,12 +2035,12 @@ begin
     fs.Write(strHTMLFooter, 7);
     fs.Write(#13#10, 2);
     finally
-      DBGrid.DataSource.DataSet.EnableControls;
       fs.free;
       MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
       Showmessage('Data saved to HTML file ' + Filename);
       Application.ProcessMessages;
     end;
+  DBGrid.DataSource.DataSet.EnableControls;
 end;
 
 // There is an UpdateGridXXX routine for each tab where a DBGrid is used.

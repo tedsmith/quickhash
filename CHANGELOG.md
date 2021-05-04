@@ -15,7 +15,7 @@ Fix : Two stringlists are created when using "Compare Two Folders" to store the 
 Fix : In the basic results txt file that is created during Compare Two Folders, the selected folder names in the log file were prefixed with the LongPathOverride of two slashes a question mark and a slash. That was corrected to just show the normal path as users dont realy need to see that (as it is just an API switch). <br>
 New : Button added to enable the user to easily make a copy of the backend SQLite database at any given point in time, for convenience. This can help users who may wish to load it into specific database tools, like SQLite Explorer or browser extensions like SQLite Manager. <br>
 New : Logo replaced with the newer Quickash logo. <br>
-New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, colon etc. If no character is chosen, a comma is assumed and used as before. <br>
+New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, hyphen etc. If no character is chosen, a comma is assumed and used as before. <br>
 Code: Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. <br>
 
 v3.2.0<br>

@@ -86,7 +86,7 @@ end;
 
 procedure TfrmDisplayGrid1.MenuItem_CopyToClipboardClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid_COPY);
+  frmSQLiteDBases.DatasetToClipBoardCOPYTAB(RecursiveDisplayGrid_COPY);
 end;
 
 // Save the COPY Window results pane to HTML File

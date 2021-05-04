@@ -208,6 +208,7 @@ type
     edtUNCPathCompareB                    : TEdit;
     FileSDBNavigator                      : TDBNavigator;
     CopyDelimiterComboBox: TComboBox;
+    TextLBLDelimiterComboBox: TComboBox;
     lblTotalFileCountNumberA              : TLabel;
     lblTotalFileCountA                    : TLabel;
     lblCompareTwoFoldersInstruction1      : TLabel;
@@ -1157,6 +1158,23 @@ begin
     end
   else
   try
+    // Set any custom delimiter. Uses ',' by default, unless chosen otherwise
+    ChosenDelimiter := TextLBLDelimiterComboBox.Text;
+    if ChosenDelimiter = 'Set Delimiter' then
+    begin
+      ChosenDelimiter := ',';
+    end
+      else  // Tab is non-printable, so requires conversion to #9
+      if ChosenDelimiter = 'Tab' then
+      begin
+        ChosenDelimiter := #9;
+      end
+        else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+        if ChosenDelimiter = 'Space' then
+        begin
+          ChosenDelimiter := #32;
+        end;
+
     slLBL := TStringListUTF8.Create;
     if not cbToggleInputDataToOutputFile.Checked then
       begin
@@ -1164,7 +1182,7 @@ begin
         begin
           strToHash := memoHashText.Lines[i];
           // Add the source data and the hash to the output
-          slLBL.Add(strToHash + ',' + Trim(CalcTheHashString(strToHash)));
+          slLBL.Add(strToHash + ChosenDelimiter + Trim(CalcTheHashString(strToHash)));
         end;
       end
     else
@@ -1203,6 +1221,23 @@ begin
   if FLBLDialog.Execute then
     begin
       try
+      // Set any custom delimiter. Uses ',' by default, unless chosen otherwise
+      ChosenDelimiter := TextLBLDelimiterComboBox.Text;
+      if ChosenDelimiter = 'Set Delimiter' then
+      begin
+        ChosenDelimiter := ',';
+      end
+        else  // Tab is non-printable, so requires conversion to #9
+        if ChosenDelimiter = 'Tab' then
+        begin
+          ChosenDelimiter := #9;
+        end
+          else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+          if ChosenDelimiter = 'Space' then
+          begin
+            ChosenDelimiter := #32;
+          end;
+
       slFLBLInput := TStringListUTF8.Create;
       slFLBLOutput:= TStringListUTF8.Create;
       slFLBLInput.Sorted:= false;
@@ -1217,7 +1252,7 @@ begin
           for i := 0 to slFLBLInput.Count -1 do
             begin
              if Length(slFLBLInput.Strings[i]) > 0 then
-              slFLBLOutput.Add(slFLBLInput.Strings[i] + ',' + Trim(CalcTheHashString(slFLBLInput.Strings[i])));
+              slFLBLOutput.Add(slFLBLInput.Strings[i] + ChosenDelimiter + Trim(CalcTheHashString(slFLBLInput.Strings[i])));
             end;
         end
       else
@@ -2608,22 +2643,67 @@ begin
   begin
     ShowMessage('Using space is not wise. Are you sure?');
   end;
+  ChosenDelimiter := C2FDelimiterComboBox.Text;
+    if ChosenDelimiter = 'Set Delimiter' then
+    begin
+      ChosenDelimiter := ',';
+    end
+      else  // Tab is non-printable, so requires conversion to #9
+      if ChosenDelimiter = 'Tab' then
+      begin
+        ChosenDelimiter := #9;
+      end
+        else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+        if ChosenDelimiter = 'Space' then
+        begin
+          ChosenDelimiter := #32;
+        end;
 end;
 
 procedure TMainForm.FileSDelimiterComboBoxChange(Sender: TObject);
 begin
-if FileSDelimiterComboBox.Text = 'Space' then
- begin
+  if FileSDelimiterComboBox.Text = 'Space' then
+  begin
    ShowMessage('Using space is not wise. Are you sure?');
- end;
+  end;
+  ChosenDelimiter := C2FDelimiterComboBox.Text;
+  if ChosenDelimiter = 'Set Delimiter' then
+  begin
+    ChosenDelimiter := ',';
+  end
+    else  // Tab is non-printable, so requires conversion to #9
+    if ChosenDelimiter = 'Tab' then
+    begin
+      ChosenDelimiter := #9;
+    end
+      else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+      if ChosenDelimiter = 'Space' then
+      begin
+        ChosenDelimiter := #32;
+      end;
 end;
 
 procedure TMainForm.CopyDelimiterComboBoxChange(Sender: TObject);
 begin
-if CopyDelimiterComboBox.Text = 'Space' then
- begin
+  if CopyDelimiterComboBox.Text = 'Space' then
+  begin
    ShowMessage('Using space is not wise. Are you sure?');
- end;
+  end;
+  ChosenDelimiter := C2FDelimiterComboBox.Text;
+  if ChosenDelimiter = 'Set Delimiter' then
+  begin
+    ChosenDelimiter := ',';
+  end
+    else  // Tab is non-printable, so requires conversion to #9
+    if ChosenDelimiter = 'Tab' then
+    begin
+      ChosenDelimiter := #9;
+    end
+      else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+      if ChosenDelimiter = 'Space' then
+      begin
+        ChosenDelimiter := #32;
+      end;
 end;
 
  // btnCompareClick : Will compare the listings of two directories, inc hidden files
