@@ -1081,7 +1081,7 @@ const
     hSelectedDisk := SysUtils.FileOpen(SourceDevice, fmOpenRead OR fmShareDenyWrite);
 
     // Check if handle is valid before doing anything else
-    if hSelectedDisk = -1 then
+    if hSelectedDisk = 0 then
     begin
      ShowMessage('Could not get exclusive disk access ' +
      'OS error and code : ' + SysErrorMessageUTF8(GetLastOSError));

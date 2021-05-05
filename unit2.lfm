@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet4
+    ActivePage = TabSheet3
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 3
+    TabIndex = 2
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -131,7 +131,7 @@ object MainForm: TMainForm
           ClientWidth = 444
           TabOrder = 3
           object btnFLBL: TButton
-            Left = 8
+            Left = 184
             Height = 25
             Hint = 'Load a large text file, hash the content '#13#10'of it line-by-line, and save the results '#13#10'to a new text file.'
             Top = 56
@@ -143,10 +143,10 @@ object MainForm: TMainForm
             TabOrder = 0
           end
           object btnLBL: TButton
-            Left = 8
+            Left = 16
             Height = 25
             Hint = 'Generate hash values line-by-line'#13#10'of the text pasted or written'#13#10'into the text area above. '#13#10'Results are saved to text file.'
-            Top = 16
+            Top = 56
             Width = 144
             Caption = 'TEXT Line-By-Line'
             OnClick = btnLBLClick
@@ -165,6 +165,25 @@ object MainForm: TMainForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 2
+          end
+          object TextLBLDelimiterComboBox: TComboBox
+            Left = 16
+            Height = 25
+            Hint = 'Select delimiter if you want. Comma is used if not specified.'
+            Top = 16
+            Width = 100
+            ItemHeight = 17
+            Items.Strings = (
+              ','
+              '-'
+              'Tab'
+              'Space'
+            )
+            OnChange = FileSDelimiterComboBoxChange
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 3
+            Text = 'Set Delimiter'
           end
         end
         object cbFlipCaseTEXT: TCheckBox
@@ -840,6 +859,7 @@ object MainForm: TMainForm
         object FileSDelimiterComboBox: TComboBox
           Left = 8
           Height = 25
+          Hint = 'Select delimiter if you want. Comma is used if not specified.'
           Top = 96
           Width = 100
           ItemHeight = 17
@@ -1277,6 +1297,7 @@ object MainForm: TMainForm
         object CopyDelimiterComboBox: TComboBox
           Left = 376
           Height = 25
+          Hint = 'Select delimiter if you want. Comma is used if not specified.'
           Top = 240
           Width = 100
           ItemHeight = 17
@@ -1849,6 +1870,7 @@ object MainForm: TMainForm
         object C2FDelimiterComboBox: TComboBox
           Left = 347
           Height = 25
+          Hint = 'Select delimiter if you want. Comma is used if not specified.'
           Top = 200
           Width = 100
           ItemHeight = 17
@@ -1859,6 +1881,8 @@ object MainForm: TMainForm
             'Space'
           )
           OnChange = C2FDelimiterComboBoxChange
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 12
           Text = 'Set Delimiter'
         end
@@ -1877,8 +1901,8 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       object btnCallDiskHasherModule: TButton
         Left = 376
         Height = 25
@@ -1893,17 +1917,17 @@ object MainForm: TMainForm
       end
       object lblDiskHashingRunAsAdminWarning: TLabel
         Left = 368
-        Height = 16
+        Height = 15
         Top = 72
-        Width = 272
+        Width = 239
         Caption = 'Must be run as administrator for disk hashing'
         ParentColor = False
       end
       object Label8: TLabel
         Left = 344
-        Height = 32
+        Height = 30
         Top = 112
-        Width = 336
+        Width = 295
         Caption = 'LINUX USERS - You may prefer to hash disks using '#10'"File" tab and navigate to /dev/sdX or /dev/sdXX as root'
         ParentColor = False
       end

@@ -12,11 +12,13 @@ Fix : DisableControls and EnableControls used more extensively to expedite the "
 Fix : When saving results as CSV in Compare Two Folders, if the user selected an existing file to overwrite, it would o that, but the next run would result in an infinite loop telling the user it already exists and to choose another file, but not being able to actually do so. That was fixed. <br>
 Fix : Apples new OSX 'Big Sur' unhelpfully removed static libraries, like the SQLite library, so it could not be referenced by file path. So a different method of lookup is needed using the dyanmic linker cache and a 3 state compiler directive is now used for loading SQLite, depending on the OS being used. That has been applied so that Apple users can continue to enjoy the benefits of QuickHash on that most changing and challenging of operating system. You're welcome. <br>
 Fix : Two stringlists are created when using "Compare Two Folders" to store the list of files for analysis. I had introduced a memory leak here without realising it and that has been corrected (with thanks to an open-source developer who spotted that for me). <br>
+Fix : A small memory leak existed in frmSQLiteDBases.DatasetToClipBoard for copying data to clipboard. The CSVClipboardList string list that was used to achieve this was not being freed. Now it is freed. 
 Fix : In the basic results txt file that is created during Compare Two Folders, the selected folder names in the log file were prefixed with the LongPathOverride of two slashes a question mark and a slash. That was corrected to just show the normal path as users dont realy need to see that (as it is just an API switch). <br>
 New : Button added to enable the user to easily make a copy of the backend SQLite database at any given point in time, for convenience. This can help users who may wish to load it into specific database tools, like SQLite Explorer or browser extensions like SQLite Manager. <br>
 New : Logo replaced with the newer Quickash logo. <br>
 New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, hyphen etc. If no character is chosen, a comma is assumed and used as before. <br>
 Code: Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. <br>
+
 
 v3.2.0<br>
 New : Blake3 hash algorithm added for text strings, a file, Files recursively, Compare Two Folders and Compare Two Files. <br>

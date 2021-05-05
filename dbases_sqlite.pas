@@ -13,7 +13,7 @@ uses
 {$endif}
   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
   LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
-  sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes, Variants;
+  sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes;
 
 type
 
@@ -78,22 +78,26 @@ type
     procedure SortBySourceHash(DBGrid : TDBGrid);
     procedure SortByDestinationHash(DBGrid : TDBGrid);
     procedure ShowMismatchesC2F(DBGrid : TDBGrid);
+    procedure ShowDiffHashes(DBGrid : TDBGrid);
+    procedure ShowMatchingHashes(DBGrid : TDBGrid);
+    procedure ShowMissingFilesFolderA(DBGrid : TDBGrid);
+    procedure ShowMissingFilesFolderB(DBGrid : TDBGrid);
+    procedure ShowMissingFromFolderAAndFolderB(DBGrid : TDBGrid);
     function CountGridRows(DBGrid : TDBGrid) : integer;
 
   private
     { private declarations }
   public
-    DBName : string;     // Used by PreserveDB button globally to enable the user to save the DB. New as of v3.3.0
-    ChosenDelimiter: string;
-    FFilePathA : String; // new to v3.3.0
-    FFilePathB : String; // new to v3.3.0
+    DBName           : string; // New to v3.3.0. Used by PreserveDB button to enable the user to save the DB.
+    ChosenDelimiter  : string; // New to v3.3.0 to enable use of preferred delim char
+    FFilePathA       : String; // new to v3.3.0 for Compare Two Folders tab
+    FFilePathB       : String; // new to v3.3.0 for Compare Two Folders tab
     { public declarations }
   const
     // More information on the use of these values is below.
     // They need not be set as constants and can be any valid value
     application_id = 1189021115; // must be a 32-bit Unsigned Integer (Longword 0 .. 4294967295)  https://www.sqlite.org/pragma.html#pragma_application_id
     user_version   = 23400001;   // must be a 32-bit Signed Integer (LongInt -2147483648 .. 2147483647)  https://www.sqlite.org/pragma.html#pragma_user_version
-    NullStrictConvert = False;
   end;
 
 var
@@ -112,8 +116,10 @@ implementation
 // If it cant be found, QH will run with some tabs, but not those that need SQLIte backend
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 var
-  guid : TGuid;
-  SQLiteLibraryPath, strFileNameRandomiser, SafePlaceForDB : string;
+  guid                  : TGuid;
+  SQLiteLibraryPath     : string = Default(string);
+  strFileNameRandomiser : string = Default(string);
+  SafePlaceForDB        : string = Default(string);
   {$ifdef Linux}
     LibHandle : Pointer;
     Pdlinfo : Pdl_info;
@@ -392,36 +398,34 @@ end;
 // Anyone who knows of a better way, let me know!
 procedure TfrmSQLiteDBases.CopySelectedRowFILESTAB(DBGrid : TDBGrid);
 var
-  FileNameCell, FilePathCell, FileHashCell, AllRowCells : string;
+  FileNameCell : string = Default(string);
+  FilePathCell : string = Default(string);
+  FileHashCell : string = Default(string);
+  AllRowCells  : string = Default(string);
 begin
   ChosenDelimiter := MainForm.ChosenDelimiter;
-  // Get the data from the filename cell that the user has selected
-  FileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
-  // Get the data from the filepath cell that the user has selected
-  FilePathCell := DBGrid.DataSource.DataSet.Fields[2].Value;
-  // Get the data from the filehash cell that the user has selected
-  FileHashCell := DBGrid.DataSource.DataSet.Fields[3].Value;
-  // and just add them all together :-)
-  AllRowCells := FileNameCell+ChosenDelimiter+FilePathCell+ChosenDelimiter+FileHashCell;
-  Clipboard.AsText := AllRowCells;
+  FileNameCell    := DBGrid.DataSource.DataSet.Fields[1].AsString;
+  FilePathCell    := DBGrid.DataSource.DataSet.Fields[2].AsString;
+  FileHashCell    := DBGrid.DataSource.DataSet.Fields[3].AsString;
+  AllRowCells     := FileNameCell+ChosenDelimiter+FilePathCell+ChosenDelimiter+FileHashCell;
+  Clipboard.AsText:= AllRowCells;
 end;
 
 procedure TfrmSQLiteDBases.CopySelectedRowCOPYTAB(DBGrid : TDBGrid);
 var
-  AllRowCells, SourceFileNameCell, SourceHash,
-    DestinationFilenameCell, DestinationHash, DateAttr : string;
+  AllRowCells             : string = Default(string);
+  SourceFileNameCell      : string = Default(string);
+  SourceHash              : string = Default(string);
+  DestinationFilenameCell : string = Default(string);
+  DestinationHash         : string = Default(string);
+  DateAttr                : string = Default(string);
 begin
   ChosenDelimiter := MainForm.ChosenDelimiter;
-  // Get the data from the source filename cell that the user has selected
-  SourceFileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
-  // Get the source file hash cell that the user has selected
-  SourceHash := DBGrid.DataSource.DataSet.Fields[2].Value;
-  // Get the destination filename
-  DestinationFilenameCell := DBGrid.DataSource.DataSet.Fields[3].Value;
-  // Get the destination hash
-  DestinationHash  := DBGrid.DataSource.DataSet.Fields[4].Value;
-  // Get the date attributes
-  DateAttr         := DBGrid.DataSource.DataSet.Fields[5].Value;
+  SourceFileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
+  SourceHash := DBGrid.DataSource.DataSet.Fields[2].AsString;
+  DestinationFilenameCell := DBGrid.DataSource.DataSet.Fields[3].AsString;
+  DestinationHash  := DBGrid.DataSource.DataSet.Fields[4].AsString;
+  DateAttr         := DBGrid.DataSource.DataSet.Fields[5].AsString;
   // and just add them all together :-)
   AllRowCells := SourceFileNameCell+ChosenDelimiter+SourceHash +ChosenDelimiter+DestinationFilenameCell+ChosenDelimiter+DestinationHash+ChosenDelimiter+DateAttr;
   Clipboard.AsText := AllRowCells;
@@ -430,48 +434,65 @@ end;
 // Copies selected row to clipboard of "Compare Two Folders" tab
 procedure TfrmSQLiteDBases.CopySelectedRowC2FTAB(DBGrid : TDBGrid);
 var
-  AllRowCells, FolderAFileNameCell, FolderAFileHash,
-    FolderBFileNameCell, FolderBFileHash : string;
+  AllRowCells : string = Default(string);
+  strID       : string = Default(string);
+  FileNameCell: string = Default(string);
+  FolderPathA : string = Default(string);
+  FileHashA   : string = Default(string);
+  FolderPathB : string = Default(string);
+  FileHashB   : string = Default(string);
 begin
   ChosenDelimiter := MainForm.ChosenDelimiter;
-  // Get the data from the source filename cell that the user has selected
-  FolderAFileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
-  // Get the source file hash cell that the user has selected
-  FolderAFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
-  // Get the destination filename
-  FolderBFileNameCell := DBGrid.DataSource.DataSet.Fields[3].Value;
-  // Get the destination hash
-  FolderBFileHash  := DBGrid.DataSource.DataSet.Fields[4].Value;
-  // and just add them all together :-)
-  AllRowCells := FolderAFileNameCell +ChosenDelimiter+
-                 FolderAFileHash     +ChosenDelimiter+
-                 FolderBFileNameCell +ChosenDelimiter+
-                 FolderBFileHash;
+  strID           := DBGrid.DataSource.DataSet.Fields[0].AsString;
+  FileNameCell    := DBGrid.DataSource.DataSet.Fields[1].AsString;
+  FolderPathA     := DBGrid.DataSource.DataSet.Fields[2].AsString;
+  FileHashA       := DBGrid.DataSource.DataSet.Fields[3].AsString;
+  FolderPathB     := DBGrid.DataSource.DataSet.Fields[4].AsString;
+  FileHashB       := DBGrid.DataSource.DataSet.Fields[5].AsString;
+
+  AllRowCells := strID               +ChosenDelimiter+
+                 FileNameCell        +ChosenDelimiter+
+                 FolderPathA         +ChosenDelimiter+
+                 FileHashA           +ChosenDelimiter+
+                 FolderPathB         +ChosenDelimiter+
+                 FileHashB;
+
   Clipboard.AsText := AllRowCells;
 end;
 
-// Copies multiple selected rows to clipboard of the "Compare Two Folders" results tab
+// Copies multiple selected rows (plural) to clipboard of the "Compare Two Folders" results tab
 // New to v3.3.0
 procedure TfrmSQLiteDBases.CopySelectedRowsC2FTAB(DBGrid : TDBGrid);
 var
-  sCSV : String;
+  AllRowCells  : string = Default(string);
+  strID        : string = Default(string);
+  FileNameCell : string = Default(string);
+  FolderPathA  : string = Default(string);
+  FileHashA    : string = Default(string);
+  FolderPathB  : string = Default(string);
+  FileHashB    : string = Default(string);
   i : Integer;
 begin
-  sCSV:='';
   ChosenDelimiter := MainForm.ChosenDelimiter;
   for i := 0 to DBGrid.SelectedRows.Count -1 do
   with DBGrid.DataSource.DataSet do
   begin
     GotoBookmark(Pointer(DBGrid.SelectedRows.Items[i]));
-    if sCSV <> '' then sCSV := sCSV + LineEnding;
+    strID           := DBGrid.DataSource.DataSet.Fields[0].AsString;
+    FileNameCell    := DBGrid.DataSource.DataSet.Fields[1].AsString;
+    FolderPathA     := DBGrid.DataSource.DataSet.Fields[2].AsString;
+    FileHashA       := DBGrid.DataSource.DataSet.Fields[3].AsString;
+    FolderPathB     := DBGrid.DataSource.DataSet.Fields[4].AsString;
+    FileHashB       := DBGrid.DataSource.DataSet.Fields[5].AsString;
 
-    sCSV := sCSV +
-      FieldByName('FilePathA').AsString+FieldByName('FileName').AsString +ChosenDelimiter+
-      FieldByName('FileHashA').AsString+ChosenDelimiter+
-      FieldByName('FilePathB').AsString+FieldByName('FileName').AsString +ChosenDelimiter+
-      FieldByName('FileHashB').AsString;
+    AllRowCells := AllRowCells         + strID +ChosenDelimiter+
+                   FileNameCell        +ChosenDelimiter+
+                   FolderPathA         +ChosenDelimiter+
+                   FileHashA           +ChosenDelimiter+
+                   FolderPathB         +ChosenDelimiter+
+                   FileHashB           +LineEnding;
   end;
-  Clipboard.AsText:=sCSV;
+  Clipboard.AsText := AllRowCells;         // Clipboard.AsText:=sCSV;
 end;
 
 
@@ -479,8 +500,12 @@ end;
 // returns active display to top row
 function TfrmSQLiteDBases.CountGridRows(DBGrid : TDBGrid) : integer;
 var
-  NoOfRows : integer;
+  NoOfRows : integer = Default(integer);
 begin
+  result := -1;
+  NoOfRows := DBGrid.DataSource.DataSet.RecordCount;
+  If NoOfRows > -1 then result := NoOfRows;
+  {pre v3.3.0 method
   result := -1;
   NoOfRows := -1;
   DBGrid.DataSource.Dataset.DisableControls;
@@ -494,13 +519,16 @@ begin
   // Go to top of grid.
   DBGrid.DataSource.DataSet.First;
   // Return count
-  If NoOfRows > -1 then result := NoOfRows;
+  If NoOfRows > -1 then result := NoOfRows;  }
 end;
 // Saves the grid in FILES tab to HTML. If small volume of records, uses a stringlist.
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : string);
 var
-  strTitle, FileNameCell, FilePathCell, FileHashCell : string;
+  strTitle       : string = Default(string);
+  FileNameCell   : string = Default(string);
+  FilePathCell   : string = Default(string);
+  FileHashCell   : string = Default(string);
   NoOfRowsInGrid : integer;
   sl             : TStringList;
   fs             : TFileStreamUTF8;
@@ -542,13 +570,13 @@ begin
           begin
             sl.add('<tr>');
             // Get the data from the filename cell that the user has selected
-            FileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
+            FileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
             sl.add('<td>'+FileNameCell+'</td>');
             // Get the data from the filepath cell that the user has selected
-            FilePathCell := DBGrid.DataSource.DataSet.Fields[2].Value;
+            FilePathCell := DBGrid.DataSource.DataSet.Fields[2].AsString;
             sl.add('<td>'+FilePathCell+'</td>');
             // Get the data from the filehash cell that the user has selected
-            FileHashCell := DBGrid.DataSource.DataSet.Fields[3].Value;
+            FileHashCell := DBGrid.DataSource.DataSet.Fields[3].AsString;
             sl.add('<td>'+FileHashCell+'</td>');
             sl.add('</tr>');
             DBGrid.DataSource.DataSet.Next;
@@ -600,21 +628,21 @@ begin
           // Start new row
           fs.Write(strTABLEROWStart[1], 4);
           // Get the data from the filename cell that the user has selected
-          FileNameCell := DBGrid.DataSource.DataSet.Fields[1].Value;
+          FileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
           // Write filename to new row
           fs.Write(strTABLEDATAStart[1], 4);
           fs.Write(FileNameCell[1], Length(FileNameCell));
           fs.Write(strTABLEDataEnd[1], 5);
 
           // Get the data from the filepath cell that the user has selected
-          FilePathCell := DBGrid.DataSource.DataSet.Fields[2].Value;
+          FilePathCell := DBGrid.DataSource.DataSet.Fields[2].AsString;
           // Write filepath to new row
           fs.Write(strTABLEDATAStart[1], 4);
           fs.Write(FilePathCell[1], Length(FilePathCell));
           fs.Write(strTABLEDATAEnd[1], 5);
 
           // Get the data from the filehash cell that the user has selected
-          FileHashCell := DBGrid.DataSource.DataSet.Fields[3].Value;
+          FileHashCell := DBGrid.DataSource.DataSet.Fields[3].AsString;
           // Write hash to new row
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(FileHashCell[1], Length(Trim(FileHashCell)));
@@ -735,14 +763,13 @@ end;
 procedure TfrmSQLiteDBases.SaveFileSDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
   linetowrite : ansistring;
-  n : integer;
   CSVFileToWrite : TFilestreamUTF8;
-  KnownHashFlagIsSet : boolean;
+  n : integer = Default(integer);
+  KnownHashFlagIsSet : boolean = Default(boolean);
 begin
   Mainform.StatusBar2.SimpleText := 'Writing data to file...please wait';
   Application.ProcessMessages;
-  n := 0;
-  KnownHashFlagIsSet := false;
+
   ChosenDelimiter := MainForm.ChosenDelimiter;
 
   try
@@ -753,8 +780,8 @@ begin
         linetowrite := '';
         linetowrite := ('Filename'  + ChosenDelimiter + 'FilePath' + ChosenDelimiter +
                         'HashValue' + ChosenDelimiter + 'FileSize' + ChosenDelimiter +
-                        'KnownHashFlag' + #13#10);
-        n := 0;
+                        'KnownHashFlag' + LineEnding);
+
         n := Length(LineToWrite);
         CSVFileToWrite.Write(linetowrite[1], n);
 
@@ -775,7 +802,7 @@ begin
                              (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
                              (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
                              (DBGrid.DataSource.DataSet.Fields[4].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
+                             (DBGrid.DataSource.DataSet.Fields[5].Text) + LineEnding;
             end
             else
               begin
@@ -783,7 +810,7 @@ begin
               linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
                              (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
                              (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+                             (DBGrid.DataSource.DataSet.Fields[4].Text) + LineEnding;
               end;
             n := 0;
             n := Length(linetowrite);
@@ -805,13 +832,12 @@ end;
 procedure TfrmSQLiteDBases.SaveCopyDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
   linetowrite : ansistring;
-  n : integer;
+  n : integer = Default(integer);
   CSVFileToWrite : TFilestreamUTF8;
 begin
   Mainform.StatusBar2.SimpleText := 'Writing data to file...please wait';
    Application.ProcessMessages;
    linetowrite := '';
-   n := 0;
    ChosenDelimiter := MainForm.ChosenDelimiter;
 
    try
@@ -822,7 +848,7 @@ begin
                     'Source Hash'              +ChosenDelimiter+
                     'Destination Filename'     +ChosenDelimiter+
                     'Destination Hash'         +ChosenDelimiter+
-                    'Original Date Attributes' + #13#10;
+                    'Original Date Attributes' + LineEnding;
 
      n := Length(linetowrite);
      CSVFileToWrite.Write(linetowrite[1], n);
@@ -837,7 +863,7 @@ begin
                         (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
                         (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
                         (DBGrid.DataSource.DataSet.Fields[4].Text) + ChosenDelimiter+
-                        (DBGrid.DataSource.DataSet.Fields[5].Text) + #13#10;
+                        (DBGrid.DataSource.DataSet.Fields[5].Text) + LineEnding;
           n := 0;
           n := Length(linetowrite);
           CSVFileToWrite.Write(linetowrite[1], n);
@@ -856,25 +882,25 @@ end;
 procedure TfrmSQLiteDBases.SaveC2FDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
   linetowrite : ansistring;
-  n : integer;
+  n : integer = Default(integer);
   CSVFileToWrite : TFilestreamUTF8;
 
 begin
   Mainform.StatusBar2.SimpleText := 'Writing results to file...please wait';
   Application.ProcessMessages;
   linetowrite := '';
-  n := 0;
   ChosenDelimiter := MainForm.ChosenDelimiter;
   try
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
     if CSVFileToWrite.Handle > 0 then
     begin
       // Add header
-      linetowrite := 'Filename'  +ChosenDelimiter+
+      linetowrite := 'ID'        +ChosenDelimiter+
+                     'Filename'  +ChosenDelimiter+
                      'FilePathA' +ChosenDelimiter+
                      'FileHashA' +ChosenDelimiter+
                      'FilePathB' +ChosenDelimiter+
-                     'FileHashB' + #13#10;
+                     'FileHashB' + LineEnding;
       n := Length(linetowrite);
       CSVFileToWrite.Write(linetowrite[1], n);
 
@@ -888,7 +914,8 @@ begin
                          (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
                          (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
                          (DBGrid.DataSource.DataSet.Fields[3].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[4].Text) + #13#10;
+                         (DBGrid.DataSource.DataSet.Fields[4].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[5].Text) + LineEnding;
 
           n := 0;
           n := Length(linetowrite);
@@ -934,7 +961,8 @@ begin
                          (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
                          (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
                          (DBGrid.DataSource.DataSet.Fields[3].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[4].Text));
+                         (DBGrid.DataSource.DataSet.Fields[4].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[5].Text));
           DBGrid.DataSource.Dataset.Next;
         end;
       finally
@@ -942,6 +970,7 @@ begin
       end;
     finally
       Clipboard.AsText := CSVClipboardList.Text;
+      CSVClipboardList.Free;
     end;
     Mainform.StatusBar2.SimpleText := 'DONE';
     ShowMessage('Grid data now in clipboard ');
@@ -981,12 +1010,14 @@ end;
 // DeleteDuplicates remove duplicate files as found in the 'FILES' tab
 procedure TfrmSQLiteDBases.DeleteDuplicates(DBGrid : TDBGrid);
 var
-  FileName, FilePath, NameAndPath, FileHash : string;
+  FileName    : string = Default(string);
+  FilePath    : string = Default(string);
+  NameAndPath : string = Default(string);
+  FileHash    : string = Default(string);
   i, FileDeletedCount : integer;
-  FilesDeletedOK : boolean;
+  FilesDeletedOK : boolean = Default(boolean);
   slDuplicates, slDuplicatesDeleted : TStringList;
 begin
-  FilesDeletedOK := false;
   FileDeletedCount := 0;
   ChosenDelimiter := MainForm.ChosenDelimiter;
   try
@@ -1001,9 +1032,9 @@ begin
     begin
       for i := 0 to DBGrid.DataSource.DataSet.FieldCount -1 do
       begin
-        FileName := DBGrid.DataSource.DataSet.Fields[1].Value;
-        FilePath := DBGrid.DataSource.DataSet.Fields[2].Value;
-        FileHash := DBGrid.DataSource.DataSet.Fields[3].Value;
+        FileName := DBGrid.DataSource.DataSet.Fields[1].AsString;
+        FilePath := DBGrid.DataSource.DataSet.Fields[2].AsString;
+        FileHash := DBGrid.DataSource.DataSet.Fields[3].AsString;
         NameAndPath := FilePath+FileName;
         // Now, add the hash value, but only if it's not already in the stringlist
         // If the currently examined hashvalue IS in the list, then it must be a duplicate
@@ -1054,7 +1085,7 @@ end;
 // Write computed values from the FILES tab to the database table TBL_FILES
 procedure TfrmSQLiteDBases.WriteFILESValuesToDatabase(Filename, Filepath, HashValue, FileSize : string; KnownHash : boolean);
 var
-  KnownHashFlag : string;
+  KnownHashFlag : string = Default(string);
 begin
   try
     sqlFILES.Close;
@@ -1257,12 +1288,11 @@ end;
 // Used by the FILES tab display grid to copy the content of Column 1 (filename) to clipboard
 procedure TfrmSQLiteDBases.CopyFilenameOfSelectedCell(DBGrid : TDBGrid);
 var
-  CellOfInterest : string;
+  CellOfInterest : string = Default(string);
 begin
-  CellOfInterest := '';
-  if not (DBGrid.DataSource.DataSet.Fields[1].Value = NULL) then
+  if not (DBGrid.DataSource.DataSet.Fields[1].AsString = NULL) then
   begin
-    CellOfInterest := DBGrid.DataSource.DataSet.Fields[1].Value;
+    CellOfInterest := DBGrid.DataSource.DataSet.Fields[1].AsString;
     Clipboard.AsText := CellOfInterest;
   end;
 end;
@@ -1270,12 +1300,11 @@ end;
 // // Used by the FILES tab display grid to copy the content of Column 2 (file path) to clipboard
 procedure TfrmSQLiteDBases.CopyFilePathOfSelectedCell(DBGrid : TDBGrid);
 var
-  CellOfInterest : string;
+  CellOfInterest : string = Default(string);
 begin
-  CellOfInterest := '';
-  if not (DBGrid.DataSource.DataSet.Fields[2].Value = NULL) then
+  if not (DBGrid.DataSource.DataSet.Fields[2].AsString = NULL) then
   begin
-    CellOfInterest := DBGrid.DataSource.DataSet.Fields[2].Value;
+    CellOfInterest := DBGrid.DataSource.DataSet.Fields[2].AsString;
     Clipboard.AsText := CellOfInterest;
   end;
 end;
@@ -1283,12 +1312,11 @@ end;
 // Used by the FILES tab display grid to copy the content of Column 3 (Hash Value) to clipboard
 procedure TfrmSQLiteDBases.CopyHashOfSelectedCell(DBGrid : TDBGrid);
 var
-  CellOfInterest : string;
+  CellOfInterest : string = Default(string);
 begin
-  CellOfInterest := '';
-  if not (DBGrid.DataSource.DataSet.Fields[3].Value = NULL) then
+  if not (DBGrid.DataSource.DataSet.Fields[3].AsString = NULL) then
   begin
-    CellOfInterest := DBGrid.DataSource.DataSet.Fields[3].Value;
+    CellOfInterest := DBGrid.DataSource.DataSet.Fields[3].AsString;
     Clipboard.AsText := CellOfInterest;
   end;
 end;
@@ -1300,13 +1328,11 @@ var
   slFileHashes   : TStringList;
   tempfile       : TFileStream;
   n : integer;
-  ChosenHashAlg,
-    Header,
-    FileForCopiedHashes,
-    linetowrite  : string;
+  ChosenHashAlg  : string = Default(string);
+  Header         : string = Default(string);
+  linetowrite    : string = Default(string);
+  FileForCopiedHashes : string = Default(string);
 begin
-  ChosenHashAlg := '';
-  Header        := '';
   n             := 0;
   case MainForm.AlgorithmChoiceRadioBox3.ItemIndex of
       0: begin
@@ -1346,14 +1372,14 @@ begin
       try
         tempfile := TFileStream.Create(FileForCopiedHashes, fmCreate);
         // Give the list a header of the chosen hash algorithm
-        linetowrite := Header + #13#10;
+        linetowrite := Header + LineEnding;
         tempfile.Write(linetowrite[1], Length(linetowrite));
         // Now add all the hash strings
         DBGrid.DataSource.DataSet.DisableControls;
         DBGrid.DataSource.DataSet.First;
         while not DBGrid.DataSource.DataSet.EOF do
         begin
-          linetowrite := (DBGrid.DataSource.DataSet.Fields[3].Text) + #13#10;
+          linetowrite := (DBGrid.DataSource.DataSet.Fields[3].Text) + LineEnding;
           n := Length(linetowrite);
           try
             tempfile.Write(linetowrite[1], n);
@@ -1420,25 +1446,12 @@ end;
 procedure TfrmSQLiteDBases.ShowMismatchesC2F(DBGrid : TDBGrid);
 begin
   try
+    DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
     //TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT ID, FolderAndFileNameA, FolderAndFileNameAHash, FolderAndFileNameB, FolderAndFileNameBHash ' + //DS (original)
     //                      'FROM TBL_COMPARE_TWO_FOLDERS WHERE FolderAndFileNameAHash <> FolderAndFileNameBHash';                                            //DS (original)
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text:=                                                 //DS (new)
-      'select a.FileName,a.FilePath as FilePathA, a.FileHash as FileHashA, '+                       //DS (new)
-      ' b.FilePath as FilePathB, b.FileHash as FileHashB '+                                         //DS (new)
-      'from TBL_COMPARE_TWO_FOLDERS a '+                                                            //DS (new)
-      '  left join TBL_COMPARE_TWO_FOLDERS b on a.FileName=b.FileName and b.FilePath=:FilePathB '+  //DS (new)
-      'where a.FilePath=:FilePathA '+                                                               //DS (new)
-      'and (a.FileHash<>b.FileHash or b.FileHash is null) '+                                        //DS (new)
-      'union '+                                                                                     //DS (new)
-      'select c.FileName,d.FilePath as FilePathA, d.FileHash as FileHashA, '+                       //DS (new)
-      ' c.FilePath as FilePathB, c.FileHash as FileHashB '+                                         //DS (new)
-      'from TBL_COMPARE_TWO_FOLDERS c '+                                                            //DS (new)
-      '  left join TBL_COMPARE_TWO_FOLDERS d on c.FileName=d.FileName and d.FilePath=:FilePathA '+  //DS (new)
-      'where c.FilePath=:FilePathB '+                                                               //DS (new)
-      'and (c.FileHash<>d.FileHash or d.FileHash is null) ';                                        //DS (new)
-    TSQLQuery(DBGrid.DataSource.Dataset).ParamByName('FilePathA').AsString:=FFilePathA;             //DS (new)
-    TSQLQuery(DBGrid.DataSource.Dataset).ParamByName('FilePathB').AsString:=FFilePathB;             //DS (new)
+    DBGrid.DataSource.DataSet.Filter:='FileHashA='''' or FileHashB='''' or FileHashA<>FileHashB';
+    DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
@@ -1451,26 +1464,132 @@ begin
     end;
 end;
 
+// Used by the COMPARE TWO FOLDERS grid to display files with differing hashes
+// New to v3.3.0
+procedure TfrmSQLiteDBases.ShowDiffHashes(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    DBGrid.DataSource.DataSet.Filter:='FileHashA<>FileHashB and FileHashA<>'''' and FileHashB<>''''';
+    DBGrid.DataSource.DataSet.Filtered:=True;
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+end;
+
+// Used by the COMPARE TWO FOLDERS grid to display only matching hashes (also if both files are empty)
+// New to v3.3.0
+procedure TfrmSQLiteDBases.ShowMatchingHashes(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    DBGrid.DataSource.DataSet.Filter:='FileHashA=FileHashB';
+    DBGrid.DataSource.DataSet.Filtered:=True;
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+end;
+
+// Used by the COMPARE TWO FOLDERS grid to show files that are missing from folder A
+// New to v3.3.0
+procedure TfrmSQLiteDBases.ShowMissingFilesFolderA(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    DBGrid.DataSource.DataSet.Filter:='FileHashA=''''';
+    DBGrid.DataSource.DataSet.Filtered:=True;
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+end;
+
+// Used by the COMPARE TWO FOLDERS grid to show files that are missing from folder B
+// New to v3.3.0
+procedure TfrmSQLiteDBases.ShowMissingFilesFolderB(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    DBGrid.DataSource.DataSet.Filter:='FileHashB=''''';
+    DBGrid.DataSource.DataSet.Filtered:=True;
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+end;
+
+// Used by the COMPARE TWO FOLDERS grid to show files that are missing either from folder A or from folder B
+procedure TfrmSQLiteDBases.ShowMissingFromFolderAAndFolderB(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    DBGrid.DataSource.DataSet.Filter:='FileHashA='''' or FileHashB=''''';
+    DBGrid.DataSource.DataSet.Filtered:=True;
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+end;
 // Used by the COMPARE TWO FOLDERS grid to show all items
 procedure TfrmSQLiteDBases.ShowAllC2FGRID(DBGrid : TDBGrid);
 begin
   try
+    DBGrid.DataSource.DataSet.Filtered:=False;
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlCOMPARETWOFOLDERS but the query connected to the grid
-    //TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';     //DS (original)
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text:=                                                 //DS (new)
-      'select a.FileName,a.FilePath as FilePathA, a.FileHash as FileHashA, '+                       //DS (new)
-      ' b.FilePath as FilePathB, b.FileHash as FileHashB '+                                         //DS (new)
-      'from TBL_COMPARE_TWO_FOLDERS a '+                                                            //DS (new)
-      '  left join TBL_COMPARE_TWO_FOLDERS b on a.FileName=b.FileName and b.FilePath=:FilePathB '+  //DS (new)
-      'where a.FilePath=:FilePathA '+                                                               //DS (new)
-      'union '+                                                                                     //DS (new)
-      'select c.FileName,d.FilePath as FilePathA, d.FileHash as FileHashA, '+                       //DS (new)
-      ' c.FilePath as FilePathB, c.FileHash as FileHashB '+                                         //DS (new)
-      'from TBL_COMPARE_TWO_FOLDERS c '+                                                            //DS (new)
-      '  left join TBL_COMPARE_TWO_FOLDERS d on c.FileName=d.FileName and d.FilePath=:FilePathA '+  //DS (new)
-      'where c.FilePath=:FilePathB ';                                                               //DS (new)
-    TSQLQuery(DBGrid.DataSource.Dataset).ParamByName('FilePathA').AsString:=FFilePathA;             //DS (new)
-    TSQLQuery(DBGrid.DataSource.Dataset).ParamByName('FilePathB').AsString:=FFilePathB;             //DS (new)
+    //TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';     //(original)
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text:=                                                 //(new)
+    'select row_number() over (order by FileName) rownum, * '+
+      'from ( '+
+      'select a.FileName,a.FilePath as FilePathA, a.FileHash as FileHashA, '+
+      ' b.FilePath as FilePathB, b.FileHash as FileHashB '+
+      'from TBL_COMPARE_TWO_FOLDERS a '+
+      '  left join TBL_COMPARE_TWO_FOLDERS b on a.FileName=b.FileName and b.FilePath=:FilePathB '+
+      'where a.FilePath=:FilePathA '+
+      'union '+
+      'select c.FileName,d.FilePath as FilePathA, d.FileHash as FileHashA, '+
+      ' c.FilePath as FilePathB, c.FileHash as FileHashB '+
+      'from TBL_COMPARE_TWO_FOLDERS c '+
+      '  left join TBL_COMPARE_TWO_FOLDERS d on c.FileName=d.FileName and d.FilePath=:FilePathA '+
+      'where c.FilePath=:FilePathB)';
+    TSQLQuery(DBGrid.DataSource.Dataset).ParamByName('FilePathA').AsString:=FFilePathA;
+    TSQLQuery(DBGrid.DataSource.Dataset).ParamByName('FilePathB').AsString:=FFilePathB;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
@@ -1662,11 +1781,16 @@ end;
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
 var
-   strTitle, strTableHeader, SourceFilename, DestinationFileName, DateAttributes,
-     SourceFileHash, DestinationFileHash : string;
-  NoOfRowsInGrid    : integer;
-  sl                : TStringList;
-  fs                : TFileStreamUTF8;
+  strTitle             : string = Default(string);
+  strTableHeader       : string = Default(string);
+  SourceFilename       : string = Default(string);
+  DestinationFileName  : string = Default(string);
+  DateAttributes       : string = Default(string);
+  SourceFileHash       : string = Default(string);
+  DestinationFileHash  : string = Default(string);
+  NoOfRowsInGrid       : integer = Default(integer);
+  sl                   : TStringList;
+  fs                   : TFileStreamUTF8;
 
   const
     strHTMLHeader      = '<HTML>'  ;
@@ -1687,7 +1811,6 @@ var
     strHTMLFooter      = '</HTML>' ;
 
 begin
-  NoOfRowsInGrid := 0;
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
   NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
   if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
@@ -1709,19 +1832,19 @@ begin
       begin
           sl.add('<tr>');
           // Get the data from the source filename cell
-          SourceFilename := DBGrid.DataSource.DataSet.Fields[1].Value;
+          SourceFilename := DBGrid.DataSource.DataSet.Fields[1].AsString;
           sl.add('<td>'+SourceFilename+'</td>');
           // Get the data from the source file hash cell
-          SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+          SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].AsString;
           sl.add('<td>'+SourceFileHash+'</td>');
           // Get the data from the destination name
-          DestinationFilename := DBGrid.DataSource.DataSet.Fields[3].Value;
+          DestinationFilename := DBGrid.DataSource.DataSet.Fields[3].AsString;
           sl.add('<td>'+DestinationFilename+'</td>');
           // Get the data from the source file hash cell
-          DestinationFileHash := DBGrid.DataSource.DataSet.Fields[4].Value;
+          DestinationFileHash := DBGrid.DataSource.DataSet.Fields[4].AsString;
           sl.add('<td>'+DestinationFileHash+'</td>');
           // Get the data from the source file hash cell
-          DateAttributes := DBGrid.DataSource.DataSet.Fields[5].Value;
+          DateAttributes := DBGrid.DataSource.DataSet.Fields[5].AsString;
           sl.add('<td>'+DateAttributes+'</td>');
           sl.add('</tr>');
           DBGrid.DataSource.DataSet.Next;
@@ -1780,35 +1903,35 @@ begin
         // Start new row
         fs.Write(strTABLEROWStart[1], 4);
           // Get the source filename cell
-          SourceFilename := DBGrid.DataSource.DataSet.Fields[1].Value;
+          SourceFilename := DBGrid.DataSource.DataSet.Fields[1].AsString;
           // Write source filename to new row
           fs.Write(strTABLEDATAStart[1], 4);
           fs.Write(SourceFilename[1], Length(SourceFilename));
           fs.Write(strTABLEDataEnd[1], 5);
 
           // Get the source hash value
-          SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].Value;
+          SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].AsString;
           // Write the source hash value
           fs.Write(strTABLEDATAStart[1], 4);
           fs.Write(SourceFileHash[1], Length(SourceFileHash));
           fs.Write(strTABLEDATAEnd[1], 5);
 
           // Get the destination filename
-          DestinationFileName := DBGrid.DataSource.DataSet.Fields[3].Value;
+          DestinationFileName := DBGrid.DataSource.DataSet.Fields[3].AsString;
           // Write the destination hash
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(DestinationFileName[1], Length(Trim(DestinationFileName)));
           fs.Write(strTABLEDATAEnd[1], 5);
 
           // Get the destination hash
-          DestinationFileHash := DBGrid.DataSource.DataSet.Fields[4].Value;
+          DestinationFileHash := DBGrid.DataSource.DataSet.Fields[4].AsString;
           // Write the destination hash
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(DestinationFileHash[1], Length(Trim(DestinationFileHash)));
           fs.Write(strTABLEDATAEnd[1], 5);
 
           // Get the date attributes from the filesystem
-          DateAttributes := DBGrid.DataSource.DataSet.Fields[5].Value;
+          DateAttributes := DBGrid.DataSource.DataSet.Fields[5].AsString;
           // Write the date attributes
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(DateAttributes[1], Length(Trim(DateAttributes)));
@@ -1839,8 +1962,15 @@ end;
 // If big volume, uses file stream.
 procedure TfrmSQLiteDBases.SaveC2FWindowToHTML(DBGrid : TDBGrid; Filename : string);
 var
-  strTitle, HeaderRow, strFilename, FilepathA, FilePathB, FileHashA, FileHashB : string;
-  NoOfRowsInGrid    : integer;
+  strTitle          : string = Default(string);
+  HeaderRow         : string = Default(string);
+  strID             : string = Default(string);
+  strFilename       : string = Default(string);
+  FilepathA         : string = Default(string);
+  FileHashA         : string = Default(string);
+  FilePathB         : string = Default(string);
+  FileHashB         : string = Default(string);
+  NoOfRowsInGrid    : integer = Default(integer);
   sl                : TStringList;
   fs                : TFileStreamUTF8;
 
@@ -1858,11 +1988,6 @@ var
     strHTMLFooter      = '</HTML>' ;
 
 begin
-  // Added to v3.3.0 to overcome null fields and avoid the exception error of
-  // could-not-convert-variant-of-type-null-into-type-string when saving large data sets as HTML
-  // See http://riversoftavg.com/blogs/index.php/2016/07/13/quick-tip-fixing-could-not-convert-variant-of-type-null-into-type/
-  Variants.NullStrictConvert := False;
-
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
   NoOfRowsInGrid := 0;
   NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
@@ -1877,22 +2002,24 @@ begin
     sl.add('<BODY>');
     sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
     sl.add('<table border=1>');
-    sl.add('<tr><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
+    sl.add('<tr><td>ID</td><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
 
     DBGrid.DataSource.DataSet.DisableControls;
     DBGrid.DataSource.DataSet.First;
     while not DBGrid.DataSource.DataSet.EOF do
       begin
           sl.add('<tr>');
-          strFileName := DBGrid.DataSource.DataSet.Fields[0].Value;
+          strID := DBGrid.DataSource.DataSet.Fields[0].AsString;
+          sl.add('<td>'+strID+'</td>');
+          strFileName := DBGrid.DataSource.DataSet.Fields[1].AsString;
           sl.add('<td>'+strFileName+'</td>');
-          FilepathA := DBGrid.DataSource.DataSet.Fields[1].Value;
+          FilepathA := DBGrid.DataSource.DataSet.Fields[2].AsString;
           sl.add('<td>'+FilepathA+'</td>');
-          FileHashA := DBGrid.DataSource.DataSet.Fields[2].Value;
+          FileHashA := DBGrid.DataSource.DataSet.Fields[3].AsString;
           sl.add('<td>'+FileHashA+'</td>');
-          FilepathB := DBGrid.DataSource.DataSet.Fields[3].Value;
+          FilepathB := DBGrid.DataSource.DataSet.Fields[4].AsString;
           sl.add('<td>'+FilepathB+'</td>');
-          FileHashB := DBGrid.DataSource.DataSet.Fields[4].Value;
+          FileHashB := DBGrid.DataSource.DataSet.Fields[5].AsString;
           sl.add('<td>'+FileHashB+'</td>');
           sl.add('</tr>');
           DBGrid.DataSource.DataSet.Next;
@@ -1929,7 +2056,7 @@ begin
     fs.Write(#13#10, 2);
     fs.Write('<table border=1>', 16);
     HeaderRow := '';
-    HeaderRow := ('<tr><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
+    HeaderRow := ('<tr><td>ID</td><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
     fs.Write(HeaderRow[1], Length(HeaderRow));
 
     { strTABLEROWStart   = '<TR>'      = 4 bytes
@@ -1948,9 +2075,24 @@ begin
         fs.Write(strTABLEROWStart[1], 4);
 
         // Column1
-        if Length(DBGrid.DataSource.DataSet.Fields[0].Value) > 0 then
+        if Length(DBGrid.DataSource.DataSet.Fields[0].AsString) > 0 then
         begin
-          strFileName := DBGrid.DataSource.DataSet.Fields[0].Value;
+          strID := DBGrid.DataSource.DataSet.Fields[0].AsString;
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Write(strID[1], Length(strID));
+          fs.Write(strTABLEDataEnd[1], 5);
+        end
+        else
+        begin
+          fs.Write(strTABLEDATAStart[1], 4);
+          fs.Writeansistring('ID not found');
+          fs.Write(strTABLEDataEnd[1], 5);
+        end;
+
+        // Column2
+        if Length(DBGrid.DataSource.DataSet.Fields[1].AsString) > 0 then
+        begin
+          strFileName := DBGrid.DataSource.DataSet.Fields[1].AsString;
           fs.Write(strTABLEDATAStart[1], 4);
           fs.Write(strFileName[1], Length(strFileName));
           fs.Write(strTABLEDataEnd[1], 5);
@@ -1962,10 +2104,10 @@ begin
           fs.Write(strTABLEDataEnd[1], 5);
         end;
 
-        // Column2
-        if Length(DBGrid.DataSource.DataSet.Fields[1].Value) > 0 then
+        // Column3
+        if Length(DBGrid.DataSource.DataSet.Fields[2].AsString) > 0 then
         begin
-          FilepathA := DBGrid.DataSource.DataSet.Fields[1].Value;
+          FilepathA := DBGrid.DataSource.DataSet.Fields[2].AsString;
           fs.Write(strTABLEDATAStart[1], 4);
           fs.Write(FilepathA[1], Length(FilepathA));
           fs.Write(strTABLEDATAEnd[1], 5);
@@ -1977,10 +2119,10 @@ begin
           fs.Write(strTABLEDataEnd[1], 5);
         end;
 
-        // Column3
-        if Length(DBGrid.DataSource.DataSet.Fields[2].Value) > 0 then
+        // Column4
+        if Length(DBGrid.DataSource.DataSet.Fields[3].AsString) > 0 then
         begin
-          FileHashA := DBGrid.DataSource.DataSet.Fields[2].Value;
+          FileHashA := DBGrid.DataSource.DataSet.Fields[3].AsString;
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(FileHashA[1], Length(FileHashA));
           fs.Write(strTABLEDATAEnd[1], 5);
@@ -1992,10 +2134,10 @@ begin
           fs.Write(strTABLEDataEnd[1], 5);
         end;
 
-        // Column4
-        if Length(DBGrid.DataSource.DataSet.Fields[3].Value) > 0 then
+        // Column5
+        if Length(DBGrid.DataSource.DataSet.Fields[4].AsString) > 0 then
         begin
-          FilepathB := DBGrid.DataSource.DataSet.Fields[3].Value;
+          FilepathB := DBGrid.DataSource.DataSet.Fields[5].AsString;
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(FilepathB[1], Length(FilepathB));
           fs.Write(strTABLEDATAEnd[1], 5);
@@ -2007,10 +2149,10 @@ begin
           fs.Write(strTABLEDataEnd[1], 5);
         end;
 
-        // Column5
-        if Length(DBGrid.DataSource.DataSet.Fields[4].Value) > 0 then
+        // Column6
+        if Length(DBGrid.DataSource.DataSet.Fields[5].AsString) > 0 then
         begin
-          FileHashB := DBGrid.DataSource.DataSet.Fields[4].Value;
+          FileHashB := DBGrid.DataSource.DataSet.Fields[5].AsString;
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(FileHashB[1], Length(FileHashB));
           fs.Write(strTABLEDATAEnd[1], 5);
@@ -2089,17 +2231,20 @@ procedure TfrmSQLiteDBases.UpdateGridCOMPARETWOFOLDERSTAB(Sender: TObject);
     sqlCOMPARETWOFOLDERS.Close;
     //sqlCOMPARETWOFOLDERS.SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';                     //DS (original)
     sqlCOMPARETWOFOLDERS.SQL.Text:=                                                                 //DS (new)
-      'select a.FileName,a.FilePath as FilePathA, a.FileHash as FileHashA, '+                       //DS (new)
-      ' b.FilePath as FilePathB, b.FileHash as FileHashB '+                                         //DS (new)
-      'from TBL_COMPARE_TWO_FOLDERS a '+                                                            //DS (new)
-      '  left join TBL_COMPARE_TWO_FOLDERS b on a.FileName=b.FileName and b.FilePath=:FilePathB '+  //DS (new)
-      'where a.FilePath=:FilePathA '+                                                               //DS (new)
-      'union '+                                                                                     //DS (new)
-      'select c.FileName,d.FilePath as FilePathA, d.FileHash as FileHashA, '+                       //DS (new)
-      ' c.FilePath as FilePathB, c.FileHash as FileHashB '+                                         //DS (new)
-      'from TBL_COMPARE_TWO_FOLDERS c '+                                                            //DS (new)
-      '  left join TBL_COMPARE_TWO_FOLDERS d on c.FileName=d.FileName and d.FilePath=:FilePathA '+  //DS (new)
-      'where c.FilePath=:FilePathB ';                                                               //DS (new)
+     'select row_number() over (order by FileName) rownum, * '+
+      'from ( '+
+      'select a.FileName,a.FilePath as FilePathA, a.FileHash as FileHashA, '+
+      ' b.FilePath as FilePathB, b.FileHash as FileHashB '+
+      'from TBL_COMPARE_TWO_FOLDERS a '+
+      '  left join TBL_COMPARE_TWO_FOLDERS b on a.FileName=b.FileName and b.FilePath=:FilePathB '+
+      'where a.FilePath=:FilePathA '+
+      'union '+
+      'select c.FileName,d.FilePath as FilePathA, d.FileHash as FileHashA, '+
+      ' c.FilePath as FilePathB, c.FileHash as FileHashB '+
+      'from TBL_COMPARE_TWO_FOLDERS c '+
+      '  left join TBL_COMPARE_TWO_FOLDERS d on c.FileName=d.FileName and d.FilePath=:FilePathA '+
+      'where c.FilePath=:FilePathB)';
+
     sqlCOMPARETWOFOLDERS.ParamByName('FilePathA').AsString:=FFilePathA;                             //DS (new)
     sqlCOMPARETWOFOLDERS.ParamByName('FilePathB').AsString:=FFilePathB;                             //DS (new)
     SQLite3Connection1.Connected := True;

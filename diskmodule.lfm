@@ -288,8 +288,8 @@ object frmDiskHashingModule: TfrmDiskHashingModule
       TimeFormat = tf24
       TimeDisplay = tdHM
       DateMode = dmComboBox
-      Date = 1.79769313486232E308
-      Time = 1.79769313486232E308
+      Date = 42736
+      Time = 0.507754062498861
       UseDefaultSeparators = True
       HideDateTimeParts = []
       MonthNames = 'Long'

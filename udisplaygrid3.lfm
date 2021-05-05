@@ -77,6 +77,26 @@ object frmDisplayGrid3: TfrmDisplayGrid3
       Caption = 'Show mismatches'
       OnClick = MenuItem_C2F_ShowMismatchesClick
     end
+    object MenuItem_C2F_ShowMatchingHashes: TMenuItem
+      Caption = 'Show matching hashes'
+      OnClick = MenuItem_C2F_ShowMatchingHashesClick
+    end
+    object MenuItem_C2F_ShowDiffHashes: TMenuItem
+      Caption = 'Show different hashes, not missing files'
+      OnClick = MenuItem_C2F_ShowDiffHashesClick
+    end
+    object MenuItem_C2F_MissingFolderAFiles: TMenuItem
+      Caption = 'Show missing FolderA files'
+      OnClick = MenuItem_C2F_MissingFolderAFilesClick
+    end
+    object MenuItem_C2F_MissingFolderBFiles: TMenuItem
+      Caption = 'Show missing FolderB files'
+      OnClick = MenuItem_C2F_MissingFolderBFilesClick
+    end
+    object MenuItem_C2F_MissingFromFolderAAndFolderB: TMenuItem
+      Caption = 'Show missing files from Folder A or B'
+      OnClick = MenuItem_C2F_MissingFromFolderAAndFolderBClick
+    end
     object MenuItem_C2F_SaveResultsCSV: TMenuItem
       Caption = 'Save as CSV File'
       OnClick = MenuItem_C2F_SaveResultsCSVClick

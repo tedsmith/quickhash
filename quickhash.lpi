@@ -57,7 +57,7 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="67">
+    <Units Count="57">
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -75,7 +75,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="96"/>
         <CursorPos X="40" Y="107"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit1>
       <Unit2>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/udisplaygrid.pas"/>
@@ -86,7 +86,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="61"/>
         <CursorPos X="15" Y="78"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit2>
       <Unit3>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/diskmodule.pas"/>
@@ -94,18 +94,18 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit3>
       <Unit4>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/diskmodule.lfm"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit4>
       <Unit5>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/diskspecification.lfm"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit5>
       <Unit6>
@@ -114,19 +114,19 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit6>
       <Unit7>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/GPTMBR.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="28" Y="9"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit7>
       <Unit8>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/uGPT.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="28" Y="10"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit8>
       <Unit9>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/uprogress.pas"/>
@@ -135,7 +135,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uProgress"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit9>
       <Unit10>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/dbases_sqlite.pas"/>
@@ -145,7 +145,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="47" Y="35"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="120"/>
       </Unit10>
       <Unit11>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/frmaboutunit.pas"/>
@@ -156,129 +156,95 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos X="62" Y="41"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="31"/>
       </Unit11>
       <Unit12>
         <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Base/HlpHashFactory.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="986"/>
         <CursorPos Y="993"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit12>
       <Unit13>
         <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Crypto/HlpSHA2_256.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="37"/>
         <CursorPos Y="53"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit13>
       <Unit14>
         <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Crypto/HlpSHA2_256Base.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="45"/>
         <CursorPos Y="62"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit14>
       <Unit15>
         <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Base/HlpHashCryptoNotBuildIn.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="28"/>
         <CursorPos Y="49"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit15>
       <Unit16>
         <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Base/HlpHash.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="75"/>
         <CursorPos Y="98"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit16>
       <Unit17>
         <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Base/HlpHashBuffer.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="56"/>
         <CursorPos Y="70"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit17>
       <Unit18>
         <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Utils/HlpArrayUtils.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="109"/>
         <CursorPos Y="124"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit18>
       <Unit19>
         <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/inc/objpash.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="193"/>
         <CursorPos X="26" Y="204"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit19>
       <Unit20>
         <Filename Value="/usr/share/lazarus/2.0.4/lcl/include/statusbar.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="23"/>
         <CursorPos Y="37"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit20>
       <Unit21>
         <Filename Value="/usr/share/lazarus/2.0.4/components/lazutils/unixlazfileutils.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="51"/>
         <CursorPos Y="70"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="3"/>
       </Unit21>
       <Unit22>
-        <Filename Value="/usr/share/lazarus/2.0.4/lcl/include/progressbar.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="142"/>
-        <CursorPos Y="161"/>
-        <UsageCount Value="2"/>
-      </Unit22>
-      <Unit23>
-        <Filename Value="/usr/share/lazarus/2.0.4/lcl/include/radiogroup.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="363"/>
-        <CursorPos X="13" Y="370"/>
-        <UsageCount Value="2"/>
-      </Unit23>
-      <Unit24>
-        <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Crypto/HlpSHA1.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="34"/>
-        <CursorPos Y="50"/>
-        <UsageCount Value="2"/>
-      </Unit24>
-      <Unit25>
-        <Filename Value="../Documents/Programming/IHAveThePower/v1.3-Dev/HashLib4Pascal/src/Crypto/HlpSHA0.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="56"/>
-        <CursorPos Y="73"/>
-        <UsageCount Value="2"/>
-      </Unit25>
-      <Unit26>
-        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-base/src/contnrs.pp"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="3" Y="1300"/>
-        <UsageCount Value="2"/>
-      </Unit26>
-      <Unit27>
         <Filename Value="../Documents/Programming/QuickHash/v3.2.0-Dev/udisplaygrid3_comparetwofolders.pas"/>
         <ComponentName Value="frmDisplayGrid3_CompareTwoFolders"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uDisplayGrid3_CompareTwoFolders"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="43" Y="3"/>
-        <UsageCount Value="33"/>
-      </Unit27>
-      <Unit28>
+        <UsageCount Value="31"/>
+      </Unit22>
+      <Unit23>
         <Filename Value="/usr/share/lazarus/2.0.4/lcl/include/customform.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2318"/>
         <CursorPos X="3" Y="2326"/>
-        <UsageCount Value="8"/>
-      </Unit28>
-      <Unit29>
+        <UsageCount Value="6"/>
+      </Unit23>
+      <Unit24>
         <Filename Value="diskspecification.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmTechSpecs"/>
@@ -289,8 +255,8 @@
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit29>
-      <Unit30>
+      </Unit24>
+      <Unit25>
         <Filename Value="frmaboutunit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmAbout"/>
@@ -301,8 +267,8 @@
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit30>
-      <Unit31>
+      </Unit25>
+      <Unit26>
         <Filename Value="dbases_sqlite.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmSQLiteDBases"/>
@@ -310,25 +276,26 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="1619"/>
-        <CursorPos X="21" Y="1639"/>
+        <TopLine Value="351"/>
+        <CursorPos X="34" Y="378"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit31>
-      <Unit32>
+      </Unit26>
+      <Unit27>
         <Filename Value="diskmodule.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmDiskHashingModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="4"/>
-        <CursorPos Y="4"/>
+        <TopLine Value="933"/>
+        <CursorPos X="36" Y="1033"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit32>
-      <Unit33>
+      </Unit27>
+      <Unit28>
         <Filename Value="FindAllFilesEnhanced.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
@@ -336,8 +303,8 @@
         <CursorPos X="38" Y="50"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
-      </Unit33>
-      <Unit34>
+      </Unit28>
+      <Unit29>
         <Filename Value="udisplaygrid.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmDisplayGrid1"/>
@@ -346,12 +313,12 @@
         <UnitName Value="uDisplayGrid"/>
         <EditorIndex Value="1"/>
         <TopLine Value="87"/>
-        <CursorPos X="31" Y="89"/>
+        <CursorPos X="33" Y="95"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit34>
-      <Unit35>
+      </Unit29>
+      <Unit30>
         <Filename Value="uGPT.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
@@ -359,8 +326,8 @@
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
         <UsageCount Value="206"/>
-      </Unit35>
-      <Unit36>
+      </Unit30>
+      <Unit31>
         <Filename Value="uKnownHashLists.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
@@ -368,8 +335,8 @@
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
         <UsageCount Value="206"/>
-      </Unit36>
-      <Unit37>
+      </Unit31>
+      <Unit32>
         <Filename Value="unit2.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="MainForm"/>
@@ -382,8 +349,8 @@
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit37>
-      <Unit38>
+      </Unit32>
+      <Unit33>
         <Filename Value="uprogress.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
@@ -392,8 +359,8 @@
         <CursorPos Y="2"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
-      </Unit38>
-      <Unit39>
+      </Unit33>
+      <Unit34>
         <Filename Value="udisplaygrid3_comparetwofolders.pas"/>
         <ComponentName Value="frmDisplayGrid3_CompareTwoFolders"/>
         <HasResources Value="True"/>
@@ -401,337 +368,296 @@
         <UnitName Value="uDisplayGrid3_CompareTwoFolders"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="36" Y="8"/>
-        <UsageCount Value="6"/>
-      </Unit39>
-      <Unit40>
+        <UsageCount Value="4"/>
+      </Unit34>
+      <Unit35>
         <Filename Value="udisplaygrid3.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmDisplayGrid3"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="88"/>
-        <CursorPos X="3" Y="100"/>
+        <TopLine Value="139"/>
+        <CursorPos X="3" Y="158"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit40>
-      <Unit41>
+      </Unit35>
+      <Unit36>
         <Filename Value="/usr/share/lazarus/2.0.4/lcl/forms.pp"/>
         <UnitName Value="Forms"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="15" Y="653"/>
-        <UsageCount Value="8"/>
-      </Unit41>
-      <Unit42>
+        <UsageCount Value="6"/>
+      </Unit36>
+      <Unit37>
         <Filename Value="/lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
         <UnitName Value="DBGrids"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="843"/>
         <CursorPos X="34" Y="863"/>
-        <UsageCount Value="56"/>
-      </Unit42>
-      <Unit43>
-        <Filename Value="/lazarus-v2.0.10/lazarus/lcl/include/customcheckbox.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="111"/>
-        <CursorPos Y="134"/>
-        <UsageCount Value="1"/>
-      </Unit43>
-      <Unit44>
-        <Filename Value="/lazarus-v2.0.10/lazarus/lcl/include/wincontrol.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="6486"/>
-        <CursorPos Y="6510"/>
-        <UsageCount Value="1"/>
-      </Unit44>
-      <Unit45>
-        <Filename Value="/lazarus-v2.0.10/lazarus/lcl/interfaces/win32/win32wsstdctrls.pp"/>
-        <UnitName Value="Win32WSStdCtrls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1924"/>
-        <CursorPos Y="1948"/>
-        <UsageCount Value="1"/>
-      </Unit45>
-      <Unit46>
-        <Filename Value="/lazarus-v2.0.10/lazarus/components/lazutils/lazfileutils.pas"/>
-        <UnitName Value="LazFileUtils"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="770"/>
-        <CursorPos Y="809"/>
-        <UsageCount Value="1"/>
-      </Unit46>
-      <Unit47>
-        <Filename Value="/lazarus-v2.0.10/lazarus/lcl/include/winapi.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="822"/>
-        <CursorPos Y="846"/>
-        <UsageCount Value="1"/>
-      </Unit47>
-      <Unit48>
-        <Filename Value="/lazarus-v2.0.10/lazarus/lcl/interfaces/win32/win32winapi.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="3034"/>
-        <CursorPos Y="3058"/>
-        <UsageCount Value="1"/>
-      </Unit48>
-      <Unit49>
+        <UsageCount Value="54"/>
+      </Unit37>
+      <Unit38>
         <Filename Value="/lazarus-v2.0.10/lazarus/components/lazutils/fileutil.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="187"/>
         <CursorPos Y="223"/>
-        <UsageCount Value="35"/>
-      </Unit49>
-      <Unit50>
+        <UsageCount Value="33"/>
+      </Unit38>
+      <Unit39>
         <Filename Value="/lazarus-v2.0.10/lazarus/components/lazutils/winlazfileutils.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos Y="46"/>
-        <UsageCount Value="35"/>
-      </Unit50>
-      <Unit51>
+        <UsageCount Value="33"/>
+      </Unit39>
+      <Unit40>
         <Filename Value="/lazarus-v2.0.10/lazarus/lcl/grids.pas"/>
         <UnitName Value="Grids"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1715"/>
         <CursorPos X="15" Y="1737"/>
-        <UsageCount Value="29"/>
-      </Unit51>
-      <Unit52>
+        <UsageCount Value="27"/>
+      </Unit40>
+      <Unit41>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/include/control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3522"/>
         <CursorPos Y="3550"/>
-        <UsageCount Value="9"/>
-      </Unit52>
-      <Unit53>
+        <UsageCount Value="7"/>
+      </Unit41>
+      <Unit42>
         <Filename Value="../../../../../../lazarus-v2.0.10/fpcsrc/rtl/objpas/sysutils/syshelph.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="107"/>
         <CursorPos X="17" Y="130"/>
-        <UsageCount Value="14"/>
-      </Unit53>
-      <Unit54>
+        <UsageCount Value="12"/>
+      </Unit42>
+      <Unit43>
         <Filename Value="../../../../../../lazarus-v2.0.10/fpcsrc/rtl/objpas/sysutils/syshelp.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="880"/>
         <CursorPos X="45" Y="880"/>
-        <UsageCount Value="14"/>
-      </Unit54>
-      <Unit55>
+        <UsageCount Value="12"/>
+      </Unit43>
+      <Unit44>
         <Filename Value="../../../../../../lazarus-v2.0.10/fpcsrc/rtl/objpas/sysutils/sysstrh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="216"/>
         <CursorPos X="10" Y="239"/>
-        <UsageCount Value="14"/>
-      </Unit55>
-      <Unit56>
+        <UsageCount Value="12"/>
+      </Unit44>
+      <Unit45>
         <Filename Value="../../../../../../lazarus-v2.0.10/fpcsrc/rtl/objpas/sysutils/sysstr.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2326"/>
         <CursorPos X="3" Y="2329"/>
-        <UsageCount Value="14"/>
-      </Unit56>
-      <Unit57>
+        <UsageCount Value="12"/>
+      </Unit45>
+      <Unit46>
         <Filename Value="../../../../../../lazarus-v2.0.10/fpcsrc/packages/fcl-db/src/export/fpcsvexport.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="154"/>
         <CursorPos X="22" Y="167"/>
-        <UsageCount Value="8"/>
-      </Unit57>
-      <Unit58>
+        <UsageCount Value="6"/>
+      </Unit46>
+      <Unit47>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/include/wincontrol.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="6486"/>
         <CursorPos Y="6510"/>
-        <UsageCount Value="9"/>
-      </Unit58>
-      <Unit59>
+        <UsageCount Value="7"/>
+      </Unit47>
+      <Unit48>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/interfaces/win32/win32wsstdctrls.pp"/>
         <UnitName Value="Win32WSStdCtrls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1073"/>
         <CursorPos Y="1100"/>
-        <UsageCount Value="9"/>
-      </Unit59>
-      <Unit60>
+        <UsageCount Value="7"/>
+      </Unit48>
+      <Unit49>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/interfaces/win32/win32proc.pp"/>
         <UnitName Value="Win32Proc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1048"/>
         <CursorPos Y="1077"/>
-        <UsageCount Value="9"/>
-      </Unit60>
-      <Unit61>
+        <UsageCount Value="7"/>
+      </Unit49>
+      <Unit50>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/components/lazutils/lazutf8.pas"/>
         <UnitName Value="LazUTF8"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3661"/>
         <CursorPos Y="3696"/>
-        <UsageCount Value="9"/>
-      </Unit61>
-      <Unit62>
+        <UsageCount Value="7"/>
+      </Unit50>
+      <Unit51>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/components/lazutils/lazutf8classes.pas"/>
         <UnitName Value="LazUTF8Classes"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="128"/>
         <CursorPos X="16" Y="151"/>
-        <UsageCount Value="9"/>
-      </Unit62>
-      <Unit63>
+        <UsageCount Value="7"/>
+      </Unit51>
+      <Unit52>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
         <UnitName Value="DBGrids"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="844"/>
         <CursorPos Y="867"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
-      </Unit63>
-      <Unit64>
+      </Unit52>
+      <Unit53>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/include/application.inc"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="355"/>
         <CursorPos Y="382"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
-      </Unit64>
-      <Unit65>
+      </Unit53>
+      <Unit54>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/interfaces/win32/win32object.inc"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="369"/>
         <CursorPos X="42" Y="411"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
-      </Unit65>
-      <Unit66>
+      </Unit54>
+      <Unit55>
         <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/interfaces/win32/win32winapi.inc"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2672"/>
         <CursorPos Y="2696"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
-      </Unit66>
+      </Unit55>
+      <Unit56>
+        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/include/treeview.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2293"/>
+        <CursorPos Y="2323"/>
+        <UsageCount Value="8"/>
+      </Unit56>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1634" TopLine="1613"/>
+        <Caret Line="793" Column="85" TopLine="761"/>
       </Position1>
       <Position2>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="801" Column="85" TopLine="769"/>
       </Position2>
       <Position3>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1635" TopLine="1613"/>
+        <Caret Line="840" Column="60" TopLine="808"/>
       </Position3>
       <Position4>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="867" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="855" Column="80" TopLine="824"/>
       </Position4>
       <Position5>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="868" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="893" Column="46" TopLine="861"/>
       </Position5>
       <Position6>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="908" Column="81" TopLine="877"/>
       </Position6>
       <Position7>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1635" TopLine="1613"/>
+        <Caret Line="1368" Column="43" TopLine="1336"/>
       </Position7>
       <Position8>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="1375" Column="81" TopLine="1343"/>
       </Position8>
       <Position9>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1636" TopLine="1613"/>
+        <Caret Line="1865" Column="20" TopLine="1833"/>
       </Position9>
       <Position10>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="867" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="1868" Column="20" TopLine="1836"/>
       </Position10>
       <Position11>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="868" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="1871" Column="20" TopLine="1839"/>
       </Position11>
       <Position12>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="1931" Column="24" TopLine="1899"/>
       </Position12>
       <Position13>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1636" TopLine="1613"/>
+        <Caret Line="1935" Column="20" TopLine="1903"/>
       </Position13>
       <Position14>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="1938" Column="20" TopLine="1906"/>
       </Position14>
       <Position15>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1637" TopLine="1613"/>
+        <Caret Line="1940" Column="20" TopLine="1908"/>
       </Position15>
       <Position16>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="867" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="2032" Column="20" TopLine="2000"/>
       </Position16>
       <Position17>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="868" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="2035" Column="20" TopLine="2003"/>
       </Position17>
       <Position18>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="2038" Column="20" TopLine="2006"/>
       </Position18>
       <Position19>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1637" TopLine="1613"/>
+        <Caret Line="2151" Column="24" TopLine="2119"/>
       </Position19>
       <Position20>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="2155" Column="20" TopLine="2123"/>
       </Position20>
       <Position21>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1638" TopLine="1613"/>
+        <Caret Line="2158" Column="20" TopLine="2126"/>
       </Position21>
       <Position22>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="867" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="1784" Column="51" TopLine="1761"/>
       </Position22>
       <Position23>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="868" TopLine="844"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="2566" Column="19" TopLine="2546"/>
       </Position23>
       <Position24>
-        <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1734" Column="3" TopLine="1732"/>
       </Position24>
       <Position25>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1638" TopLine="1613"/>
+        <Caret Line="48" Column="15" TopLine="29"/>
       </Position25>
       <Position26>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1639" TopLine="1613"/>
+        <Caret Line="365" Column="74" TopLine="348"/>
       </Position26>
       <Position27>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="867" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="264" Column="27" TopLine="245"/>
       </Position27>
       <Position28>
-        <Filename Value="../../../../../../lazarus-v2.0.10/lazarus/lcl/dbgrids.pas"/>
-        <Caret Line="868" TopLine="844"/>
+        <Filename Value="dbases_sqlite.pas"/>
+        <Caret Line="338" Column="44" TopLine="306"/>
       </Position28>
       <Position29>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1634" TopLine="1613"/>
+        <Caret Line="357" Column="54" TopLine="325"/>
       </Position29>
       <Position30>
         <Filename Value="dbases_sqlite.pas"/>
-        <Caret Line="1640" TopLine="1613"/>
+        <Caret Line="369" Column="54" TopLine="337"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
