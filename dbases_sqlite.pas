@@ -78,6 +78,8 @@ type
     procedure SortBySourceHash(DBGrid : TDBGrid);
     procedure SortByDestinationHash(DBGrid : TDBGrid);
     procedure ShowMismatchesC2F(DBGrid : TDBGrid);
+    procedure ShowDuplicatesC2FTAB(DBGrid : TDBGrid);
+    procedure Copy_C2F_DuplicatesList(DBGrid : TDBGrid);
     procedure ShowDiffHashes(DBGrid : TDBGrid);
     procedure ShowMatchingHashes(DBGrid : TDBGrid);
     procedure ShowMissingFilesFolderA(DBGrid : TDBGrid);
@@ -378,9 +380,9 @@ begin
                   ' "FileHash" VARCHAR NULL);');
       // Creating an index based upon id in the TBL_COMPARE_TWO_FOLDERS Table
       //SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COMPARE_TWO_FOLDERS_id_idx" ON "TBL_COMPARE_TWO_FOLDERS"( "id" );'); //DS (original) - no need because it is primary key
-      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX COMPARE_TWO_FOLDERS_path_name_hash_idx '+  //DS (new)
+      SQLite3Connection1.ExecuteDirect('CREATE INDEX COMPARE_TWO_FOLDERS_path_name_hash_idx '+  //DS (new)
                                        '  ON TBL_COMPARE_TWO_FOLDERS (FilePath, FileName, FileHash)'); //DS (new)
-      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX COMPARE_TWO_FOLDERS_path_hash_name_idx '+  //DS (new)
+      SQLite3Connection1.ExecuteDirect('CREATE INDEX COMPARE_TWO_FOLDERS_path_hash_name_idx '+  //DS (new)
                                        '  ON TBL_COMPARE_TWO_FOLDERS (FilePath, FileHash, FileName)'); //DS (new)
 
       // Now write to the new database
@@ -933,6 +935,45 @@ begin
   end;
 end;
 
+// Used by "Compare Two Folders" to clipboard the different view when a users right clicks
+// and asks to list duplicates. As the column layout is different, this is its own clipboard event
+procedure TfrmSQLiteDBases.Copy_C2F_DuplicatesList(DBGrid : TDBGrid);
+var
+  CSVClipboardList : TStringListUTF8;
+  RowCount : integer = Default(integer);
+begin
+  Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
+  Application.ProcessMessages;
+  ChosenDelimiter := MainForm.ChosenDelimiter;
+    try
+      CSVClipboardList := TStringListUTF8.Create;
+      // Add the grid headers
+      CSVClipboardList.Add('ID'      + ChosenDelimiter + 'Filepath'  + ChosenDelimiter +
+                           'FileName'+ ChosenDelimiter + 'HashValue');
+      DBGrid.DataSource.Dataset.DisableControls;
+      try
+        // Add the grid content
+        DBGrid.DataSource.Dataset.First;
+        while not DBGrid.DataSource.Dataset.EoF do
+        begin
+          CSVClipboardList.Add((DBGrid.DataSource.DataSet.Fields[0].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
+                         (DBGrid.DataSource.DataSet.Fields[3].Text) +LineEnding);
+
+          DBGrid.DataSource.Dataset.Next;
+        end;
+      finally
+        DBGrid.DataSource.Dataset.EnableControls;
+      end;
+    finally
+      Clipboard.AsText := CSVClipboardList.Text;
+      CSVClipboardList.Free;
+    end;
+    Mainform.StatusBar2.SimpleText := 'DONE';
+    ShowMessage('Grid data now in clipboard ');
+end;
+
 // Copies the FILES DBGrid content to clipboard
 procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
 var
@@ -1448,8 +1489,6 @@ begin
   try
     DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    //TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT ID, FolderAndFileNameA, FolderAndFileNameAHash, FolderAndFileNameB, FolderAndFileNameBHash ' + //DS (original)
-    //                      'FROM TBL_COMPARE_TWO_FOLDERS WHERE FolderAndFileNameAHash <> FolderAndFileNameBHash';                                            //DS (original)
     DBGrid.DataSource.DataSet.Filter:='FileHashA='''' or FileHashB='''' or FileHashA<>FileHashB';
     DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
@@ -1463,6 +1502,57 @@ begin
       end;
     end;
 end;
+
+// Used by the COMPARE TWO FOLDERS grid to display duplicates from folders
+// New to v3.3.0
+procedure TfrmSQLiteDBases.ShowDuplicatesC2FTAB(DBGrid : TDBGrid);
+begin
+  try
+    DBGrid.DataSource.DataSet.Filtered:=False; // Remove any filters
+    DBGrid.DataSource.Dataset.Close;
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT ' +
+                                                     '  row_number() over ( ' +
+                                                     '    ORDER BY ' +
+                                                     '      FileHash, ' +
+                                                     '      FilePath ' +
+                                                     '  ) rownum, ' +
+                                                     '  x.FilePath, ' +
+                                                     '  x.FileName, ' +
+                                                     '  x.FileHash ' +
+                                                     'FROM ' +
+                                                     '  ( ' +
+                                                     '    SELECT ' +
+                                                     '      distinct a.FilePath, ' +
+                                                     '      a.FileName, ' +
+                                                     '      a.FileHash ' +
+                                                     '    FROM ' +
+                                                     '      tbl_compare_two_folders a, ' +
+                                                     '      tbl_compare_two_folders b ' +
+                                                     '    WHERE ' +
+                                                     '      a.FileHash = b.FileHash ' +
+                                                     '      and a.id <> b.id ' +
+                                                     '  ) x ';
+    // Note we could add and a.FileName<>b.FileName to get all files with same hash,
+    // but with different filenames - in either directory. We can think on that for now.
+
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+
+  if (MessageDlg('Clipboard it?', 'Copy results to clipboard now? Due to column display the usual methods cannot be used later', mtConfirmation,
+     [mbNo, mbYes],0) = mrYes) then
+     begin
+       Copy_C2F_DuplicatesList(DBGrid);
+     end;
+end;
+
 
 // Used by the COMPARE TWO FOLDERS grid to display files with differing hashes
 // New to v3.3.0

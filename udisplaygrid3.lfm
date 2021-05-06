@@ -77,6 +77,10 @@ object frmDisplayGrid3: TfrmDisplayGrid3
       Caption = 'Show mismatches'
       OnClick = MenuItem_C2F_ShowMismatchesClick
     end
+    object MenuItem_C2F_ShowDuplicates: TMenuItem
+      Caption = 'Show Duplicates'
+      OnClick = MenuItem_C2F_ShowDuplicatesClick
+    end
     object MenuItem_C2F_ShowMatchingHashes: TMenuItem
       Caption = 'Show matching hashes'
       OnClick = MenuItem_C2F_ShowMatchingHashesClick

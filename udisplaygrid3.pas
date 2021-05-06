@@ -17,6 +17,7 @@ type
     btnC2FClipboard: TButton;
     dbGridC2F: TDBGrid;
     DBNavigator_C2F: TDBNavigator;
+    MenuItem_C2F_ShowDuplicates: TMenuItem;
     MenuItem_C2F_MissingFromFolderAAndFolderB: TMenuItem;
     MenuItem_C2F_MissingFolderAFiles: TMenuItem;
     MenuItem_C2F_MissingFolderBFiles: TMenuItem;
@@ -37,6 +38,7 @@ type
     procedure MenuItem_C2F_MissingFromFolderAAndFolderBClick(Sender: TObject);
     procedure MenuItem_C2F_ShowDiffHashesClick(Sender: TObject);
     procedure MenuItem_C2F_SelectedRowsC2FGRIDClick(Sender: TObject);
+    procedure MenuItem_C2F_ShowDuplicatesClick(Sender: TObject);
     procedure MenuItem_C2F_ShowMatchingHashesClick(Sender: TObject);
     procedure MenuItem_C2F_ShowMismatchesClick(Sender: TObject);
     procedure MenuItem_C2FToHTMLClick(Sender: TObject);
@@ -162,6 +164,11 @@ end;
 procedure TfrmDisplayGrid3.MenuItem_C2F_SelectedRowsC2FGRIDClick(Sender: TObject);
 begin
   frmSQLiteDBases.CopySelectedRowsC2FTAB(dbGridC2F);
+end;
+
+procedure TfrmDisplayGrid3.MenuItem_C2F_ShowDuplicatesClick(Sender: TObject);
+begin
+  frmSQLiteDBases.ShowDuplicatesC2FTAB(dbGridC2F);
 end;
 
 // Shows hashes that match in "Compare Two Folders" DB grid

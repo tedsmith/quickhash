@@ -3,22 +3,38 @@
 
 v3.3.0<br>
 Improvement : Monumentally large changes to "Compare Two Folders" processing, scrubbing away much of the earlier effort and restructuring it, with big thanks to an open-source co-developer who has helped me here. Key amongst them are that v3.3.0 addresses a bug where rows got mis-aligned if the file counts differed. The mis-match was still correctly reported in v3.2.0, and even if the file matches counted but the hashes differed, that was also still OK. But, the rows got out of sync if the file counts differed due to there being less files in one folder than the other and my use of the UPDATE SQL statement. Additional restructuring applied but note that C2F is really designed to check that two folders are a mirror image of each other, and it is supposed to help you confirm this is the case, rather than help you clean up your disk. If your aim is to use it as a file manager, then QH might not be the best option. Other tools like Beyond Compare might be better for your needs here. <br>
-Improvement : The "Compare Two Folders" tab now has a right click option in the results grid to 'Show Mismatches'. This will filter the results to show mis-matched hash computations, or files that exist in FolderA but not FolderB (or visa versa). Very useful if the user has spent hours comparings hundreds of thousands of files and one or more does not match - now the user can list them easily. <br>
-Improvement : Column headers added to CSV and HTML output (achieved by right clicking the display grid result) when using the "Copy" tab. <br>
+That said, the ability now exists to compare files by name and hash value in both folders, and then the user can right click the results and see many other options too : <br>
+1) Restore Results view<br>
+2) Clipboard all rows<br>
+3) Clipboard selected row<br>
+4) Clipboard all selected rows (currently does it in reverse order for some reason)<br>
+5) Show mismatches (new, based on filename or hash or both) <br>
+6) Show duplicates (new, offers the chance to clipboard immediately after because the column row changes for this display)<br>
+7) Show matching hashes (new) <br>
+8) Show different hashes, not missing files (new)<br>
+9) Show missing FolderA files (new)<br>
+10) Show missing FolderB files (new)<br>
+11) Show missing files from Folder A or FolderB (new)<br>
+12) Save as CSV file<br>
+13) Save as HTML file<br>
+That is a whopping array of ways to conduct some analysis of two folders and is about as good as I think I can make it and is based on help from the community. If that still falls short, other tools are available. <br>
+Improvement : DB Rows were being counted (when required) using a slower method than I had realised. With v3.3.0, counts are now immediate by calling DBGrid.DataSource.DataSet.RecordCount;  
+Improvement : Column headers added to CSV and HTML outputs (achieved by right clicking the display grid results throughout). I may have missed one but I think I have them all covered <br>
 Improvement : Removed the generation of a "QH_XXXXX" time stamp named parent folder in destination folder when copying as many users reported this was unhelpful.<br>
 Improvement : SQLite DLL's for Windows replaced with stable version 3.35.5.0 as of April 2021 (replacing former version 3.21.0.0).<br>
 Improvement : The size of some fields in SQLite was set to 32767 to account for crazily large filename and filepath combinations. But on reflection, that seems extreme use of memory for what must be one in a billion chances and very unlikely to be encountered. Instead, 4096 size is set in v3.3.0 to still enable QH to account for very long paths, but given that filenames alone can rarely exceed 255 (even where paths can) on any of the 3 OSes except for some UTF8 and UTF16 variances, where even with those the maximum is still 1020 bytes (4 bytes for every single char of the 255 max)<br>
 Fix : DisableControls and EnableControls used more extensively to expedite the "Save as CSV" and "Save as HTML" options for large volumes of data, as some user reported save efforts taking several hours for millions of rows of data. This makes sense because Quickhash was repaitning the display grid after each row file write.  <br>
-Fix : When saving results as CSV in Compare Two Folders, if the user selected an existing file to overwrite, it would o that, but the next run would result in an infinite loop telling the user it already exists and to choose another file, but not being able to actually do so. That was fixed. <br>
-Fix : Apples new OSX 'Big Sur' unhelpfully removed static libraries, like the SQLite library, so it could not be referenced by file path. So a different method of lookup is needed using the dyanmic linker cache and a 3 state compiler directive is now used for loading SQLite, depending on the OS being used. That has been applied so that Apple users can continue to enjoy the benefits of QuickHash on that most changing and challenging of operating system. You're welcome. <br>
+Fix : When saving results as CSV in Compare Two Folders, if the user selected an existing file to overwrite, it would do that, but the next run would result in an infinite loop telling the user it already exists and to choose another file, but not being able to actually do so. That was fixed. <br>
+Fix : Apples new OSX 'Big Sur' OS unhelpfully removed static libraries, like the SQLite library, so it could not be referenced by file path. So a different method of lookup is needed using the dyanmic linker cache and a 3 state compiler directive is now used for loading SQLite, depending on the OS being used. That has been applied so that Apple users can continue to enjoy the benefits of QuickHash on that most changing and challenging of operating system. You're welcome. <br>
 Fix : Two stringlists are created when using "Compare Two Folders" to store the list of files for analysis. I had introduced a memory leak here without realising it and that has been corrected (with thanks to an open-source developer who spotted that for me). <br>
 Fix : A small memory leak existed in frmSQLiteDBases.DatasetToClipBoard for copying data to clipboard. The CSVClipboardList string list that was used to achieve this was not being freed. Now it is freed. 
 Fix : In the basic results txt file that is created during Compare Two Folders, the selected folder names in the log file were prefixed with the LongPathOverride of two slashes a question mark and a slash. That was corrected to just show the normal path as users dont realy need to see that (as it is just an API switch). <br>
+Fix : .Value was used extensively to "call" a value from a DB cell. But some cells can be NULL in QuickHash. And if they are, using .Value can generate an error. Instead this is now switched to .AsString meaning a NULL value returns an empty string, as intended. 
 New : Button added to enable the user to easily make a copy of the backend SQLite database at any given point in time, for convenience. This can help users who may wish to load it into specific database tools, like SQLite Explorer or browser extensions like SQLite Manager. <br>
 New : Logo replaced with the newer Quickash logo. <br>
-New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, hyphen etc. If no character is chosen, a comma is assumed and used as before. <br>
+New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, hyphen and (heaven forbid) even the space char. If no character is chosen, a comma is assumed and used as before. <br>
 Code: Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. <br>
-
+Code: More effort made to initialise variables 
 
 v3.2.0<br>
 New : Blake3 hash algorithm added for text strings, a file, Files recursively, Compare Two Folders and Compare Two Files. <br>
