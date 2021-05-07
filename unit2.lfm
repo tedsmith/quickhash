@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 318
+  Left = 363
   Height = 733
-  Top = 177
+  Top = 202
   Width = 1023
   AllowDropFiles = True
   Caption = 'QuickHash v3.3.0 (2021) - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -2277,6 +2277,10 @@ object MainForm: TMainForm
       object MenuItem2A: TMenuItem
         Caption = 'About QuickHash'
         OnClick = MenuItem2AClick
+      end
+      object MenuItem7: TMenuItem
+        Caption = 'SQLite Version'
+        OnClick = MenuItem7Click
       end
     end
   end

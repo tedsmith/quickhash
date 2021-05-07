@@ -85,6 +85,7 @@ type
     procedure ShowMissingFilesFolderA(DBGrid : TDBGrid);
     procedure ShowMissingFilesFolderB(DBGrid : TDBGrid);
     procedure ShowMissingFromFolderAAndFolderB(DBGrid : TDBGrid);
+    function DBVersionLookup() : string;
     function CountGridRows(DBGrid : TDBGrid) : integer;
 
   private
@@ -392,6 +393,30 @@ begin
     end;
   except
     ShowMessage('SQLite detected but could not check if a database file exists');
+  end;
+end;
+
+// Shows the user what version of SQLite is in use.
+function TfrmSQLiteDBases.DBVersionLookup() : string;
+ var
+  DynamicSQLQuery: TSQLQuery;
+begin
+  result := '';
+  DynamicSQLQuery := TSQLQuery.Create(nil);
+  try
+    try
+      DynamicSQLQuery.DataBase := SQLTransaction1.DataBase;
+      DynamicSQLQuery.SQL.Add('SELECT sqlite_version()');
+      DynamicSQLQuery.Open;
+      result := ('SQLite version : ' + DynamicSQLQuery.FieldByName('sqlite_version()').AsString);
+    except
+      on E: EDatabaseError do
+      begin
+        MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+      end;
+    end;
+  finally
+    DynamicSQLQuery.Free;
   end;
 end;
 

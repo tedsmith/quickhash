@@ -208,6 +208,7 @@ type
     edtUNCPathCompareB                    : TEdit;
     FileSDBNavigator                      : TDBNavigator;
     CopyDelimiterComboBox: TComboBox;
+    MenuItem7: TMenuItem;
     TextLBLDelimiterComboBox: TComboBox;
     lblTotalFileCountNumberA              : TLabel;
     lblTotalFileCountA                    : TLabel;
@@ -443,6 +444,7 @@ type
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
+    procedure MenuItem7Click(Sender: TObject);
     procedure MenuItem_CopyAllHashesToClipboardFILESClick(Sender: TObject);
     procedure MenuItem_DeleteDupsClick(Sender: TObject);
     procedure MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
@@ -1666,6 +1668,15 @@ procedure TMainForm.MenuItem6Click(Sender: TObject);
 begin
   b64StringGrid1File.CopyToClipboard(true);
   Showmessage('Grid row data copied to clipboard OK');
+end;
+
+// Show the user the version of SQLite in use via the About menu
+procedure TMainForm.MenuItem7Click(Sender: TObject);
+var
+  strDBVersion : string = Default(string);
+begin
+  strDBVersion := frmSQLiteDBases.DBVersionLookup;
+  if Length(strDBVersion) > 0 then ShowMessage(strDBVersion) else ShowMessage('SQlite version could not be determined');
 end;
 
 procedure TMainForm.MenuItem_CopyAllHashesToClipboardFILESClick(Sender: TObject);
