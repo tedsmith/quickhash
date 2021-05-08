@@ -15,7 +15,7 @@ uses
   {$endif}
 
   {$ifdef Windows}
-    Process, Windows, ActiveX, ComObj, Variants,
+    Process, Windows, ActiveX, ComObj, Variants, comserv,
     win32proc, GPTMBR, uGPT, // for the OS name detection : http://free-pascal-lazarus.989080.n3.nabble.com/Lazarus-WindowsVersion-td4032307.html
   {$endif}
     diskspecification, uProgress, Classes, SysUtils, FileUtil,
@@ -109,18 +109,25 @@ var
   // Yes, all these for just that!! The joy of Windows coding
   // Credit to RRUZ at SO : https://stackoverflow.com/questions/12271269/how-can-i-correlate-logical-drives-and-physical-disks-using-the-wmi-and-delphi/12271778#comment49108167_12271778
   // https://theroadtodelphi.wordpress.com/2010/12/01/accesing-the-wmi-from-pascal-code-delphi-oxygene-freepascal/#Lazarus
-  function ListDrives : string;
+  function ListDrives : boolean;
+  function GetWin32_DiskPartitionInfo() : boolean;
+  function GetWin32_PhysicalDiskInfo() : boolean;
+  function DriveTypeStr(DriveType:integer): string;
   function VarStrNull(const V:OleVariant):string;
   function GetWMIObject(const objectName: String): IDispatch;
   function VarArrayToStr(const vArray: variant): string;
   function RemoveLogicalVolPrefix(strPath : string; LongPathOverrideVal : string) : string;
-
+  
+procedure RtlGetNtVersionNumbers(out MajorVersion : DWORD;
+                                 out MinorVersion : DWORD;
+                                 out Build        : DWORD);
+          stdcall; external 'ntdll.dll';
   // Formatting functions
   function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
   function GetSectorSizeInBytes(hSelectedDisk : THandle) : Int64;
   function GetJustDriveLetter(str : widestring) : string;
   function GetDriveIDFromLetter(str : string) : Byte;
-  function GetVolumeName(DriveLetter: Char): string;
+  // function GetVolumeName(DriveLetter: Char): string; DEPRECATED as of v3.3.0
   function GetOSName() : string;
   {$endif}
 
@@ -1163,7 +1170,7 @@ const
          // Log the actions
         try
           slHashLog := TStringList.Create;
-          slHashLog.Add('Disk hashed using: '          + frmDiskHashingModule.Caption);
+          slHashLog.Add('Disk hashed using: '         + frmDiskHashingModule.Caption);
           {$ifdef WIndows}
           slHashLog.Add('Using operating system: '    + GetOSName);
           {$endif}
@@ -1411,6 +1418,8 @@ begin
           frmDiskHashingModule.ledtComputedHashD.Visible := false;
           frmDiskHashingModule.ledtComputedHashE.Enabled := false;
           frmDiskHashingModule.ledtComputedHashE.Visible := false;
+          frmDiskHashingModule.ledtComputedHashF.Visible := false;
+          frmDiskHashingModule.ledtComputedHashF.Enabled := false;
         end;
       end
         else if HashChoice = 2 then
@@ -1431,6 +1440,8 @@ begin
               frmDiskHashingModule.ledtComputedHashD.Visible := false;
               frmDiskHashingModule.ledtComputedHashE.Enabled := false;
               frmDiskHashingModule.ledtComputedHashE.Visible := false;
+              frmDiskHashingModule.ledtComputedHashF.Visible := false;
+              frmDiskHashingModule.ledtComputedHashF.Enabled := false;
             end;
           end
             else if HashChoice = 3 then
@@ -1454,6 +1465,8 @@ begin
                 frmDiskHashingModule.ledtComputedHashD.Visible := false;
                 frmDiskHashingModule.ledtComputedHashE.Enabled := false;
                 frmDiskHashingModule.ledtComputedHashE.Visible := false;
+                frmDiskHashingModule.ledtComputedHashF.Visible := false;
+                frmDiskHashingModule.ledtComputedHashF.Enabled := false;
               end
             else if HashChoice = 4 then
               begin
@@ -1477,6 +1490,8 @@ begin
                   frmDiskHashingModule.ledtComputedHashE.Clear;
                   frmDiskHashingModule.ledtComputedHashE.Enabled := false;
                   frmDiskHashingModule.ledtComputedHashE.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashF.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashF.Enabled := false;
                 end;
               end
             else if HashChoice = 5 then
@@ -1501,6 +1516,8 @@ begin
                   frmDiskHashingModule.ledtComputedHashE.Clear;
                   frmDiskHashingModule.ledtComputedHashE.Enabled := false;
                   frmDiskHashingModule.ledtComputedHashE.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashF.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashF.Enabled := false;
                 end;
               end
             else if HashChoice = 6 then
@@ -1527,6 +1544,8 @@ begin
                   frmDiskHashingModule.ledtComputedHashE.Clear;
                   frmDiskHashingModule.ledtComputedHashE.Enabled := false;
                   frmDiskHashingModule.ledtComputedHashE.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashF.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashF.Enabled := false;
                 end;
               end
             else if HashChoice = 7 then
@@ -1561,6 +1580,8 @@ begin
                   {$else if CPU32}
                     frmDiskHashingModule.ledtComputedHashE.Text    := Uppercase(HashInstancexxHash32Result.ToString());
                   {$endif}
+                  frmDiskHashingModule.ledtComputedHashF.Visible := false;
+                  frmDiskHashingModule.ledtComputedHashF.Enabled := false;
                 end;
               end
               else if HashChoice = 8 then
@@ -1701,7 +1722,181 @@ begin
   OleCheck(Moniker.BindToObject(BindCtx, nil, IDispatch, Result));
 end;
 
+// Used to display the lidst of physical disks and logical drives in the Treeview
+// Returns false if unsuccessful. True otherwise
+function ListDrives() : boolean;
+var
+  PhysicalDiskData : boolean = Default(boolean);
+  LogicalVolData : boolean = Default(boolean);
+begin
+  result := false;
+  NullStrictConvert := false;
 
+  // Build the Treeview structure
+  frmDiskHashingModule.Treeview1.Images := frmDiskHashingModule.ImageList1;
+  PhyDiskNode     := frmDiskHashingModule.TreeView1.Items.Add(nil,'Physical Disk') ;
+  PhyDiskNode.ImageIndex := 0;
+  DriveLetterNode := frmDiskHashingModule.TreeView1.Items.Add(nil,'Logical Volume') ;
+  DriveLetterNode.ImageIndex := 1;
+
+  // GET PHYSICAL DISKS DATA and populate Treeview
+  try
+    PhysicalDiskData := GetWin32_PhysicalDiskInfo;
+ except
+    on E:EOleException do
+        ShowMessage(Format('EOleException %s %x', [E.Message,E.ErrorCode]));
+	on E:Exception do
+        ShowMessage(E.Classname + ':' + E.Message);
+ end;
+   // GET PARTITION DATA OF EACH DISK  and populate Treeview
+ try
+   LogicalVolData := GetWin32_DiskPartitionInfo;
+ except
+    on E:EOleException do
+        ShowMessage(Format('EOleException %s %x', [E.Message,E.ErrorCode]));
+	on E:Exception do
+        ShowMessage(E.Classname + ':' + E.Message);
+ end;
+
+ if (LogicalVolData = true) and (PhysicalDiskData = true) then
+   begin
+     result := true;
+   end;
+end;
+
+// Gets physical disk data based on the Windows WMI Win32_DiskDrive module(Windows Management Instrumentation)
+// Returns true on success. False otherwise
+// https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-diskdrive
+function GetWin32_PhysicalDiskInfo() : boolean;
+const
+  WbemUser            ='';
+  WbemPassword        ='';
+  WbemComputer        ='localhost';
+  wbemFlagForwardOnly = $00000020;
+var
+  FSWbemLocator : OLEVariant;
+  FWMIService   : OLEVariant;
+  FWbemObjectSet: OLEVariant;
+  FWbemObject   : OLEVariant;
+  oEnum         : IEnumvariant;
+  sValue        : string;
+  iValue        : LongWord;
+  v             : olevariant;
+  Val1          : widestring = Default(widestring);
+  Val2          : widestring = Default(widestring);
+  Val3          : widestring = Default(widestring);
+  Val4          : widestring = Default(widestring);
+begin
+  result := false;
+  FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  FWMIService   := FSWbemLocator.ConnectServer(WbemComputer, 'root\CIMV2', WbemUser, WbemPassword);
+  FWbemObjectSet:= FWMIService.ExecQuery('SELECT * FROM Win32_DiskDrive','WQL',wbemFlagForwardOnly);
+  oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
+  while oEnum.Next(1, FWbemObject, iValue) = 0 do
+  begin
+    sValue:= FWbemObject.Properties_.Item('DeviceID').Value;
+    Val1 := (Format(' %s',[sValue])) + ' (';
+
+    sValue:= FWbemObject.Properties_.Item('Size').Value;
+    v     := FWbemObject.Size;
+    if not varisnull(v) then // can be null for removable drives.
+      begin
+        Val2 := FormatByteSize(v) + '), ';
+      end;
+
+    sValue:= FWbemObject.Properties_.Item('Model').Value;
+    Val3 := (Format('Model: %s',[sValue])) + ', ';
+
+    sValue:= FWbemObject.Properties_.Item('Partitions').Value;
+    Val4 :=(Format(' Partitions:    %s',[sValue]));// Uint32
+
+    if Length(Val1) > 0 then
+    begin
+      frmDiskHashingModule.TreeView1.Items.AddChild(PhyDiskNode, Val1 + Val2 + Val3 + Val4);
+    end;
+    FWbemObject:=Unassigned;
+  end;
+  result := true;
+end;
+
+// Used by GetWin32_DiskPartitionInfo to render drive type codes to friendly name
+function DriveTypeStr(DriveType:integer): string;
+  begin
+   result := '';
+    case DriveType of
+      0 : Result:='Unknown';
+      1 : Result:='No Root Directory';
+      2 : Result:='Removable Disk';
+      3 : Result:='Local Disk';
+      4 : Result:='Network Drive';
+      5 : Result:='CD/DVD Disc';
+      6 : Result:='RAM Disk';
+    end;
+  end;
+
+// Gets logical partition data based on the Windows WMI Win32_LogicalDisk module (Windows Management Instrumentation)
+// Returns true on success. False otherwise
+// https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-logicaldisk
+// ToDo : For next version, perhaps explore more specifics of partitions using Win32_DiskPartition
+function GetWin32_DiskPartitionInfo() : boolean;
+const
+  WbemUser            ='';
+  WbemPassword        ='';
+  WbemComputer        ='localhost';
+  wbemFlagForwardOnly = $00000020;
+var
+  FSWbemLocator : OLEVariant;
+  FWMIService   : OLEVariant;
+  FWbemObjectSet: OLEVariant;
+  FWbemObject   : OLEVariant;
+  oEnum         : IEnumvariant;
+  iValue        : LongWord;
+  v             : olevariant;
+  Val1          : widestring = Default(widestring);
+  Val2          : widestring = Default(widestring);
+  Val3          : widestring = Default(widestring);
+  Val4          : widestring = Default(widestring);
+  Val5          : widestring = Default(widestring);
+  Val6          : widestring = Default(widestring);
+  Val7          : widestring = Default(widestring);
+begin;
+  result := false;
+  FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  FWMIService   := FSWbemLocator.ConnectServer('localhost', 'root\CIMV2', '', '');
+  FWbemObjectSet:= FWMIService.ExecQuery('SELECT * FROM  Win32_LogicalDisk','WQL',wbemFlagForwardOnly);
+  oEnum         := IUnknown(FWbemObjectSet._NewEnum) as IEnumVariant;
+  while oEnum.Next(1, FWbemObject, iValue) = 0 do
+  begin
+    Val1 := (Format('Drive %s',[String(FWbemObject.DeviceID)]));                             // string
+    Val2 := (Format(' Type: %s',[DriveTypeStr(FWbemObject.DriveType)])) +', ';               // string
+
+    v    := FWbemObject.Size;                                                                // UInt64
+    if not varisnull(v) then // can be null for removable drives.
+    begin
+      Val3:= 'Size: ' + FormatByteSize(v) + ', ';
+    end
+    else Val3 := '0,';
+
+    v    := FWbemObject.Freespace;                                                           // Uint64
+    if not varisnull(v) then // can be null if some kind of virtual FS or just actually full
+      begin
+        Val4 := 'Free space: ' + FormatByteSize(v) + ', ';
+      end
+    else Val4 := '0,';
+
+    Val5 := (Format(', Filesystem: %s',[String(FWbemObject.FileSystem)]));                   // string
+
+    Val6 := (Format(', Vol Name: %s',[String(FWbemObject.VolumeName)]));                     // string
+
+    Val7 := (Format(', Vol Ser No: %s',[String(FWbemObject.VolumeSerialNumber)]));           // string
+
+    FWbemObject:=Unassigned;
+    frmDiskHashingModule.TreeView1.Items.AddChild(DriveLetterNode, Val1 + Val2 + Val3 + Val4 + Val5 + Val6 + Val7);
+  end;
+  result := true;
+end;
+
+{
 function ListDrives : string;
 var
   FSWbemLocator  : Variant;
@@ -1813,7 +2008,7 @@ begin
    end;
   frmDiskHashingModule.Treeview1.AlphaSort;
 end;
-
+}
 
 
 // Returns just the drive letter from the treeview, e.g. 'Drive X:' becomes just 'X'
@@ -1833,6 +2028,8 @@ begin
   result := (Ord(str[1]))-64;
 end;
 
+{DEPRECATED : As of v3.3.0, now achieved by FWbemObject.VolumeName of Win32_LogicalDisk}
+{
 // Returns the volume name and serial number in Windows of a given mounted drive.
 // Note : NOT the serial number of the hard disk itself! Just the volume name.
 function GetVolumeName(DriveLetter: Char): string;
@@ -1857,7 +2054,7 @@ begin
     SetErrorMode(oldmode);
   end;
 end;
-
+}
 // GetSectorSizeInBytes queries the disk secotr size. 512 is most common size
 // but with GPT disks, 1024 and 4096 bytes will soon be common.
 // We're only interested in BytesPerSector by the way - the rest of it is utter rubbish
@@ -1897,24 +2094,74 @@ begin
   else result := -1;
 end;
 
-// Obtains the name of the host OS for embedding into the E01 image
-// http://free-pascal-lazarus.989080.n3.nabble.com/Lazarus-WindowsVersion-td4032307.html
+// Due to Windows seemingly being unable to sync its version numbers to names properly, still
+// (yes, even as of 2021!), the former GetOSName function is replaced by this one
+// which I found thanks to this post : https://forum.lazarus.freepascal.org/index.php?topic=47308.0
+// Seemingly, according to : https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getversion
+{
+"With the release of Windows 8.1, the behavior of the GetVersion API
+has changed in the value it will return for the operating system version.
+The value returned by the GetVersion function now depends on how the
+application is manifested.
+
+Applications not manifested for Windows 8.1 or Windows 10 will return the
+Windows 8 OS version value (6.2)."
+
+So, using the original GetOSName function, and the inbuilt WindowsVersion value,
+WindowsVersion was still returning "wv8" (Windows 8). So it has had to be replaced
+with this effort, which seems to work well.
+}
+function GetOSName() : string;
+const
+  BUILD_FREE_VAL = word($F000);
+  BUILD_FREE_STR = 'Free build';
+  BUILD_CHKD_STR = 'Checked build';
+  BuildString    : pchar = BUILD_FREE_STR;
+var
+  MajorVersion   : DWORD;
+  MinorVersion   : DWORD;
+  BuildNumberRec : packed record
+                     BuildNumber : word;
+                     Build       : word;
+                   end;
+  Build          : DWORD absolute BuildNumberRec;
+
+{ this function is undocumented but always found in ntdll                     }
+
+begin
+  RtlGetNtVersionNumbers(MajorVersion, MinorVersion, Build);
+
+  result := ('Windows version : ' + IntToStr(MajorVersion)) + (', Minor version : ' + IntToStr(MinorVersion)) +
+            (', Build  number : ' + IntToStr(BuildNumberRec.BuildNumber));
+
+  {if BuildNumberRec.Build <> BUILD_FREE_VAL then BuildString := BUILD_CHKD_STR;
+  writeln('Free/Checked  : ', BuildString);
+  }
+end;
+
+// DEPRECATED as of v3.3.0 of Quickhash. See newer function call above.
+{// Obtains the name of the host OS
 function GetOSName() : string;
 var
   OSVersion : string;
 begin
-  if WindowsVersion = wv95 then OSVersion              := 'Windows 95 '
-   else if WindowsVersion = wvNT4 then OSVersion       := 'Windows NT v.4 '
-   else if WindowsVersion = wv98 then OSVersion        := 'Windows 98 '
-   else if WindowsVersion = wvMe then OSVersion        := 'Windows ME '
-   else if WindowsVersion = wv2000 then OSVersion      := 'Windows 2000 '
-   else if WindowsVersion = wvXP then OSVersion        := 'Windows XP '
-   else if WindowsVersion = wvServer2003 then OSVersion:= 'Windows Server 2003 '
-   else if WindowsVersion = wvVista then OSVersion     := 'Windows Vista '
-   else if WindowsVersion = wv7 then OSVersion         := 'Windows 7 '
-   else OSVersion:= 'MS Windows ';
+  result := '';
+  if WindowsVersion      = wv95 then OSVersion        := 'Windows 95 '
+  else if WindowsVersion = wvNT4 then OSVersion       := 'Windows NT v.4 '
+  else if WindowsVersion = wv98 then OSVersion        := 'Windows 98 '
+  else if WindowsVersion = wvMe then OSVersion        := 'Windows ME '
+  else if WindowsVersion = wv2000 then OSVersion      := 'Windows 2000 '
+  else if WindowsVersion = wvXP then OSVersion        := 'Windows XP '
+  else if WindowsVersion = wvServer2003 then OSVersion:= 'Windows Server 2003 '
+  else if WindowsVersion = wvVista then OSVersion     := 'Windows Vista '
+  else if WindowsVersion = wv7 then OSVersion         := 'Windows 7 '
+  else if WindowsVersion = wv8 then OSVersion         := 'Windows 8 '
+  else if WindowsVersion = wv8_1 then OSVersion       := 'Windows 8.1 '
+  else if WindowsVersion = wv10 then OSVersion        := 'Windows 10 '
+  else if WindowsVersion = wvLater then OSVersion     := 'MS Windows '
+  else OSVersion:= 'MS Windows ';
   result := OSVersion;
-end;
+end;}
 {$endif}
 
 end.
