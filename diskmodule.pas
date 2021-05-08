@@ -1,7 +1,5 @@
 unit diskmodule;
-{  Based on my disk imager 'YAFFI' (https://github.com/tedsmith/yaffi),
-   this unit enables QuickHash to hash disk drives.
-}
+//  this unit enables QuickHash to hash disk drives.
 {$mode objfpc}{$H+} // {$H+} ensures strings are of unlimited size
 
 interface
@@ -16,7 +14,7 @@ uses
 
   {$ifdef Windows}
     Process, Windows, ActiveX, ComObj, Variants, comserv,
-    win32proc, GPTMBR, uGPT, // for the OS name detection : http://free-pascal-lazarus.989080.n3.nabble.com/Lazarus-WindowsVersion-td4032307.html
+    win32proc, GPTMBR, uGPT,
   {$endif}
     diskspecification, uProgress, Classes, SysUtils, FileUtil,
     Forms, Controls, Graphics, LazUTF8, strutils,
@@ -68,8 +66,6 @@ type
     DiskHashingTimer: TTimer;
     TreeView1: TTreeView;
     ZVDateTimePickerDiskModule: TZVDateTimePicker;
-
-    // http://forum.lazarus.freepascal.org/index.php/topic,28560.0.html
     procedure btnAbortHashingClick(Sender: TObject);
     procedure btnRefreshDiskListClick(Sender: TObject);
     procedure btnStartHashingClick(Sender: TObject);
@@ -105,10 +101,10 @@ var
   Stop : boolean;
 
   {$ifdef Windows}
-  // These four functions are needed for traversing the attached disks in Windows.
-  // Yes, all these for just that!! The joy of Windows coding
-  // Credit to RRUZ at SO : https://stackoverflow.com/questions/12271269/how-can-i-correlate-logical-drives-and-physical-disks-using-the-wmi-and-delphi/12271778#comment49108167_12271778
-  // https://theroadtodelphi.wordpress.com/2010/12/01/accesing-the-wmi-from-pascal-code-delphi-oxygene-freepascal/#Lazarus
+  // These few functions are needed for traversing the attached disks in Windows.
+  // Much of the disk and partitions data is derived for display purposes from
+  // Credit to https://github.com/RRUZ/delphi-wmi-class-generator
+  // For the actual hashing functions, direct Windows API calls are used.
   function ListDrives : boolean;
   function GetWin32_DiskPartitionInfo() : boolean;
   function GetWin32_PhysicalDiskInfo() : boolean;
@@ -118,27 +114,27 @@ var
   function VarArrayToStr(const vArray: variant): string;
   function RemoveLogicalVolPrefix(strPath : string; LongPathOverrideVal : string) : string;
   
-procedure RtlGetNtVersionNumbers(out MajorVersion : DWORD;
-                                 out MinorVersion : DWORD;
-                                 out Build        : DWORD);
-          stdcall; external 'ntdll.dll';
+  procedure RtlGetNtVersionNumbers(out MajorVersion : DWORD;
+                                   out MinorVersion : DWORD;
+                                   out Build        : DWORD);
+                                   stdcall; external 'ntdll.dll';
   // Formatting functions
   function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
   function GetSectorSizeInBytes(hSelectedDisk : THandle) : Int64;
   function GetJustDriveLetter(str : widestring) : string;
   function GetDriveIDFromLetter(str : string) : Byte;
-  // function GetVolumeName(DriveLetter: Char): string; DEPRECATED as of v3.3.0
   function GetOSName() : string;
+  // function GetVolumeName(DriveLetter: Char): string; DEPRECATED as of v3.3.0
   {$endif}
 
   {$ifdef Unix}
+  // These are Linux specific functions
   procedure ListDrivesLinux();
   function GetOSNameLinux() : string;
   function GetBlockCountLinux(s : string) : string;
   function GetBlockSizeLinux(DiskDevName : string) : Integer;
   function GetDiskLabels(DiskDevName : string) : string;
   function GetByteCountLinux(DiskDevName : string) : QWord;
-
   {$endif}
 
   function HashDisk(hDiskHandle : THandle; DiskSize : Int64; HashChoice : Integer) : Int64;
@@ -150,7 +146,6 @@ implementation
 {$R *.lfm}
 
 { TfrmDiskHashingModule }
-
 
 // Enable or disable elements depending on the OS hosting the application
 procedure TfrmDiskHashingModule.FormCreate(Sender: TObject);

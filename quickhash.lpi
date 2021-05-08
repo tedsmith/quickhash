@@ -292,8 +292,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="1783"/>
-        <CursorPos X="50" Y="1808"/>
+        <TopLine Value="172"/>
+        <CursorPos X="61" Y="137"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
