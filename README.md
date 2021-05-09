@@ -44,6 +44,13 @@ For Windows users wishing to compile SQLite DLL's themselves, you can do so by: 
   
   or you can download the latest compiled version of Quickhash that includes the DLL's already from www.quickhash-gui.org <br> 
   
-I am hopeful this guide might encourage collaborators and also help various Linux distributors include QuickHash into their package management platforms. 
+For Linux users wishing to compile SQLite SO.0 files themselves, you can also do so by: <br>  
 
-Ted Smith
+  Following the steps for Windows users as above, but then running the following compiler code: <br>
+  gcc -shared -o libsqlite3.so.0 -fPIC sqlite3.c <br>
+
+For OSX users wishing to compile SQLite libsqlite3.dylib files themselves, I assume the process is as for Linux but I have never done it (disclaimer) : <br>  
+    Following the steps for Windows users as above, but then running the following compiler code: <br>
+    gcc -shared -o libsqlite3.dylib -fPIC sqlite3.c <br>
+  
+I am hopeful this guide might encourage collaborators and also help various Linux distributors include QuickHash into their package management platforms. <br>
