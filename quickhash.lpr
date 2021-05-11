@@ -81,7 +81,8 @@ uses
   Interfaces, // this includes the LCL widgetset
   //FindAllFilesEnhanced, uKnownHashLists,
   Forms, lazdbexport, uDisplayGrid, udisplaygrid3, Unit2, dbases_sqlite,
-  frmAboutUnit, zvdatetimectrls, diskmodule, diskspecification, uProgress;
+  frmAboutUnit, zvdatetimectrls, diskmodule, diskspecification, uProgress,
+  uLibEWF;
 
 {$R *.res}
 

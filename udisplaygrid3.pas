@@ -112,17 +112,21 @@ procedure TfrmDisplayGrid3.MenuItem_C2FToHTMLClick(Sender: TObject);
 var
   ExportFilename : string;
 begin
-  ExportFilename := '';
-  frmDisplayGrid3SaveDialog.Title := 'Save results as...';
-  frmDisplayGrid3SaveDialog.InitialDir := GetCurrentDir;
-  frmDisplayGrid3SaveDialog.Filter := 'Web Page|*.html';
-  frmDisplayGrid3SaveDialog.DefaultExt := 'HTML';
-
-  if frmDisplayGrid3SaveDialog.Execute then
+  if frmSQLiteDBases.FC2Fquery = true then  // If "Show Duplicates" is active, do not allow HTML output
   begin
-    ExportFilename := frmDisplayGrid3SaveDialog.FileName;
-    frmSQLiteDBases.SaveC2FWindowToHTML(dbGridC2F, ExportFilename);
-  end;
+    ExportFilename := '';
+    frmDisplayGrid3SaveDialog.Title := 'Save results as...';
+    frmDisplayGrid3SaveDialog.InitialDir := GetCurrentDir;
+    frmDisplayGrid3SaveDialog.Filter := 'Web Page|*.html';
+    frmDisplayGrid3SaveDialog.DefaultExt := 'HTML';
+
+    if frmDisplayGrid3SaveDialog.Execute then
+    begin
+      ExportFilename := frmDisplayGrid3SaveDialog.FileName;
+      frmSQLiteDBases.SaveC2FWindowToHTML(dbGridC2F, ExportFilename);
+    end;
+  end
+  else Showmessage('HTML output not possible with "Show Duplicates" active. Restore default view or use "Save to CSV" instead');
 end;
 
 // Show mis-matched values, where a hash was found in one folder but not the other

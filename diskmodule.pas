@@ -730,9 +730,8 @@ var
   GB: QWord;
   TB: QWord;
 begin
-
-  B  := 1; //byte
-  KB := 1024 * B; //kilobyte
+  B  := 1;         //byte
+  KB := 1024 * B;  //kilobyte
   MB := 1024 * KB; //megabyte
   GB := 1024 * MB; //gigabyte
   TB := 1024 * GB; //terabyte
@@ -749,7 +748,11 @@ begin
         if bytes > KB then
           result := FormatFloat('#.## KiB', bytes / KB)
         else
-          result := FormatFloat('#.## bytes', bytes) ;
+          if bytes > B then
+          result := FormatFloat('#.## bytes', bytes)
+        else
+          if bytes = 0 then
+          result := '0 bytes';
 end;
 
 

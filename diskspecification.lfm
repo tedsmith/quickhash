@@ -1,13 +1,13 @@
 object frmTechSpecs: TfrmTechSpecs
-  Left = 620
+  Left = 709
   Height = 375
-  Top = 330
+  Top = 377
   Width = 508
   Caption = 'Technical Specifications of Disk'
   ClientHeight = 375
   ClientWidth = 508
   Position = poDesktopCenter
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.10.0'
   object Memo1: TMemo
     Left = 16
     Height = 296
@@ -29,7 +29,7 @@ object frmTechSpecs: TfrmTechSpecs
     TabOrder = 1
   end
   object sdTechSpecsFile: TSaveDialog
-    left = 240
-    top = 328
+    Left = 240
+    Top = 328
   end
 end

@@ -104,15 +104,16 @@ uses
   HlpIHash,
   HlpIHashResult,
   HlpBlake3,
-
+  // New as of v3.0.0, for creating hash lists for faster comparisons of two folders
+  contnrs,
+  // New as of v3.0.0, for importing hash lists
+  uKnownHashLists,
   // New as of v3.0.0
   dbases_sqlite, uDisplayGrid,
   // New as of v3.2.0
   udisplaygrid3,
-  // Also new as of v3.0.0, for creating hash lists for faster comparisons of two folders
-  contnrs,
-  // Also new as of v3.0.0, for importing hash lists
-  uKnownHashLists,
+  // Not for v3.3.0. Maybe for next version?
+  //uLibEWF,
 
   // Remaining Uses clauses for specific OS's
   {$IFDEF Windows}
@@ -523,11 +524,13 @@ type
 
     // Functions
     function RoundToNearest(TheDateTime,TheRoundStep:TDateTime):TdateTime;
-    function  ValidateTextWithHash(strToBeHashed:ansistring): string;
-    function  CalcTheHashString(strToBeHashed:ansistring):string;
-    function  CalcTheHashFile(FileToBeHashed:string):string;
-    function  FormatByteSize(const bytes: QWord): string;
-    function  RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
+    function ValidateTextWithHash(strToBeHashed:ansistring): string;
+    function CalcTheHashString(strToBeHashed:ansistring):string;
+    function CalcTheHashFile(FileToBeHashed:string):string;
+    // function CalcTheHashE01File(FileToBeHashed:string) : string;  // Not for v3.3.0. Maybe for next version?
+    // function IsItE01(filename : string) : boolean;                // Not for v3.3.0. Maybe for next version?
+    function FormatByteSize(const bytes: QWord): string;
+    function RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     function RetrieveFileList(FolderName : string) : TStringList;
     function HashFolderListA(Path : string; slFileListA : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
     function HashFolderListB(Path : string; slFileListB : TStringList; intFileCount : integer; SaveData : Boolean) : TFPHashList;
@@ -1054,6 +1057,16 @@ begin
         end;
 end;
 
+// Not for v3.3.0. Maybe for next version?
+{function TMainForm.IsItE01(filename : string) : boolean;
+var
+  FileExt : string = Default(string);
+begin
+  result := false;
+  FileExt := Uppercase(ExtractFileExt(filename));
+  If FileExt = '.E01' then result := true;
+end;  }
+
 procedure TMainForm.btnHashFileClick(Sender: TObject);
 var
   filename : string;
@@ -1071,6 +1084,7 @@ begin
     begin
       filename := OpenDialog1.Filename;
     end;
+
   // First, clear the captions from any earlier file hashing actions
   lblStartedFileAt.Caption := '';
   lbEndedFileAt.Caption    := '';
@@ -2725,7 +2739,7 @@ procedure TMainForm.btnCompareClick(Sender: TObject);
 var
   FolderA, FolderB : string;
 
-  slFileListA, slFileListB, slMissingHashes  : TStringList;
+  slFileListA, slFileListB : TStringList;
 
   tfpHashListA, tfpHashListB : TFPHashList;
 
@@ -2769,7 +2783,9 @@ begin
 
   // Empty database table TBL_COMPARE_TWO_FOLDERS from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
-   frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS', frmDisplayGrid3.dbGridC2F);
+  frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS_MATCH', frmDisplayGrid3.dbGridC2F);
+  frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS_DUPLICATES', frmDisplayGrid3.dbGridC2F);
+  //frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS', frmDisplayGrid3.dbGridC2F);
 
   if cbUNCModeCompFolders.Checked then
   begin
@@ -2901,20 +2917,7 @@ begin
         lblTotalFileCountNumberB.Caption := IntToStr(FolderBFileCount);
 
         //Populate database with all rows required for the biggest of the two folders
-        // If they match, just use the FolderA file count
-       { if FolderAFileCount > FolderBFileCount then
-        begin
-        frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderAFileCount);
-        end
-          else if FolderBFileCount > FolderAFileCount then
-          begin
-          frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderBFileCount);
-          end
-            else if FolderAFileCount = FolderBFileCount then
-            begin
-            frmSQLiteDBases.Write_INSERT_All_Rows_Required(FolderAFileCount);
-            end;
-        }
+
         // If the file counts match in both Folders
 
         if FolderAFileCount = FolderBFileCount then
@@ -2938,7 +2941,7 @@ begin
           tfpHashListB.Free;
         end // End of if FileCounts match
         else
-        begin
+        begin  // If the file count of Folder A is less than B
           if (FolderAFileCount < FolderBFileCount) then
           begin
             StatusBar6.SimpleText:= 'FolderA has less files than FolderB. Comparing files in both folders using hashing...';
@@ -2954,7 +2957,7 @@ begin
           end
           else
             if (FolderAFileCount > FolderBFileCount) then
-            begin
+            begin  // If the file count of Folder A is more than B
               StatusBar6.SimpleText:= 'FolderA has more files than FolderB. Comparing files in both folders using hashing...';
               tfpHashListA := HashFolderListA(FolderA, slFileListA, FolderAFileCount, NeedToSave);
               tfpHashListB := HashFolderListB(FolderB, slFileListB, FolderBFileCount, NeedToSave);
@@ -3001,8 +3004,20 @@ begin
    // Commit any final database values that may not have yet been comitted
    // and make the display grid of compared folder content visible
   frmSQLiteDBases.SQLTransaction1.CommitRetaining;
-  frmSQLiteDBases.FFilePathA:=RemoveLongPathOverrideChars(FolderA, LongPathOverride); //DS (new)
-  frmSQLiteDBases.FFilePathB:=RemoveLongPathOverrideChars(FolderB, LongPathOverride); //DS (new)
+  {$ifdef Windows}
+  frmSQLiteDBases.FFilePathA:=RemoveLongPathOverrideChars(FolderA, LongPathOverride);
+  frmSQLiteDBases.FFilePathB:=RemoveLongPathOverrideChars(FolderB, LongPathOverride);
+  {$else}
+    {$ifdef Darwin}
+    frmSQLiteDBases.FFilePathA:= FolderA;
+    frmSQLiteDBases.FFilePathB:= FolderB;
+    {$endif}
+    {$IFDEF UNIX and !$ifdef Darwin}
+    frmSQLiteDBases.FFilePathA:= FolderA;
+    frmSQLiteDBases.FFilePathB:= FolderB;
+    {$ENDIF}
+  {$endif}
+  frmSQLiteDBases.PrepareData_COMPARE_TWO_FOLDERS; // prepares matches and duplicates with row id
   frmSQLiteDBases.UpdateGridCOMPARETWOFOLDERSTAB(nil);
   frmDisplayGrid3.Visible := true;
   frmDisplayGrid3.Show;
@@ -3052,16 +3067,13 @@ begin
 
         // Write values to database. +1 because DB rowcount is not zero based
         {$ifdef Windows}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
         frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal); //DS (new)
         {$else}
         {$ifdef Darwin}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal);
         {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal);
         {$ENDIF}
         {$endif}
 
@@ -3090,16 +3102,13 @@ begin
         HashListA.Add(HashVal, @HashVal);
         // Write values to database
         {$ifdef Windows}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal, i+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListA.Strings[i], LongPathOverride), HashVal);
         {$else}
         {$ifdef Darwin}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal);
         {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderA(slFileListA.Strings[i], HashVal, i+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListA.Strings[i], HashVal);
         {$ENDIF}
         {$endif}
 
@@ -3171,16 +3180,13 @@ begin
           HashListB.Add(HashVal, @HashVal);
           // Write values to database  +1 because DB rowcount is not zero based
           {$ifdef Windows}
-          //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
-          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal); //DS (new)
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal);
           {$else}
           {$ifdef Darwin}
-          //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
-          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal);
           {$endif}
           {$IFDEF UNIX and !$ifdef Darwin}
-          //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
-          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
+          frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal);
           {$ENDIF}
           {$endif}
 
@@ -3210,16 +3216,13 @@ begin
 
         // Write values to database
         {$ifdef Windows}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal, j+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(RemoveLongPathOverrideChars(Path, LongPathOverride), RemoveLongPathOverrideChars(slFileListB.Strings[j], LongPathOverride), HashVal);
         {$else}
         {$ifdef Darwin}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal);
         {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
-        //frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS_FolderB(slFileListB.Strings[j], HashVal, j+1);
-        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal); //DS (new)
+        frmSQLiteDBases.Write_COMPARE_TWO_FOLDERS(Path, slFileListB.Strings[j], HashVal);
         {$ENDIF}
         {$endif}
 
@@ -3769,7 +3772,6 @@ end;
 function TMainForm.CalcTheHashString(strToBeHashed:ansistring):string;
 var
   TabRadioGroup1: TRadioGroup;
-  test : TBytes;
   HashInstanceBlake3 : IHash;
   HashInstanceResultBlake3 : IHashResult;
 begin
@@ -3786,13 +3788,6 @@ begin
         4: TabRadioGroup1 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
         5: TabRadioGroup1 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Two Folders.
         7: TabRadioGroup1 := AlgorithmChoiceRadioBox7;  //RadioGroup for Base64
-        {
-        0: TabRadioGroup1 := AlgorithmChoiceRadioBox1;  //RadioGroup on the 1st tab.
-        1: TabRadioGroup1 := AlgorithmChoiceRadioBox2;  //RadioGroup on the 2nd tab.
-        2: TabRadioGroup1 := AlgorithmChoiceRadioBox3;  //RadioGroup on the 3rd tab.
-        3: TabRadioGroup1 := AlgorithmChoiceRadioBox4;  //RadioGroup on the 4th tab.
-        4: TabRadioGroup1 := AlgorithmChoiceRadioBox6;  //RadioGroup on the 5th tab.
-        5: TabRadioGroup1 := AlgorithmChoiceRadioBox7;  //RadioGroup on the 6th tab.}
       end;
 
       case TabRadioGroup1.ItemIndex of
@@ -4215,6 +4210,95 @@ begin
   else result := 'File could not be accessed.'
 end;
 
+// Not for v3.3.0. Maybe for next version? This quick start was for SHA1 only.
+// Once I get the libewf DLL to compile properly will reimplement and expand
+{function TMainForm.CalcTheHashE01File(FileToBeHashed:string):string;
+var
+  HashInstanceMD5_ImageVerification,
+  HashInstanceSHA1_ImageVerification        : IHash;
+
+  HashInstanceResultMD5_ImageVerification,
+  HashInstanceResultSHA1_ImageVerification  : IHashResult;
+
+  // HashLib4Pascal types for xxHash. xxHash64 is crazy fast on 64, but if run on a 32-bit
+  // system, performance is hindered considerably. So for this algorithm, CPU dependant
+  // instances are created
+  {$ifdef CPU64}
+  HashInstancexxHash64       : IHash;
+  HashInstanceResultxxHash64 : IHashResult;
+  {$else if CPU32}
+  HashInstancexxHash32         : IHash;
+  HashInstanceResultxxHash32   : IHashResult;
+  {$endif}
+
+  Buffer                               : array [0..65535] of byte;
+  BytesRead                            : integer;
+  ImageFileSize        : Int64;
+
+  strImageMD5HashValue, strImageSHA1HashValue             : string;
+
+  fLibEWFVerificationInstance : TLibEWF;
+
+begin
+  BytesRead      := 0;
+  TotalBytesRead := 0;
+  ImageFileSize  := 0;
+  ImageFileSize := 0;
+  //frmProgress.btnCloseProgressWindow.Enabled := false;
+
+  // Initialise new hashing digests
+  HashInstanceSHA1_ImageVerification := THashFactory.TCrypto.CreateSHA1();
+  HashInstanceSHA1_ImageVerification.Initialize();
+
+  // Create the libEWF instance and ensure the DLL is found
+  fLibEWFVerificationInstance := TLibEWF.create;
+
+  // Now open the E01 image file with write access
+  if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
+  begin
+    ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
+    //frmProgress.Show;
+    //if frmyaffi.cbVerify.checked then
+    //frmProgress.lblStatus.Caption := ' Verifying E01 image...please wait';
+    //frmProgress.lblTotalBytesSource.Caption := ' bytes verified of ' + IntToStr(ImageFileSize);
+
+    // If SHA1 hash was chosen, compute the SHA1 hash of the image
+    fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
+    repeat
+      // Read the E01 image file in buffered blocks. Hash each block as we go
+      BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
+      if BytesRead = -1 then
+        begin
+          RaiseLastOSError;
+          exit;
+        end
+      else
+        begin
+          inc(TotalBytesRead, BytesRead);
+          HashInstanceSHA1_ImageVerification.TransformUntyped(Buffer, BytesRead);
+          //frmProgress.lblTotalBytesRead.Caption:= IntToStr(TotalBytesRead);
+          //frmProgress.ProgressBar1.Position := Trunc((TotalBytesRead/ImageFileSize)*100);
+          //frmProgress.lblPercent.Caption := ' (' + IntToStr(frmProgress.ProgressBar1.Position) + '%)';
+        end;
+        Application.ProcessMessages;
+    until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
+
+    HashInstanceResultSHA1_ImageVerification := HashInstanceSHA1_ImageVerification.TransformFinal();
+    strImageSHA1HashValue := Uppercase(HashInstanceResultSHA1_ImageVerification.ToString());
+    if Length(strImageSHA1HashValue) > 0 then
+    begin
+      ShowMessage(strImageSHA1HashValue);
+      result := strImageSHA1HashValue;
+    end
+    else result := 'SHA-1 Verification failed!';
+
+    // Release the EWF File Handle now that it is verified
+    fLibEWFVerificationInstance.libewf_close();
+    //frmProgress.btnCloseProgressWindow.Enabled := true;
+  end // End of E01 Open statement
+  else ShowMessage('Unable to open E01 image file for verification');
+end;   }
+
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
 var
   SizeOfFile : int64;
@@ -4286,7 +4370,7 @@ procedure TMainForm.lblURLBannerClick(Sender: TObject);
 var
   QuickHashURL: string;
 begin
-  QuickHashURL := 'http://quickhash-gui.org';
+  QuickHashURL := 'http://www.quickhash-gui.org';
   OpenURL(QuickHashURL);
 end;
 
@@ -4303,11 +4387,10 @@ var
   SizeOfFile2, TotalBytesRead2, NoFilesExamined, SizeOfCurrentFile: Int64;
 
   ParentSource,  ParentDestination, SourceFileHasHash, DestinationFileHasHash, FinalisedDestDir,
-    FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
-    OutputDirDateFormatted, CrDateModDateAccDate,
-    CSVLogFile2, strNoOfFilesToExamine,
-    strTimeDifference,  FileMask,
-    Col1SourceFilePathAndName, Col2SourceHash, Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute: string;
+  FinalisedFileName, CopiedFilePathAndName, SourceDirectoryAndFileName,
+  CrDateModDateAccDate, CSVLogFile2, strNoOfFilesToExamine, OutputDirDateFormatted,
+  strTimeDifference,  FileMask, Col1SourceFilePathAndName, Col2SourceHash,
+  Col3CopiedFilePathAndName, Col4DestinationHash, Col5DateAttribute: string;
 
   SystemDate, StartTime, EndTime, TimeDifference : TDateTime;
 
@@ -4322,10 +4405,11 @@ var
   {$ENDIF}
 
 begin
-  ParentSource         := '';
+  ParentSource            := '';
   FinalisedDestDir        := '';
   SourceFileHasHash       := '';
   DestinationFileHasHash  := '';
+  CopiedFilePathAndName   := '';
   CrDateModDateAccDate    := '';
   FileMask                := '';
   NoOfFilesCopiedOK       := 0;
@@ -4942,26 +5026,6 @@ begin
   Button8CopyAndHash.Enabled := true;
 end;
 
-// Returns the size of the file in bytes on success. -1 otherwise.
-// Needed only if the UNC prefixes cause a problem which they used to but seem not
-// to anymore. So I just use FileSize now for all three operating systems.
-{
-function TMainForm.FileSizeWithLongPath(strFileName : string) : Int64;
-var
-  fs : TFileStream;
-  FileSize : Int64;
-begin
-  result := -1;
-  try
-    fs := TFileStream.Create(strFileName, faReadOnly);
-    FileSize := 0;
-    FileSize := fs.size;
-  finally
-    fs.free;
-  end;
-  if FileSize > 0 then result := FileSize;
-end;
-}
 {$IFDEF Windows}
 // FUNCTION FileTimeToDTime - Windows specific,
 // kindly acknowledged from xenblaise @ http://forum.lazarus.freepascal.org/index.php?topic=10869.0
@@ -5204,9 +5268,8 @@ var
   GB: QWord;
   TB: QWord;
 begin
-
-  B  := 1; //byte
-  KB := 1024 * B; //kilobyte
+  B  := 1;         //byte
+  KB := 1024 * B;  //kilobyte
   MB := 1024 * KB; //megabyte
   GB := 1024 * MB; //gigabyte
   TB := 1024 * GB; //terabyte
@@ -5226,6 +5289,7 @@ begin
           if bytes > B then
           result := FormatFloat('#.## bytes', bytes)
         else
+          if bytes = 0 then
           result := '0 bytes';
 end;
 
