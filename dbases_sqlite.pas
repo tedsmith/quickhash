@@ -20,19 +20,19 @@ type
   { TfrmSQLiteDBases }
 
   TfrmSQLiteDBases = class(TForm)
-    CSVExporter1: TCSVExporter; // We use this for users who want to clipboard the results. Works fine if not too many values.
-    DataSource1: TDataSource;
-    DataSource2: TDataSource;
-    DataSource3: TDataSource;
-    lblConnectionStatus: TLabel;
-    SQLDBLibraryLoaderLinux: TSQLDBLibraryLoader;
-    SQLDBLibraryLoaderOSX: TSQLDBLibraryLoader;
-    SQLDBLibraryLoaderWindows: TSQLDBLibraryLoader;
-    SQLite3Connection1: TSQLite3Connection;
-    sqlFILES: TSQLQuery;
-    sqlCOPY: TSQLQuery;
-    sqlCOMPARETWOFOLDERS : TSQLQuery;
-    SQLTransaction1: TSQLTransaction;
+    CSVExporter1               : TCSVExporter; // We use this for users who want to clipboard the results. Works fine if not too many values.
+    DataSource1                : TDataSource;
+    DataSource2                : TDataSource;
+    DataSource3                : TDataSource;
+    SQLDBLibraryLoaderLinux    : TSQLDBLibraryLoader;
+    SQLDBLibraryLoaderOSX      : TSQLDBLibraryLoader;
+    SQLDBLibraryLoaderWindows  : TSQLDBLibraryLoader;
+    SQLite3Connection1         : TSQLite3Connection;
+    sqlFILES                   : TSQLQuery;
+    sqlCOPY                    : TSQLQuery;
+    sqlCOMPARETWOFOLDERS       : TSQLQuery;
+    SQLTransaction1            : TSQLTransaction;
+    lblConnectionStatus        : TLabel;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure CreateDatabase(DBaseName : string);
@@ -96,7 +96,7 @@ type
     ChosenDelimiter  : string; // New to v3.3.0 to enable use of preferred delim char
     FFilePathA       : String; // new to v3.3.0 for Compare Two Folders tab
     FFilePathB       : String; // new to v3.3.0 for Compare Two Folders tab
-    FC2Fquery        : Boolean;
+    FC2Fquery        : Boolean;// New to v3.3.0 to enable and control results of "Show Duplicates" right click option
     { public declarations }
   const
     // More information on the use of these values is below.
@@ -135,56 +135,57 @@ var
   {$endif}
 begin
   // Set the delimiter to whatever the user selects in the main form.
- ChosenDelimiter := MainForm.ChosenDelimiter;
+  ChosenDelimiter := MainForm.ChosenDelimiter;
 
   // Initiate calls to SQLite libraries for WINDOWS
   {$ifdef windows}
-  SQLDBLibraryLoaderWindows.ConnectionType := 'SQLite3';
+    SQLDBLibraryLoaderWindows.ConnectionType := 'SQLite3';
   // Load the right DLL for the architecture of Windows in use
   {$ifdef CPU32}
     SQLiteLibraryPath := 'sqlite3-win32.dll';
   {$else ifdef CPU64}
     SQLiteLibraryPath := 'sqlite3-win64.dll';
   {$endif}
+
   // Check the DLL exists and load it
   if FileExists(SQLiteLibraryPath) then
   begin
-   SQLDBLibraryLoaderWindows.LibraryName := SQLiteLibraryPath;
-   SQLDBLibraryLoaderWindows.Enabled := true;
-   SQLDBLibraryLoaderWindows.LoadLibrary;
+  SQLDBLibraryLoaderWindows.LibraryName := SQLiteLibraryPath;
+  SQLDBLibraryLoaderWindows.Enabled := true;
+  SQLDBLibraryLoaderWindows.LoadLibrary;
 
-   if CreateGUID(guid) = 0 then
-   begin
-     strFileNameRandomiser := GUIDToString(guid);
-   end
-   else
-     begin
-       strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
-     end;
-   // write the SQLite database file to system temp
-   SafePlaceForDB := GetTempDir;
-   if ForceDirectories(SafePlaceForDB) then
-   begin
-     SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
-     // Create the database
-     CreateDatabase(SQLite3Connection1.DatabaseName);
-     if SQLIte3Connection1.Connected then
-     begin
-       lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-       DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
-     end;
-   end
-   else
-     begin
-       Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
-     end;
+  if CreateGUID(guid) = 0 then
+  begin
+   strFileNameRandomiser := GUIDToString(guid);
   end
   else
    begin
-     ShowMessage('Cannot create SQLite database. Probably SQLite libraries are not on your system.');
-     MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
-     MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
+     strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
    end;
+  // write the SQLite database file to system temp
+  SafePlaceForDB := GetTempDir;
+  if ForceDirectories(SafePlaceForDB) then
+  begin
+   SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
+   // Create the database
+   CreateDatabase(SQLite3Connection1.DatabaseName);
+   if SQLIte3Connection1.Connected then
+   begin
+     lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+     DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
+   end;
+  end
+  else
+   begin
+     Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
+   end;
+  end
+  else
+  begin
+    ShowMessage('Cannot create SQLite database. Probably SQLite libraries are not on your system.');
+    MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+    MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
+  end;
   {$endif} // End of Windows compiler directive
 
   // Initiate calls to SQLite libraries for LINUX
@@ -203,21 +204,21 @@ begin
 
   if FileExists(SQLiteLibraryPath) then
   begin
-  SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath;
-  SQLDBLibraryLoaderLinux.Enabled := true;
-  SQLDBLibraryLoaderLinux.LoadLibrary;
-  if CreateGUID(guid) = 0 then
-   begin
+    SQLDBLibraryLoaderLinux.LibraryName := SQLiteLibraryPath;
+    SQLDBLibraryLoaderLinux.Enabled := true;
+    SQLDBLibraryLoaderLinux.LoadLibrary;
+    if CreateGUID(guid) = 0 then
+    begin
      strFileNameRandomiser := GUIDToString(guid);
-   end
-   else
+    end
+    else
      begin
        strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
      end;
-   // write the SQLite database file to system temp
-   SafePlaceForDB := GetTempDir;
-   if ForceDirectories(SafePlaceForDB) then
-   begin
+    // write the SQLite database file to system temp
+    SafePlaceForDB := GetTempDir;
+    if ForceDirectories(SafePlaceForDB) then
+    begin
      SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
      // Create the database
      CreateDatabase(SQLite3Connection1.DatabaseName);
@@ -226,18 +227,18 @@ begin
        lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
        DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
      end;
-   end
-   else
+    end
+    else
      begin
        Showmessage('Could not create folder ' + SafePlaceForDB + ' for ' + SQLite3Connection1.DatabaseName);
      end;
   end
   else
-   begin
-     ShowMessage('Cannot create SQLite database. Probably SQLite libraries are not on your system.');
-     MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
-     MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
-   end;
+  begin
+    ShowMessage('Cannot create SQLite database. Probably SQLite libraries are not on your system.');
+    MainForm.TabSheet3.Enabled := false; // disable FileS tab, because it needs SQLite
+    MainForm.TabSheet4.Enabled := false; // disable Copy tab, because it needs SQLite
+  end;
   {$endif}   // End of Linux compiler directive
 
   // Initiate calls to SQLite libraries for APPLE OSX
@@ -254,61 +255,60 @@ begin
   // check whether loading was possible and successful but then just unload it
   // to allow the TSQLDBLibraryLoader to load it, later
   if LibHandle <> 0 then
-    begin
-      // Nothing is needed here anymore
-    end
+  begin
+    // Nothing is needed here anymore
+  end
   else ShowMessage('Cannot load SQLite libraries for backend use.' + SysErrorMessage(GetLastOSError));
 
   // unload library and pass control to TSQLDBLibraryLoader
   if LibHandle <> NilHandle then
+  begin
+    unloadLibrary(LibHandle);
+    SQLDBLibraryLoaderOSX.LibraryName := 'libsqlite3.dylib';
+    SQLDBLibraryLoaderOSX.Enabled := true;
+    SQLDBLibraryLoaderOSX.LoadLibrary;
+
+    // Generate a unique name for the DB
+    if CreateGUID(guid) = 0 then
     begin
-      unloadLibrary(LibHandle);
-      SQLDBLibraryLoaderOSX.LibraryName := 'libsqlite3.dylib';
-      SQLDBLibraryLoaderOSX.Enabled := true;
-      SQLDBLibraryLoaderOSX.LoadLibrary;
-
-      // Generate a unique name for the DB
-      if CreateGUID(guid) = 0 then
+      strFileNameRandomiser := GUIDToString(guid);
+    end
+    else
       begin
-        strFileNameRandomiser := GUIDToString(guid);
-      end
-      else
-        begin
-          strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
-        end;
+        strFileNameRandomiser := FormatDateTime('YYYY-MM-DD_HH-MM-SS.ZZZ', Now);
+      end;
 
-      // write the SQLite database file to system temp
-      SafePlaceForDB := GetTempDir;
-      if ForceDirectories(SafePlaceForDB) then
+    // write the SQLite database file to system temp
+    SafePlaceForDB := GetTempDir;
+    if ForceDirectories(SafePlaceForDB) then
+    begin
+      SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
+      // Create the database
+      CreateDatabase(SQLite3Connection1.DatabaseName);
+      if SQLIte3Connection1.Connected then
       begin
-        SQLite3Connection1.DatabaseName := SafePlaceForDB + 'QuickHashDB_' + strFileNameRandomiser + '.sqlite';
-        // Create the database
-        CreateDatabase(SQLite3Connection1.DatabaseName);
-        if SQLIte3Connection1.Connected then
-        begin
-          lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
-          DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
-        end;
-      end
-    end;
+        lblConnectionStatus.Caption:= 'SQLite3 Database connection active';
+        DBName := SQLite3Connection1.DatabaseName;  // We call DBName from Unit2, that is why it is declared here
+      end;
+    end
+  end;
 
   LibHandle := NilHandle;
 
   // Method used prior to v3.3.0, for info
-   { SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
-    SQLiteLibraryPath := '';
-    LibHandle := dlopen('libsqlite3.dylib', RTLD_LAZY);
-    if LibHandle <> nil then
-    begin
-      Pdlinfo := LibHandle;
-      PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
-      SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
-      PtrSQLiteLibraryPath := nil;
-      dlclose(LibHandle);
-    end;}
+  { SQLDBLibraryLoaderOSX.ConnectionType := 'SQLite3';
+  SQLiteLibraryPath := '';
+  LibHandle := dlopen('libsqlite3.dylib', RTLD_LAZY);
+  if LibHandle <> nil then
+  begin
+    Pdlinfo := LibHandle;
+    PtrSQLiteLibraryPath := Pdlinfo^.dli_fbase;
+    SQLiteLibraryPath := String(PtrSQLiteLibraryPath);
+    PtrSQLiteLibraryPath := nil;
+    dlclose(LibHandle);
+  end;}
   {$endif} // End of Apple OSX compiler directive
 end;
-
 
 // Create a fresh SQLite database for each instance of the program
 procedure TfrmSQLiteDBases.CreateDatabase(DBaseName : string);
@@ -485,8 +485,30 @@ var
   FileHashA   : string = Default(string);
   FolderPathB : string = Default(string);
   FileHashB   : string = Default(string);
+  // For filtered view
+  FolderPath  : string = Default(string);
+  FileName    : string = Default(string);
+  FileHash    : string = Default(string);
 begin
   ChosenDelimiter := MainForm.ChosenDelimiter;
+
+  // If user has enabled "Show Duplicates" filter, copy the adjusted layout
+  If FC2Fquery = false  then
+  begin
+  strID          := DBGrid.DataSource.DataSet.Fields[0].AsString;
+  FolderPath     := DBGrid.DataSource.DataSet.Fields[1].AsString;
+  FileName       := DBGrid.DataSource.DataSet.Fields[2].AsString;
+  FileHash       := DBGrid.DataSource.DataSet.Fields[3].AsString;
+
+  AllRowCells := strID       +ChosenDelimiter+
+                 FolderPath  +ChosenDelimiter+
+                 FileName    +ChosenDelimiter+
+                 FileHash    +ChosenDelimiter;
+
+  Clipboard.AsText := AllRowCells;
+  end
+  else   // If user has not enabled "Show Duplicates" filter, copy the standard layout
+  begin
   strID           := DBGrid.DataSource.DataSet.Fields[0].AsString;
   FileNameCell    := DBGrid.DataSource.DataSet.Fields[1].AsString;
   FolderPathA     := DBGrid.DataSource.DataSet.Fields[2].AsString;
@@ -494,14 +516,15 @@ begin
   FolderPathB     := DBGrid.DataSource.DataSet.Fields[4].AsString;
   FileHashB       := DBGrid.DataSource.DataSet.Fields[5].AsString;
 
-  AllRowCells := strID               +ChosenDelimiter+
-                 FileNameCell        +ChosenDelimiter+
-                 FolderPathA         +ChosenDelimiter+
-                 FileHashA           +ChosenDelimiter+
-                 FolderPathB         +ChosenDelimiter+
-                 FileHashB;
+  AllRowCells     := strID        +ChosenDelimiter+
+                     FileNameCell +ChosenDelimiter+
+                     FolderPathA  +ChosenDelimiter+
+                     FileHashA    +ChosenDelimiter+
+                     FolderPathB  +ChosenDelimiter+
+                     FileHashB;
 
   Clipboard.AsText := AllRowCells;
+  end;
 end;
 
 // Copies multiple selected rows (plural) to clipboard of the "Compare Two Folders" results grid
@@ -517,10 +540,33 @@ var
   FolderPathB  : string = Default(string);
   FileHashB    : string = Default(string);
   i : Integer;
+
+  FolderPath   : string = Default(string);
+  FileName     : string = Default(string);
+  FileHash     : string = Default(string);
 begin
   ChosenDelimiter := MainForm.ChosenDelimiter;
   for i := 0 to DBGrid.SelectedRows.Count -1 do
   with DBGrid.DataSource.DataSet do
+  begin
+  // If user has enabled "Show Duplicates" filter, copy the adjusted layout
+  If FC2Fquery = false  then
+  begin
+    GotoBookmark(Pointer(DBGrid.SelectedRows.Items[i]));
+    strID        := DBGrid.DataSource.DataSet.Fields[0].AsString;
+    FolderPath   := DBGrid.DataSource.DataSet.Fields[1].AsString;
+    FileName     := DBGrid.DataSource.DataSet.Fields[2].AsString;
+    FileHash     := DBGrid.DataSource.DataSet.Fields[3].AsString;
+
+
+    AllRowCells  := AllRowCells + strID +ChosenDelimiter+
+                    FolderPath  +ChosenDelimiter+
+                    FileName    +ChosenDelimiter+
+                    FileHash    +LineEnding;
+
+    Clipboard.AsText := AllRowCells;
+  end
+  else   // If user has not enabled "Show Duplicates" filter, copy the standard layout
   begin
     GotoBookmark(Pointer(DBGrid.SelectedRows.Items[i]));
     strID           := DBGrid.DataSource.DataSet.Fields[0].AsString;
@@ -538,8 +584,8 @@ begin
                        FileHashB    +LineEnding;
   end;
   Clipboard.AsText := AllRowCells;         // Clipboard.AsText:=sCSV;
+  end;
 end;
-
 
 // Counts rows of current DBGrid. Returns positive integer if successfull and
 // returns active display to top row
@@ -579,19 +625,19 @@ var
   sl             : TStringList;
   fs             : TFileStreamUTF8;
 
-  const
-    strHTMLHeader      = '<HTML>'  ;
-    strTITLEHeader     = '<TITLE>QuickHash HTML Output' ;
-    strBODYHeader      = '<BODY>'  ;
-    strTABLEHeader     = '<TABLE>' ;
-    strTABLEROWStart   = '<TR>'    ;
-    strTABLEDATAStart  = '<TD>'    ;
-    strTABLEDataEnd    = '</TD>'   ;
-    strTABLEROWEnd     = '</TR>'   ;
-    strTABLEFooter     = '</TABLE>';
-    strBODYFooter      = '</BODY>' ;
-    strTITLEFooter     = '</TITLE>';
-    strHTMLFooter      = '</HTML>' ;
+const
+  strHTMLHeader      = '<HTML>'  ;
+  strTITLEHeader     = '<TITLE>QuickHash HTML Output' ;
+  strBODYHeader      = '<BODY>'  ;
+  strTABLEHeader     = '<TABLE>' ;
+  strTABLEROWStart   = '<TR>'    ;
+  strTABLEDATAStart  = '<TD>'    ;
+  strTABLEDataEnd    = '</TD>'   ;
+  strTABLEROWEnd     = '</TR>'   ;
+  strTABLEFooter     = '</TABLE>';
+  strBODYFooter      = '</BODY>' ;
+  strTITLEFooter     = '</TITLE>';
+  strHTMLFooter      = '</HTML>' ;
 
 begin
   NoOfRowsInGrid := -1;
@@ -1128,7 +1174,6 @@ begin
   end;
 end;
 
-
 // ShowDuplicates lists entries with duplicate hash values from the FILES tab,
 // by searching hash column for matches and then displays all rows fully
 // for which duplicate hashes were found
@@ -1160,8 +1205,9 @@ var
   FilePath    : string = Default(string);
   NameAndPath : string = Default(string);
   FileHash    : string = Default(string);
+
   i, FileDeletedCount : integer;
-  FilesDeletedOK : boolean = Default(boolean);
+  FilesDeletedOK      : boolean = Default(boolean);
   slDuplicates, slDuplicatesDeleted : TStringList;
 begin
   FileDeletedCount := 0;
@@ -1276,7 +1322,7 @@ begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
-                          'FROM TBL_FILES ORDER BY Id';
+                                                     'FROM TBL_FILES ORDER BY Id';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
@@ -1295,7 +1341,7 @@ begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
-                          'FROM TBL_FILES ORDER BY FileName';
+                                                     'FROM TBL_FILES ORDER BY FileName';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
@@ -1314,7 +1360,7 @@ begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
-                        'FROM TBL_FILES ORDER BY FilePath';
+                                                    'FROM TBL_FILES ORDER BY FilePath';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
@@ -1333,7 +1379,7 @@ begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
-                        'FROM TBL_FILES ORDER BY HashValue';
+                                                    'FROM TBL_FILES ORDER BY HashValue';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
@@ -1352,7 +1398,7 @@ begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
-                        'FROM TBL_FILES ORDER BY KnownHashFlag';
+                                                    'FROM TBL_FILES ORDER BY KnownHashFlag';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
@@ -1793,7 +1839,7 @@ begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
-                          'FROM TBL_COPY ORDER BY SourceFilename';
+                                                     'FROM TBL_COPY ORDER BY SourceFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
@@ -1812,7 +1858,7 @@ begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
-                        'FROM TBL_COPY ORDER BY DestinationFilename';
+                                                     'FROM TBL_COPY ORDER BY DestinationFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
@@ -1831,7 +1877,7 @@ begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
-                          'FROM TBL_COPY ORDER BY SourceHash';
+                                                    'FROM TBL_COPY ORDER BY SourceHash';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
    frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
@@ -1850,7 +1896,7 @@ begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
-                          'FROM TBL_COPY ORDER BY DestinationHash';
+                                                    'FROM TBL_COPY ORDER BY DestinationHash';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
    frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
@@ -2129,18 +2175,18 @@ var
   sl                : TStringList;
   fs                : TFileStreamUTF8;
 
-  const
-    strHTMLHeader      = '<HTML>'  ;
-    strTITLEHeader     = '<TITLE>QuickHash HTML Output' ;
-    strBODYHeader      = '<BODY>'  ;
-    strTABLEROWStart   = '<TR>'    ;
-    strTABLEDATAStart  = '<TD>'    ;
-    strTABLEDataEnd    = '</TD>'   ;
-    strTABLEROWEnd     = '</TR>'   ;
-    strTABLEFooter     = '</TABLE>';
-    strBODYFooter      = '</BODY>' ;
-    strTITLEFooter     = '</TITLE>';
-    strHTMLFooter      = '</HTML>' ;
+const
+  strHTMLHeader     = '<HTML>'  ;
+  strTITLEHeader    = '<TITLE>QuickHash HTML Output' ;
+  strBODYHeader     = '<BODY>'  ;
+  strTABLEROWStart  = '<TR>'    ;
+  strTABLEDATAStart = '<TD>'    ;
+  strTABLEDataEnd   = '</TD>'   ;
+  strTABLEROWEnd    = '</TR>'   ;
+  strTABLEFooter    = '</TABLE>';
+  strBODYFooter     = '</BODY>' ;
+  strTITLEFooter    = '</TITLE>';
+  strHTMLFooter     = '</HTML>' ;
 
 begin
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
@@ -2379,30 +2425,31 @@ procedure TfrmSQLiteDBases.UpdateGridCOPYTAB(Sender: TObject);
   end;
 end;
 
+// New to v3.3.0 thanks to community support. Enables a much more varied option for filtering results
 procedure TfrmSQLiteDBases.PrepareData_COMPARE_TWO_FOLDERS; // prepares matches and duplicates with row id
 begin
   try
     sqlCOMPARETWOFOLDERS.Close;
     sqlCOMPARETWOFOLDERS.SQL.Text :=
-      'insert into TBL_COMPARE_TWO_FOLDERS_MATCH (FileName,FilePathA,FileHashA,FilePathB,FileHashB) ' +
-      'select a.FileName,a.FilePath as FilePathA, a.FileHash as FileHashA, '+
+      'INSERT into TBL_COMPARE_TWO_FOLDERS_MATCH (FileName,FilePathA,FileHashA,FilePathB,FileHashB) ' +
+      'SELECT a.FileName,a.FilePath as FilePathA, a.FileHash as FileHashA, '+
       ' b.FilePath as FilePathB, b.FileHash as FileHashB '+
-      'from TBL_COMPARE_TWO_FOLDERS a '+
+      'FROM TBL_COMPARE_TWO_FOLDERS a '+
       '  left join TBL_COMPARE_TWO_FOLDERS b on a.FileName=b.FileName and b.FilePath=:FilePathB '+
-      'where a.FilePath=:FilePathA '+
+      'WHERE a.FilePath=:FilePathA '+
       'union '+
-      'select c.FileName,d.FilePath as FilePathA, d.FileHash as FileHashA, '+
+      'SELECT c.FileName,d.FilePath as FilePathA, d.FileHash as FileHashA, '+
       ' c.FilePath as FilePathB, c.FileHash as FileHashB '+
-      'from TBL_COMPARE_TWO_FOLDERS c '+
+      'FROM TBL_COMPARE_TWO_FOLDERS c '+
       '  left join TBL_COMPARE_TWO_FOLDERS d on c.FileName=d.FileName and d.FilePath=:FilePathA '+
-      'where c.FilePath=:FilePathB';
+      'WHERE c.FilePath=:FilePathB';
     SQLTransaction1.Active := True;
     sqlCOMPARETWOFOLDERS.ParamByName('FilePathA').AsString:=FFilePathA;
     sqlCOMPARETWOFOLDERS.ParamByName('FilePathB').AsString:=FFilePathB;
     sqlCOMPARETWOFOLDERS.ExecSQL;
 
     sqlCOMPARETWOFOLDERS.SQL.Text :=
-      'insert into TBL_COMPARE_TWO_FOLDERS_DUPLICATES (FilePath,FileName,FileHash) ' +
+      'INSERT into TBL_COMPARE_TWO_FOLDERS_DUPLICATES (FilePath,FileName,FileHash) ' +
       'SELECT distinct a.FilePath, a.FileName, a.FileHash ' +
       'FROM tbl_compare_two_folders a, ' +
       '     tbl_compare_two_folders b ' +

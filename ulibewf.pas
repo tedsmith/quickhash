@@ -44,7 +44,7 @@ type
   TARRPCHAR = array of pansiChar;
   PARRPCHAR = ^TARRPCHAR;
 
-  TLibEWFCheckSig        = function(filename : pansiChar) : integer; cdecl;
+  TLibEWFCheckSig        = function(filename : pansiChar; error:pointer) : integer; cdecl;
   TLibEWFOpen            = function(filenames : TARRPCHAR; amount_of_files : TUINT16; flags : TUINT8) : PLIBEWFHDL; cdecl;
   TLibEWFReadRand        = function(handle : PLIBEWFHDL; buffer : pointer; size : TSIZE; offset : TSIZE64) : integer; cdecl;
   Tlibewfhandlewriterand = function(handle : PLIBEWFHDL; buffer : pointer; size : TSIZE; offset : TSIZE64) : integer; cdecl;
@@ -158,7 +158,7 @@ type
   public
     constructor create();
     destructor destroy(); override;
-    function libewf_check_file_signature(const filename : ansistring) : integer;
+    function libewf_check_file_signature(const filename : ansistring ) : integer;
     function libewf_open(const filename : ansistring;flag:byte=$1) : integer;
     function libewf_read_random(buffer : pointer; size : longword; offset : int64) : integer;
     function libewf_write_random(buffer : pointer; size : longword; offset : int64) : integer;
@@ -192,7 +192,7 @@ const
 
   LIBEWF_DEFAULT_SEGMENT_FILE_SIZE = (1500 * 1024 * 1024); // 2086666240 = 1,990Mb
 
-  LIBEWF_VERSION              = 'V3';
+  LIBEWF_VERSION              = 'V2';
 
   LIBEWF_FORMAT_UNKNOWN	      = $00;
   LIBEWF_FORMAT_ENCASE1	      = $01;
@@ -229,24 +229,41 @@ implementation
   */}
 constructor TLibEWF.create();
 var
-  libFileName : Unicodestring;
+  libFileName : ansistring;
+  cvtString : string;
 begin
   fLibHandle := nilhandle;
   fCurEWFHandle:=nil;
 
   {$ifdef Windows}
-  libFileName:=ExtractFilePath(Application.ExeName)+'libewf-v3.dll';//-new.dll';
+  libFileName:=ExtractFilePath(Application.ExeName)+'libewf-x64.dll';//-new.dll';
   {$endif}
   {$ifdef UNIX}
-  libFileName:=ExtractFilePath(Application.ExeName)+'libewf-v3.so';
+  //libFileName:=ExtractFilePath(Application.ExeName)+'libewf-v3.so';
   {$endif}
 
   if FileExists(libFileName) { *Converted from FileExists* } then
   begin
     {$ifdef Windows}
-    fLibHandle := LoadLibrary(PChar(libFileName));
-    //fLibHandle := dynlibs.LoadLibrary(libFileName);
-
+    fLibHandle := LoadLibraryA(PAnsiChar(libFileName)); //LoadLibrary('libewf.dll');
+    // check whether loading was successful
+    if fLibHandle <> 0 then
+     begin
+       // assign address of the subroutine call to the variable cvtString
+       Pointer(cvtString) := GetProcAddress(fLibHandle, 'cvtString');
+       // check whether a valid address has been returned
+       if @cvtString <> nil then
+        begin
+         // just crack on. But could notify user with ShowMessage(cvtString + 'Success')
+        ShowMessage(cvtString + 'Success');
+        end
+       // error message on no valid address
+       else
+         ShowMessage('libewf library could not access memory address. LastOSError1 = ' + SysErrorMessage(GetLastOSError));
+     end
+   else
+     // error message on load failure
+     ShowMessage('libewf library could not be loaded. LastOSError2 = ' + SysErrorMessage(GetLastOSError));
 
     if fLibHandle<>nilhandle then
     begin
@@ -385,11 +402,14 @@ end;
   * @return 0 if successful and valid, -1 otherwise.
   */}
 function TLibEWF.libewf_check_file_signature(const filename : ansistring) : integer;
+var
+  err:pointer;
 begin
   Result:=0;
+  err := nil;
   if fLibHandle<>0 then
   begin
-    Result:=fLibEWFCheckSig(pansiChar(filename));
+    Result:=fLibEWFCheckSig(fLibEWFCheckSig(pansiChar(filename), @err);
   end;
 end;
 
@@ -440,7 +460,7 @@ begin
     {  if LIBEWF_VERSION='V1'
         then fCurEWFHandle:=fLibEWFOpen(fileNamePChars, Length(fileNamePChars), flag); //v2
       //fCurEWFHandle:=fLibEWFOpen(fileNamePChars, Length(fileNamePChars), byte('r')); //v1 }
-      if LIBEWF_VERSION='V3' then
+      if LIBEWF_VERSION='V2' then
         begin
         ret := flibewfhandleinitialize (@fCurEWFHandle,@err); //pointer to pointer = ** in c
         if ret=1 then
@@ -473,7 +493,7 @@ begin
   begin
   if LIBEWF_VERSION='V1' then
     Result:=fLibEWFReadRand(fCurEWFHandle, buffer, size, offset);
-  if LIBEWF_VERSION='V3' then
+  if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlereadrandom(fCurEWFHandle,
                                     buffer,
                                     size,
@@ -507,7 +527,7 @@ begin
   if fLibHandle<>0 then
   begin
     if LIBEWF_VERSION='V1' then Result:=fLibEWFWriteRand(fCurEWFHandle, buffer, size, offset);
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
       Result:=flibewfhandlewriterandom(fCurEWFHandle,
                                        buffer,
                                        size,
@@ -541,7 +561,7 @@ begin
   Result:=-1;
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibEWFhandlewritebuffer(fCurEWFHandle,
                                      buffer,
                                      size,
@@ -568,7 +588,7 @@ begin
   Result:=-1;
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibEWFhandlereadbuffer(fCurEWFHandle,
                                     buffer,
                                     size,
@@ -598,7 +618,7 @@ begin
 
    if fLibHandle<>0 then
    begin
-     if LIBEWF_VERSION='V3' then
+     if LIBEWF_VERSION='V2' then
      Result:=flibewfhandleseekoffset(fCurEWFHandle,
                                      Offset,
                                      Whence,
@@ -630,7 +650,7 @@ begin
 
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlesetmd5hash(fCurEWFHandle,
                                     md5_hash,
                                     size,
@@ -661,7 +681,7 @@ begin
 
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlesetsha1hash(fCurEWFHandle,
                                     sha1_hash,
                                     size,
@@ -690,7 +710,7 @@ begin
 
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlesetmaximumsegmentsize(fCurEWFHandle,
                                                size,
                                                @err);
@@ -719,7 +739,7 @@ begin
 
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlesetformat(fCurEWFHandle, Format, @err);
   end;
 
@@ -746,7 +766,7 @@ begin
 
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlesetmediaflags(fCurEWFHandle,
                                        volume_type,
                                        @err);
@@ -779,7 +799,7 @@ begin
 
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlepreparewritechunk(fCurEWFHandle,
                                            @ChunkBuffer,
                                            ChunkBufferSize,
@@ -839,7 +859,7 @@ begin
 
   if fLibHandle<>0 then
   begin
-   if LIBEWF_VERSION='V3' then
+   if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlewritechunk(fCurEWFHandle,
                                      @ChunkBuffer,
                                      ChunkBufferSize,
@@ -882,7 +902,7 @@ begin
   Result  := -1;
   if fLibHandle<>0 then
   begin
-    if LIBEWF_VERSION='V3' then
+    if LIBEWF_VERSION='V2' then
       Result:=flibewfhandlesetcompressionvalues (fCurEWFHandle,
                                                  level,
                                                  flags,
@@ -914,7 +934,7 @@ begin
   if fLibHandle<>0 then
   begin
   //if LIBEWF_VERSION='V1' then ...;
-  if LIBEWF_VERSION='V3' then
+  if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlesetutf8headervalue (fCurEWFHandle,
                                             pansichar(identifier),
                                             length(identifier),
@@ -951,7 +971,7 @@ begin
   begin
   //if LIBEWF_VERSION='V1' then ...;
   getmem(p,255);
-  if LIBEWF_VERSION='V3' then
+  if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlegetutf8headervalue (fCurEWFHandle,
                                              pansichar(identifier),
                                              length(identifier),
@@ -981,7 +1001,7 @@ begin
   begin
   //if LIBEWF_VERSION='V1' then ...;
   getmem(p,255);
-  if LIBEWF_VERSION='V3' then
+  if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlegetutf8hashvalue(fCurEWFHandle,
                                           pansichar(identifier),
                                           length(identifier),
@@ -1009,7 +1029,7 @@ begin
   if (fLibHandle<>0) and (fCurEWFHandle<>nil) then
   begin
     //if libewf_version='V1' then fLibEWFGetSize(fCurEWFHandle,@resInt64);
-    if libewf_version='V3' then flibewfhandlegetmediasize (fCurEWFHandle,
+    if libewf_version='V2' then flibewfhandlegetmediasize (fCurEWFHandle,
                                                           @resInt64,
                                                           @err);
     Result:=resInt64;
@@ -1042,7 +1062,7 @@ begin
   if fLibHandle<>0 then
   begin
     if libewf_version='V1' then  Result:=fLibEWFClose(fCurEWFHandle);
-    if libewf_version='V3' then
+    if libewf_version='V2' then
       begin
       Result:=flibewfhandleclose (fCurEWFHandle,@err);
       if result=0 then result:=flibewfhandlefree (@fCurEWFHandle,@err);

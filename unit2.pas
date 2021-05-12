@@ -113,7 +113,7 @@ uses
   // New as of v3.2.0
   udisplaygrid3,
   // Not for v3.3.0. Maybe for next version?
-  //uLibEWF,
+  uLibEWF,
 
   // Remaining Uses clauses for specific OS's
   {$IFDEF Windows}
@@ -527,8 +527,8 @@ type
     function ValidateTextWithHash(strToBeHashed:ansistring): string;
     function CalcTheHashString(strToBeHashed:ansistring):string;
     function CalcTheHashFile(FileToBeHashed:string):string;
-    // function CalcTheHashE01File(FileToBeHashed:string) : string;  // Not for v3.3.0. Maybe for next version?
-    // function IsItE01(filename : string) : boolean;                // Not for v3.3.0. Maybe for next version?
+    function CalcTheHashE01File(FileToBeHashed:string) : string;  // Not for v3.3.0. Maybe for next version?
+    function IsItE01(filename : string) : boolean;                // Not for v3.3.0. Maybe for next version?
     function FormatByteSize(const bytes: QWord): string;
     function RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     function RetrieveFileList(FolderName : string) : TStringList;
@@ -1058,14 +1058,14 @@ begin
 end;
 
 // Not for v3.3.0. Maybe for next version?
-{function TMainForm.IsItE01(filename : string) : boolean;
+function TMainForm.IsItE01(filename : string) : boolean;
 var
   FileExt : string = Default(string);
 begin
   result := false;
   FileExt := Uppercase(ExtractFileExt(filename));
   If FileExt = '.E01' then result := true;
-end;  }
+end;
 
 procedure TMainForm.btnHashFileClick(Sender: TObject);
 var
@@ -1074,6 +1074,7 @@ var
   start, stop, scheduleStartTime : TDateTime;
   LoopCounter : integer;
   elapsed, StartSecondsCounter, EndSecondsCounter : Int64;
+  IsFileE01 : boolean = Default(Boolean);
 begin
   PageControl1.ActivePage := Tabsheet2;  // Ensure File tab activated if triggered via menu
   filename := '';
@@ -1128,7 +1129,13 @@ begin
         edtFileNameToBeHashed.Caption := (filename);
         StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
         Application.ProcessMessages;
-        fileHashValue := CalcTheHashFile(Filename); // Custom function
+        IsFileE01 := IsItE01(filename);
+        if IsFileE01 = true then
+          begin
+            fileHashValue := CalcTheHashE01File(Filename);
+          end
+        else fileHashValue := CalcTheHashFile(Filename); // Custom function
+
         memFileHashField.Lines.Add(UpperCase(fileHashValue));
         StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
@@ -4210,9 +4217,8 @@ begin
   else result := 'File could not be accessed.'
 end;
 
-// Not for v3.3.0. Maybe for next version? This quick start was for SHA1 only.
-// Once I get the libewf DLL to compile properly will reimplement and expand
-{function TMainForm.CalcTheHashE01File(FileToBeHashed:string):string;
+// Not for v3.3.0 perhaps. Maybe for next version? This quick start was for SHA1 only.
+function TMainForm.CalcTheHashE01File(FileToBeHashed:string):string;
 var
   HashInstanceMD5_ImageVerification,
   HashInstanceSHA1_ImageVerification        : IHash;
@@ -4231,11 +4237,11 @@ var
   HashInstanceResultxxHash32   : IHashResult;
   {$endif}
 
-  Buffer                               : array [0..65535] of byte;
-  BytesRead                            : integer;
+  Buffer               : array [0..65535] of byte;
+  BytesRead            : integer;
   ImageFileSize        : Int64;
 
-  strImageMD5HashValue, strImageSHA1HashValue             : string;
+  strImageMD5HashValue, strImageSHA1HashValue : string;
 
   fLibEWFVerificationInstance : TLibEWF;
 
@@ -4297,7 +4303,7 @@ begin
     //frmProgress.btnCloseProgressWindow.Enabled := true;
   end // End of E01 Open statement
   else ShowMessage('Unable to open E01 image file for verification');
-end;   }
+end;
 
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
 var
