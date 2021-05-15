@@ -1,6 +1,7 @@
 unit uLibEWF;
 
 {$MODE Delphi}
+//{$MODE objfpc}
 
 {/*
   * Original Module providing Delphi bindings for the Library for the Expert Witness Compression Format Support (libewf.dll)
@@ -80,6 +81,7 @@ type
 
   // LibEWF v3 (https://github.com/libyal/libewf/blob/57dfc1f510f08f34eb34452f6679c38185be9472/manuals/libewf.3)
 
+  Tlibewfcheckfilesignaturefileiohandle    = function(handle : PLIBEWFHDL; error:pointer) : integer; cdecl;
   Tlibewfhandleclone                       = function(hDestination : PLIBEWFHDL; hSource : PLIBEWFHDL; error:pointer) : integer;  cdecl;
   Tlibewfhandlesignalabort                 = function(handle : PLIBEWFHDL; error:pointer) : integer;   cdecl;
   Tlibewfhandlereadbufferatoffset          = function(handle : PLIBEWFHDL; buffer : pointer; size : TSIZE; offset : TSIZE64; error:pointer) : integer; cdecl;
@@ -136,6 +138,7 @@ type
     flibewfhandlesetmediaflags                 : Tlibewfhandlesetmediaflags;
     flibewfhandleseekoffset                    : Tlibewfhandleseekoffset;
     // LibEWF v3
+    flibewfcheckfilesignaturefileiohandle      : Tlibewfcheckfilesignaturefileiohandle;
     flibewfhandleclone                         : Tlibewfhandleclone;
     flibewfhandlesignalabort                   : Tlibewfhandlesignalabort;
     flibewfhandlereadbufferatoffset            : Tlibewfhandlereadbufferatoffset;
@@ -158,7 +161,9 @@ type
   public
     constructor create();
     destructor destroy(); override;
+    function InitialiseProcAddresses() : boolean;
     function libewf_check_file_signature(const filename : ansistring ) : integer;
+    function libewf_check_file_signature_file_io_handle(handle : PLIBEWFHDL; error:pointer) : integer;
     function libewf_open(const filename : ansistring;flag:byte=$1) : integer;
     function libewf_read_random(buffer : pointer; size : longword; offset : int64) : integer;
     function libewf_write_random(buffer : pointer; size : longword; offset : int64) : integer;
@@ -224,25 +229,87 @@ const
 
 implementation
 
+// Initilise all handles to any libewf processes
+function TLibEWF.InitialiseProcAddresses() : boolean;
+begin
+  result := false;
+  @flibewfhandleinitialize           := nil;
+  @flibewfhandlefree                 := nil;
+  @flibewfhandleopen                 := nil;
+  @flibewfhandleclose                := nil;
+  @flibewfhandlereadrandom           := nil;
+  @flibewfhandlewriterandom          := nil;
+  @flibewfhandlegetmediasize         := nil;
+  @flibewfhandlesetcompressionvalues := nil;
+  @flibewfhandlesetutf8headervalue   := nil;
+  @flibewfhandlegetutf8headervalue   := nil;
+  @flibewfhandlegetutf8hashvalue     := nil;
+  @fLibEWFCheckSig                   := nil;
+  @fLibEWFOpen                       := nil;
+  @fLibEWFReadRand                   := nil;
+  @fLibEWFWriteRand                  := nil;
+  @fLibEWFGetSize                    := nil;
+  @fLibEWFParseHdrVals               := nil;
+  @fLibEWFClose                      := nil;
+  @fLibEWFErrorSPrint                := nil;
+  @flibewfhandlereadbuffer           := nil;
+  @flibEWFhandlewritebuffer          := nil;
+  @flibewfhandlesetSHA1hash          := nil;
+  @flibewfhandlesetMD5hash           := nil;
+  @flibewfhandlepreparewritechunk    := nil;
+  @flibewfhandlewritechunk           := nil;
+  @flibewfhandlesetmaximumsegmentsize:= nil;
+  @flibewfhandlesetformat            := nil;
+  @flibewfhandlesetmediaflags        := nil;
+  @flibewfhandleseekoffset           := nil;
+  // libEWF V3
+  @flibewfcheckfilesignaturefileiohandle     := nil;
+  @flibewfhandleclone                        := nil;
+  @flibewfhandlesignalabort                  := nil;
+  @flibewfhandlereadbufferatoffset           := nil;
+  @flibewfhandlewritebufferatoffset          := nil;
+  @flibewfhandlegetdatachunk                 := nil;
+  @flibewfhandlereaddatachunk                := nil;
+  @flibewfhandlewritedatachunk               := nil;
+  @flibewfhandlewritefinalize                := nil;
+  @flibewfhandlegetoffset                    := nil;
+  @flibewfhandlesetsegmentfilename           := nil;
+  @flibewfhandlegetmaximumsegmentsize        := nil;
+  @flibewfhandlesetmaximumsegmentsize        := nil;
+  @flibewfhandlesegmentfilescorrupted        := nil;
+  @flibewfhandlesegmentfilesencrypted        := nil;
+  @flibewfhandlegetfilenamesize              := nil;
+  @flibewfhandlegetfilename                  := nil;
+  @flibewfhandlegetsegmentfilename           := nil;
+  @flibewfhandlesetmaximumnumberofopenhandles:= nil;
+  @flibewfhandlegetsegmentfilenamesize       := nil;
+  result := true;
+end;
+
 {/*
   * Constructs a LibEWF object instance (also loads the library).
   */}
 constructor TLibEWF.create();
 var
-  libFileName : ansistring;
-  cvtString : string;
+  libFileName              : ansistring = Default(ansistring);
+  cvtString                : string     = Default(string);
+  ProcAddressesInitialised : Boolean    = Default(boolean);
 begin
   fLibHandle := nilhandle;
   fCurEWFHandle:=nil;
 
   {$ifdef Windows}
-  libFileName:=ExtractFilePath(Application.ExeName)+'libewf-x64.dll';//-new.dll';
+    {$ifdef CPU32}
+      libFileName:=ExtractFilePath(Application.ExeName)+'libewf-x86.dll';//-new.dll';
+    {$else ifdef CPU64}
+      libFileName:=ExtractFilePath(Application.ExeName)+'libewf-x64.dll';//-new.dll';
+    {$endif}
   {$endif}
   {$ifdef UNIX}
-  //libFileName:=ExtractFilePath(Application.ExeName)+'libewf-v3.so';
+  // Build SO files etc first.
   {$endif}
 
-  if FileExists(libFileName) { *Converted from FileExists* } then
+  if FileExists(libFileName) then
   begin
     {$ifdef Windows}
     fLibHandle := LoadLibraryA(PAnsiChar(libFileName)); //LoadLibrary('libewf.dll');
@@ -255,7 +322,6 @@ begin
        if @cvtString <> nil then
         begin
          // just crack on. But could notify user with ShowMessage(cvtString + 'Success')
-        ShowMessage(cvtString + 'Success');
         end
        // error message on no valid address
        else
@@ -267,123 +333,125 @@ begin
 
     if fLibHandle<>nilhandle then
     begin
-      // libEWF v2
-      @flibewfhandleinitialize           :=GetProcAddress(fLibHandle,'_libewf_handle_initialize');
-      @flibewfhandlefree                 :=GetProcAddress(fLibHandle,'_libewf_handle_free');
-      @flibewfhandleopen                 :=GetProcAddress(fLibHandle,'_libewf_handle_open');
-      @flibewfhandleclose                :=GetProcAddress(fLibHandle,'_libewf_handle_close');
-      @flibewfhandlereadrandom           :=GetProcAddress(fLibHandle,'_libewf_handle_read_random');
-      @flibewfhandlewriterandom          :=GetProcAddress(fLibHandle,'_libewf_handle_write_random');
-      @flibewfhandlegetmediasize         :=GetProcAddress(fLibHandle,'_libewf_handle_get_media_size');
-      @flibewfhandlesetcompressionvalues :=GetProcAddress(fLibHandle,'_libewf_handle_set_compression_values');
-      @flibewfhandlesetutf8headervalue   :=GetProcAddress(fLibHandle,'_libewf_handle_set_utf8_header_value');
-      @flibewfhandlegetutf8headervalue   :=GetProcAddress(fLibHandle,'_libewf_handle_get_utf8_header_value');
-      @flibewfhandlegetutf8hashvalue     :=GetProcAddress(fLibHandle,'_libewf_handle_get_utf8_hash_value');
-      @fLibEWFCheckSig                   :=GetProcAddress(fLibHandle,'_libewf_check_file_signature');
-      @fLibEWFOpen                       :=GetProcAddress(fLibHandle,'_libewf_open');
-      @fLibEWFReadRand                   :=GetProcAddress(fLibHandle,'_libewf_read_random');
-      @fLibEWFWriteRand                  :=GetProcAddress(fLibHandle,'_libewf_write_random');
-      @fLibEWFGetSize                    :=GetProcAddress(fLibHandle,'_libewf_get_media_size');
-      @fLibEWFParseHdrVals               :=GetProcAddress(fLibHandle,'_libewf_parse_header_values');
-      @fLibEWFClose                      :=GetProcAddress(fLibHandle,'_libewf_close');
-      @fLibEWFErrorSPrint                :=GetProcAddress(fLibHandle,'_libewf_error_backtrace_sprint');
-      @flibewfhandlereadbuffer           :=GetProcAddress(fLibHandle,'_libewf_handle_read_buffer');
-      @flibEWFhandlewritebuffer          :=GetProcAddress(fLibHandle,'_libewf_handle_write_buffer');
-      @flibewfhandlesetSHA1hash          :=GetProcAddress(fLibHandle,'_libewf_handle_set_sha1_hash');
-      @flibewfhandlesetMD5hash           :=GetProcAddress(fLibHandle,'_libewf_handle_set_md5_hash');
-      @flibewfhandlepreparewritechunk    :=GetProcAddress(fLibHandle,'_libewf_handle_prepare_write_chunk');
-      @flibewfhandlewritechunk           :=GetProcAddress(fLibHandle,'_libewf_handle_write_chunk');
-      @flibewfhandlesetmaximumsegmentsize:=GetProcAddress(fLibHandle,'_libewf_handle_set_maximum_segment_size');
-      @flibewfhandlesetformat            :=GetProcAddress(fLibHandle,'_libewf_handle_set_format');
-      @flibewfhandlesetmediaflags        :=GetProcAddress(fLibHandle,'_libewf_handle_set_media_flags');
-      @flibewfhandleseekoffset           :=GetProcAddress(fLibHandle,'_libewf_handle_seek_offset');
-      // libEWF V3
-      @flibewfhandleclone                        :=GetProcAddress(fLibHandle,'_libewf_handle_clone'); // V3
-      @flibewfhandlesignalabort                  :=GetProcAddress(fLibHandle,'_libewf_handle_signal_abort'); //V3
-      @flibewfhandlereadbufferatoffset           :=GetProcAddress(fLibHandle,'_libewf_handle_read_buffer_at_offset'); //V3
-      @flibewfhandlewritebufferatoffset          :=GetProcAddress(fLibHandle,'_libewf_handle_write_buffer_at_offset'); //V3
-      @flibewfhandlegetdatachunk                 :=GetProcAddress(fLibHandle,'_libewf_handle_get_data_chunk'); //V3
-      @flibewfhandlereaddatachunk                :=GetProcAddress(fLibHandle,'_libewf_handle_read_data_chunk'); //V3
-      @flibewfhandlewritedatachunk               :=GetProcAddress(fLibHandle,'_libewf_handle_write_data_chunk'); //V3
-      @flibewfhandlewritefinalize                :=GetProcAddress(fLibHandle,'_libewf_handle_write_finalize'); //V3
-      @flibewfhandlegetoffset                    :=GetProcAddress(fLibHandle,'_libewf_handle_get_offset'); //V3
-      @flibewfhandlesetsegmentfilename           :=GetProcAddress(fLibHandle,'_libewf_handle_set_segment_filename'); //V3
-      @flibewfhandlegetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'_libewf_handle_get_maximum_segment_size'); //V3
-      @flibewfhandlesetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'_libewf_handle_set_maximum_segment_size'); //V3
-      @flibewfhandlesegmentfilescorrupted        :=GetProcAddress(fLibHandle,'_libewf_handle_segment_files_corrupted'); //V3
-      @flibewfhandlesegmentfilesencrypted        :=GetProcAddress(fLibHandle,'_libewf_handle_segment_files_encrypted'); //V3
-      @flibewfhandlegetfilenamesize              :=GetProcAddress(fLibHandle,'_libewf_handle_get_filename_size'); //V3
-      @flibewfhandlegetfilename                  :=GetProcAddress(fLibHandle,'_libewf_handle_get_filename'); //V3
-      @flibewfhandlegetsegmentfilename           :=GetProcAddress(fLibHandle,'_libewf_handle_get_segment_filename'); //V3
-      @flibewfhandlesetmaximumnumberofopenhandles:=GetProcAddress(fLibHandle,'_libewf_handle_set_maximum_number_of_open_handles'); //V3
-      @flibewfhandlegetsegmentfilenamesize       :=GetProcAddress(fLibHandle,'_libewf_handle_get_segment_filename_size'); //V3
+      ProcAddressesInitialised := InitialiseProcAddresses;
+      if ProcAddressesInitialised = true then
+      begin
+        // libEWF v2
+        @flibewfhandleinitialize           :=GetProcAddress(fLibHandle,'libewf_handle_initialize');
+        @flibewfhandlefree                 :=GetProcAddress(fLibHandle,'libewf_handle_free');
+        @flibewfhandleopen                 :=GetProcAddress(fLibHandle,'libewf_handle_open');
+        @flibewfhandleclose                :=GetProcAddress(fLibHandle,'libewf_handle_close');
+        @flibewfhandlereadrandom           :=GetProcAddress(fLibHandle,'libewf_handle_read_random');
+        @flibewfhandlewriterandom          :=GetProcAddress(fLibHandle,'libewf_handle_write_random');
+        @flibewfhandlegetmediasize         :=GetProcAddress(fLibHandle,'libewf_handle_get_media_size');
+        @flibewfhandlesetcompressionvalues :=GetProcAddress(fLibHandle,'libewf_handle_set_compression_values');
+        @flibewfhandlesetutf8headervalue   :=GetProcAddress(fLibHandle,'libewf_handle_set_utf8_header_value');
+        @flibewfhandlegetutf8headervalue   :=GetProcAddress(fLibHandle,'libewf_handle_get_utf8_header_value');
+        @flibewfhandlegetutf8hashvalue     :=GetProcAddress(fLibHandle,'libewf_handle_get_utf8_hash_value');
+        @fLibEWFCheckSig                   :=GetProcAddress(fLibHandle,'libewf_check_file_signature');
+        @fLibEWFOpen                       :=GetProcAddress(fLibHandle,'libewf_open');
+        @fLibEWFReadRand                   :=GetProcAddress(fLibHandle,'libewf_read_random');
+        @fLibEWFWriteRand                  :=GetProcAddress(fLibHandle,'libewf_write_random');
+        @fLibEWFGetSize                    :=GetProcAddress(fLibHandle,'libewf_get_media_size');
+        @fLibEWFParseHdrVals               :=GetProcAddress(fLibHandle,'libewf_parse_header_values');
+        @fLibEWFClose                      :=GetProcAddress(fLibHandle,'libewf_close');
+        @fLibEWFErrorSPrint                :=GetProcAddress(fLibHandle,'libewf_error_backtrace_sprint');
+        @flibewfhandlereadbuffer           :=GetProcAddress(fLibHandle,'libewf_handle_read_buffer');
+        @flibEWFhandlewritebuffer          :=GetProcAddress(fLibHandle,'libewf_handle_write_buffer');
+        @flibewfhandlesetSHA1hash          :=GetProcAddress(fLibHandle,'libewf_handle_set_sha1_hash');
+        @flibewfhandlesetMD5hash           :=GetProcAddress(fLibHandle,'libewf_handle_set_md5_hash');
+        @flibewfhandlepreparewritechunk    :=GetProcAddress(fLibHandle,'libewf_handle_prepare_write_chunk');
+        @flibewfhandlewritechunk           :=GetProcAddress(fLibHandle,'libewf_handle_write_chunk');
+        @flibewfhandlesetmaximumsegmentsize:=GetProcAddress(fLibHandle,'libewf_handle_set_maximum_segment_size');
+        @flibewfhandlesetformat            :=GetProcAddress(fLibHandle,'libewf_handle_set_format');
+        @flibewfhandlesetmediaflags        :=GetProcAddress(fLibHandle,'libewf_handle_set_media_flags');
+        @flibewfhandleseekoffset           :=GetProcAddress(fLibHandle,'libewf_handle_seek_offset');
+        // libEWF V3
+        @flibewfcheckfilesignaturefileiohandle     :=GetProcAddress(fLibHandle,'libewf_check_file_signature_file_io_handle');
+        @flibewfhandleclone                        :=GetProcAddress(fLibHandle,'libewf_handle_clone'); // V3
+        @flibewfhandlesignalabort                  :=GetProcAddress(fLibHandle,'libewf_handle_signal_abort'); //V3
+        @flibewfhandlereadbufferatoffset           :=GetProcAddress(fLibHandle,'libewf_handle_read_buffer_at_offset'); //V3
+        @flibewfhandlewritebufferatoffset          :=GetProcAddress(fLibHandle,'libewf_handle_write_buffer_at_offset'); //V3
+        @flibewfhandlegetdatachunk                 :=GetProcAddress(fLibHandle,'libewf_handle_get_data_chunk'); //V3
+        @flibewfhandlereaddatachunk                :=GetProcAddress(fLibHandle,'libewf_handle_read_data_chunk'); //V3
+        @flibewfhandlewritedatachunk               :=GetProcAddress(fLibHandle,'libewf_handle_write_data_chunk'); //V3
+        @flibewfhandlewritefinalize                :=GetProcAddress(fLibHandle,'libewf_handle_write_finalize'); //V3
+        @flibewfhandlegetoffset                    :=GetProcAddress(fLibHandle,'libewf_handle_get_offset'); //V3
+        @flibewfhandlesetsegmentfilename           :=GetProcAddress(fLibHandle,'libewf_handle_set_segment_filename'); //V3
+        @flibewfhandlegetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'libewf_handle_get_maximum_segment_size'); //V3
+        @flibewfhandlesetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'libewf_handle_set_maximum_segment_size'); //V3
+        @flibewfhandlesegmentfilescorrupted        :=GetProcAddress(fLibHandle,'libewf_handle_segment_files_corrupted'); //V3
+        @flibewfhandlesegmentfilesencrypted        :=GetProcAddress(fLibHandle,'libewf_handle_segment_files_encrypted'); //V3
+        @flibewfhandlegetfilenamesize              :=GetProcAddress(fLibHandle,'libewf_handle_get_filename_size'); //V3
+        @flibewfhandlegetfilename                  :=GetProcAddress(fLibHandle,'libewf_handle_get_filename'); //V3
+        @flibewfhandlegetsegmentfilename           :=GetProcAddress(fLibHandle,'libewf_handle_get_segment_filename'); //V3
+        @flibewfhandlesetmaximumnumberofopenhandles:=GetProcAddress(fLibHandle,'libewf_handle_set_maximum_number_of_open_handles'); //V3
+        @flibewfhandlegetsegmentfilenamesize       :=GetProcAddress(fLibHandle,'libewf_handle_get_segment_filename_size'); //V3
 
-    end;
-    {$endif}
+      {$endif}
 
-    {$ifdef UNIX}
-    fLibHandle := LoadLibrary(libFileName);
+      {$ifdef UNIX}
+      fLibHandle := LoadLibrary(libFileName);
 
-    if fLibHandle<>0 then
-    begin
-      //v2
-      @flibewfhandleinitialize          :=GetProcAddress(fLibHandle,'libewf_handle_initialize');
-      @flibewfhandlefree                :=GetProcAddress(fLibHandle,'libewf_handle_free');
-      @flibewfhandleopen                :=GetProcAddress(fLibHandle,'libewf_handle_open');
-      @flibewfhandleclose               :=GetProcAddress(fLibHandle,'libewf_handle_close');
-      @flibewfhandlereadrandom          :=GetProcAddress(fLibHandle,'libewf_handle_read_random');
-      @flibewfhandlewriterandom         :=GetProcAddress(fLibHandle,'libewf_handle_write_random');
-      @flibewfhandlegetmediasize        :=GetProcAddress(fLibHandle,'libewf_handle_get_media_size');
-
-      @flibewfhandlesetcompressionvalues:=GetProcAddress(fLibHandle,'libewf_handle_set_compression_values');
-      @flibewfhandlesetutf8headervalue  :=GetProcAddress(fLibHandle,'libewf_handle_set_utf8_header_value');
-      @flibewfhandlegetutf8headervalue  :=GetProcAddress(fLibHandle,'libewf_handle_get_utf8_header_value');
-      @flibewfhandlegetutf8hashvalue    :=GetProcAddress(fLibHandle,'libewf_handle_get_utf8_hash_value');
-      //
-      @fLibEWFCheckSig                  :=GetProcAddress(fLibHandle,'libewf_check_file_signature');
-      @fLibEWFOpen                      :=GetProcAddress(fLibHandle,'libewf_open');
-      @fLibEWFReadRand                  :=GetProcAddress(fLibHandle,'libewf_read_random');
-      @fLibEWFWriteRand                 :=GetProcAddress(fLibHandle,'libewf_write_random');
-      @fLibEWFGetSize                   :=GetProcAddress(fLibHandle,'libewf_get_media_size');
-      @fLibEWFParseHdrVals              :=GetProcAddress(fLibHandle,'libewf_parse_header_values');
-      @fLibEWFClose                     :=GetProcAddress(fLibHandle,'libewf_close');
-      @fLibEWFErrorSPrint               :=GetProcAddress(fLibHandle,'libewf_error_backtrace_sprint');
-      @flibewfhandlereadbuffer          :=GetProcAddress(fLibHandle, 'libewf_handle_read_buffer');
-      @flibEWFhandlewritebuffer         :=GetProcAddress(fLibHandle, 'libewf_handle_write_buffer');
-      @flibewfhandlesetSHA1hash         :=GetProcAddress(fLibHandle, 'libewf_handle_set_sha1_hash');
-      @flibewfhandlesetMD5hash          :=GetProcAddress(fLibHandle, 'libewf_handle_set_md5_hash');
-      @flibewfhandlepreparewritechunk   :=GetProcAddress(fLibHandle, 'libewf_handle_prepare_write_chunk');
-      @flibewfhandlewritechunk          :=GetProcAddress(fLibHandle, 'libewf_handle_write_chunk');
-      @flibewfhandlesetmaximumsegmentsize:=GetProcAddress(fLibHandle, 'libewf_handle_set_maximum_segment_size');
-      @flibewfhandlesetformat           :=GetProcAddress(fLibHandle, 'libewf_handle_set_format');
-      @flibewfhandlesetmediaflags       :=GetProcAddress(fLibHandle, 'libewf_handle_set_media_flags');
-      @flibewfhandleseekoffset          :=GetProcAddress(fLibHandle, 'libewf_handle_seek_offset');
-
-      // libEWF V3
-      @flibewfhandleclone                        :=GetProcAddress(fLibHandle,'_libewf_handle_clone'); // V3
-      @flibewfhandlesignalabort                  :=GetProcAddress(fLibHandle,'_libewf_handle_signal_abort'); //V3
-      @flibewfhandlereadbufferatoffset           :=GetProcAddress(fLibHandle,'_libewf_handle_read_buffer_at_offset'); //V3
-      @flibewfhandlewritebufferatoffset          :=GetProcAddress(fLibHandle,'_libewf_handle_write_buffer_at_offset'); //V3
-      @flibewfhandlegetdatachunk                 :=GetProcAddress(fLibHandle,'_libewf_handle_get_data_chunk'); //V3
-      @flibewfhandlereaddatachunk                :=GetProcAddress(fLibHandle,'_libewf_handle_read_data_chunk'); //V3
-      @flibewfhandlewritedatachunk               :=GetProcAddress(fLibHandle,'_libewf_handle_write_data_chunk'); //V3
-      @flibewfhandlewritefinalize                :=GetProcAddress(fLibHandle,'_libewf_handle_write_finalize'); //V3
-      @flibewfhandlegetoffset                    :=GetProcAddress(fLibHandle,'_libewf_handle_get_offset'); //V3
-      @flibewfhandlesetsegmentfilename           :=GetProcAddress(fLibHandle,'_libewf_handle_set_segment_filename'); //V3
-      @flibewfhandlegetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'_libewf_handle_get_maximum_segment_size'); //V3
-      @flibewfhandlesetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'_libewf_handle_set_maximum_segment_size'); //V3
-      @flibewfhandlesegmentfilescorrupted        :=GetProcAddress(fLibHandle,'_libewf_handle_segment_files_corrupted'); //V3
-      @flibewfhandlesegmentfilesencrypted        :=GetProcAddress(fLibHandle,'_libewf_handle_segment_files_encrypted'); //V3
-      @flibewfhandlegetfilenamesize              :=GetProcAddress(fLibHandle,'_libewf_handle_get_filename_size'); //V3
-      @flibewfhandlegetfilename                  :=GetProcAddress(fLibHandle,'_libewf_handle_get_filename'); //V3
-      @flibewfhandlegetsegmentfilename           :=GetProcAddress(fLibHandle,'_libewf_handle_get_segment_filename'); //V3
-      @flibewfhandlesetmaximumnumberofopenhandles:=GetProcAddress(fLibHandle,'_libewf_handle_set_maximum_number_of_open_handles'); //V3
-      @flibewfhandlegetsegmentfilenamesize       :=GetProcAddress(fLibHandle,'_libewf_handle_get_segment_filename_size'); //V3
-
-    end;
-    {$endif}
-  end
-  else showmessage('could not find libewf.dll');
+      if fLibHandle<>0 then
+      begin
+        //v2
+        @flibewfhandleinitialize           :=GetProcAddress(fLibHandle,'libewf_handle_initialize');
+        @flibewfhandlefree                 :=GetProcAddress(fLibHandle,'libewf_handle_free');
+        @flibewfhandleopen                 :=GetProcAddress(fLibHandle,'libewf_handle_open');
+        @flibewfhandleclose                :=GetProcAddress(fLibHandle,'libewf_handle_close');
+        @flibewfhandlereadrandom           :=GetProcAddress(fLibHandle,'libewf_handle_read_random');
+        @flibewfhandlewriterandom          :=GetProcAddress(fLibHandle,'libewf_handle_write_random');
+        @flibewfhandlegetmediasize         :=GetProcAddress(fLibHandle,'libewf_handle_get_media_size');
+        @flibewfhandlesetcompressionvalues :=GetProcAddress(fLibHandle,'libewf_handle_set_compression_values');
+        @flibewfhandlesetutf8headervalue   :=GetProcAddress(fLibHandle,'libewf_handle_set_utf8_header_value');
+        @flibewfhandlegetutf8headervalue   :=GetProcAddress(fLibHandle,'libewf_handle_get_utf8_header_value');
+        @flibewfhandlegetutf8hashvalue     :=GetProcAddress(fLibHandle,'libewf_handle_get_utf8_hash_value');
+        @fLibEWFCheckSig                   :=GetProcAddress(fLibHandle,'libewf_check_file_signature');
+        @fLibEWFOpen                       :=GetProcAddress(fLibHandle,'libewf_open');
+        @fLibEWFReadRand                   :=GetProcAddress(fLibHandle,'libewf_read_random');
+        @fLibEWFWriteRand                  :=GetProcAddress(fLibHandle,'libewf_write_random');
+        @fLibEWFGetSize                    :=GetProcAddress(fLibHandle,'libewf_get_media_size');
+        @fLibEWFParseHdrVals               :=GetProcAddress(fLibHandle,'libewf_parse_header_values');
+        @fLibEWFClose                      :=GetProcAddress(fLibHandle,'libewf_close');
+        @fLibEWFErrorSPrint                :=GetProcAddress(fLibHandle,'libewf_error_backtrace_sprint');
+        @flibewfhandlereadbuffer           :=GetProcAddress(fLibHandle,'libewf_handle_read_buffer');
+        @flibEWFhandlewritebuffer          :=GetProcAddress(fLibHandle,'libewf_handle_write_buffer');
+        @flibewfhandlesetSHA1hash          :=GetProcAddress(fLibHandle,'libewf_handle_set_sha1_hash');
+        @flibewfhandlesetMD5hash           :=GetProcAddress(fLibHandle,'libewf_handle_set_md5_hash');
+        @flibewfhandlepreparewritechunk    :=GetProcAddress(fLibHandle,'libewf_handle_prepare_write_chunk');
+        @flibewfhandlewritechunk           :=GetProcAddress(fLibHandle,'libewf_handle_write_chunk');
+        @flibewfhandlesetmaximumsegmentsize:=GetProcAddress(fLibHandle,'libewf_handle_set_maximum_segment_size');
+        @flibewfhandlesetformat            :=GetProcAddress(fLibHandle,'libewf_handle_set_format');
+        @flibewfhandlesetmediaflags        :=GetProcAddress(fLibHandle,'libewf_handle_set_media_flags');
+        @flibewfhandleseekoffset           :=GetProcAddress(fLibHandle,'libewf_handle_seek_offset');
+        // libEWF V3
+        @flibewfcheckfilesignaturefileiohandle     :=GetProcAddress(fLibHandle,'libewf_check_file_signature_file_io_handle');
+        @flibewfhandleclone                        :=GetProcAddress(fLibHandle,'libewf_handle_clone'); // V3
+        @flibewfhandlesignalabort                  :=GetProcAddress(fLibHandle,'libewf_handle_signal_abort'); //V3
+        @flibewfhandlereadbufferatoffset           :=GetProcAddress(fLibHandle,'libewf_handle_read_buffer_at_offset'); //V3
+        @flibewfhandlewritebufferatoffset          :=GetProcAddress(fLibHandle,'libewf_handle_write_buffer_at_offset'); //V3
+        @flibewfhandlegetdatachunk                 :=GetProcAddress(fLibHandle,'libewf_handle_get_data_chunk'); //V3
+        @flibewfhandlereaddatachunk                :=GetProcAddress(fLibHandle,'libewf_handle_read_data_chunk'); //V3
+        @flibewfhandlewritedatachunk               :=GetProcAddress(fLibHandle,'libewf_handle_write_data_chunk'); //V3
+        @flibewfhandlewritefinalize                :=GetProcAddress(fLibHandle,'libewf_handle_write_finalize'); //V3
+        @flibewfhandlegetoffset                    :=GetProcAddress(fLibHandle,'libewf_handle_get_offset'); //V3
+        @flibewfhandlesetsegmentfilename           :=GetProcAddress(fLibHandle,'libewf_handle_set_segment_filename'); //V3
+        @flibewfhandlegetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'libewf_handle_get_maximum_segment_size'); //V3
+        @flibewfhandlesetmaximumsegmentsize        :=GetProcAddress(fLibHandle,'libewf_handle_set_maximum_segment_size'); //V3
+        @flibewfhandlesegmentfilescorrupted        :=GetProcAddress(fLibHandle,'libewf_handle_segment_files_corrupted'); //V3
+        @flibewfhandlesegmentfilesencrypted        :=GetProcAddress(fLibHandle,'libewf_handle_segment_files_encrypted'); //V3
+        @flibewfhandlegetfilenamesize              :=GetProcAddress(fLibHandle,'libewf_handle_get_filename_size'); //V3
+        @flibewfhandlegetfilename                  :=GetProcAddress(fLibHandle,'libewf_handle_get_filename'); //V3
+        @flibewfhandlegetsegmentfilename           :=GetProcAddress(fLibHandle,'libewf_handle_get_segment_filename'); //V3
+        @flibewfhandlesetmaximumnumberofopenhandles:=GetProcAddress(fLibHandle,'libewf_handle_set_maximum_number_of_open_handles'); //V3
+        @flibewfhandlegetsegmentfilenamesize       :=GetProcAddress(fLibHandle,'libewf_handle_get_segment_filename_size'); //V3
+      end;
+      {$endif}
+    end  // End of process address initialisation
+  end // End of libewf handle check
+  else showmessage('could not find libewf dll file');
+  end;
 end;
 
 destructor TLibEWF.destroy();
@@ -409,7 +477,20 @@ begin
   err := nil;
   if fLibHandle<>0 then
   begin
-    Result:=fLibEWFCheckSig(fLibEWFCheckSig(pansiChar(filename), @err);
+    Result:=fLibEWFCheckSig(pansiChar(filename), @err);
+  end;
+end;
+
+function TLibEWF.libewf_check_file_signature_file_io_handle(handle : PLIBEWFHDL; error:pointer) : integer;
+var
+  err : pointer;
+  ret:integer;
+begin
+  result := 0;
+  err := nil;
+  if fLibHandle<>0 then
+  begin
+  result := fLibewfcheckfilesignaturefileiohandle(handle, @err);
   end;
 end;
 
@@ -437,7 +518,9 @@ begin
     begin
       filenameRoot:=Copy(filename,1, Length(filename)-4);
       curFilename:=filenameRoot+'.E01';
+      filenames.Add(curFilename);
 
+      // Itterate all the E01 segments for the image set
       while FileExists(curFilename) do
       begin
         if libewf_check_file_signature(curFilename)=1 then
@@ -455,11 +538,10 @@ begin
         begin
           fileNamePChars[fCount]:=pansiChar(ansistring(filenames[fCount]));
         end;
-      fCurEWFHandle := nil; err := nil;
 
-    {  if LIBEWF_VERSION='V1'
-        then fCurEWFHandle:=fLibEWFOpen(fileNamePChars, Length(fileNamePChars), flag); //v2
-      //fCurEWFHandle:=fLibEWFOpen(fileNamePChars, Length(fileNamePChars), byte('r')); //v1 }
+      // Blank out space for handles
+      fCurEWFHandle := nil; err := nil;
+      // Initiate handles to image, and open it
       if LIBEWF_VERSION='V2' then
         begin
         ret := flibewfhandleinitialize (@fCurEWFHandle,@err); //pointer to pointer = ** in c
@@ -467,7 +549,6 @@ begin
           if flibewfhandleopen (fCurEWFHandle,fileNamePChars, Length(fileNamePChars), flag,@err)<>1 then
             raise exception.Create('flibewfhandleopen failed');
         end;
-
       if fCurEWFHandle<>nil then  Result:=0;
     end;
   finally

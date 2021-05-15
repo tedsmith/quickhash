@@ -953,6 +953,7 @@ procedure TMainForm.FormDropFiles(Sender: TObject;
 var
   filename, fileHashValue : ansistring;
   start, stop, elapsed : TDateTime;
+  IsFileE01 : Boolean = Default(Boolean);
 begin
   // First, clear the captions from any earlier file hashing actions
   StatusBar1.SimpleText    := '';
@@ -985,7 +986,14 @@ begin
       edtFileNameToBeHashed.Caption := (filename);
       StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
       Application.ProcessMessages;
-      fileHashValue := CalcTheHashFile(Filename); // Custom function
+
+      IsFileE01 := IsItE01(Filename);
+      if IsFileE01 = true then
+        begin
+          fileHashValue := CalcTheHashE01File(Filename); // Conduct E01 hashing
+        end
+      else fileHashValue := CalcTheHashFile(Filename); // Just the hash the normal file
+
       memFileHashField.Lines.Add(UpperCase(fileHashValue));
       StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
@@ -3717,6 +3725,7 @@ var
   HashValue : ansistring;
   start, stop : TDateTime;
   elapsed, StartSecondsCounter, EndSecondsCounter : Int64;
+  IsFileE01 : Boolean = Default(Boolean);
 begin
   if edtFileNameToBeHashed.Text <> 'File being hashed...' then
     begin
@@ -3730,7 +3739,14 @@ begin
       StartSecondsCounter := GetTickCount;
       lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(start);
       Application.ProcessMessages;
-      HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text);
+
+      IsFileE01 := IsItE01(edtFileNameToBeHashed.Text);
+      if IsFileE01 = true then
+        begin
+          HashValue := CalcTheHashE01File(edtFileNameToBeHashed.Text); // Conduct E01 hashing
+        end
+      else HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text); // Just the hash the normal file
+
       memFileHashField.Lines.Add(Uppercase(HashValue));
       stop := Now;
       EndSecondsCounter := GetTickCount;
@@ -4219,29 +4235,34 @@ end;
 
 // Not for v3.3.0 perhaps. Maybe for next version? This quick start was for SHA1 only.
 function TMainForm.CalcTheHashE01File(FileToBeHashed:string):string;
+const
+  BufSize = 64 * 1024;  // 64kb buffer
 var
-  HashInstanceMD5_ImageVerification,
-  HashInstanceSHA1_ImageVerification        : IHash;
+  HashInstanceMD5,
+  HashInstanceSHA1,
+  HashInstanceSHA3,
+  HashInstanceSHA256,
+  HashInstanceSHA512 : IHash;
 
-  HashInstanceResultMD5_ImageVerification,
-  HashInstanceResultSHA1_ImageVerification  : IHashResult;
+  HashInstanceResultMD5,
+  HashInstanceResultSHA1,
+  HashInstanceResultSHA3,
+  HashInstanceResultSHA256,
+  HashInstanceResultSHA512 : IHashResult;
 
-  // HashLib4Pascal types for xxHash. xxHash64 is crazy fast on 64, but if run on a 32-bit
-  // system, performance is hindered considerably. So for this algorithm, CPU dependant
-  // instances are created
-  {$ifdef CPU64}
-  HashInstancexxHash64       : IHash;
-  HashInstanceResultxxHash64 : IHashResult;
-  {$else if CPU32}
-  HashInstancexxHash32         : IHash;
-  HashInstanceResultxxHash32   : IHashResult;
-  {$endif}
+  TabRadioGroup2: TRadioGroup;
+  Buffer: array [0 .. BufSize - 1] of Byte;
 
-  Buffer               : array [0..65535] of byte;
-  BytesRead            : integer;
-  ImageFileSize        : Int64;
+  TotalBytesRead_B : QWord = Default(QWord);
+  LoopCounter      : QWord = Default(QWord);
+  BytesRead        : integer = Default(integer);
+  ImageFileSize    : Int64 = Default(Int64);
 
-  strImageMD5HashValue, strImageSHA1HashValue : string;
+  strImageMD5HashValue    : string = Default(string);
+  strImageSHA1HashValue   : string = Default(string);
+  strImageSHA3HashValue   : string = Default(string);
+  strImageSHA256HashValue : string = Default(string);
+  strImageSHA512HashValue : string = Default(string);
 
   fLibEWFVerificationInstance : TLibEWF;
 
@@ -4252,57 +4273,300 @@ begin
   ImageFileSize := 0;
   //frmProgress.btnCloseProgressWindow.Enabled := false;
 
-  // Initialise new hashing digests
-  HashInstanceSHA1_ImageVerification := THashFactory.TCrypto.CreateSHA1();
-  HashInstanceSHA1_ImageVerification.Initialize();
+  // Initialise Buffer
+  FillChar(Buffer, SizeOf(Buffer), 0);
 
-  // Create the libEWF instance and ensure the DLL is found
-  fLibEWFVerificationInstance := TLibEWF.create;
+  case PageControl1.TabIndex of
+        0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
+        1: TabRadioGroup2 := AlgorithmChoiceRadioBox2;  //RadioGroup for File.
+        2: TabRadioGroup2 := AlgorithmChoiceRadioBox3;  //RadioGroup for FileS.
+        3: TabRadioGroup2 := AlgorithmChoiceRadioBox4;  //RadioGroup for Copy.
+        4: TabRadioGroup2 := AlgorithmChoiceRadioBox5;  //RadioGroup for Compare Two Files.
+        5: TabRadioGroup2 := AlgorithmChoiceRadioBox6;  //RadioGroup for Compare Two Folders.
+        7: TabRadioGroup2 := AlgorithmChoiceRadioBox7;  //RadioGroup for Base64
+  end;
 
-  // Now open the E01 image file with write access
-  if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
-  begin
-    ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
-    //frmProgress.Show;
-    //if frmyaffi.cbVerify.checked then
-    //frmProgress.lblStatus.Caption := ' Verifying E01 image...please wait';
-    //frmProgress.lblTotalBytesSource.Caption := ' bytes verified of ' + IntToStr(ImageFileSize);
+  case TabRadioGroup2.ItemIndex of
+      0: begin
+         // MD5
+         HashInstanceMD5 := THashFactory.TCrypto.CreateMD5();
+         HashInstanceMD5.Initialize();
+         // Create the libEWF instance and ensure the DLL is found
+         fLibEWFVerificationInstance := TLibEWF.create;
+         if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
+         begin
+           ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
 
-    // If SHA1 hash was chosen, compute the SHA1 hash of the image
-    fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
-    repeat
-      // Read the E01 image file in buffered blocks. Hash each block as we go
-      BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
-      if BytesRead = -1 then
+           // ToDo : update libewf_GetHashValue IRO of libewf_handle_get_utf8_hash_value
+           // so the embedded hash can be looked up and then compared against
+           // https://github.com/libyal/libewf-legacy/blob/main/include/libewf.h.in
+
+           // If SHA1 hash was chosen, compute the SHA1 hash of the image
+           fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
+           repeat
+           // Read the E01 image file in buffered blocks. Hash each block as we go
+           BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
+           if BytesRead = -1 then
+             begin
+               RaiseLastOSError;
+               exit;
+             end
+           else
+             begin
+               inc(TotalBytesRead, BytesRead);
+               HashInstanceMD5.TransformUntyped(Buffer, BytesRead);
+               // If the File tab is the tab doing the hashing, refresh the interface
+               if PageControl1.ActivePage = TabSheet2 then
+                begin
+                 inc(TotalBytesRead_B, BytesRead);
+                 inc(LoopCounter, 1);
+                 if LoopCounter = 100 then // Every X buffer reads, refresh interface
+                   begin
+                   pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                   lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                   LoopCounter := 0;
+                   Application.ProcessMessages;
+                   end;
+                 end;
+             end;
+             Application.ProcessMessages;
+           until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
+
+           HashInstanceResultMD5 := HashInstanceMD5.TransformFinal();
+           strImageMD5HashValue := Uppercase(HashInstanceResultMD5.ToString());
+           if Length(strImageMD5HashValue) > 0 then
+           begin
+             result := strImageMD5HashValue;
+           end
+           else result := 'MD5 hash computation failed!';
+        end; // libewf_open End
+        // Release the EWF File Handle now that it is verified
+        fLibEWFVerificationInstance.libewf_close();
+        end;  // MD5 End
+
+      1: begin
+         // Initialise new hashing digests
+         HashInstanceSHA1 := THashFactory.TCrypto.CreateSHA1();
+         HashInstanceSHA1.Initialize();
+
+         // Create the libEWF instance and ensure the DLL is found
+         fLibEWFVerificationInstance := TLibEWF.create;
+
+         // Now open the E01 image file with write access
+         if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
+         begin
+           ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
+           // If SHA1 hash was chosen, compute the SHA1 hash of the image
+           fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
+           repeat
+             // Read the E01 image file in buffered blocks. Hash each block as we go
+             BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
+             if BytesRead = -1 then
+               begin
+                 RaiseLastOSError;
+                 exit;
+               end
+             else
+               begin
+                 inc(TotalBytesRead, BytesRead);
+                 HashInstanceSHA1.TransformUntyped(Buffer, BytesRead);
+                 // If the File tab is the tab doing the hashing, refresh the interface
+                 if PageControl1.ActivePage = TabSheet2 then
+                  begin
+                   inc(TotalBytesRead_B, BytesRead);
+                   inc(LoopCounter, 1);
+                   if LoopCounter = 100 then // Every X buffer reads, refresh interface
+                     begin
+                     pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                     lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                     LoopCounter := 0;
+                     Application.ProcessMessages;
+                     end;
+                   end;
+               end;
+               Application.ProcessMessages;
+           until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
+
+           HashInstanceResultSHA1 := HashInstanceSHA1.TransformFinal();
+           strImageSHA1HashValue := Uppercase(HashInstanceResultSHA1.ToString());
+           if Length(strImageSHA1HashValue) > 0 then
+           begin
+             result := strImageSHA1HashValue;
+           end
+         else result := 'SHA-1 hash computation failed!';
+        end;  // libewf_open End
+        // Release the EWF File Handle now that it is verified
+        fLibEWFVerificationInstance.libewf_close();
+        end;  // SHA-1 End
+
+      2: begin
+         // SHA-3
+         HashInstanceSHA3 := THashFactory.TCrypto.CreateSHA3_256();
+         HashInstanceSHA3.Initialize();
+         // Create the libEWF instance and ensure the DLL is found
+         fLibEWFVerificationInstance := TLibEWF.create;
+         if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
+         begin
+           ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
+           // If SHA1 hash was chosen, compute the SHA1 hash of the image
+           fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
+           repeat
+           // Read the E01 image file in buffered blocks. Hash each block as we go
+           BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
+           if BytesRead = -1 then
+             begin
+               RaiseLastOSError;
+               exit;
+             end
+           else
+             begin
+               inc(TotalBytesRead, BytesRead);
+               HashInstanceSHA3.TransformUntyped(Buffer, BytesRead);
+               // If the File tab is the tab doing the hashing, refresh the interface
+               if PageControl1.ActivePage = TabSheet2 then
+                begin
+                 inc(TotalBytesRead_B, BytesRead);
+                 inc(LoopCounter, 1);
+                 if LoopCounter = 100 then // Every X buffer reads, refresh interface
+                   begin
+                   pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                   lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                   LoopCounter := 0;
+                   Application.ProcessMessages;
+                   end;
+                 end;
+             end;
+             Application.ProcessMessages;
+           until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
+
+           HashInstanceResultSHA3 := HashInstanceSHA3.TransformFinal();
+           strImageSHA3HashValue := Uppercase(HashInstanceResultSHA3.ToString());
+           if Length(strImageSHA3HashValue) > 0 then
+           begin
+             result := strImageSHA3HashValue;
+           end
+           else result := 'SHA-3 hash computation failed!';
+        end; // libewf_open End
+        // Release the EWF File Handle now that it is verified
+        fLibEWFVerificationInstance.libewf_close();
+        end;  // SHA-3 End
+
+      3: begin
+        // SHA-256
+        HashInstanceSHA256 := THashFactory.TCrypto.CreateSHA2_256();
+        HashInstanceSHA256.Initialize();
+        // Create the libEWF instance and ensure the DLL is found
+        fLibEWFVerificationInstance := TLibEWF.create;
+        if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
         begin
-          RaiseLastOSError;
-          exit;
-        end
-      else
+          ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
+          // If SHA256 hash was chosen, compute the SHA256 hash of the image
+          fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
+          repeat
+          // Read the E01 image file in buffered blocks. Hash each block as we go
+          BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
+          if BytesRead = -1 then
+            begin
+              RaiseLastOSError;
+              exit;
+            end
+          else
+            begin
+              inc(TotalBytesRead, BytesRead);
+              HashInstanceSHA256.TransformUntyped(Buffer, BytesRead);
+              // If the File tab is the tab doing the hashing, refresh the interface
+              if PageControl1.ActivePage = TabSheet2 then
+               begin
+                inc(TotalBytesRead_B, BytesRead);
+                inc(LoopCounter, 1);
+                if LoopCounter = 100 then // Every X buffer reads, refresh interface
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  Application.ProcessMessages;
+                  end;
+                end;
+            end;
+            Application.ProcessMessages;
+          until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
+
+          HashInstanceResultSHA256 := HashInstanceSHA256.TransformFinal();
+          strImageSHA256HashValue := Uppercase(HashInstanceResultSHA256.ToString());
+          if Length(strImageSHA256HashValue) > 0 then
+          begin
+            result := strImageSHA256HashValue;
+          end
+          else result := 'SHA256 hash computation failed!';
+        end; // libewf_open End
+        // Release the EWF File Handle now that it is verified
+        fLibEWFVerificationInstance.libewf_close();
+        end;  // SHA-256 End
+
+      4: begin
+        // SHA-512
+        HashInstanceSHA512 := THashFactory.TCrypto.CreateSHA2_512();
+        HashInstanceSHA512.Initialize();
+        // Create the libEWF instance and ensure the DLL is found
+        fLibEWFVerificationInstance := TLibEWF.create;
+        if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
         begin
-          inc(TotalBytesRead, BytesRead);
-          HashInstanceSHA1_ImageVerification.TransformUntyped(Buffer, BytesRead);
-          //frmProgress.lblTotalBytesRead.Caption:= IntToStr(TotalBytesRead);
-          //frmProgress.ProgressBar1.Position := Trunc((TotalBytesRead/ImageFileSize)*100);
-          //frmProgress.lblPercent.Caption := ' (' + IntToStr(frmProgress.ProgressBar1.Position) + '%)';
-        end;
-        Application.ProcessMessages;
-    until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
+          ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
+          // If SHA512 hash was chosen, compute the SHA512 hash of the image
+          fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
+          repeat
+          // Read the E01 image file in buffered blocks. Hash each block as we go
+          BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
+          if BytesRead = -1 then
+            begin
+              RaiseLastOSError;
+              exit;
+            end
+          else
+            begin
+              inc(TotalBytesRead, BytesRead);
+              HashInstanceSHA512.TransformUntyped(Buffer, BytesRead);
+              // If the File tab is the tab doing the hashing, refresh the interface
+              if PageControl1.ActivePage = TabSheet2 then
+               begin
+                inc(TotalBytesRead_B, BytesRead);
+                inc(LoopCounter, 1);
+                if LoopCounter = 100 then // Every X buffer reads, refresh interface
+                  begin
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                  LoopCounter := 0;
+                  Application.ProcessMessages;
+                  end;
+                end;
+            end;
+            Application.ProcessMessages;
+          until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
 
-    HashInstanceResultSHA1_ImageVerification := HashInstanceSHA1_ImageVerification.TransformFinal();
-    strImageSHA1HashValue := Uppercase(HashInstanceResultSHA1_ImageVerification.ToString());
-    if Length(strImageSHA1HashValue) > 0 then
-    begin
-      ShowMessage(strImageSHA1HashValue);
-      result := strImageSHA1HashValue;
-    end
-    else result := 'SHA-1 Verification failed!';
+          HashInstanceResultSHA512 := HashInstanceSHA512.TransformFinal();
+          strImageSHA512HashValue := Uppercase(HashInstanceResultSHA512.ToString());
+          if Length(strImageSHA512HashValue) > 0 then
+          begin
+            result := strImageSHA512HashValue;
+          end
+          else result := 'SHA512 hash computation failed!';
+        end; // libewf_open End
+        // Release the EWF File Handle now that it is verified
+        fLibEWFVerificationInstance.libewf_close();
+        end;  // SHA-512 End
 
-    // Release the EWF File Handle now that it is verified
-    fLibEWFVerificationInstance.libewf_close();
-    //frmProgress.btnCloseProgressWindow.Enabled := true;
-  end // End of E01 Open statement
-  else ShowMessage('Unable to open E01 image file for verification');
+      5: begin
+      ShowMessage('xxHash is not typically used in E01 images');
+      end;
+
+      6: begin
+      ShowMessage('Blake2B is not typically used in E01 images');
+      end;
+
+      7: begin
+      ShowMessage('Blake3 is not typically used in E01 images');
+      end;
+  end; // Case radio group end
 end;
 
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
