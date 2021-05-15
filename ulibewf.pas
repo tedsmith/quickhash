@@ -1,12 +1,27 @@
 unit uLibEWF;
 
 {$MODE Delphi}
-//{$MODE objfpc}
 
 {/*
-  * Original Module providing Delphi bindings for the Library for the Expert Witness Compression Format Support (libewf.dll)
+  * Original Module providing Delphi bindings for the Library for the
+  * Expert Witness Compression Format Support (libewf.dll)
+
+  * LibEWF (and the libewf-x64.dll and libewf-x86.dll) are compiled from source
+  * of Joachim Metz (joachimmetz - https://github.com/libyal/libewf) and the DLLs
+  * were both compiled using MSYS2. LibEWF is LGPL-3.0 Licensed.
+
+  * libgcc_s_dw2-1.dll (GCC low-level runtime library) is licensed under
+  * GPL licence (https://gcc.gnu.org/) and the DLL was compiled using MSYS2
+
+  * libwinpthread-1.dll is licensed under MIT, BSD
+  * https://packages.msys2.org/package/mingw-w64-x86_64-libwinpthread and the DLL
+  * was compiled using MSYS2
+
+  * zLib is Copyright (C) 1995-2017 Jean-loup Gailly and Mark Adler
+  * https://zlib.net/zlib_license.html and the DLL was compiled using MSYS2
   *
-  * Copyright (c) 2010, Brendan Berney <brendan@e-bren.net> and modified and updated by Ted Smith 2021
+  * This unit is copyright (c) 2010 Brendan Berney <brendan@e-bren.net> and modified
+  * and updated by Ted Smith 2015, and 2021 for QuickHash GUI (tedsmith@quickhash-gui.org)
   *
   * This software is free software: you can redistribute it and/or modify
   * it under the terms of the GNU Lesser General Public License as published by
