@@ -322,7 +322,8 @@ begin
     {$endif}
   {$endif}
   {$ifdef Linux}
-  libFileName:='libewf-Linux-x64.so';
+  //LD_LOAD_LIBRARY_PATH := ExtractFilePath(Application.ExeName)
+  libFileName:=ExtractFilePath(Application.ExeName)+'libewf-Linux-x64.so';
   {$endif}
 
   if FileExists(libFileName) then
