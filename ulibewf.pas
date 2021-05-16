@@ -322,8 +322,11 @@ begin
     {$endif}
   {$endif}
   {$ifdef Linux}
-  //LD_LOAD_LIBRARY_PATH := ExtractFilePath(Application.ExeName)
-  libFileName:=ExtractFilePath(Application.ExeName)+'libewf-Linux-x64.so';
+    {$ifdef CPU32}
+    // Reserved for when we compile a 32-bit SO file
+    {$else ifdef CPU64}
+      libFileName:=ExtractFilePath(Application.ExeName)+'libewf-Linux-x64.so';
+    {$endif}
   {$endif}
 
   if FileExists(libFileName) then
@@ -460,6 +463,9 @@ end;
   * @return 0 if successful and valid, -1 otherwise.
   */}
 function TLibEWF.libewf_open(const filename : ansistring;flag:byte=$1) : integer;
+const
+  UppercaseExt : ansistring = '.E01';
+  LowercaseExt : ansistring = '.e01';
 var
   filenames : TStringList;
   fileNamePChars : TARRPCHAR;
@@ -468,6 +474,7 @@ var
   fCount : integer;
   err:pointer;
   ret:integer;
+
 begin
   err       :=nil;
   Result    :=-1;
@@ -476,8 +483,20 @@ begin
   try
     if fLibHandle<>0 then
     begin
+      // Deal with case sensitivity of E01 extension for cross platform purposes
+      if ExtractFileExt(filename) = UppercaseExt then
+      begin
       filenameRoot:=Copy(filename,1, Length(filename)-4);
-      curFilename:=filenameRoot+'.E01';
+      curFilename:=filenameRoot+UppercaseExt;
+      end
+      else
+      begin
+        if ExtractFileExt(filename) = LowercaseExt then
+        begin
+        filenameRoot:=Copy(filename,1, Length(filename)-4);
+        curFilename:=filenameRoot+LowercaseExt;
+        end;
+      end;
       filenames.Add(curFilename);
 
       // Itterate all the E01 segments for the image set
@@ -501,13 +520,13 @@ begin
 
       // Blank out space for handles
       fCurEWFHandle := nil; err := nil;
-      // Initiate handles to image, and open it
+      // Initiate handle to image, and then open it
       if LIBEWF_VERSION='V2' then
         begin
         ret := flibewfhandleinitialize (@fCurEWFHandle,@err); //pointer to pointer = ** in c
         if ret=1 then
           if flibewfhandleopen (fCurEWFHandle,fileNamePChars, Length(fileNamePChars), flag,@err)<>1 then
-            raise exception.Create('flibewfhandleopen failed');
+            raise exception.Create('libewf_handle_open failed.');
         end;
       if fCurEWFHandle<>nil then  Result:=0;
     end;

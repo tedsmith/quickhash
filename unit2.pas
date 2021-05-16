@@ -1071,8 +1071,15 @@ var
   FileExt : string = Default(string);
 begin
   result := false;
-  FileExt := Uppercase(ExtractFileExt(filename));
-  If FileExt = '.E01' then result := true;
+  FileExt := ExtractFileExt(filename);
+  If (FileExt = '.E01') then
+  begin
+    result := true;
+  end;
+  If (FileExt = '.e01') then
+  begin
+    result := true;
+  end;
 end;
 
 procedure TMainForm.btnHashFileClick(Sender: TObject);
@@ -4254,7 +4261,6 @@ var
   Buffer: array [0 .. BufSize - 1] of Byte;
 
   TotalBytesRead_B : QWord = Default(QWord);
-  LoopCounter      : QWord = Default(QWord);
   BytesRead        : integer = Default(integer);
   ImageFileSize    : Int64 = Default(Int64);
 
@@ -4271,7 +4277,6 @@ begin
   TotalBytesRead := 0;
   ImageFileSize  := 0;
   ImageFileSize := 0;
-  //frmProgress.btnCloseProgressWindow.Enabled := false;
 
   // Initialise Buffer
   FillChar(Buffer, SizeOf(Buffer), 0);
@@ -4293,15 +4298,17 @@ begin
          HashInstanceMD5.Initialize();
          // Create the libEWF instance and ensure the DLL is found
          fLibEWFVerificationInstance := TLibEWF.create;
+         // Open the Image
          if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
          begin
+           // Get the size of the data within the image
            ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
 
            // ToDo : update libewf_GetHashValue IRO of libewf_handle_get_utf8_hash_value
            // so the embedded hash can be looked up and then compared against
            // https://github.com/libyal/libewf-legacy/blob/main/include/libewf.h.in
 
-           // If SHA1 hash was chosen, compute the SHA1 hash of the image
+           // If MD5 hash was chosen, compute the MD5 hash of the image
            fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
            repeat
            // Read the E01 image file in buffered blocks. Hash each block as we go
@@ -4318,18 +4325,13 @@ begin
                // If the File tab is the tab doing the hashing, refresh the interface
                if PageControl1.ActivePage = TabSheet2 then
                 begin
-                 inc(TotalBytesRead_B, BytesRead);
-                 inc(LoopCounter, 1);
-                 if LoopCounter = 100 then // Every X buffer reads, refresh interface
-                   begin
-                   pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
-                   lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
-                   LoopCounter := 0;
-                   Application.ProcessMessages;
-                   end;
-                 end;
-             end;
-             Application.ProcessMessages;
+                  inc(TotalBytesRead_B, BytesRead);
+                  pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                  Application.ProcessMessages;
+                end;
+              end;
+              Application.ProcessMessages;
            until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
 
            HashInstanceResultMD5 := HashInstanceMD5.TransformFinal();
@@ -4373,15 +4375,10 @@ begin
                  // If the File tab is the tab doing the hashing, refresh the interface
                  if PageControl1.ActivePage = TabSheet2 then
                   begin
-                   inc(TotalBytesRead_B, BytesRead);
-                   inc(LoopCounter, 1);
-                   if LoopCounter = 100 then // Every X buffer reads, refresh interface
-                     begin
+                     inc(TotalBytesRead_B, BytesRead);
                      pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
                      lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
-                     LoopCounter := 0;
                      Application.ProcessMessages;
-                     end;
                    end;
                end;
                Application.ProcessMessages;
@@ -4408,7 +4405,7 @@ begin
          if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
          begin
            ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
-           // If SHA1 hash was chosen, compute the SHA1 hash of the image
+           // If SHA3 hash was chosen, compute the SHA3 hash of the image
            fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
            repeat
            // Read the E01 image file in buffered blocks. Hash each block as we go
@@ -4425,15 +4422,10 @@ begin
                // If the File tab is the tab doing the hashing, refresh the interface
                if PageControl1.ActivePage = TabSheet2 then
                 begin
-                 inc(TotalBytesRead_B, BytesRead);
-                 inc(LoopCounter, 1);
-                 if LoopCounter = 100 then // Every X buffer reads, refresh interface
-                   begin
+                   inc(TotalBytesRead_B, BytesRead);
                    pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
                    lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
-                   LoopCounter := 0;
                    Application.ProcessMessages;
-                   end;
                  end;
              end;
              Application.ProcessMessages;
@@ -4477,16 +4469,11 @@ begin
               // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
                begin
-                inc(TotalBytesRead_B, BytesRead);
-                inc(LoopCounter, 1);
-                if LoopCounter = 100 then // Every X buffer reads, refresh interface
-                  begin
-                  pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
-                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
-                  LoopCounter := 0;
-                  Application.ProcessMessages;
-                  end;
-                end;
+                 inc(TotalBytesRead_B, BytesRead);
+                 pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                 lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                 Application.ProcessMessages;
+               end;
             end;
             Application.ProcessMessages;
           until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
@@ -4529,16 +4516,11 @@ begin
               // If the File tab is the tab doing the hashing, refresh the interface
               if PageControl1.ActivePage = TabSheet2 then
                begin
-                inc(TotalBytesRead_B, BytesRead);
-                inc(LoopCounter, 1);
-                if LoopCounter = 100 then // Every X buffer reads, refresh interface
-                  begin
-                  pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
-                  lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
-                  LoopCounter := 0;
-                  Application.ProcessMessages;
-                  end;
-                end;
+                 inc(TotalBytesRead_B, BytesRead);
+                 pbFile.Position := ((TotalBytesRead_B * 100) DIV ImageFileSize);
+                 lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                 Application.ProcessMessages;
+               end;
             end;
             Application.ProcessMessages;
           until (TotalBytesRead = ImageFileSize); // or (frmYaffi.Stop = true);
