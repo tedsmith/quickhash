@@ -474,7 +474,8 @@ var
   fCount : integer;
   err:pointer;
   ret:integer;
-
+  incrementorVal : integer = Default(integer);
+  UseUpperCase : Boolean = Default(Boolean);
 begin
   err       :=nil;
   Result    :=-1;
@@ -488,6 +489,7 @@ begin
       begin
       filenameRoot:=Copy(filename,1, Length(filename)-4);
       curFilename:=filenameRoot+UppercaseExt;
+      UseUpperCase := true;
       end
       else
       begin
@@ -495,19 +497,29 @@ begin
         begin
         filenameRoot:=Copy(filename,1, Length(filename)-4);
         curFilename:=filenameRoot+LowercaseExt;
+        UseUpperCase := false;
         end;
       end;
-      filenames.Add(curFilename);
+      //filenames.Add(curFilename);
 
-      // Itterate all the E01 segments for the image set
+      // Itterate all the E01 segments for the image set to build the list of E01 to X0X.
+      // Break if any are invalid E01 files.
       while FileExists(curFilename) do
       begin
         if libewf_check_file_signature(curFilename)=1 then
           begin
-            filenames.Add(curFilename)
+            filenames.Add(curFilename);
           end
-        else break;
-        curFilename:=filenameRoot+'.E'+Format('%.2d',[filenames.Count+1]);
+          else
+          begin
+            raise exception.Create(curFilename + ' seems to have invalid E01 signature.');
+            break;
+          end;
+        if UseUpperCase then
+          begin
+            curFilename:=filenameRoot+'.E'+Format('%.2d',[filenames.Count+1]);
+          end
+        else curFilename:=filenameRoot+'.e'+Format('%.2d',[filenames.Count+1]);
       end;
 
       if flag=$2 then filenames.Add(filenameRoot);

@@ -112,7 +112,7 @@ uses
   dbases_sqlite, uDisplayGrid,
   // New as of v3.2.0
   udisplaygrid3,
-  // Not for v3.3.0. Maybe for next version?
+  // New to v3.3.0 as experimental new feature.
   uLibEWF,
 
   // Remaining Uses clauses for specific OS's
@@ -527,8 +527,8 @@ type
     function ValidateTextWithHash(strToBeHashed:ansistring): string;
     function CalcTheHashString(strToBeHashed:ansistring):string;
     function CalcTheHashFile(FileToBeHashed:string):string;
-    function CalcTheHashE01File(FileToBeHashed:string) : string;  // Not for v3.3.0. Maybe for next version?
-    function IsItE01(filename : string) : boolean;                // Not for v3.3.0. Maybe for next version?
+    function CalcTheHashE01File(FileToBeHashed:string) : string;  // New to v3.3.0 as experimental new feature.
+    function IsItE01(filename : string) : boolean;                // New to v3.3.0 as experimental new feature.
     function FormatByteSize(const bytes: QWord): string;
     function RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     function RetrieveFileList(FolderName : string) : TStringList;
@@ -1065,23 +1065,6 @@ begin
         end;
 end;
 
-// Not for v3.3.0. Maybe for next version?
-function TMainForm.IsItE01(filename : string) : boolean;
-var
-  FileExt : string = Default(string);
-begin
-  result := false;
-  FileExt := ExtractFileExt(filename);
-  If (FileExt = '.E01') then
-  begin
-    result := true;
-  end;
-  If (FileExt = '.e01') then
-  begin
-    result := true;
-  end;
-end;
-
 procedure TMainForm.btnHashFileClick(Sender: TObject);
 var
   filename : string;
@@ -1147,9 +1130,18 @@ begin
         IsFileE01 := IsItE01(filename);
         if IsFileE01 = true then
           begin
-            fileHashValue := CalcTheHashE01File(Filename);
+            if (MessageDlg('BIG CAUTION HERE!', 'You are about to compute the INTERNAL hash of a ' + lineending
+                           + 'forensic E01 image, not the hash of a single file. Proceed  '        + lineending
+                           + 'only if you understand what this means! Or if '                      + lineending
+                           + 'you actually want to compute the file hashes of each E01 '           + lineending
+                           + 'segment, use the FileS tab instead. Also, this is an experimental '  + lineending
+                           + 'new feature added in v3.3.0.', mtConfirmation,
+             [mbNo, mbYes],0) = mrYes) then
+             begin
+             fileHashValue := CalcTheHashE01File(Filename);
+             end;
           end
-        else fileHashValue := CalcTheHashFile(Filename); // Custom function
+        else fileHashValue := CalcTheHashFile(Filename);
 
         memFileHashField.Lines.Add(UpperCase(fileHashValue));
         StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
@@ -4240,7 +4232,25 @@ begin
   else result := 'File could not be accessed.'
 end;
 
-// Not for v3.3.0 perhaps. Maybe for next version? This quick start was for SHA1 only.
+// New to v3.3.0 as experimental new feature. Returns true if it looks like an
+// an Expert Witness Format (EWF), aka E01 image
+function TMainForm.IsItE01(filename : string) : boolean;
+var
+  FileExt : string = Default(string);
+begin
+  result := false;
+  FileExt := ExtractFileExt(filename);
+  If (FileExt = '.E01') then
+  begin
+    result := true;
+  end;
+  If (FileExt = '.e01') then
+  begin
+    result := true;
+  end;
+end;
+
+// New to v3.3.0 as experimental new feature.
 function TMainForm.CalcTheHashE01File(FileToBeHashed:string):string;
 const
   BufSize = 64 * 1024;  // 64kb buffer
@@ -4260,10 +4270,15 @@ var
   TabRadioGroup2: TRadioGroup;
   Buffer: array [0 .. BufSize - 1] of Byte;
 
-  TotalBytesRead_B : QWord = Default(QWord);
-  BytesRead        : integer = Default(integer);
-  ImageFileSize    : Int64 = Default(Int64);
+  TotalBytesRead_B        : QWord = Default(QWord);
+  BytesRead               : integer = Default(integer);
+  CurrSHA1HashValResult   : integer = Default(integer);
+  CurrMD5HashValResult    : integer = Default(integer);
+  libewfCloseResult       : integer = Default(integer);
+  ImageFileSize           : Int64   = Default(Int64);
 
+  strCurrentMD5HashVal    : string = Default(string);
+  strCurrentSHA1HashVal   : string = Default(string);
   strImageMD5HashValue    : string = Default(string);
   strImageSHA1HashValue   : string = Default(string);
   strImageSHA3HashValue   : string = Default(string);
@@ -4273,13 +4288,9 @@ var
   fLibEWFVerificationInstance : TLibEWF;
 
 begin
-  BytesRead      := 0;
-  TotalBytesRead := 0;
-  ImageFileSize  := 0;
-  ImageFileSize := 0;
-
   // Initialise Buffer
   FillChar(Buffer, SizeOf(Buffer), 0);
+  TotalBytesRead := 0;
 
   case PageControl1.TabIndex of
         0: TabRadioGroup2 := AlgorithmChoiceRadioBox1;  //RadioGroup for Text.
@@ -4304,14 +4315,11 @@ begin
            // Get the size of the data within the image
            ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
 
-           // ToDo : update libewf_GetHashValue IRO of libewf_handle_get_utf8_hash_value
-           // so the embedded hash can be looked up and then compared against
-           // https://github.com/libyal/libewf-legacy/blob/main/include/libewf.h.in
-
-           // If MD5 hash was chosen, compute the MD5 hash of the image
+           // Navigate to start of E01
            fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
            repeat
            // Read the E01 image file in buffered blocks. Hash each block as we go
+           FillChar(Buffer, SizeOf(Buffer), 0);
            BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
            if BytesRead = -1 then
              begin
@@ -4341,9 +4349,19 @@ begin
              result := strImageMD5HashValue;
            end
            else result := 'MD5 hash computation failed!';
+           // Get the existing MD5 hash, if available
+           CurrMD5HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('MD5', strCurrentMD5HashVal);
         end; // libewf_open End
+
         // Release the EWF File Handle now that it is verified
-        fLibEWFVerificationInstance.libewf_close();
+        StatusBar1.Caption := 'Closing handles and releasing memory. Please wait...';
+        libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
+        if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
+
+        if CurrMD5HashValResult = 1 then
+        begin
+          ShowMessage('For info, the MD5 hash stored in the image is ' + lineending + Uppercase(strCurrentMD5HashVal));
+        end;
         end;  // MD5 End
 
       1: begin
@@ -4358,10 +4376,11 @@ begin
          if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
          begin
            ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
-           // If SHA1 hash was chosen, compute the SHA1 hash of the image
+           // Navigate to start of E01
            fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
            repeat
              // Read the E01 image file in buffered blocks. Hash each block as we go
+             FillChar(Buffer, SizeOf(Buffer), 0);
              BytesRead     := fLibEWFVerificationInstance.libewf_handle_read_buffer(@Buffer, SizeOf(Buffer));
              if BytesRead = -1 then
                begin
@@ -4391,9 +4410,17 @@ begin
              result := strImageSHA1HashValue;
            end
          else result := 'SHA-1 hash computation failed!';
+         CurrSHA1HashValResult := fLibEWFVerificationInstance.libewf_GetHashValue('SHA1', strCurrentSHA1HashVal);
         end;  // libewf_open End
+
         // Release the EWF File Handle now that it is verified
-        fLibEWFVerificationInstance.libewf_close();
+        StatusBar1.Caption := 'Closing handles and releasing memory. Please wait...';
+        libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
+        if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
+        if CurrSHA1HashValResult = 1 then
+        begin
+          ShowMessage('For info, the SHA1 hash stored in the image is ' + lineending + Uppercase(strCurrentSHA1HashVal));
+        end;
         end;  // SHA-1 End
 
       2: begin
@@ -4405,7 +4432,7 @@ begin
          if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
          begin
            ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
-           // If SHA3 hash was chosen, compute the SHA3 hash of the image
+           // Navigate to start of E01
            fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
            repeat
            // Read the E01 image file in buffered blocks. Hash each block as we go
@@ -4452,7 +4479,7 @@ begin
         if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
         begin
           ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
-          // If SHA256 hash was chosen, compute the SHA256 hash of the image
+          // Navigate to start of E01
           fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
           repeat
           // Read the E01 image file in buffered blocks. Hash each block as we go
@@ -4499,7 +4526,7 @@ begin
         if fLibEWFVerificationInstance.libewf_open(FileToBeHashed, LIBEWF_OPEN_READ) = 0 then
         begin
           ImageFileSize := fLibEWFVerificationInstance.libewf_handle_get_media_size();
-          // If SHA512 hash was chosen, compute the SHA512 hash of the image
+          // Navigate to start of E01
           fLibEWFVerificationInstance.libewf_handle_seek_offset(0, 0);
           repeat
           // Read the E01 image file in buffered blocks. Hash each block as we go
