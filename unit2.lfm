@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 363
+  Left = 229
   Height = 733
-  Top = 202
+  Top = 158
   Width = 1023
   AllowDropFiles = True
   Caption = 'QuickHash v3.3.0 (2021) - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -19,29 +19,29 @@ object MainForm: TMainForm
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet2
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
       Hint = 'Hash portions of text'
       Caption = 'Te&xt'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       OnContextPopup = TabSheet1ContextPopup
       ParentShowHint = False
       object TextHashingGroupBox: TGroupBox
         Left = 120
         Height = 534
         Top = 10
-        Width = 847
+        Width = 849
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Text Hashing'
         ClientHeight = 512
-        ClientWidth = 843
+        ClientWidth = 845
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -52,7 +52,7 @@ object MainForm: TMainForm
           Height = 191
           Hint = 'Type or paste and watch hash value change.   For amounts larger than several hundred Kb, save data to a file and use File Hashing instead.   Be aware of line endings! '
           Top = 9
-          Width = 821
+          Width = 823
           Anchors = [akTop, akLeft, akRight]
           Lines.Strings = (
             'Type or paste text here - hash will update as you type'
@@ -80,7 +80,7 @@ object MainForm: TMainForm
           Height = 56
           Hint = 'This is the hash of ALL THE TEXT in the textarea above'#13#10'For line-by-line analysis, use the button'#13#10#13#10'The hash value can be copied from here'#13#10'to clipboard (highlight and press Ctrl + C or right click ''Copy'''
           Top = 408
-          Width = 821
+          Width = 823
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           Font.Height = -13
@@ -109,10 +109,10 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated hash matches the computed hash.'#13#10'To resume normal behaviour, return value '#13#10'to ''...'' (3 dots only)'#13#10'It expects you to paste hash values '#13#10'of the correct length'
           Top = 368
-          Width = 822
+          Width = 824
           Anchors = [akTop, akLeft, akRight]
           EditLabel.Height = 17
-          EditLabel.Width = 822
+          EditLabel.Width = 824
           EditLabel.Caption = 'Expected Hash Value (clear, then paste value from other utility)'
           EditLabel.ParentColor = False
           ParentShowHint = False
@@ -1901,8 +1901,8 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Hint = 'Compute a SHA-1 hash of a physical disk in Windows.'#13#10'Must run QuickHash as administrator with '#13#10'Windows Vista or above'
       Caption = 'Disks'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       object btnCallDiskHasherModule: TButton
         Left = 376
         Height = 25

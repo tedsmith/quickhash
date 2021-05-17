@@ -2587,7 +2587,10 @@ end;
 // It also clears all labels from any previous runs of the form.
 procedure TMainForm.btnCallDiskHasherModuleClick(Sender: TObject);
 begin
+  btnCallDiskHasherModule.Caption:= 'Loading list...';
+  Application.ProcessMessages;
   diskmodule.frmDiskHashingModule.Show;
+  btnCallDiskHasherModule.Caption:= 'Launch Disk Hashing Module';
 end;
 
 // RemoveLongPathOverrideChars : The long path override prefix will be either:
@@ -4248,6 +4251,12 @@ begin
   begin
     result := true;
   end;
+  {$ifdef Darwin}
+  result := false;
+  ShowMessage('For now, EWF (E01) support is not available in Apple OSX.' + lineending
+  + ' Perhaps in the future, when its easier to compile source, it may be.' + lineending
+  + ' Hash of file segment will be computed only.');
+  {$endif}
 end;
 
 // New to v3.3.0 as experimental new feature.
@@ -4276,7 +4285,7 @@ var
   CurrMD5HashValResult    : integer = Default(integer);
   libewfCloseResult       : integer = Default(integer);
   ImageFileSize           : Int64   = Default(Int64);
-
+  strExistingHash         : string = Default(string);
   strCurrentMD5HashVal    : string = Default(string);
   strCurrentSHA1HashVal   : string = Default(string);
   strImageMD5HashValue    : string = Default(string);
@@ -4346,22 +4355,22 @@ begin
            strImageMD5HashValue := Uppercase(HashInstanceResultMD5.ToString());
            if Length(strImageMD5HashValue) > 0 then
            begin
-             result := strImageMD5HashValue;
+             // Get the existing MD5 hash, if available
+             CurrMD5HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('MD5', strCurrentMD5HashVal);
+             if CurrMD5HashValResult = 1 then
+             begin
+               strExistingHash := '';
+               strExistingHash := (' (MD5 stored in image : ' + strCurrentMD5HashVal + ')');
+             end;
+             result := strImageMD5HashValue + strExistingHash;
            end
            else result := 'MD5 hash computation failed!';
-           // Get the existing MD5 hash, if available
-           CurrMD5HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('MD5', strCurrentMD5HashVal);
         end; // libewf_open End
 
         // Release the EWF File Handle now that it is verified
         StatusBar1.Caption := 'Closing handles and releasing memory. Please wait...';
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
-
-        if CurrMD5HashValResult = 1 then
-        begin
-          ShowMessage('For info, the MD5 hash stored in the image is ' + lineending + Uppercase(strCurrentMD5HashVal));
-        end;
         end;  // MD5 End
 
       1: begin
@@ -4407,7 +4416,14 @@ begin
            strImageSHA1HashValue := Uppercase(HashInstanceResultSHA1.ToString());
            if Length(strImageSHA1HashValue) > 0 then
            begin
-             result := strImageSHA1HashValue;
+            // Get the existing MD5 hash, if available
+             CurrSHA1HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('SHA1', strCurrentSHA1HashVal);
+             if CurrSHA1HashValResult = 1 then
+             begin
+               strExistingHash := '';
+               strExistingHash := (' (SHA1 stored in image : ' + strCurrentSHA1HashVal + ')');
+             end;
+             result := strImageSHA1HashValue + strExistingHash;
            end
          else result := 'SHA-1 hash computation failed!';
          CurrSHA1HashValResult := fLibEWFVerificationInstance.libewf_GetHashValue('SHA1', strCurrentSHA1HashVal);

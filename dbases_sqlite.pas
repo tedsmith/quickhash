@@ -120,6 +120,8 @@ implementation
 // On creation we check for SQLite capability and load as we find it.
 // If it cant be found, QH will run with some tabs, but not those that need SQLIte backend
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
+const
+  LIB_FOLDER : ansistring = 'libs';
 var
   guid                  : TGuid;
   SQLiteLibraryPath     : string = Default(string);
@@ -142,9 +144,9 @@ begin
     SQLDBLibraryLoaderWindows.ConnectionType := 'SQLite3';
   // Load the right DLL for the architecture of Windows in use
   {$ifdef CPU32}
-    SQLiteLibraryPath := 'sqlite3-win32.dll';
+    SQLiteLibraryPath := ExtractFilePath(Application.ExeName)+IncludeTrailingPathDelimiter(LIB_FOLDER)+'sqlite3-win32.dll';
   {$else ifdef CPU64}
-    SQLiteLibraryPath := 'sqlite3-win64.dll';
+    SQLiteLibraryPath := ExtractFilePath(Application.ExeName)+IncludeTrailingPathDelimiter(LIB_FOLDER)+'sqlite3-win64.dll';
   {$endif}
 
   // Check the DLL exists and load it
@@ -188,7 +190,7 @@ begin
   end;
   {$endif} // End of Windows compiler directive
 
-  // Initiate calls to SQLite libraries for LINUX
+  // Initiate calls to standard built in SQLite libraries for LINUX
   {$ifdef linux}
   SQLDBLibraryLoaderLinux.ConnectionType := 'SQLite3';
   SQLiteLibraryPath := '';
@@ -241,7 +243,7 @@ begin
   end;
   {$endif}   // End of Linux compiler directive
 
-  // Initiate calls to SQLite libraries for APPLE OSX
+  // Initiate calls to standard built in SQLite libraries for APPLE OSX
   {$ifdef darwin}
   // Thanks to OSX being a total and utter pain, moving goal posts with every release of OSX,
   // and since BigSur has removed libraries, more Skullduggery is required for
