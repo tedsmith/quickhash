@@ -90,6 +90,9 @@ uses
   {$ifdef Linux}
     dynlibs;
   {$endif}
+  {$ifdef darwin}
+    dynlibs;
+  {$endif}
 
 type
   TINT16 = ShortInt; // was short
