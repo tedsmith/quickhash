@@ -4,21 +4,21 @@
 v3.3.0<br>
 Improvement : Monumentally large changes to "Compare Two Folders" processing, scrubbing away much of the earlier effort and restructuring it, with big thanks to an open-source co-developer who has helped me here. Key amongst them are that v3.3.0 addresses a bug where rows got mis-aligned if the file counts differed. The mis-match was still correctly reported in v3.2.0, and even if the file matches counted but the hashes differed, that was also still OK. But, the rows got out of sync if the file counts differed due to there being less files in one folder than the other and my use of the UPDATE SQL statement. Additional restructuring applied but note that C2F is really designed to check that two folders are a mirror image of each other, and it is supposed to help you confirm this is the case, rather than help you clean up your disk. If your aim is to use it as a file manager, then QH might not be the best option. Other tools like Beyond Compare might be better for your needs here. <br>
 That said, the ability now exists to compare files by name and hash value in both folders, and then the user can right click the results and see many other options too : <br>
-1) Restore Results view<br>
-2) Clipboard all rows<br>
-3) Clipboard selected row<br>
-4) Clipboard all selected rows (currently does it in reverse order for some reason)<br>
-5) Show mismatches (new, based on filename or hash or both) <br>
-6) Show duplicates (new, offers the chance to clipboard immediately after because the column row changes for this display)<br>
-7) Show matching hashes (new) <br>
-8) Show different hashes, not missing files (new)<br>
-9) Show missing FolderA files (new)<br>
-10) Show missing FolderB files (new)<br>
-11) Show missing files from Folder A or FolderB (new)<br>
-12) Save as CSV file<br>
-13) Save as HTML file<br>
+~ Restore Results view<br>
+~  Clipboard all rows<br>
+~  Clipboard selected row<br>
+~  Clipboard all selected rows (currently does it in reverse order for some reason)<br>
+~  Show mismatches (new, based on filename or hash or both) <br>
+~  Show duplicates (new, offers the chance to clipboard immediately after because the column row changes for this display)<br>
+~  Show matching hashes (new) <br>
+~  Show different hashes, not missing files (new)<br>
+~  Show missing FolderA files (new)<br>
+~  Show missing FolderB files (new)<br>
+~  Show missing files from Folder A or FolderB (new)<br>
+~  Save as CSV file<br>
+~  Save as HTML file<br>
 That is a whopping array of ways to conduct some analysis of two folders and is about as good as I think I can make it and is based on help from the community. If that still falls short, other tools are available. <br>
-Improvement : DB Rows were being counted (when required) using a slower method than I had realised. With v3.3.0, counts are now immediate by calling DBGrid.DataSource.DataSet.RecordCount;  
+Improvement : DB Rows were being counted (when required) using a slower method than I had realised. With v3.3.0, counts are now immediate by calling DBGrid.DataSource.DataSet.RecordCount; <br> 
 Improvement : Column headers added to CSV and HTML outputs (achieved by right clicking the display grid results throughout). I may have missed one but I think I have them all covered <br>
 Improvement : Removed the generation of a "QH_XXXXX" time stamp named parent folder in destination folder when copying as many users reported this was unhelpful.<br>
 Improvement : SQLite DLL's for Windows replaced with stable version 3.35.5.0 as of April 2021 (replacing former version 3.21.0.0).<br>
@@ -29,9 +29,9 @@ Fix : DisableControls and EnableControls used more extensively to expedite the "
 Fix : When saving results as CSV in Compare Two Folders, if the user selected an existing file to overwrite, it would do that, but the next run would result in an infinite loop telling the user it already exists and to choose another file, but not being able to actually do so. That was fixed. <br>
 Fix : Apples new OSX 'Big Sur' OS unhelpfully removed static libraries, like the SQLite library, so it could not be referenced by file path. So a different method of lookup is needed using the dyanmic linker cache and a 3 state compiler directive is now used for loading SQLite, depending on the OS being used. That has been applied so that Apple users can continue to enjoy the benefits of QuickHash on that most changing and challenging of operating system. You're welcome. <br>
 Fix : Two stringlists are created when using "Compare Two Folders" to store the list of files for analysis. I had introduced a memory leak here without realising it and that has been corrected (with thanks to an open-source developer who spotted that for me). <br>
-Fix : A small memory leak existed in frmSQLiteDBases.DatasetToClipBoard for copying data to clipboard. The CSVClipboardList string list that was used to achieve this was not being freed. Now it is freed. 
+Fix : A small memory leak existed in frmSQLiteDBases.DatasetToClipBoard for copying data to clipboard. The CSVClipboardList string list that was used to achieve this was not being freed. Now it is freed. <br>
 Fix : In the basic results txt file that is created during Compare Two Folders, the selected folder names in the log file were prefixed with the LongPathOverride of two slashes a question mark and a slash. That was corrected to just show the normal path as users dont realy need to see that (as it is just an API switch). <br>
-Fix : .Value was used extensively to "call" a value from a DB cell. But some cells can be NULL in QuickHash. And if they are, using .Value can generate an error. Instead this is now switched to .AsString meaning a NULL value returns an empty string, as intended. 
+Fix : .Value was used extensively to "call" a value from a DB cell. But some cells can be NULL in QuickHash. And if they are, using .Value can generate an error. Instead this is now switched to .AsString meaning a NULL value returns an empty string, as intended. <br>
 Fix : The disk hashing module showed the field for Blake after hashing, even if empty and not computed, and was not being hidden like the others. That was fixed.  <br>
 Fix : The disk hashing module reported "Windows 8" when conducted using "Windows 10". This was not actually wrong, but mis-leading, and is actually due to the Windows API being woeful in parts with regard to how the "number" and "name" of Windows are reported. So a new function created to speak to ntldr.dll directly so that now the major, minor, and build versions are all reported. </br>
 New : Ability to hash forensic images of the Expert Witness Format (EWF), also known as "E01 Images". Available for Windows and Linux for user who know what they are doing with regard to forensic images. It is not available for OSX, for now. Quickhash will conduct the hash and also report the embedded MD5 or SHA1 hash, if available, depending on the type of hash the user is performing. So if the E01 contains both MD5 and SHA1, but the user selects SHA1, then the embedded SHA1 hash will be reported as well as the computed SHA1 hash. More features will likely follow in future of this landmark addition to QuickHash GUI. <br> 
@@ -39,8 +39,8 @@ New : Button added to enable the user to easily make a copy of the backend SQLit
 New : Logo replaced with the newer Quickash logo. <br>
 New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, hyphen and (heaven forbid) even the space char. If no character is chosen, a comma is assumed and used as before. <br>
 New : The user can now use the About menu to establish the version of SQLite that is being used by QuickHash. <br>
-Code: Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. <br>
-Code: More effort made to initialise variables 
+Code : Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. <br>
+Code : More effort made to initialise variables <br>
 Code : Dismodule code entirely refactored to be more efficient, to produce more useful data for the user, and to help safeguard against null values, removable drive bays with no disks, and for general ease of reading <br>
 
 v3.2.0<br>
