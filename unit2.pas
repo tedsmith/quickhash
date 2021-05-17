@@ -162,6 +162,11 @@ type
      ullAvailExtendedVirtual : uint64;
   end;
 
+   E01HashInfo = record
+     ComputedHash: string;
+     ExistingHash: string;
+   end;
+
    TMainForm = class(TForm)
     AlgorithmChoiceRadioBox1              : TRadioGroup;
     AlgorithmChoiceRadioBox2              : TRadioGroup;
@@ -529,7 +534,7 @@ type
     function ValidateTextWithHash(strToBeHashed:ansistring): string;
     function CalcTheHashString(strToBeHashed:ansistring):string;
     function CalcTheHashFile(FileToBeHashed:string):string;
-    function CalcTheHashE01File(FileToBeHashed:string) : string;  // New to v3.3.0 as experimental new feature.
+    function CalcTheHashE01File(FileToBeHashed:string) : E01HashInfo;  // New to v3.3.0 as experimental new feature.
     function IsItE01(filename : string) : boolean;                // New to v3.3.0 as experimental new feature.
     function FormatByteSize(const bytes: QWord): string;
     function RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
@@ -956,6 +961,7 @@ var
   filename, fileHashValue : ansistring;
   start, stop, elapsed : TDateTime;
   IsFileE01 : Boolean = Default(Boolean);
+  E01HashData : E01HashInfo;
 begin
   // First, clear the captions from any earlier file hashing actions
   StatusBar1.SimpleText    := '';
@@ -991,12 +997,29 @@ begin
 
       IsFileE01 := IsItE01(Filename);
       if IsFileE01 = true then
+      begin
+      if (MessageDlg('BIG CAUTION HERE!', 'You are about to compute the INTERNAL hash of a ' + lineending
+               + 'forensic E01 image, not the hash of a single file. Proceed  '        + lineending
+               + 'only if you understand what this means! Or if '                      + lineending
+               + 'you actually want to compute the file hashes of each E01 '           + lineending
+               + 'segment, use the FileS tab instead. Also, this is an experimental '  + lineending
+               + 'new feature added in v3.3.0.', mtConfirmation,
+        [mbNo, mbYes],0) = mrYes) then
         begin
-          fileHashValue := CalcTheHashE01File(Filename); // Conduct E01 hashing
-        end
-      else fileHashValue := CalcTheHashFile(Filename); // Just the hash the normal file
+          E01HashData := CalcTheHashE01File(Filename);
+          fileHashValue := E01HashData.ComputedHash;
+          memFileHashField.Lines.Add(UpperCase(fileHashValue));
+          Application.ProcessMessages;
+          if Length(E01HashData.ExistingHash) > 0 then
+          lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
+        end;
+      end
+      else
+      begin  // The file is not an E01, so hash as normal
+        fileHashValue := CalcTheHashFile(Filename);
+        memFileHashField.Lines.Add(UpperCase(fileHashValue));
+      end;
 
-      memFileHashField.Lines.Add(UpperCase(fileHashValue));
       StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
       OpenDialog1.Close;
@@ -1008,8 +1031,9 @@ begin
       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
       Application.ProcessMessages;
 
-
-      // If the user has ane existing hash to check, compare it here
+      // If the user has an existing hash to check, compare it here
+      if IsFileE01 = false then
+      begin
       if (lbleExpectedHash.Text = '') then exit
       else
         if (lbleExpectedHash.Text <> '...') then
@@ -1023,6 +1047,7 @@ begin
             Showmessage('Expected hash DOES NOT match the computed file hash!');
           end;
         end;
+      end;
      end
   else
     ShowMessage('An error occured opening the file. Error code: ' +  SysErrorMessageUTF8(GetLastOSError));
@@ -1075,6 +1100,7 @@ var
   LoopCounter : integer;
   elapsed, StartSecondsCounter, EndSecondsCounter : Int64;
   IsFileE01 : boolean = Default(Boolean);
+  E01HashData : E01HashInfo;
 begin
   PageControl1.ActivePage := Tabsheet2;  // Ensure File tab activated if triggered via menu
   filename := '';
@@ -1130,7 +1156,7 @@ begin
         StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
         Application.ProcessMessages;
         IsFileE01 := IsItE01(filename);
-        if IsFileE01 = true then
+        if IsFileE01 = true then  // The file is an E01, so call modified hash routine
           begin
             if (MessageDlg('BIG CAUTION HERE!', 'You are about to compute the INTERNAL hash of a ' + lineending
                            + 'forensic E01 image, not the hash of a single file. Proceed  '        + lineending
@@ -1140,25 +1166,33 @@ begin
                            + 'new feature added in v3.3.0.', mtConfirmation,
              [mbNo, mbYes],0) = mrYes) then
              begin
-             fileHashValue := CalcTheHashE01File(Filename);
+               E01HashData := CalcTheHashE01File(Filename);
+               fileHashValue := E01HashData.ComputedHash;
+               memFileHashField.Lines.Add(UpperCase(fileHashValue));
+               Application.ProcessMessages;
+               if Length(E01HashData.ExistingHash) > 0 then
+               lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
              end;
           end
-        else fileHashValue := CalcTheHashFile(Filename);
+        else
+        begin  // The file is not an E01, so hash as normal
+          fileHashValue := CalcTheHashFile(Filename);
+          memFileHashField.Lines.Add(UpperCase(fileHashValue));
+        end;
 
-        memFileHashField.Lines.Add(UpperCase(fileHashValue));
         StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
 
         OpenDialog1.Close;
         stop := Now;
         EndSecondsCounter := getTickCount;
         elapsed:=EndSecondsCounter - StartSecondsCounter;
-        lbEndedFileAt.Caption    := 'Ended at   : ' + DateTimeToStr(stop);
+        lbEndedFileAt.Caption    := 'Ended at    : ' + DateTimeToStr(stop);
         lblFileTimeTaken.Caption := 'Time taken : ' + IntToStr(elapsed DIV 1000) + ' secs';
         Application.ProcessMessages;
 
         // If the user has ane existing hash to check in expected hash value field,
         // compare it here
-        lbleExpectedHashChange(Sender);
+        if IsFileE01 = false then lbleExpectedHashChange(Sender);
       end
       else
       begin
@@ -1448,9 +1482,20 @@ begin
      exit
     else if (lbleExpectedHash.Text = '...') then
       exit
+      {
+       32	MD5
+       40	SHA-1
+       64	SHA-3
+       64	SHA-256
+       128	SHA512
+       16	xxHash
+       64	Blake2B
+       64	Blake3
+       8        CRC32
+       }
      else if (Length(trim(lbleExpectedHash.Text)) = 32) or (Length(trim(lbleExpectedHash.Text)) = 40)
           or (Length(trim(lbleExpectedHash.Text)) = 64) or (Length(trim(lbleExpectedHash.Text)) = 128)
-          or (Length(trim(lbleExpectedHash.Text)) = 8) then
+          or (Length(trim(lbleExpectedHash.Text)) = 16) or (Length(trim(lbleExpectedHash.Text)) = 8) then
      begin
        if Uppercase(memFileHashField.Lines[0]) = Trim(Uppercase(lbleExpectedHash.Text)) then
        begin
@@ -1476,9 +1521,20 @@ begin
      exit
     else if (lbleExpectedHashText.Text = '...') then
       exit
+      {
+      32	MD5
+      40	SHA-1
+      64	SHA-3
+      64	SHA-256
+      128	SHA512
+      16	xxHash
+      64	Blake2B
+      64	Blake3
+      8	        CRC32
+      }
      else if (Length(trim(lbleExpectedHashText.Text)) = 32) or (Length(trim(lbleExpectedHashText.Text)) = 40)
           or (Length(trim(lbleExpectedHashText.Text)) = 64) or (Length(trim(lbleExpectedHashText.Text)) = 128)
-          or (Length(trim(lbleExpectedHashText.Text)) = 8) then
+          or (Length(trim(lbleExpectedHashText.Text)) = 16) or (Length(trim(lbleExpectedHashText.Text)) = 8) then
      begin
        if Uppercase(StrHashValue.Lines[0]) = Trim(Uppercase(lbleExpectedHashText.Text)) then
          begin
@@ -3739,6 +3795,7 @@ var
   start, stop : TDateTime;
   elapsed, StartSecondsCounter, EndSecondsCounter : Int64;
   IsFileE01 : Boolean = Default(Boolean);
+  E01HashData : E01HashInfo;
 begin
   if edtFileNameToBeHashed.Text <> 'File being hashed...' then
     begin
@@ -3756,11 +3813,19 @@ begin
       IsFileE01 := IsItE01(edtFileNameToBeHashed.Text);
       if IsFileE01 = true then
         begin
-          HashValue := CalcTheHashE01File(edtFileNameToBeHashed.Text); // Conduct E01 hashing
+          E01HashData := CalcTheHashE01File(edtFileNameToBeHashed.Text);
+          HashValue := E01HashData.ComputedHash;
+          memFileHashField.Lines.Add(UpperCase(HashValue));
+          Application.ProcessMessages;
+          if Length(E01HashData.ExistingHash) > 0 then
+          lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
         end
-      else HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text); // Just the hash the normal file
+        else
+        begin  // The file is not an E01, so hash as normal
+          HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text);
+          memFileHashField.Lines.Add(UpperCase(HashValue));
+        end;
 
-      memFileHashField.Lines.Add(Uppercase(HashValue));
       stop := Now;
       EndSecondsCounter := GetTickCount;
       elapsed := EndSecondsCounter - StartSecondsCounter;
@@ -3769,7 +3834,7 @@ begin
       lblFileTimeTaken.Caption := 'Time taken : '+ IntToStr(elapsed DIV 1000);;
       // If the user has pasted an expected hash value, since the last hash computation,
       // then check if it matches the newly computed hash
-      lbleExpectedHashChange(self);
+       if IsFileE01 = false then lbleExpectedHashChange(self);
       Application.ProcessMessages;
     end;
 end;
@@ -4296,6 +4361,7 @@ begin
   begin
     result := true;
     {$ifdef Darwin}
+      // So the file is an E01, but we dont support OSX, so switch it back to false
       result := false;
       ShowMessage('For now, EWF (E01) support is not available in Apple OSX.' + lineending
       + ' Perhaps in the future, when its easier to compile source, it may be.' + lineending
@@ -4306,6 +4372,7 @@ begin
   begin
     result := true;
     {$ifdef Darwin}
+      // So the file is an e01, but we dont support OSX, so switch it back to false
       result := false;
       ShowMessage('For now, EWF (E01) support is not available in Apple OSX.' + lineending
       + ' Perhaps in the future, when its easier to compile source, it may be.' + lineending
@@ -4315,7 +4382,7 @@ begin
 end;
 
 // New to v3.3.0 as experimental new feature.
-function TMainForm.CalcTheHashE01File(FileToBeHashed:string):string;
+function TMainForm.CalcTheHashE01File(FileToBeHashed:string):E01HashInfo;
 const
   BufSize = 64 * 1024;  // 64kb buffer
 var
@@ -4414,12 +4481,11 @@ begin
              CurrMD5HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('MD5', strCurrentMD5HashVal);
              if CurrMD5HashValResult = 1 then
              begin
-               strExistingHash := '';
-               strExistingHash := (' (MD5 stored in image : ' + strCurrentMD5HashVal + ')');
+               result.ExistingHash := strCurrentMD5HashVal;
              end;
-             result := strImageMD5HashValue + strExistingHash;
+             result.ComputedHash := strImageMD5HashValue;
            end
-           else result := 'MD5 hash computation failed!';
+           else result.ComputedHash := 'MD5 hash computation failed!';
         end; // libewf_open End
 
         // Release the EWF File Handle now that it is verified
@@ -4475,12 +4541,11 @@ begin
              CurrSHA1HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('SHA1', strCurrentSHA1HashVal);
              if CurrSHA1HashValResult = 1 then
              begin
-               strExistingHash := '';
-               strExistingHash := (' (SHA1 stored in image : ' + strCurrentSHA1HashVal + ')');
+               result.ExistingHash := strCurrentSHA1HashVal;
              end;
-             result := strImageSHA1HashValue + strExistingHash;
+             result.ComputedHash := strImageSHA1HashValue;
            end
-         else result := 'SHA-1 hash computation failed!';
+         else result.ComputedHash := 'SHA-1 hash computation failed!';
          CurrSHA1HashValResult := fLibEWFVerificationInstance.libewf_GetHashValue('SHA1', strCurrentSHA1HashVal);
         end;  // libewf_open End
 
@@ -4533,9 +4598,9 @@ begin
            strImageSHA3HashValue := Uppercase(HashInstanceResultSHA3.ToString());
            if Length(strImageSHA3HashValue) > 0 then
            begin
-             result := strImageSHA3HashValue;
+             result.ComputedHash := strImageSHA3HashValue;
            end
-           else result := 'SHA-3 hash computation failed!';
+           else result.ComputedHash := 'SHA-3 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
         fLibEWFVerificationInstance.libewf_close();
@@ -4580,9 +4645,9 @@ begin
           strImageSHA256HashValue := Uppercase(HashInstanceResultSHA256.ToString());
           if Length(strImageSHA256HashValue) > 0 then
           begin
-            result := strImageSHA256HashValue;
+            result.ComputedHash := strImageSHA256HashValue;
           end
-          else result := 'SHA256 hash computation failed!';
+          else result.ComputedHash := 'SHA256 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
         fLibEWFVerificationInstance.libewf_close();
@@ -4627,9 +4692,9 @@ begin
           strImageSHA512HashValue := Uppercase(HashInstanceResultSHA512.ToString());
           if Length(strImageSHA512HashValue) > 0 then
           begin
-            result := strImageSHA512HashValue;
+            result.ComputedHash := strImageSHA512HashValue;
           end
-          else result := 'SHA512 hash computation failed!';
+          else result.ComputedHash := 'SHA512 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
         fLibEWFVerificationInstance.libewf_close();
