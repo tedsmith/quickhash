@@ -53,6 +53,7 @@ type
     procedure SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : string);
     procedure SaveC2FWindowToHTML(DBGrid : TDBGrid; Filename : string);
     procedure DatasetToClipBoard(DBGrid : TDBGrid);
+    procedure DatasetToClipBoardFILES(DBGrid : TDBGrid);
     procedure DatasetToClipBoardCOPYTAB(DBGrid : TDBGrid);
     procedure ShowDuplicates(DBGrid : TDBGrid);
     procedure DeleteDuplicates(DBGrid : TDBGrid);
@@ -136,8 +137,8 @@ var
      LibHandle : THandle = Default(THandle);
   {$endif}
 begin
-  // Set the delimiter to whatever the user selects in the main form.
-  ChosenDelimiter := MainForm.ChosenDelimiter;
+  // Set the delimiter to comma by default.
+  ChosenDelimiter := ',';
 
   // Initiate calls to SQLite libraries for WINDOWS
   {$ifdef windows}
@@ -1092,7 +1093,98 @@ begin
     ShowMessage('Grid data now in clipboard ');
 end;
 
-// Copies the FILES DBGrid content to clipboard
+// Used to clipboard the entire FILES display grid
+procedure TfrmSQLiteDBases.DatasetToClipBoardFILES(DBGrid : TDBGrid);
+var
+  CSVClipboardList : TStringListUTF8;
+  RowCount : integer = Default(integer);
+  KnownHashFlagIsSet : boolean = Default(boolean);
+begin
+  Mainform.StatusBar2.SimpleText := 'Copying data to clipboard...please wait';
+  Application.ProcessMessages;
+
+  if MainForm.C2FDelimiterComboBox.text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.C2FDelimiterComboBox.text;              // The C2F tab delimiter
+  end
+  else if MainForm.FileSDelimiterComboBox.Text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.FileSDelimiterComboBox.Text;            // The FileS tab delimiter
+  end
+  else if MainForm.CopyDelimiterComboBox.Text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.CopyDelimiterComboBox.Text;             // The Copy tab delimiter
+  end
+  else if MainForm.TextLBLDelimiterComboBox.Text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.TextLBLDelimiterComboBox.Text;          // The Text tab delimiter
+  end;
+
+  if ChosenDelimiter = 'Set Delimiter' then                             // If still default, use comma
+  begin
+    ChosenDelimiter := ',';
+  end
+    else  // Tab is non-printable, so requires conversion to #9, and may have already been converted
+          // as ChosenDelimiter is global
+    if (ChosenDelimiter = 'Tab') or (ChosenDelimiter = #9) then         // If Tab use #9
+    begin
+      ChosenDelimiter := #9;
+    end
+      else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
+      if (ChosenDelimiter = 'Space') or (ChosenDelimiter = #32) then    // If space use #32
+      begin
+        ChosenDelimiter := #32;
+      end;
+
+  RowCount := CountGridRows(DBGrid);
+  if RowCount < 20000 then
+  begin
+    try
+      CSVClipboardList := TStringListUTF8.Create;
+      CSVClipboardList.Add('Filename'  + ChosenDelimiter + 'FilePath' + ChosenDelimiter +
+                        'HashValue' + ChosenDelimiter + 'FileSize' + ChosenDelimiter +
+                        'KnownHashFlag' + LineEnding);
+
+      if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
+          else KnownHashFlagIsSet := false;
+
+      DBGrid.DataSource.Dataset.DisableControls;
+      try
+        DBGrid.DataSource.Dataset.First;
+        while not DBGrid.DataSource.Dataset.EoF do
+        begin
+          if KnownHashFlagIsSet then
+          begin
+            // Include all columns, inc hash flag, but exclude the row count (not needed for a CSV output).
+            CSVClipboardList.Add(DBGrid.DataSource.DataSet.Fields[1].Text + ChosenDelimiter+
+                           DBGrid.DataSource.DataSet.Fields[2].Text + ChosenDelimiter+
+                           DBGrid.DataSource.DataSet.Fields[3].Text + ChosenDelimiter+
+                           DBGrid.DataSource.DataSet.Fields[4].Text + ChosenDelimiter+
+                           DBGrid.DataSource.DataSet.Fields[5].Text);
+          end
+          else
+            begin
+            // Include all columns, exc hash flag, but exclude the row count (not needed for a CSV output).
+            CSVClipboardList.Add(DBGrid.DataSource.DataSet.Fields[1].Text + ChosenDelimiter+
+                           DBGrid.DataSource.DataSet.Fields[2].Text + ChosenDelimiter+
+                           DBGrid.DataSource.DataSet.Fields[3].Text + ChosenDelimiter+
+                           DBGrid.DataSource.DataSet.Fields[4].Text + LineEnding);
+            end;
+          DBGrid.DataSource.Dataset.Next;
+        end;
+      finally
+        DBGrid.DataSource.Dataset.EnableControls;
+      end;
+    finally
+      Clipboard.AsText := CSVClipboardList.Text;
+      CSVClipboardList.Free;
+    end;
+    Mainform.StatusBar2.SimpleText := 'DONE';
+    ShowMessage('Grid data now in clipboard');
+  end;
+end;
+
+// Copies the DBGrid content to clipboard
 procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
 var
   CSVClipboardList : TStringListUTF8;
@@ -1101,18 +1193,39 @@ begin
   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
   Application.ProcessMessages;
 
-  ChosenDelimiter := MainForm.FileSDelimiterComboBox.Text;
-  if ChosenDelimiter = 'Set Delimiter' then
+  // I need to work out a better way to do this but ChosenDelimiter is global
+  // and set by the OnSelectionChange event of several drop downs. So at the point
+  // a copy to clipboard is triggered, check if any have been changed away from
+  // default of "Set Delimiter", which results in a comma being used.
+  if MainForm.C2FDelimiterComboBox.text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.C2FDelimiterComboBox.text;              // The C2F tab delimiter
+  end
+  else if MainForm.FileSDelimiterComboBox.Text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.FileSDelimiterComboBox.Text;            // The FileS tab delimiter
+  end
+  else if MainForm.CopyDelimiterComboBox.Text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.CopyDelimiterComboBox.Text;             // The Copy tab delimiter
+  end
+  else if MainForm.TextLBLDelimiterComboBox.Text <> 'Set Delimiter' then
+  begin
+    ChosenDelimiter := MainForm.TextLBLDelimiterComboBox.Text;          // The Text tab delimiter
+  end;
+
+  if ChosenDelimiter = 'Set Delimiter' then                             // If still default, use comma
   begin
     ChosenDelimiter := ',';
   end
-    else  // Tab is non-printable, so requires conversion to #9
-    if ChosenDelimiter = 'Tab' then
+    else  // Tab is non-printable, so requires conversion to #9, and may have already been converted
+          // as ChosenDelimiter is global
+    if (ChosenDelimiter = 'Tab') or (ChosenDelimiter = #9) then         // If Tab use #9
     begin
       ChosenDelimiter := #9;
     end
       else  // It is tricky to show a space character in the list so I chose to write "Space" so that needs converting to #32
-      if ChosenDelimiter = 'Space' then
+      if (ChosenDelimiter = 'Space') or (ChosenDelimiter = #32) then    // If space use #32
       begin
         ChosenDelimiter := #32;
       end;
@@ -1132,8 +1245,8 @@ begin
       begin
       // Add the grid headers as normal
       CSVClipboardList.Add('ID'      + ChosenDelimiter + 'Filename'  + ChosenDelimiter +
-                           'FilePath'+ ChosenDelimiter + 'HashValue' + ChosenDelimiter +
-                           'FileSize'+ ChosenDelimiter + 'KnownHashFlag');
+                           'FolderAPath'+ ChosenDelimiter + 'FolderAHashValue' + ChosenDelimiter +
+                           'FolderBPath'+ ChosenDelimiter + 'FolderBHashValue');
       end;
       DBGrid.DataSource.Dataset.DisableControls;
       try

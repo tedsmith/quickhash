@@ -2,7 +2,7 @@
     Quick Hash - A Linux, Windows and Apple Mac OSX GUI for quickly selecting one or more files
     and generating hash values for them.
 
-    Copyright (C) 2011-2020  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2021  Ted Smith www.quickhash-gui.org
 
     The use of the word 'quick' refers to the ease in which the software operates
     in both Linux, Apple Mac and Windows (very few options to worry about, no
@@ -17,7 +17,7 @@
     Benchmark tests are welcomed.
 
     Contributions from members at the Lazarus forums, Stackoverflow and other
-    StackExchnage groups are welcomed and acknowledged. Contributions from
+    StackExchange groups are welcomed and acknowledged. Contributions from
     DaReal Shinji are also welcomed and acknowledged, particularly helping with
     Debian package creation and ideas
 
@@ -104,6 +104,8 @@ uses
   HlpIHash,
   HlpIHashResult,
   HlpBlake3,
+  // New to v3.3.0
+  HlpCRC,
   // New as of v3.0.0, for creating hash lists for faster comparisons of two folders
   contnrs,
   // New as of v3.0.0, for importing hash lists
@@ -1520,6 +1522,9 @@ begin
       7: begin
       ChosenHashAlg := 'Blake3';
       end;
+      8: begin
+      ChosenHashAlg := 'CRC32';
+      end;
   end;
   if lblFileAHash.Caption = '...' then
     exit
@@ -1559,6 +1564,9 @@ begin
       end;
       7: begin
       ChosenHashAlg := 'Blake3';
+      end;
+      8: begin
+      ChosenHashAlg := 'CRC32';
       end;
   end;
   if lblFileBHash.Caption = '...' then
@@ -1735,7 +1743,7 @@ end;
 // Copy entire FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid1);
+  frmSQLiteDBases.DatasetToClipBoardFILES(RecursiveDisplayGrid1);
 end;
 
 // Copy file path of selected row from FILES tab grid to clipboard
@@ -2685,7 +2693,7 @@ begin
   begin
     ShowMessage('Using space is not wise. Are you sure?');
   end;
-  ChosenDelimiter := C2FDelimiterComboBox.Text;
+  ChosenDelimiter := MainForm.C2FDelimiterComboBox.Text;
     if ChosenDelimiter = 'Set Delimiter' then
     begin
       ChosenDelimiter := ',';
@@ -3641,6 +3649,9 @@ begin
       7: begin
       ChosenHashAlg := 'Blake3';
       end;
+      8: begin
+      ChosenHashAlg := 'CRC32';
+      end;
   end;
   slCompareTwoFiles := TStringList.Create;
   slCompareTwoFiles.Add('File A: ' + edtFileAName.Caption + ', ' + ChosenHashAlg + ' Hash: ' + lblFileAHash.Caption);
@@ -3799,6 +3810,7 @@ var
   TabRadioGroup1: TRadioGroup;
   HashInstanceBlake3 : IHash;
   HashInstanceResultBlake3 : IHashResult;
+  crcstandard : HlpCRC.TCRCStandard;
 begin
   TabRadioGroup1 := AlgorithmChoiceRadioBox1;
   result := '';
@@ -3848,6 +3860,10 @@ begin
              HashInstanceResultBlake3 := HashInstanceBlake3.TransformFinal();
              result := HashInstanceResultBlake3.ToString()
            end;
+        8: begin
+             crcstandard := TCRCStandard.CRC32;
+             result := THashFactory.TChecksum.TCRC.CreateCRC(crcstandard).ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
       end;  // end of case statement
     end; // End of string length check
 end;
@@ -3865,7 +3881,8 @@ var
   HashInstanceSHA256,
   HashInstanceSHA512,
   HashInstanceBlake2B,
-  HashInstanceBlake3        : IHash;
+  HashInstanceBlake3,
+  HashInstanceCRC32: IHash;
 
   HashInstanceResultMD5,
   HashInstanceResultSHA1,
@@ -3873,7 +3890,8 @@ var
   HashInstanceResultSHA256,
   HashInstanceResultSHA512,
   HashInstanceResultBlake2B,
-  HashInstanceResultBlake3  : IHashResult;
+  HashInstanceResultBlake3,
+  HashInstanceResultCRC32 : IHashResult;
 
   // HashLib4Pascal types for xxHash. xxHash64 is crazy fast on 64, but if run on a 32-bit
   // system, performance is hindered considerably. So for this algorithm, CPU dependant
@@ -3885,6 +3903,7 @@ var
   HashInstancexxHash32         : IHash;
   HashInstanceResultxxHash32   : IHashResult;
 {$endif}
+  crcstandard : TCRCStandard;
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
   TotalBytesRead_B, LoopCounter, IntFileSize : QWord;
@@ -4209,6 +4228,36 @@ begin
           HashInstanceResultBlake3 := HashInstanceBlake3.TransformFinal();
           result := HashInstanceResultBlake3.ToString()
           end; // End of Blake3
+
+       8: begin
+          crcstandard := TCRCStandard.CRC32;
+          HashInstanceCRC32 := THashFactory.TChecksum.TCRC.CreateCRC(crcstandard);
+          HashInstanceCRC32.Initialize();
+          repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceCRC32.TransformUntyped(Buffer, i);
+                // If the File tab is the tab doing the hashing, refresh the interface
+                if PageControl1.ActivePage = TabSheet2 then
+                  begin
+                  inc(TotalBytesRead_B, i);
+                  inc(LoopCounter, 1);
+                  if LoopCounter = 40 then
+                    begin
+                    pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                    lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
+                    LoopCounter := 0;
+                    Application.ProcessMessages;
+                    end;
+                  end;
+              end;
+            until false;
+          HashInstanceResultCRC32 := HashInstanceCRC32.TransformFinal();
+          result := HashInstanceResultCRC32.ToString();
+          end; // End of CRC32
     end; // end of case statement
   end // end of FileSize greater than zero byte check
   else
@@ -4590,6 +4639,10 @@ begin
 
       7: begin
       ShowMessage('Blake3 is not typically used in E01 images');
+      end;
+
+      8: begin
+      ShowMessage('CRC32 is certainly not typically used in E01 images');
       end;
   end; // Case radio group end
 end;

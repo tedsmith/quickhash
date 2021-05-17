@@ -234,7 +234,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
         Left = 16
-        Height = 190
+        Height = 206
         Hint = 'Easily recompute different hashes'#13#10'by choosing a different hash algorithm.'#13#10'Note SHA-3 and Blake2b are 256 bit mode. '
         Top = 10
         Width = 96
@@ -248,7 +248,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 168
+        ClientHeight = 184
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -261,6 +261,7 @@ object MainForm: TMainForm
           'xxHash'
           'Blake2B'
           'Blake3'
+          'CRC32'
         )
         OnClick = AlgorithmChoiceRadioBox1Click
         OnSelectionChanged = HashText
@@ -272,7 +273,7 @@ object MainForm: TMainForm
       object SystemRAMGroupBox: TGroupBox
         Left = 16
         Height = 81
-        Top = 208
+        Top = 224
         Width = 96
         Caption = 'System RAM'
         ClientHeight = 59
@@ -504,7 +505,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup
         Left = 16
-        Height = 190
+        Height = 206
         Top = 10
         Width = 96
         AutoFill = True
@@ -517,7 +518,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 168
+        ClientHeight = 184
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -530,6 +531,7 @@ object MainForm: TMainForm
           'xxHash'
           'Blake2B'
           'Blake3'
+          'CRC32'
         )
         OnClick = AlgorithmChoiceRadioBox2Click
         OnSelectionChanged = AlgorithmChoiceRadioBox2SelectionChanged
@@ -540,19 +542,19 @@ object MainForm: TMainForm
     object TabSheet3: TTabSheet
       Hint = 'Compute hashes for multiple files in a directory'#13#10'recursively, or just those in the root of the directory'
       Caption = 'FileS'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       ParentShowHint = False
       ShowHint = True
       object DirectoryHashingGroupBox: TGroupBox
         Left = 120
-        Height = 639
+        Height = 645
         Top = 10
-        Width = 855
+        Width = 857
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Hash all files in chosen directory - recursive by default'
-        ClientHeight = 617
-        ClientWidth = 851
+        ClientHeight = 623
+        ClientWidth = 853
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -591,7 +593,7 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'The chosen parent directory'
           Top = 160
-          Width = 820
+          Width = 822
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           TabOrder = 0
@@ -611,7 +613,7 @@ object MainForm: TMainForm
           Left = 520
           Height = 17
           Top = 56
-          Width = 231
+          Width = 233
           Anchors = [akTop, akLeft, akRight]
           Caption = '% Complete:'
           ParentColor = False
@@ -668,8 +670,8 @@ object MainForm: TMainForm
           AnchorSideRight.Side = asrBottom
           Left = 8
           Height = 23
-          Top = 574
-          Width = 843
+          Top = 580
+          Width = 845
           Align = alCustom
           Anchors = [akLeft, akRight]
           AutoSize = False
@@ -692,7 +694,7 @@ object MainForm: TMainForm
           Left = 686
           Height = 17
           Top = 56
-          Width = 165
+          Width = 167
           Anchors = [akTop, akLeft, akRight]
           Caption = '...'
           ParentColor = False
@@ -804,9 +806,9 @@ object MainForm: TMainForm
         end
         object RecursiveDisplayGrid1: TDBGrid
           Left = 8
-          Height = 358
+          Height = 364
           Top = 200
-          Width = 841
+          Width = 843
           Anchors = [akTop, akLeft, akRight, akBottom]
           Color = clWindow
           Columns = <>
@@ -876,7 +878,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox3: TRadioGroup
         Left = 16
-        Height = 190
+        Height = 206
         Top = 10
         Width = 96
         AutoFill = True
@@ -889,7 +891,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 168
+        ClientHeight = 184
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -902,6 +904,7 @@ object MainForm: TMainForm
           'xxHash'
           'Blake2B'
           'Blake3'
+          'CRC32'
         )
         OnClick = AlgorithmChoiceRadioBox3Click
         ParentFont = False
@@ -928,19 +931,19 @@ object MainForm: TMainForm
     object TabSheet4: TTabSheet
       Hint = 'Choose a directory, have its content hashed, files are copied to destination, and re-hashed.'
       Caption = '&Copy'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       ParentShowHint = False
       ShowHint = True
       object CopyFilesHashingGroupBox: TGroupBox
         Left = 120
         Height = 596
         Top = 10
-        Width = 841
+        Width = 843
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Hash files in chosen directory, copy them, and re-hash the copied files (recursive by default) '
         ClientHeight = 574
-        ClientWidth = 837
+        ClientWidth = 839
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -950,10 +953,10 @@ object MainForm: TMainForm
           Left = 8
           Height = 184
           Top = 8
-          Width = 828
+          Width = 830
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 184
-          ClientWidth = 828
+          ClientWidth = 830
           TabOrder = 3
           OnClick = Panel1CopyAndHashOptionsClick
           object CheckBoxListOfDirsOnly: TCheckBox
@@ -1112,7 +1115,7 @@ object MainForm: TMainForm
             AnchorSideTop.Control = pbCopy
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = pbCopy
-            Left = 393
+            Left = 394
             Height = 17
             Top = 159
             Width = 9
@@ -1237,7 +1240,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 23
           Top = 551
-          Width = 837
+          Width = 839
           Panels = <>
           ParentShowHint = False
         end
@@ -1314,7 +1317,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox4: TRadioGroup
         Left = 16
-        Height = 190
+        Height = 206
         Top = 10
         Width = 96
         AutoFill = True
@@ -1327,7 +1330,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 168
+        ClientHeight = 184
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1340,6 +1343,7 @@ object MainForm: TMainForm
           'xxHash'
           'Blake2B'
           'Blake3'
+          'CRC32'
         )
         OnClick = AlgorithmChoiceRadioBox4Click
         ParentFont = False
@@ -1358,11 +1362,11 @@ object MainForm: TMainForm
     end
     object TabSheet7: TTabSheet
       Caption = 'Compare Two Files'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       object AlgorithmChoiceRadioBox5: TRadioGroup
         Left = 16
-        Height = 190
+        Height = 206
         Top = 10
         Width = 96
         AutoFill = True
@@ -1375,7 +1379,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 168
+        ClientHeight = 184
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1388,6 +1392,7 @@ object MainForm: TMainForm
           'xxHash'
           'Blake2B'
           'Blake3'
+          'CRC32'
         )
         OnClick = AlgorithmChoiceRadioBox5Click
         OnSelectionChanged = AlgorithmChoiceRadioBox5SelectionChanged
@@ -1399,11 +1404,11 @@ object MainForm: TMainForm
         Left = 120
         Height = 296
         Top = 10
-        Width = 841
+        Width = 843
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Choose two files and click ''Compare Files'''
         ClientHeight = 274
-        ClientWidth = 837
+        ClientWidth = 839
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
@@ -1495,7 +1500,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 23
           Top = 251
-          Width = 837
+          Width = 839
           Panels = <>
         end
         object edtFileAName: TEdit
@@ -1503,7 +1508,7 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Path to the file you wish to analyse. '#13#10'Type or paste path here directly, '#13#10'or use the button to the left to select it'
           Top = 9
-          Width = 659
+          Width = 661
           Anchors = [akTop, akLeft, akRight]
           ParentShowHint = False
           ShowHint = True
@@ -1515,7 +1520,7 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Path to the second file you wish to analyse. '#13#10'Type or paste path here directly, '#13#10'or use the button to the left to select it'
           Top = 72
-          Width = 659
+          Width = 661
           Anchors = [akTop, akLeft, akRight]
           ParentShowHint = False
           ShowHint = True
@@ -1561,8 +1566,8 @@ object MainForm: TMainForm
     end
     object TabSheet6: TTabSheet
       Caption = 'Compare Two Folders'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       OnContextPopup = TabSheet6ContextPopup
       ParentShowHint = False
       object GroupBox2: TGroupBox
@@ -1572,12 +1577,12 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 120
         Height = 177
-        Top = 439
-        Width = 835
+        Top = 445
+        Width = 837
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Summary'
         ClientHeight = 155
-        ClientWidth = 831
+        ClientWidth = 833
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
@@ -1592,7 +1597,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox6: TRadioGroup
         Left = 16
-        Height = 190
+        Height = 206
         Top = 10
         Width = 96
         AutoFill = True
@@ -1605,7 +1610,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 168
+        ClientHeight = 184
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1618,6 +1623,7 @@ object MainForm: TMainForm
           'xxHash'
           'Blake2B'
           'Blake3'
+          'CRC32'
         )
         OnClick = AlgorithmChoiceRadioBox6Click
         ParentFont = False
@@ -1625,13 +1631,13 @@ object MainForm: TMainForm
       end
       object GroupBox1: TGroupBox
         Left = 120
-        Height = 408
+        Height = 414
         Top = 10
-        Width = 835
+        Width = 837
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Compare two folders'
-        ClientHeight = 386
-        ClientWidth = 831
+        ClientHeight = 392
+        ClientWidth = 833
         DragMode = dmAutomatic
         Font.Height = -13
         ParentFont = False
@@ -1715,8 +1721,8 @@ object MainForm: TMainForm
         object StatusBar6: TStatusBar
           Left = 8
           Height = 23
-          Top = 361
-          Width = 811
+          Top = 367
+          Width = 813
           Align = alNone
           Anchors = [akLeft, akRight]
           AutoSize = False
@@ -1934,11 +1940,11 @@ object MainForm: TMainForm
     end
     object TabSheet8: TTabSheet
       Caption = 'Base64 Data'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       object AlgorithmChoiceRadioBox7: TRadioGroup
         Left = 16
-        Height = 190
+        Height = 206
         Top = 10
         Width = 96
         AutoFill = True
@@ -1951,7 +1957,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 168
+        ClientHeight = 184
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1964,6 +1970,7 @@ object MainForm: TMainForm
           'xxHash'
           'Blake2B'
           'Blake3'
+          'CRC32'
         )
         OnClick = AlgorithmChoiceRadioBox7Click
         ParentFont = False
@@ -1973,11 +1980,11 @@ object MainForm: TMainForm
         Left = 120
         Height = 614
         Top = 10
-        Width = 849
+        Width = 851
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Base64 Decoder and Hasher'
         ClientHeight = 592
-        ClientWidth = 845
+        ClientWidth = 847
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -2017,7 +2024,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 136
           Top = 56
-          Width = 827
+          Width = 829
           Anchors = [akTop, akLeft, akRight]
           ColCount = 4
           Columns = <          
@@ -2043,7 +2050,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 224
           Top = 256
-          Width = 827
+          Width = 829
           Anchors = [akTop, akLeft, akRight]
           AutoAdvance = aaDown
           ColCount = 4
@@ -2070,38 +2077,38 @@ object MainForm: TMainForm
         end
         object b64ProgressFileS: TEdit
           Left = 184
-          Height = 28
+          Height = 25
           Hint = 'Progress of Base64 decoding of FileS will show here'
           Top = 216
-          Width = 639
+          Width = 641
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           TabOrder = 5
         end
         object b64DecoderProgress: TEdit
           Left = 184
-          Height = 28
+          Height = 25
           Hint = 'Progress of Base64 decoding of FileS will show here'
           Top = 512
-          Width = 639
+          Width = 641
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           TabOrder = 6
         end
         object lblB64DecoderWarning: TLabel
           Left = 16
-          Height = 32
+          Height = 34
           Top = 552
-          Width = 232
+          Width = 235
           Caption = '(Simply for creating decoded copies of '#13#10'encoded Base64 files. No hashing done)'
           ParentColor = False
           WordWrap = True
         end
         object lblB64Warning: TLabel
           Left = 200
-          Height = 32
+          Height = 34
           Top = 7
-          Width = 452
+          Width = 454
           Caption = 'Only minimal checks are conducted to check supplied data is Base64 encoded'#13#10'Ideally, ensure your source data is Base64 encoded to start with'
           ParentColor = False
         end
