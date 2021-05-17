@@ -4284,7 +4284,7 @@ begin
   else result := 'File could not be accessed.'
 end;
 
-// New to v3.3.0 as experimental new feature. Returns true if it looks like an
+// New to v3.3.0 as experimental new feature. Returns true if it looks like
 // an Expert Witness Format (EWF), aka E01 image
 function TMainForm.IsItE01(filename : string) : boolean;
 var
@@ -4295,17 +4295,23 @@ begin
   If (FileExt = '.E01') then
   begin
     result := true;
+    {$ifdef Darwin}
+      result := false;
+      ShowMessage('For now, EWF (E01) support is not available in Apple OSX.' + lineending
+      + ' Perhaps in the future, when its easier to compile source, it may be.' + lineending
+      + ' Hash of file segment will be computed only.');
+    {$endif}
   end;
   If (FileExt = '.e01') then
   begin
     result := true;
+    {$ifdef Darwin}
+      result := false;
+      ShowMessage('For now, EWF (E01) support is not available in Apple OSX.' + lineending
+      + ' Perhaps in the future, when its easier to compile source, it may be.' + lineending
+      + ' Hash of file segment will be computed only.');
+    {$endif}
   end;
-  {$ifdef Darwin}
-  result := false;
-  ShowMessage('For now, EWF (E01) support is not available in Apple OSX.' + lineending
-  + ' Perhaps in the future, when its easier to compile source, it may be.' + lineending
-  + ' Hash of file segment will be computed only.');
-  {$endif}
 end;
 
 // New to v3.3.0 as experimental new feature.
