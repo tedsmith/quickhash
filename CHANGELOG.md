@@ -4,7 +4,7 @@
 v3.3.0<br>
 Improvement : Monumentally large changes to "Compare Two Folders" processing, scrubbing away much of the earlier effort and restructuring it, with big thanks to an open-source co-developer who has helped me here. Key amongst them are that v3.3.0 addresses a bug where rows got mis-aligned if the file counts differed. The mis-match was still correctly reported in v3.2.0, and even if the file matches counted but the hashes differed, that was also still OK. But, the rows got out of sync if the file counts differed due to there being less files in one folder than the other and my use of the UPDATE SQL statement. Additional restructuring applied but note that C2F is really designed to check that two folders are a mirror image of each other, and it is supposed to help you confirm this is the case, rather than help you clean up your disk. If your aim is to use it as a file manager, then QH might not be the best option. Other tools like Beyond Compare might be better for your needs here. <br>
 That said, the ability now exists to compare files by name and hash value in both folders, and then the user can right click the results and see many other options too : <br>
-~ Restore Results view<br>
+~  Restore Results view<br>
 ~  Clipboard all rows<br>
 ~  Clipboard selected row<br>
 ~  Clipboard all selected rows (currently does it in reverse order for some reason)<br>
@@ -17,7 +17,7 @@ That said, the ability now exists to compare files by name and hash value in bot
 ~  Show missing files from Folder A or FolderB (new)<br>
 ~  Save as CSV file<br>
 ~  Save as HTML file<br>
-That is a whopping array of ways to conduct some analysis of two folders and is about as good as I think I can make it and is based on help from the community. If that still falls short, other tools are available. <br>
+That is a whopping array of ways to conduct some analysis of two folders and is about as good as I think I can make it and is based on help from the community. If that still falls short, other tools are available, or get stuck in yourself and help me. <br>
 Improvement : DB Rows were being counted (when required) using a slower method than I had realised. With v3.3.0, counts are now immediate by calling DBGrid.DataSource.DataSet.RecordCount; <br> 
 Improvement : Column headers added to CSV and HTML outputs (achieved by right clicking the display grid results throughout). I may have missed one but I think I have them all covered <br>
 Improvement : Removed the generation of a "QH_XXXXX" time stamp named parent folder in destination folder when copying as many users reported this was unhelpful.<br>
@@ -36,11 +36,11 @@ Fix : In the Text tab, the "Expected Hash" lookup was not applied for xxHash, wh
 Fix : In the File tab, the "Expected Hash" lookup was not applied for xxHash, which was missed before so if users pasted an expected xxHash value, it would not be looked up against the computed hash. That was fixed. <br>
 Fix : The disk hashing module showed the field for Blake after hashing, even if empty and not computed, and was not being hidden like the others. That was fixed.  <br>
 Fix : The disk hashing module reported "Windows 8" when conducted using "Windows 10". This was not actually wrong, but mis-leading, and is actually due to the Windows API being woeful in parts with regard to how the "number" and "name" of Windows are reported. So a new function created to speak to ntldr.dll directly so that now the major, minor, and build versions are all reported. </br>
-New : Ability to hash forensic images of the Expert Witness Format (EWF), also known as "E01 Images". Available for Windows and Linux for user who know what they are doing with regard to forensic images. It is not available for OSX, for now. Quickhash will conduct the hash and also report the embedded MD5 or SHA1 hash, if available, depending on the type of hash the user is performing. So if the E01 contains both MD5 and SHA1, but the user selects SHA1, then the embedded SHA1 hash will be reported as well as the computed SHA1 hash. More features will likely follow in future of this landmark addition to QuickHash GUI. <br> 
-New : CRC32 alogirthm added for Text, File, FileS, Compare Two Files, Compare Two Folders and Base64. Not added to disks, and not available for EWF (E01) image hashing. 
+New : Ability to hash forensic images of the Expert Witness Format (EWF), also known as "E01 Images". Available for Windows and Linux for users who know what they are doing with regard to forensic images. It is not available for OSX, for now. Quickhash will conduct the hash and also report the embedded MD5 or SHA1 hash, if available, placing it in the "Expected Hash" field automatically, depending on the type of hash the user is performing. So if the E01 contains both MD5 and SHA1, but the user selects SHA1, then the embedded SHA1 hash will be reported as well as the computed SHA1 hash, and the same theory for MD5. More features will likely follow in future of this landmark addition to QuickHash GUI. <br> 
+New : CRC32 algorithm added for Text, File, FileS, Compare Two Files, Compare Two Folders and Base64. Not added to disks, and not available for EWF (E01) image hashing. 
 New : Button added to enable the user to easily make a copy of the backend SQLite database at any given point in time, for convenience. This can help users who may wish to load it into specific database tools, like SQLite Explorer or browser extensions like SQLite Manager. <br>
 New : Logo replaced with the newer Quickash logo. <br>
-New : In some parts of QH, the user can now select their own delimiter character via a drop down menu, such as the tab character, hyphen and (heaven forbid) even the space char. If no character is chosen, a comma is assumed and used as before. <br>
+New : In some parts of QH where display grids of data are generated (FileS, Copy, Compare Two Folders), the user can now select their own delimiter character via a drop down menu, such as the tab character, hyphen and (heaven forbid) even the space char. If no character is chosen, a comma is assumed and used as before. <br>
 New : The user can now use the About menu to establish the version of SQLite that is being used by QuickHash. <br>
 Code : Adjusted variable naming in the "ProcessDir" function relating to source and destination folders because it was so confusing I did not even understand it several years after first writing it. <br>
 Code : More effort made to initialise variables <br>
