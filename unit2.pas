@@ -217,6 +217,7 @@ type
     FileSDBNavigator                      : TDBNavigator;
     CopyDelimiterComboBox: TComboBox;
     MenuItem7: TMenuItem;
+    TaskDialog1_E01Images: TTaskDialog;
     TextLBLDelimiterComboBox: TComboBox;
     lblTotalFileCountNumberA              : TLabel;
     lblTotalFileCountA                    : TLabel;
@@ -969,6 +970,11 @@ begin
   lblFileTimeTaken.Caption := '...';
   memFileHashField.Clear;
 
+  // Ensure when the user drag n drops a file, the "File" tab becomes active.
+  // Since v3.3.0 this is additionally important to ensure that E01 files,
+  // and the actions needed to check for them, are not triggered when the "FileS"
+  // tab is active, because we dont want users being paused after selecting a folder
+  // just because there happens to be one or more E01 files in it.
   tabsheet2.Visible:= true;
   tabsheet2.Show;
 
@@ -998,29 +1004,41 @@ begin
       IsFileE01 := IsItE01(Filename);
       if IsFileE01 = true then
       begin
-      if (MessageDlg('BIG CAUTION HERE!', 'You are about to compute the INTERNAL hash of a ' + lineending
-               + 'forensic E01 image, not the hash of a single file. Proceed  '        + lineending
-               + 'only if you understand what this means! Or if '                      + lineending
-               + 'you actually want to compute the file hashes of each E01 '           + lineending
-               + 'segment, use the FileS tab instead. Also, this is an experimental '  + lineending
-               + 'new feature added in v3.3.0.', mtConfirmation,
-        [mbNo, mbYes],0) = mrYes) then
+        TaskDialog1_E01Images.Text:='Do you want to compute the INTERNAL hash of a ' + lineending
+                       + 'forensic E01 image, or the hash of a single segment? Proceed  '        + lineending
+                       + 'only if you understand what this means! Also, this is '  + lineending
+                       + 'an experimental new feature, added in v3.3.0.';
+        TaskDialog1_E01Images.Execute;
+        if TaskDialog1_E01Images.ModalResult = mrOK then
         begin
-          E01HashData := CalcTheHashE01File(Filename);
-          fileHashValue := E01HashData.ComputedHash;
-          memFileHashField.Lines.Add(UpperCase(fileHashValue));
-          Application.ProcessMessages;
-          if Length(E01HashData.ExistingHash) > 0 then
-          lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
+          if TaskDialog1_E01Images.RadioButton.Index = 0 then
+          begin
+             E01HashData := CalcTheHashE01File(Filename);
+             fileHashValue := E01HashData.ComputedHash;
+             memFileHashField.Lines.Add(UpperCase(fileHashValue));
+             StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
+             Application.ProcessMessages;
+             if Length(E01HashData.ExistingHash) > 0 then
+             lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
+           end  // End of E01 full image hashing
+          else
+          if TaskDialog1_E01Images.RadioButton.Index = 1 then
+          begin  // User wants do just the segment of the E01 so hash as normal
+            fileHashValue := CalcTheHashFile(Filename);
+            memFileHashField.Lines.Add(UpperCase(fileHashValue));
+          end; // End of E01 segment hashing
+        end  // End of TTaskDialog warning message
+        else
+        begin
+          StatusBar1.SimpleText := 'E01 selection cancelled or aborted.';
         end;
-      end
-      else
-      begin  // The file is not an E01, so hash as normal
-        fileHashValue := CalcTheHashFile(Filename);
-        memFileHashField.Lines.Add(UpperCase(fileHashValue));
-      end;
-
+      end  // End of Is E01
+    else
+    begin  // The file is not an E01, so hash as normal
+      fileHashValue := CalcTheHashFile(Filename);
+      memFileHashField.Lines.Add(UpperCase(fileHashValue));
       StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
+    end;
 
       OpenDialog1.Close;
 
@@ -1031,7 +1049,7 @@ begin
       lblFileTimeTaken.Caption := 'Time taken : '+ TimeToStr(elapsed);
       Application.ProcessMessages;
 
-      // If the user has an existing hash to check, compare it here
+      // If the user has an existing hash to check, compare it here, but not if it is an E01 file
       if IsFileE01 = false then
       begin
       if (lbleExpectedHash.Text = '') then exit
@@ -1155,32 +1173,50 @@ begin
         edtFileNameToBeHashed.Caption := (filename);
         StatusBar1.SimpleText := ' H A S H I N G  F I L E...P L E A S E  W A I T';
         Application.ProcessMessages;
-        IsFileE01 := IsItE01(filename);
-        if IsFileE01 = true then  // The file is an E01, so call modified hash routine
-          begin
-            if (MessageDlg('BIG CAUTION HERE!', 'You are about to compute the INTERNAL hash of a ' + lineending
-                           + 'forensic E01 image, not the hash of a single file. Proceed  '        + lineending
-                           + 'only if you understand what this means! Or if '                      + lineending
-                           + 'you actually want to compute the file hashes of each E01 '           + lineending
-                           + 'segment, use the FileS tab instead. Also, this is an experimental '  + lineending
-                           + 'new feature added in v3.3.0.', mtConfirmation,
-             [mbNo, mbYes],0) = mrYes) then
-             begin
-               E01HashData := CalcTheHashE01File(Filename);
-               fileHashValue := E01HashData.ComputedHash;
-               memFileHashField.Lines.Add(UpperCase(fileHashValue));
-               Application.ProcessMessages;
-               if Length(E01HashData.ExistingHash) > 0 then
-               lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
-             end;
-          end
-        else
-        begin  // The file is not an E01, so hash as normal
-          fileHashValue := CalcTheHashFile(Filename);
-          memFileHashField.Lines.Add(UpperCase(fileHashValue));
-        end;
-
-        StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
+        // Only if the File tab is being used, do the E01 checking. We dont want
+        // it checking E01 files that may exist in a folder with loads of other files
+        // when the user is using the FileS tab (Tabsheet3)
+        if PageControl1.ActivePage = TabSheet2 then
+        begin
+          IsFileE01 := IsItE01(filename);
+          if IsFileE01 = true then  // The file is an E01, so call modified hash routine
+            begin
+              TaskDialog1_E01Images.Text:='Do you want to compute the INTERNAL hash of a ' + lineending
+                             + 'forensic E01 image, or the hash of a single segment? Proceed  '        + lineending
+                             + 'only if you understand what this means! Also, this is '  + lineending
+                             + 'an experimental new feature, added in v3.3.0.';
+              TaskDialog1_E01Images.Execute;
+              if TaskDialog1_E01Images.ModalResult = mrOK then
+              begin
+                if TaskDialog1_E01Images.RadioButton.Index = 0 then
+                begin
+                   E01HashData := CalcTheHashE01File(Filename);
+                   fileHashValue := E01HashData.ComputedHash;
+                   memFileHashField.Lines.Add(UpperCase(fileHashValue));
+                   StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
+                   Application.ProcessMessages;
+                   if Length(E01HashData.ExistingHash) > 0 then
+                   lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
+                 end  // End of E01 full image hashing
+                else
+                if TaskDialog1_E01Images.RadioButton.Index = 1 then
+                begin  // User wants do just the segment of the E01 so hash as normal
+                  fileHashValue := CalcTheHashFile(Filename);
+                  memFileHashField.Lines.Add(UpperCase(fileHashValue));
+                end; // End of E01 segment hashing
+              end  // End of TTaskDialog warning message
+              else
+              begin
+                StatusBar1.SimpleText := 'E01 selection cancelled or aborted.';
+              end;
+            end  // End of Is E01
+          else
+          begin  // The file is not an E01, so hash as normal
+            fileHashValue := CalcTheHashFile(Filename);
+            memFileHashField.Lines.Add(UpperCase(fileHashValue));
+            StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
+          end;
+        end;  // end of PageControl1.ActivePage = TabSheet2 check.
 
         OpenDialog1.Close;
         stop := Now;
@@ -4490,6 +4526,7 @@ begin
 
         // Release the EWF File Handle now that it is verified
         StatusBar1.Caption := 'Closing handles and releasing memory. Please wait...';
+        Application.ProcessMessages;
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
         end;  // MD5 End
@@ -4551,6 +4588,8 @@ begin
 
         // Release the EWF File Handle now that it is verified
         StatusBar1.Caption := 'Closing handles and releasing memory. Please wait...';
+        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        Application.ProcessMessages;
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
         if CurrSHA1HashValResult = 1 then
@@ -4603,7 +4642,10 @@ begin
            else result.ComputedHash := 'SHA-3 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
-        fLibEWFVerificationInstance.libewf_close();
+        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        Application.ProcessMessages;
+        libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
+        if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
         end;  // SHA-3 End
 
       3: begin
@@ -4650,7 +4692,10 @@ begin
           else result.ComputedHash := 'SHA256 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
-        fLibEWFVerificationInstance.libewf_close();
+        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        Application.ProcessMessages;
+        libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
+        if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
         end;  // SHA-256 End
 
       4: begin
@@ -4697,7 +4742,10 @@ begin
           else result.ComputedHash := 'SHA512 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
-        fLibEWFVerificationInstance.libewf_close();
+        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        Application.ProcessMessages;
+        libewfCloseResult   := fLibEWFVerificationInstance.libewf_close();
+        if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
         end;  // SHA-512 End
 
       5: begin
