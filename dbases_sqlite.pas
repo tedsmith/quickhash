@@ -624,6 +624,7 @@ var
   FileNameCell   : string = Default(string);
   FilePathCell   : string = Default(string);
   FileHashCell   : string = Default(string);
+  FileSizeCell   : string = Default(string);
   NoOfRowsInGrid : integer;
   sl             : TStringList;
   fs             : TFileStreamUTF8;
@@ -648,7 +649,7 @@ begin
   if DBGrid.Name = 'RecursiveDisplayGrid1' then
     begin
       NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
-      if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
+      if (NoOfRowsInGrid < 20000) and (NoOfRowsInGrid > -1) then
       try
         MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
         Application.ProcessMessages;
@@ -659,20 +660,24 @@ begin
         sl.add('<BODY>');
         sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
         sl.add('<TABLE>');
+        sl.add('<TR><TD>Filename</TD><TD>Filepath</TD><TD>Filehash</TD><TD>Filesize</TD></TR>');
         DBGrid.DataSource.DataSet.DisableControls;
         DBGrid.DataSource.DataSet.First;
         while not DBGrid.DataSource.DataSet.EOF do
           begin
             sl.add('<tr>');
-            // Get the data from the filename cell that the user has selected
+            // Get the data from the filename cell
             FileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
             sl.add('<td>'+FileNameCell+'</td>');
-            // Get the data from the filepath cell that the user has selected
+            // Get the data from the filepath cell
             FilePathCell := DBGrid.DataSource.DataSet.Fields[2].AsString;
             sl.add('<td>'+FilePathCell+'</td>');
-            // Get the data from the filehash cell that the user has selected
+            // Get the data from the filehash cell
             FileHashCell := DBGrid.DataSource.DataSet.Fields[3].AsString;
             sl.add('<td>'+FileHashCell+'</td>');
+            // Get the data from the filesize cell
+            FileSizeCell := DBGrid.DataSource.DataSet.Fields[4].AsString;
+            sl.add('<td>'+FileSizeCell+'</td>');
             sl.add('</tr>');
             DBGrid.DataSource.DataSet.Next;
           end;
@@ -1143,7 +1148,7 @@ begin
       CSVClipboardList := TStringListUTF8.Create;
       CSVClipboardList.Add('Filename'  + ChosenDelimiter + 'FilePath' + ChosenDelimiter +
                         'HashValue' + ChosenDelimiter + 'FileSize' + ChosenDelimiter +
-                        'KnownHashFlag' + LineEnding);
+                        'KnownHashFlag');
 
       if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
           else KnownHashFlagIsSet := false;
@@ -1168,7 +1173,7 @@ begin
             CSVClipboardList.Add(DBGrid.DataSource.DataSet.Fields[1].Text + ChosenDelimiter+
                            DBGrid.DataSource.DataSet.Fields[2].Text + ChosenDelimiter+
                            DBGrid.DataSource.DataSet.Fields[3].Text + ChosenDelimiter+
-                           DBGrid.DataSource.DataSet.Fields[4].Text + LineEnding);
+                           DBGrid.DataSource.DataSet.Fields[4].Text);
             end;
           DBGrid.DataSource.Dataset.Next;
         end;
