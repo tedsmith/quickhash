@@ -122,7 +122,12 @@ implementation
 // If it cant be found, QH will run with some tabs, but not those that need SQLIte backend
 procedure TfrmSQLiteDBases.FormCreate(Sender: TObject);
 const
-  LIB_FOLDER : ansistring = 'libs';
+  {$ifdef CPU32}
+  LIB_FOLDER : ansistring = 'libs\x86';
+  {$else ifdef CPU64}
+  LIB_FOLDER : ansistring = 'libs\x64';
+  {$endif}
+//  LIB_FOLDER : ansistring = 'libs';
 var
   guid                  : TGuid;
   SQLiteLibraryPath     : string = Default(string);

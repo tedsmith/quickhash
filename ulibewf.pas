@@ -351,7 +351,11 @@ end;
   */}
 constructor TLibEWF.create();
 const
-  LIB_FOLDER : ansistring = 'libs';
+  {$ifdef CPU32}
+  LIB_FOLDER : ansistring = 'libs\x86';
+  {$else ifdef CPU64}
+  LIB_FOLDER : ansistring = 'libs\x64';
+  {$endif}
 var
   libFileName              : ansistring = Default(ansistring);
   cvtString                : string     = Default(string);

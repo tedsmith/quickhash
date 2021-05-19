@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -2285,9 +2285,13 @@ object MainForm: TMainForm
         Caption = 'About QuickHash'
         OnClick = MenuItem2AClick
       end
-      object MenuItem7: TMenuItem
+      object MenuItem2B: TMenuItem
         Caption = 'SQLite Version'
-        OnClick = MenuItem7Click
+        OnClick = MenuItem2BClick
+      end
+      object MenuItem2C: TMenuItem
+        Caption = 'Check Environment'
+        OnClick = MenuItem2CClick
       end
     end
   end
@@ -2459,5 +2463,20 @@ object MainForm: TMainForm
       end>
     Left = 32
     Top = 304
+  end
+  object TaskDialog2_CRC32: TTaskDialog
+    Buttons = <>
+    Caption = 'Rename files with CRC inserted?'
+    FooterIcon = tdiQuestion
+    MainIcon = tdiQuestion
+    RadioButtons = <    
+      item
+        Caption = 'Just compute hashes. No renaming'
+      end    
+      item
+        Caption = 'Compute hashes and rename'
+      end>
+    Left = 32
+    Top = 264
   end
 end

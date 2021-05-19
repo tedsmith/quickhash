@@ -1,0 +1,30 @@
+object frmEnvironmentCheck: TfrmEnvironmentCheck
+  Left = 404
+  Height = 413
+  Top = 266
+  Width = 769
+  Caption = 'QuickHash-GUI Environment Checker'
+  ClientHeight = 413
+  ClientWidth = 769
+  OnCreate = FormCreate
+  Position = poDesktopCenter
+  LCLVersion = '2.0.12.0'
+  object memEnvList: TMemo
+    Left = 16
+    Height = 351
+    Top = 48
+    Width = 738
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+  object btnCheckNow: TButton
+    Left = 16
+    Height = 25
+    Top = 8
+    Width = 115
+    Caption = 'Check Now..'
+    OnClick = btnCheckNowClick
+    TabOrder = 1
+  end
+end

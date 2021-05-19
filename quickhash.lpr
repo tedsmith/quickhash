@@ -82,7 +82,7 @@ uses
   //FindAllFilesEnhanced, uKnownHashLists,
   Forms, lazdbexport, uDisplayGrid, udisplaygrid3, Unit2, dbases_sqlite,
   frmAboutUnit, zvdatetimectrls, diskmodule, diskspecification, uProgress,
-  uLibEWF;
+  uLibEWF, uEnvironmentChecker;
 
 {$R *.res}
 
@@ -91,6 +91,7 @@ begin
   Application.Title:='Quickhash-GUI';
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TfrmEnvironmentCheck,frmEnvironmentCheck);
   Application.CreateForm(TfrmDisplayGrid1, frmDisplayGrid1);
   Application.CreateForm(TfrmDisplayGrid3, frmDisplayGrid3);
   Application.CreateForm(TfrmAbout, frmAbout);
@@ -107,6 +108,7 @@ begin
   {$IFDEF UNIX and !$ifdef Darwin}
   {$ENDIF}
   {$ENDIF}
+  Application.CreateForm(TfrmEnvironmentCheck, frmEnvironmentCheck);
   Application.Run;
 end.
 

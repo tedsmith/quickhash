@@ -114,6 +114,8 @@ uses
   dbases_sqlite, uDisplayGrid,
   // New as of v3.2.0
   udisplaygrid3,
+  // New to v3.3.0 for Environment Checker
+  uEnvironmentChecker,
   // New to v3.3.0 as experimental new feature.
   uLibEWF,
 
@@ -216,7 +218,9 @@ type
     edtUNCPathCompareB                    : TEdit;
     FileSDBNavigator                      : TDBNavigator;
     CopyDelimiterComboBox: TComboBox;
-    MenuItem7: TMenuItem;
+    MenuItem2B: TMenuItem;
+    MenuItem2C: TMenuItem;
+    TaskDialog2_CRC32: TTaskDialog;
     TaskDialog1_E01Images: TTaskDialog;
     TextLBLDelimiterComboBox: TComboBox;
     lblTotalFileCountNumberA              : TLabel;
@@ -449,11 +453,12 @@ type
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2AClick(Sender: TObject);
     procedure MenuItem1CClick(Sender: TObject);
+    procedure MenuItem2CClick(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
-    procedure MenuItem7Click(Sender: TObject);
+    procedure MenuItem2BClick(Sender: TObject);
     procedure MenuItem_CopyAllHashesToClipboardFILESClick(Sender: TObject);
     procedure MenuItem_DeleteDupsClick(Sender: TObject);
     procedure MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
@@ -535,8 +540,11 @@ type
     function ValidateTextWithHash(strToBeHashed:ansistring): string;
     function CalcTheHashString(strToBeHashed:ansistring):string;
     function CalcTheHashFile(FileToBeHashed:string):string;
-    function CalcTheHashE01File(FileToBeHashed:string) : E01HashInfo;  // New to v3.3.0 as experimental new feature.
-    function IsItE01(filename : string) : boolean;                // New to v3.3.0 as experimental new feature.
+    function CalcTheHashE01File(FileToBeHashed:string) : E01HashInfo;                // New to v3.3.0 as experimental new feature.
+    function IsItE01(filename : string) : boolean;                                   // New to v3.3.0 as experimental new feature.
+    function GetCRCRenamingChoice() : boolean;                                       // New to v3.3.0 for CRC32
+    function RenameFileWithCRCHash(OldFileName : string; HashVal : string) : string; // New to v3.3.0 for CRC32
+    function WriteFilenameWithCRCHash(OldFileName : string; NewFileName : string) : boolean;
     function FormatByteSize(const bytes: QWord): string;
     function RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
     function RetrieveFileList(FolderName : string) : TStringList;
@@ -574,17 +582,16 @@ type
    CommitFrequencyChecker, tmp : integer;   // To keep track of SQLite commits
    TotalBytesRead              : UInt64;
    StopScan1, StopScan2, SourceDirValid, DestDirValid : Boolean;
-   SourceDir, DestDir : string;             // For the joint copy and hash routines
+   SourceDir, DestDir : string;   // For the joint copy and hash routines
 
-   DirA, DirB : string;
-   sValue1 : string;                        // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
-
+   DirA, DirB         : string;
+   sValue1            : string;   // Set by GetWin32_DiskDriveInfo then used by ListDisks OnClick event - Windows only
+   ChosenDelimiter    : string;   // New to v3.3.0 for enabling user to set their own delimiter
    slMultipleDirNames             : TStringList;
    fsSaveFolderComparisonsLogFile : TFileStream;
 
    MultipleDirsChosen, StartHashing : boolean;
-
-   ChosenDelimiter : string;                // New to v3.3.0 for enabling user to set their own delimiter
+   RenameFilesWithCRCHashOrNot      : Boolean; // New to v3.3.0 to enable renaming of files hashed with CRC32
 
    {$IFDEF WINDOWS}
    // For copying better with 255 MAX_PATH limits of Windows. Instead we invoke Unicode
@@ -646,7 +653,8 @@ function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; extern
 {$ENDIF}
 
 { TMainForm }
-
+// The main QH form. On creation, enable or disable various features
+// depending on the OS, or CPU architecture, or both
 procedure TMainForm.FormCreate(Sender: TObject);
 var
   x, y : integer;
@@ -677,13 +685,21 @@ begin
   StopScan1    := false;
   StopScan2    := false;
 
+  {$ifdef Linux}
+  MenuItem2C.Enabled:= false;  // Disable environment check via About menu for Linux
+  {$endif}
+
+  {$ifdef Darwin}
+  MenuItem2C.Enabled:= false;  // Disable environment check via About menu for OSX
+  {$endif}
+
   {$ifdef Windows}
   // These are the default values to be prefixed before a path to invoke longer
   // NTFS filename length over the 260 MAX_PATH. Where the user opts for UNC paths
   // as well, it becomes '\\?\UNC\'
   LongPathOverride := '\\?\';
-
   {$endif}
+
   // In Lazarus versions  < 1.4.4, the 'FileSortType' property of ShellTreeViews
   // would cause the listing to be doubled if anything other than fstNone was chosen
   // So this will ensure I have sorting until that is fixed.
@@ -713,20 +729,20 @@ begin
   {$endif}
 
   {$IFDEF WINDOWS}
-    Label8.Caption            := '';
-    chkCopyHidden.Enabled     := false;
-    chkCopyHidden.ShowHint    := true;
-    chkCopyHidden.Hint        := 'On Windows, QuickHash finds hidden files and folders by default';
+    Label8.Caption               := '';
+    chkCopyHidden.Enabled        := false;
+    chkCopyHidden.ShowHint       := true;
+    chkCopyHidden.Hint           := 'On Windows, QuickHash finds hidden files and folders by default';
 
     // Remove the advice about using the File tab for hashing files.
-    Label6.Caption            := '';
-    SystemRAMGroupBox.Visible := true;
-    sysRAMTimer.enabled       := true;
-    lblRAM.Caption            := GetSystemMem;
-    Edit2SourcePath.Enabled   :=true;
-    Edit2SourcePath.Visible   :=true;
-    Edit3DestinationPath.Enabled:=true;
-    Edit3DestinationPath.Visible:=true;
+    Label6.Caption               := '';
+    SystemRAMGroupBox.Visible    := true;
+    sysRAMTimer.enabled          := true;
+    lblRAM.Caption               := GetSystemMem;
+    Edit2SourcePath.Enabled      := true;
+    Edit2SourcePath.Visible      := true;
+    Edit3DestinationPath.Enabled := true;
+    Edit3DestinationPath.Visible := true;
   {$ENDIF}
 
   {$IFDEF Windows}
@@ -1765,6 +1781,15 @@ begin
   MainForm.Close;
 end;
 
+// New to v3.3.0. Launches frmEnvironmentCheck form
+procedure TMainForm.MenuItem2CClick(Sender: TObject);
+begin
+  // Only for Windows platforms
+  {$ifdef Windows}
+  frmEnvironmentCheck.Visible:= true;
+  {$endif}
+end;
+
 procedure TMainForm.MenuItem3Click(Sender: TObject);
 begin
   b64StringGrid2FileS.CopyToClipboard(false);
@@ -1799,7 +1824,7 @@ begin
 end;
 
 // Show the user the version of SQLite in use via the About menu
-procedure TMainForm.MenuItem7Click(Sender: TObject);
+procedure TMainForm.MenuItem2BClick(Sender: TObject);
 var
   strDBVersion : string = Default(string);
 begin
@@ -2531,6 +2556,20 @@ var
       end;
       {$endif}
 
+      // Added with v3.3.0. If the user has chosen CRC32, ask if the files
+      // should just be hashed, or also renamed with the hash at the same time
+      if AlgorithmChoiceRadioBox3.ItemIndex = 8 then
+      begin
+        // If true, rename files. Otherwise just hash. If dialog cancelled, exit loop
+        RenameFilesWithCRCHashOrNot := false;
+        RenameFilesWithCRCHashOrNot := GetCRCRenamingChoice;
+        if TaskDialog2_CRC32.ModalResult = mrCancel then
+        begin
+          StatusBar2.SimpleText := 'CRCR32 hashing cancelled by user.';
+          exit;
+        end;
+      end;
+
       RecursiveDisplayGrid1.Visible := false;
       RecursiveDisplayGrid1.Clear;
       // If a scheduler has been set, wait for that future time to arrive
@@ -2539,121 +2578,121 @@ var
         InvokeScheduler(self);
       end;
 
-       // Now lets recursively count each file,
-       start := Now;
-       lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('YY/MM/DD HH:MM:SS', Start);
-       StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
-       Label5.Visible        := true;
+      // Now lets recursively count each file,
+      start := Now;
+      lblTimeTaken3.Caption := 'Started: '+ FormatDateTime('YY/MM/DD HH:MM:SS', Start);
+      StatusBar2.SimpleText := ' C O U N T I N G  F I L E S...P L E A S E  W A I T   A   M O M E N T ...';
+      Label5.Visible        := true;
 
-       Application.ProcessMessages;
+      Application.ProcessMessages;
 
-       // If the user has a filemask enabled, we need to ensure our filecount figures
-       // take account of only files that match the mask.
+      // If the user has a filemask enabled, we need to ensure our filecount figures
+      // take account of only files that match the mask.
 
-       if FileTypeMaskCheckBox2.Checked then
+      if FileTypeMaskCheckBox2.Checked then
+      begin
+       FileMask := FileMaskField2.Text;
+      end
+      else FileMask := '*';
+
+      // By default, the recursive dir hashing will hash all files of all sub-dirs
+      // from the root of the chosen dir. If the box is ticked, the user just wants
+      // to hash the files in the root of the chosen dir.
+
+      if chkRecursiveDirOverride.Checked then   // User does NOT want recursive
+        begin
+         if chkHiddenFiles.Checked then         // ...but does want hidden files
+           begin
+             TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, FileMask, False, True);
+           end
+         else                                  // User does not want hidden
+           begin
+             TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, FileMask, False);
+           end;
+        end
+      else
+        begin                                  // User DOES want recursive
+          if chkHiddenFiles.Checked then       // ...and he wants hidden
+            begin
+              TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, FileMask, true, true);
+            end
+          else                                 // ...but not want hidden
+            begin
+              TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, FileMask, true);
+            end;
+        end;
+
+    lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
+    NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
+    //RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
+    Application.ProcessMessages;
+
+    // Create and assign a File Searcher instance and dictate its behaviour.
+    // Then hash each file accordingly.
+    try
+     FS := TFileSearcher.Create;
+
+     // Set parameters for searching for hidden or non-hidden files and dirs
+     // and (since v2.6.4) with a mask, or not
+     if chkHiddenFiles.Checked then
        begin
-         FileMask := FileMaskField2.Text;
+         if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
+         FS.DirectoryAttribute := faAnyFile or faHidden;
+         FS.FileAttribute := faAnyFile or faHidden;
+         FS.OnFileFound := @HashFile;
        end
-       else FileMask := '*';
-
-       // By default, the recursive dir hashing will hash all files of all sub-dirs
-       // from the root of the chosen dir. If the box is ticked, the user just wants
-       // to hash the files in the root of the chosen dir.
-
-       if chkRecursiveDirOverride.Checked then   // User does NOT want recursive
-         begin
-           if chkHiddenFiles.Checked then        // ...but does want hidden files
-             begin
-               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, FileMask, False, True);
-             end
-           else                                  // User does not want hidden
-             begin
-               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, FileMask, False);
-             end;
-         end
-       else
-         begin                                  // User DOES want recursive
-           if chkHiddenFiles.Checked then         // ...and he wants hidden
-             begin
-               TotalFilesToExamine := FindAllFilesEx(LongPathOverride+DirToHash, FileMask, true, true);
-             end
-           else                                  // ...but not want hidden
-             begin
-               TotalFilesToExamine := FindAllFiles(LongPathOverride+DirToHash, FileMask, true);
-             end;
-         end;
-
-       lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
-       NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
-       //RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
-       Application.ProcessMessages;
-
-       // Create and assign a File Searcher instance and dictate its behaviour.
-       // Then hash each file accordingly.
-       try
-         FS := TFileSearcher.Create;
-
-         // Set parameters for searching for hidden or non-hidden files and dirs
-         // and (since v2.6.4) with a mask, or not
-         if chkHiddenFiles.Checked then
-           begin
-             if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
-             FS.DirectoryAttribute := faAnyFile or faHidden;
-             FS.FileAttribute := faAnyFile or faHidden;
-             FS.OnFileFound := @HashFile;
-           end
-         else
-           begin
-             if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
-             FS.FileAttribute := faAnyFile;
-             FS.OnFileFound := @HashFile;
-           end;
-
-         // Set parameters for searching recursivley or not, and (since v2.6.4)
-         // with a mask, or not
-         if chkRecursiveDirOverride.Checked then
-           begin
-             if FileTypeMaskCheckBox2.Checked then
-               begin
-                 SearchMask := FileMask;
-               end
-               else SearchMask := '';
-             FS.Search(LongPathOverride+DirToHash, SearchMask, False, False);
-           end
-         else
-           begin
-             if FileTypeMaskCheckBox2.Checked then
-               begin
-                 SearchMask := FileMask;
-               end
-               else SearchMask := '';
-             FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
-           end;
-       finally
-         // Hashing complete. Now free resources
-         FS.Free;
-         TotalFilesToExamine.Free;
-       end;
-
-       // Now that the data is all computed, display the grid in the GUI.
-       // Update the SQLite database with any remaining commits and display
-       // content in DBGrid
-       frmSQLiteDBases.SQLTransaction1.CommitRetaining;
-       frmSQLiteDBases.UpdateGridFILES(nil);
-       RecursiveDisplayGrid1.Visible := true;
-
-       // and conclude timings and update display
-       stop := Now;
-       elapsed := stop - start;
-       lblTimeTaken4.Caption := 'Time taken : '+ FormatDateTime('HH:MM:SS', elapsed);
-       StatusBar2.SimpleText := ' DONE! ';
-       btnClipboardResults.Enabled := true;
-
-       // If user has imported an existing hash list, check new results against it
-       if cbLoadHashList.Checked then
+     else
        begin
-         StatusBar2.SimpleText:= 'See rightmost column for hashset correlations. ' + IntToStr(CountHashesInKnownList) + ' unique hashes are in the imported hash list';
+         if FileTypeMaskCheckBox2.Checked then FS.MaskSeparator:= ';';
+         FS.FileAttribute := faAnyFile;
+         FS.OnFileFound := @HashFile;
        end;
+
+     // Set parameters for searching recursivley or not, and (since v2.6.4)
+     // with a mask, or not
+     if chkRecursiveDirOverride.Checked then
+       begin
+         if FileTypeMaskCheckBox2.Checked then
+           begin
+             SearchMask := FileMask;
+           end
+           else SearchMask := '';
+         FS.Search(LongPathOverride+DirToHash, SearchMask, False, False);
+       end
+     else
+       begin
+         if FileTypeMaskCheckBox2.Checked then
+           begin
+             SearchMask := FileMask;
+           end
+           else SearchMask := '';
+         FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
+       end;
+    finally
+     // Hashing complete. Now free resources
+     FS.Free;
+     TotalFilesToExamine.Free;
+    end;
+
+    // Now that the data is all computed, display the grid in the GUI.
+    // Update the SQLite database with any remaining commits and display
+    // content in DBGrid
+    frmSQLiteDBases.SQLTransaction1.CommitRetaining;
+    frmSQLiteDBases.UpdateGridFILES(nil);
+    RecursiveDisplayGrid1.Visible := true;
+
+    // and conclude timings and update display
+    stop := Now;
+    elapsed := stop - start;
+    lblTimeTaken4.Caption := 'Time taken : '+ FormatDateTime('HH:MM:SS', elapsed);
+    StatusBar2.SimpleText := ' DONE! ';
+    btnClipboardResults.Enabled := true;
+
+    // If user has imported an existing hash list, check new results against it
+    if cbLoadHashList.Checked then
+    begin
+     StatusBar2.SimpleText:= 'See rightmost column for hashset correlations. ' + IntToStr(CountHashesInKnownList) + ' unique hashes are in the imported hash list';
+    end;
   end; // end of SelectDirectoryDialog1.Execute
 end;
 
@@ -4525,7 +4564,7 @@ begin
         end; // libewf_open End
 
         // Release the EWF File Handle now that it is verified
-        StatusBar1.Caption := 'Closing handles and releasing memory. Please wait...';
+        StatusBar1.SimpleText := 'Closing handles and releasing memory. Please wait...';
         Application.ProcessMessages;
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
@@ -4587,8 +4626,7 @@ begin
         end;  // libewf_open End
 
         // Release the EWF File Handle now that it is verified
-        StatusBar1.Caption := 'Closing handles and releasing memory. Please wait...';
-        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        StatusBar1.SimpleText := 'Closing handles and releasing memory. Please wait...';
         Application.ProcessMessages;
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
@@ -4642,7 +4680,7 @@ begin
            else result.ComputedHash := 'SHA-3 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
-        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        StatusBar1.SimpleText := 'Closing handles and releasing memory. May take a while. Please wait..';
         Application.ProcessMessages;
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
@@ -4692,7 +4730,7 @@ begin
           else result.ComputedHash := 'SHA256 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
-        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        StatusBar1.SimpleText := 'Closing handles and releasing memory. Please wait...';
         Application.ProcessMessages;
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
@@ -4742,7 +4780,7 @@ begin
           else result.ComputedHash := 'SHA512 hash computation failed!';
         end; // libewf_open End
         // Release the EWF File Handle now that it is verified
-        StatusBar1.SimpleText := 'Closing E01 handles and freeing memory. May take a while. Please wait..';
+        StatusBar1.SimpleText := 'Closing handles and releasing memory. Please wait...';
         Application.ProcessMessages;
         libewfCloseResult   := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
@@ -4766,13 +4804,72 @@ begin
   end; // Case radio group end
 end;
 
+// New to v3.3.0. Determines if the user wants to rename files with the computed CRC values, or not
+// Returns false if not. True otherwise.
+function TMainForm.GetCRCRenamingChoice() : boolean;
+begin
+  result := false;
+  TaskDialog2_CRC32.Text:='Question : Just compute the CRC32 values of the files? (Default)' + lineending
+                        + 'Or, do you want to compute the CRC32 and then rename ' + lineending
+                        + 'the file by appending the CRC32 value? ' + lineending
+                        + 'Example : MyFile.mp4 becomes MyFile-[AB1234BC].mp4';
+  TaskDialog2_CRC32.Execute;
+  if TaskDialog2_CRC32.ModalResult = mrOK then
+  begin
+    if TaskDialog2_CRC32.RadioButton.Index = 0 then
+    begin
+       result := false; // Just compute hashes. No renaming wanted
+    end
+    else if TaskDialog2_CRC32.RadioButton.Index = 1 then
+    begin
+       result := true; // Compute hashes and rename files by inserting CRC
+    end;
+  end;
+end;
+
+// New to v3.3.0. Takes current filename, and computes new filename based on
+// appending hash value to the end (CRC32 only for now). e.g. MyFile.doc becomes MyFile-[AB123456AD].doc
+// Returns new filename on success. Empty string on failure.
+function TMainForm.RenameFileWithCRCHash(OldFileName : string; HashVal : string) : string;
+var
+  OldFileNameRootPath          : string = Default(string);
+  OldFileNameWithoutPath       : string = Default(string);
+  OldFileNameWithoutPathOrExt  : string = Default(string);
+  OldFileNameExt               : string = Default(string);
+  CRC32String                  : string = Default(string);
+  NewFileName                  : string = Default(string);
+begin
+  result := '';
+  OldFileNameRootPath          := ExtractFilePath(OldFileName);
+  OldFileNameWithoutPath       := ExtractFileName(OldFileName);
+  OldFileNameWithoutPathOrExt  := ExtractFileNameWithoutExt(OldFileNameWithoutPath);
+  OldFileNameExt               := ExtractFileExt(OldFileName);
+  CRC32String                  := '-['+HashVal+']';
+
+  NewFileName := OldFileNameRootPath + OldFileNameWithoutPathOrExt + CRC32String + OldFileNameExt;
+
+  if Length(NewFileName) = 0 then RaiseLastOSError;
+  result := NewFileName;
+end;
+// New to v3.3.0. Takes current filename, and the newly computed hash appended
+// file name and writes the new filename over the old filename.
+// e.g. MyFile.doc becomes MyFile-[AB123456AD].doc. Returns true on success, false otherwise.
+function TMainForm.WriteFilenameWithCRCHash(OldFileName : string; NewFileName : string) : boolean;
+begin
+  result := false;
+  result := RenameFile(OldFileName, NewFileName);
+  if result = false then RaiseLastOSError;
+end;
+
+// Called by TFileSearcher via FileS tab to hash each file
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
 var
   SizeOfFile : int64;
-  NameOfFileToHashFull, PathOnly, NameOnly, PercentageProgress : string;
+  NameOfFileToHashFull, PathOnly, NameOnly, PercentageProgress, NewFileName : string;
   fileHashValue : ansistring;
   SG : TStringGrid;
   DoesHashExistAlready : Boolean;
+  RenamingSuccessfull : Boolean = Default(Boolean);
 begin
   SG            := TStringGrid.Create(self);
   SizeOfFile    := 0;
@@ -4802,15 +4899,38 @@ begin
     // Now generate the hash value using a custom function and convert the result to uppercase
     if cbLoadHashList.Checked then
     begin
-      FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
+      FileHashValue        := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
       DoesHashExistAlready := IsHashInTheKnownList(FileHashValue); // We pass this as a flag to SQLIte later
+      // If CRC32 selected, and a request to rename the files was also chosen, do that
+      if RenameFilesWithCRCHashOrNot = true then
+      begin
+        NewFileName := RenameFileWithCRCHash(NameOfFileToHashFull, FileHashValue);
+        RenamingSuccessfull := WriteFilenameWithCRCHash(NameOfFileToHashFull, NewFileName);
+        if RenamingSuccessfull = false then RaiseLastOSError;
+      end;
     end
-      else FileHashValue := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
-    {$IFDEF Windows}
-      PathOnly := RemoveLongPathOverrideChars(PathOnly, LongPathOverride); // Remove the \\?\ for display purposes
-    {$ENDIF}
+      else
+      begin
+        // Compute the hash of the file
+        FileHashValue   := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
+        // If CRC32 selected, and a request to rename the files was also chosen, do that
+        if RenameFilesWithCRCHashOrNot = true then
+        begin
+          NewFileName := RenameFileWithCRCHash(NameOfFileToHashFull, FileHashValue);
+          RenamingSuccessfull := WriteFilenameWithCRCHash(NameOfFileToHashFull, NewFileName);
+          if RenamingSuccessfull = false then RaiseLastOSError;
+        end;
+        {$IFDEF Windows}
+          PathOnly := RemoveLongPathOverrideChars(PathOnly, LongPathOverride); // Remove the \\?\ for display purposes
+        {$ENDIF}
+      end;
 
     // Save to database
+    if RenameFilesWithCRCHashOrNot = true then
+    begin
+      frmSQLiteDBases.WriteFILESValuesToDatabase(ExtractFileName(NewFileName), PathOnly, FileHashValue, FormatByteSize(SizeOfFile), DoesHashExistAlready);
+    end
+    else
     frmSQLiteDBases.WriteFILESValuesToDatabase(NameOnly, PathOnly, FileHashValue, FormatByteSize(SizeOfFile), DoesHashExistAlready);
     // Periodically commit database changes. If too often, slows it down
     CommitCount(nil);
