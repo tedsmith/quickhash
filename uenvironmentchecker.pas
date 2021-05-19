@@ -50,13 +50,13 @@ begin
   result := false;
   ExpectedFileCount := 5;
   {$ifdef CPU32}
-  memEnvList.Text:= 'Number of DLLs expected : '       + IntToStr(ExpectedFileCount) + '. ' +
+  memEnvList.Text:= 'Number of DLLs expected : '       + IntToStr(ExpectedFileCount) + '. ' + LineEnding +
                     'Expected DLLs and SHA-1 hashes: ' + LineEnding +
-                    'libewf-x86.dll'		+ #9#9 + '915E3F26E170A062312A8CD73462AE6ECA6EF7BA' +
-                    'libgcc_s_dw2-1.dll'	+ #9#9 + '201924954A5A593C4CA24EE0FE799A764B41598D' +
-                    'libwinpthread-1.dll'	+ #9#9 + '34E84ED8F69F05FCAD212B02C2B064A5C7377904' +
-                    'sqlite3-win32.dll'		+ #9#9 + '0B25A2BA06DD5B8FE2A5F33C5C8442D4C12A2B70' +
-                    'zlib1.dll (x86 copy)'	+ #9#9 + 'B1D1FECBB568EDCF712232738BA3805B47BC6036' + Lineending;
+                    'libewf-x86.dll'		+ #9#9 + '915E3F26E170A062312A8CD73462AE6ECA6EF7BA' + Lineending+
+                    'libgcc_s_dw2-1.dll'	+ #9#9 + '201924954A5A593C4CA24EE0FE799A764B41598D' + Lineending+
+                    'libwinpthread-1.dll'	+ #9#9 + '34E84ED8F69F05FCAD212B02C2B064A5C7377904' + Lineending+
+                    'sqlite3-win32.dll'		+ #9#9 + '0B25A2BA06DD5B8FE2A5F33C5C8442D4C12A2B70' + Lineending+
+                    'zlib1.dll (x86 copy)'	+ #9#9 + 'B1D1FECBB568EDCF712232738BA3805B47BC6036' + Lineending+
                     '==================================================================='           + Lineending;
   {$else ifdef CPU64}
   memEnvList.Text:= 'Number of DLLs expected : '        + IntToStr(ExpectedFileCount) + '. ' + LineEnding +
