@@ -112,11 +112,12 @@ var
   strDBVersion    : string = Default(string);
 begin
   memEnvList.Lines.Add('Checking environment. Please wait...');
+  {$ifdef Windows}
   // Check DLLs for Windows installs
   ExpectedDLLPath := ExtractFilePath(Application.ExeName)+IncludeTrailingPathDelimiter(LIB_FOLDER);
   AreDLLsPresent := DLLScan(ExpectedDLLPath);
   if AreDLLsPresent = false then memEnvList.Lines.Add('At least 1 DLL is missing. QuickHash may not function fully.');
-
+  {$endif}
   // Show SQLite Name
   strActiveDB := dbases_sqlite.frmSQLiteDBases.DBName;
   if Length(strActiveDB) > 0 then memEnvList.Lines.Add('SQLite Database Name : ' + strActiveDB)

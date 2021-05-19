@@ -233,8 +233,8 @@ type
     function libewf_HandleSetCompressionValues(level,flags:byte) : integer;
     function libewf_SetHeaderValue(identifier,value:ansistring) : integer;
     function libewf_GetHeaderValue(identifier:ansistring;var value:ansistring) : integer;
+    //function libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
     function libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
-
     function libewf_handle_read_buffer(Buffer : Pointer; size : longword) : integer;
     function libewf_handle_write_buffer(Buffer : Pointer; size : longword) : integer;
     function libewf_handle_set_md5_hash(md5_hash : Pointer; size : TSIZE) : integer;
@@ -352,9 +352,25 @@ end;
 constructor TLibEWF.create();
 const
   {$ifdef CPU32}
-  LIB_FOLDER : ansistring = 'libs\x86';
+    {$ifdef Windows}
+    LIB_FOLDER : ansistring = 'libs\x86';
+    {$endif}
+    {$ifdef Linux}
+    LIB_FOLDER : ansistring = 'libs/x86';
+    {$endif}
+    {$ifdef Darwin}
+    LIB_FOLDER : ansistring = 'libs/x86';
+    {$endif}
   {$else ifdef CPU64}
-  LIB_FOLDER : ansistring = 'libs\x64';
+    {$ifdef Windows}
+    LIB_FOLDER : ansistring = 'libs\x64';
+    {$endif}
+    {$ifdef Linux}
+    LIB_FOLDER : ansistring = 'libs/x64';
+    {$endif}
+    {$ifdef Darwin}
+    LIB_FOLDER : ansistring = 'libs/x64';
+    {$endif}
   {$endif}
 var
   libFileName              : ansistring = Default(ansistring);
@@ -1112,6 +1128,7 @@ end;
   * @param value
   * @return 1 success, -1 if unsuccessful, 0 if not present
   */}
+//function TLibEWF.libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
 function TLibEWF.libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
 var
   err:pointer;
@@ -1125,7 +1142,8 @@ begin
   //if LIBEWF_VERSION='V1' then ...;
   getmem(p,255);
   if LIBEWF_VERSION='V2' then
-    Result:=flibewfhandlegetutf8hashvalue(fCurEWFHandle,
+
+  Result:=flibewfhandlegetutf8hashvalue(fCurEWFHandle,
                                           pansichar(identifier),
                                           length(identifier),
                                           p,

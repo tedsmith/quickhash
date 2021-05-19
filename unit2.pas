@@ -4554,7 +4554,9 @@ begin
            begin
              // Get the existing MD5 hash, if available
              CurrMD5HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('MD5', strCurrentMD5HashVal);
-             if CurrMD5HashValResult = 1 then
+             if CurrMD5HashValResult = -1 then result.ExistingHash := 'Unable to retrieve value from image'; // Failed to get existing hash
+             if CurrMD5HashValResult =  0 then result.ExistingHash := '...';                                 // Hash not available to get
+             if CurrMD5HashValResult =  1 then                                                               // Hash found
              begin
                result.ExistingHash := strCurrentMD5HashVal;
              end;
@@ -4613,16 +4615,17 @@ begin
            strImageSHA1HashValue := Uppercase(HashInstanceResultSHA1.ToString());
            if Length(strImageSHA1HashValue) > 0 then
            begin
-            // Get the existing MD5 hash, if available
+            // Get the existing SHA1 hash, if available
              CurrSHA1HashValResult  := fLibEWFVerificationInstance.libewf_GetHashValue('SHA1', strCurrentSHA1HashVal);
-             if CurrSHA1HashValResult = 1 then
+             if CurrSHA1HashValResult = -1 then result.ExistingHash := 'Unable to retrieve value from image'; // Failed to get existing hash
+             if CurrSHA1HashValResult =  0 then result.ExistingHash := '...';                                 // Hash not available to get
+             if CurrSHA1HashValResult =  1 then                                                               // Hash found
              begin
                result.ExistingHash := strCurrentSHA1HashVal;
              end;
              result.ComputedHash := strImageSHA1HashValue;
            end
          else result.ComputedHash := 'SHA-1 hash computation failed!';
-         CurrSHA1HashValResult := fLibEWFVerificationInstance.libewf_GetHashValue('SHA1', strCurrentSHA1HashVal);
         end;  // libewf_open End
 
         // Release the EWF File Handle now that it is verified
