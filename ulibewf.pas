@@ -233,7 +233,6 @@ type
     function libewf_HandleSetCompressionValues(level,flags:byte) : integer;
     function libewf_SetHeaderValue(identifier,value:ansistring) : integer;
     function libewf_GetHeaderValue(identifier:ansistring;var value:ansistring) : integer;
-    //function libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
     function libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
     function libewf_handle_read_buffer(Buffer : Pointer; size : longword) : integer;
     function libewf_handle_write_buffer(Buffer : Pointer; size : longword) : integer;
@@ -369,7 +368,7 @@ const
     LIB_FOLDER : ansistring = 'libs/x64';
     {$endif}
     {$ifdef Darwin}
-    LIB_FOLDER : ansistring = 'libs/x64';
+    LIB_FOLDER : ansistring = 'libs/x64';   // Not releasing this for functionality for OSX yet but may do in future
     {$endif}
   {$endif}
 var
@@ -567,7 +566,6 @@ begin
         UseUpperCase := false;
         end;
       end;
-      //filenames.Add(curFilename);
 
       // Itterate all the E01 segments for the image set to build the list of E01 to X0X.
       // Break if any are invalid E01 files.
@@ -598,7 +596,7 @@ begin
         end;
 
       // Blank out space for handles
-      fCurEWFHandle := nil; err := nil;
+      fCurEWFHandle := nil;
       // Initiate handle to image, and then open it
       if LIBEWF_VERSION='V2' then
         begin
@@ -683,8 +681,7 @@ begin
   end;
 end;
 
-{/* Added by SMITH 2015
-  * write the buffer to a new EWF file.
+{/* write the buffer to a new EWF file.
   * @param handle : libEWF File Handle to write to
   * @param buffer : pointer - pointer to a preallocated buffer (byte array) to write from.
   * @param size - The number of bytes to write
@@ -1103,22 +1100,30 @@ var
   err:pointer;
   p:pansichar;
   l:tsize;
+  strError : string;
 begin
   err:=nil;
   Result:=-1;
   if fLibHandle<>0 then
   begin
-  //if LIBEWF_VERSION='V1' then ...;
-  getmem(p,255);
-  if LIBEWF_VERSION='V2' then
-    Result:=flibewfhandlegetutf8headervalue (fCurEWFHandle,
-                                             pansichar(identifier),
-                                             length(identifier),
-                                             p,
-                                             l,
-                                             @err);
-  if result=1 then value:=strpas(p);
-  FreeMemory(p);
+    //if LIBEWF_VERSION='V1' then ...;
+    getmem(p,255);
+    if LIBEWF_VERSION='V2' then
+      Result:=flibewfhandlegetutf8headervalue (fCurEWFHandle,
+                                               pansichar(identifier),
+                                               length(identifier),
+                                               p,
+                                               l,
+                                               @err);
+    if result=1 then value:=strpas(p);
+    FreeMemory(p);
+
+    if result = -1 then
+    begin
+      SetLength(strError, 512);
+      fLibEWFErrorSPrint(err, @strError[1], Length(strError));
+      ShowMessage(strError);
+    end;
   end;
 end;
 
@@ -1134,6 +1139,7 @@ var
   err:pointer;
   p:pansichar;
   l:tsize;
+  strError : string;
 begin
   err:=nil;
   Result:=-1;
@@ -1142,8 +1148,7 @@ begin
   //if LIBEWF_VERSION='V1' then ...;
   getmem(p,255);
   if LIBEWF_VERSION='V2' then
-
-  Result:=flibewfhandlegetutf8hashvalue(fCurEWFHandle,
+    Result:=flibewfhandlegetutf8hashvalue(fCurEWFHandle,
                                           pansichar(identifier),
                                           length(identifier),
                                           p,
@@ -1151,6 +1156,13 @@ begin
                                           @err);
   if result=1 then value:=strpas(p);
   FreeMemory(p);
+
+  if result = -1 then
+    begin
+      SetLength(strError, 512);
+      fLibEWFErrorSPrint(err, @strError[1], Length(strError));
+      ShowMessage(strError);
+    end;
   end;
 end;
 
