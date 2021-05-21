@@ -484,11 +484,18 @@ begin
 end;
 
 destructor TLibEWF.destroy();
+var
+  LibUnloadedOK : Boolean = Default(Boolean);
 begin
   if (fCurEWFHandle<>nil) then
   begin
     libewf_close();
-    FreeLibrary(fLibHandle);
+    {$ifdef Windows}
+      LibUnloadedOK := FreeLibrary(fLibHandle);  // Use this for Delphi\Windows suitability re LoadLibraryA
+    {$endif}
+    {$ifdef Linux}
+      LibUnloadedOK :=UnloadLibrary(fLibHandle);// Use this for Linux suitability as we use standard LoadLibrary
+    {$endif}
   end;
   inherited;
 end;
