@@ -1139,13 +1139,12 @@ var
   err:pointer;
   p:pansichar;
   l:tsize;
-  strError : string;
+  strError: string;
 begin
   err:=nil;
   Result:=-1;
   if fLibHandle<>0 then
   begin
-  //if LIBEWF_VERSION='V1' then ...;
   getmem(p,255);
   if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlegetutf8hashvalue(fCurEWFHandle,
@@ -1154,6 +1153,7 @@ begin
                                           p,
                                           l,
                                           @err);
+
   if result=1 then value:=strpas(p);
   FreeMemory(p);
 
