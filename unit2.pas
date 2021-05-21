@@ -4633,10 +4633,6 @@ begin
         Application.ProcessMessages;
         libewfCloseResult := fLibEWFVerificationInstance.libewf_close();
         if libewfCloseResult = -1 then ShowMessage('Unable to release handle to image file.');
-        if CurrSHA1HashValResult = 1 then
-        begin
-          ShowMessage('For info, the SHA1 hash stored in the image is ' + lineending + Uppercase(strCurrentSHA1HashVal));
-        end;
         end;  // SHA-1 End
 
       2: begin
