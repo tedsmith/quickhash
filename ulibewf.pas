@@ -375,11 +375,9 @@ var
   libFileName              : ansistring = Default(ansistring);
   cvtString                : string     = Default(string);
   ProcAddressesInitialised : Boolean    = Default(boolean);
-
 begin
   fLibHandle := nilhandle;
   fCurEWFHandle:=nil;
-
   {$ifdef Windows}
     {$ifdef CPU32}
       libFileName:=ExtractFilePath(Application.ExeName)+IncludeTrailingPathDelimiter(LIB_FOLDER)+'libewf-x86.dll';//-new.dll';
@@ -398,7 +396,8 @@ begin
   if FileExists(libFileName) then
   begin
     {$ifdef Windows}
-      fLibHandle := LoadLibraryA(PAnsiChar(libFileName)); //LoadLibrary('libewf.dll');
+    //fLibHandle := LoadLibraryA(PAnsiChar(libFileName)); // The usual route, but LoadLibraryEx enables me to ensure QH DLLs are loaded
+      fLibHandle := LoadLibraryEx(PAnsiChar(libFileName), 0, LOAD_WITH_ALTERED_SEARCH_PATH); // LOAD_WITH_ALTERED_SEARCH_PATH ensures our DLLs are used
     {$endif}
     {$ifdef Linux}
       fLibHandle := LoadLibrary(libFileName);

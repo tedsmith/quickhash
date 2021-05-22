@@ -1527,6 +1527,7 @@ end;
 // the hash of the file, this onKeyUp event will then see if the pasted value
 // matches the value just computed. New to v2.8.3
 // QH expects the entered hash values to at least be of the proper length
+// As of v3.3.0, also used for embedded hashes from E01 forensic images
 procedure TMainForm.lbleExpectedHashChange(Sender: TObject);
 begin
    if memFileHashField.Lines[0] = 'Computed hash will appear here...' then

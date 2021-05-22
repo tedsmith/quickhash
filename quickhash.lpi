@@ -60,7 +60,7 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="57">
+    <Units Count="58">
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -176,7 +176,7 @@
         <ComponentName Value="frmTechSpecs"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <CursorPos X="22" Y="12"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
@@ -189,7 +189,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="frmAboutUnit"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="10"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -200,9 +200,9 @@
         <ComponentName Value="frmSQLiteDBases"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="11"/>
-        <TopLine Value="134"/>
-        <CursorPos X="36" Y="152"/>
+        <EditorIndex Value="12"/>
+        <TopLine Value="140"/>
+        <CursorPos Y="163"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -213,7 +213,7 @@
         <ComponentName Value="frmDiskHashingModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="1062"/>
         <CursorPos X="30" Y="1068"/>
         <UsageCount Value="206"/>
@@ -223,7 +223,7 @@
       <Unit17>
         <Filename Value="FindAllFilesEnhanced.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="15"/>
         <CursorPos X="38" Y="50"/>
         <UsageCount Value="206"/>
@@ -270,8 +270,7 @@
         <UnitName Value="Unit2"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="3867"/>
-        <CursorPos X="20" Y="3874"/>
+        <CursorPos X="28" Y="8"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -283,7 +282,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uProgress"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="38"/>
         <CursorPos X="3" Y="59"/>
         <UsageCount Value="206"/>
@@ -296,7 +295,7 @@
         <ComponentName Value="frmDisplayGrid3"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="69"/>
         <CursorPos X="28" Y="75"/>
         <UsageCount Value="200"/>
@@ -353,8 +352,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="uLibEWF"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="1143"/>
-        <CursorPos X="25" Y="1163"/>
+        <CursorPos X="9" Y="2"/>
         <UsageCount Value="193"/>
         <Loaded Value="True"/>
       </Unit30>
@@ -556,8 +554,16 @@
         <CursorPos Y="489"/>
         <UsageCount Value="10"/>
       </Unit56>
+      <Unit57>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/fpc/3.2.0/source/rtl/win/wininc/defines.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="2261"/>
+        <CursorPos X="41" Y="2278"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit57>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="14" HistoryIndex="13">
       <Position1>
         <Filename Value="unit2.pas"/>
         <Caret Line="1559" TopLine="1531"/>
@@ -594,6 +600,26 @@
         <Filename Value="unit2.pas"/>
         <Caret Line="1210" Column="87" TopLine="1198"/>
       </Position9>
+      <Position10>
+        <Filename Value="ulibewf.pas"/>
+        <Caret Line="400" Column="98" TopLine="375"/>
+      </Position10>
+      <Position11>
+        <Filename Value="ulibewf.pas"/>
+        <Caret Line="406" TopLine="387"/>
+      </Position11>
+      <Position12>
+        <Filename Value="ulibewf.pas"/>
+        <Caret Line="400" Column="64" TopLine="384"/>
+      </Position12>
+      <Position13>
+        <Filename Value="ulibewf.pas"/>
+        <Caret Line="401" TopLine="384"/>
+      </Position13>
+      <Position14>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="3874" Column="20" TopLine="3867"/>
+      </Position14>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -616,6 +642,7 @@
     </CodeGeneration>
     <Linking>
       <Debugging>
+        <GenerateDebugInfo Value="False"/>
         <DebugInfoType Value="dsDwarf2Set"/>
         <StripSymbols Value="True"/>
       </Debugging>

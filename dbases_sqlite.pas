@@ -160,7 +160,7 @@ begin
   begin
   SQLDBLibraryLoaderWindows.LibraryName := SQLiteLibraryPath;
   SQLDBLibraryLoaderWindows.Enabled := true;
-  SQLDBLibraryLoaderWindows.LoadLibrary;
+  SQLDBLibraryLoaderWindows.LoadLibrary;   // We dont need to use LoadLibraryEx here as SQLDBLibraryLoader seems to load the supplied SQlite.dll as intended
 
   if CreateGUID(guid) = 0 then
   begin
