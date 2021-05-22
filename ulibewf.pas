@@ -125,7 +125,7 @@ type
   Tlibewfhandlesetcompressionvalues = function(handle : PLIBEWFHDL; compression_level:TUINT8;compression_flags:TUINT8 ; error:pointer) : integer; cdecl;
   Tlibewfhandlesetutf8headervalue   = function(handle : PLIBEWFHDL;identifier:pansichar;identifier_length:TSIZE;utf8_string:pansichar;utf8_string_length:TSIZE; error:pointer) : integer; cdecl;
   Tlibewfhandlegetutf8headervalue   = function(handle : PLIBEWFHDL;identifier:pansichar;identifier_length:TSIZE;utf8_string:pansichar;utf8_string_length:TSIZE; error:pointer) : integer; cdecl;
-  Tlibewfhandlegetutf8hashvalue     = function(handle : PLIBEWFHDL;identifier:pansichar;identifier_length:TSIZE;utf8_string:pansichar;utf8_string_length:TSIZE; error:pointer) : integer; cdecl;
+  Tlibewfhandlegetutf8hashvalue     = function(handle : PLIBEWFHDL;identifier:pansichar;identifier_length:TSIZE;utf8_string:string;utf8_string_length:TSIZE; error:pointer) : integer; cdecl;
 
   TLibEWFErrorSPrint             = function (error: pointer; str: pchar; size: TSIZE) : TINT16; cdecl;
   Tlibewfhandlereadbuffer        = function(handle : PLIBEWFHDL; buffer : pointer; size : TSIZE; error:pointer) : integer; cdecl;
@@ -1140,29 +1140,29 @@ end;
   * @param value
   * @return 1 success, -1 if unsuccessful, 0 if not present
   */}
-//function TLibEWF.libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
+
 function TLibEWF.libewf_GetHashValue(identifier:ansistring;var value:ansistring) : integer;
 var
   err:pointer;
-  p:pansichar;
+  HashVal:ansistring;
   l:tsize;
   strError: string;
 begin
   err:=nil;
   Result:=-1;
+  SetLength(HashVal, 512);
+  l := 512;
   if fLibHandle<>0 then
   begin
-  getmem(p,255);
   if LIBEWF_VERSION='V2' then
     Result:=flibewfhandlegetutf8hashvalue(fCurEWFHandle,
                                           pansichar(identifier),
                                           length(identifier),
-                                          p,
+                                          HashVal,
                                           l,
                                           @err);
 
-  if result=1 then value:=strpas(p);
-  FreeMemory(p);
+  if result=1 then value:=(HashVal);
 
   if result = -1 then
     begin

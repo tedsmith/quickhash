@@ -1181,8 +1181,7 @@ begin
             until scheduleStartTime = Now;
         end;
 
-        //start := Now;
-        start:=Now;
+        start := Now;
         StartSecondsCounter := getTickCount;
         lblStartedFileAt.Caption := 'Started at : '+ DateTimeToStr(Start);
 
@@ -1204,6 +1203,7 @@ begin
               TaskDialog1_E01Images.Execute;
               if TaskDialog1_E01Images.ModalResult = mrOK then
               begin
+                // === Hash the full E01 image ===
                 if TaskDialog1_E01Images.RadioButton.Index = 0 then
                 begin
                    E01HashData := CalcTheHashE01File(Filename);
@@ -1211,12 +1211,10 @@ begin
                    memFileHashField.Lines.Add(UpperCase(fileHashValue));
                    StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
                    Application.ProcessMessages;
-                   if Length(E01HashData.ExistingHash) > 0 then
-                   lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
                  end  // End of E01 full image hashing
-                else
+                else  // === Hash the single E01 segment file ===
                 if TaskDialog1_E01Images.RadioButton.Index = 1 then
-                begin  // User wants do just the segment of the E01 so hash as normal
+                begin
                   fileHashValue := CalcTheHashFile(Filename);
                   memFileHashField.Lines.Add(UpperCase(fileHashValue));
                 end; // End of E01 segment hashing
@@ -1237,13 +1235,16 @@ begin
         OpenDialog1.Close;
         stop := Now;
         EndSecondsCounter := getTickCount;
-        elapsed:=EndSecondsCounter - StartSecondsCounter;
+        elapsed := EndSecondsCounter - StartSecondsCounter;
         lbEndedFileAt.Caption    := 'Ended at    : ' + DateTimeToStr(stop);
         lblFileTimeTaken.Caption := 'Time taken : ' + IntToStr(elapsed DIV 1000) + ' secs';
         Application.ProcessMessages;
 
-        // If the user has ane existing hash to check in expected hash value field,
-        // compare it here
+        // If an E01 embedded hash was found, put it in Expected Hash now
+        if Length(E01HashData.ExistingHash) > 0 then
+                   lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
+        // If the user has an existing hash to check in expected hash value field,
+        // and the file is not an E01 file, compare it here
         if IsFileE01 = false then lbleExpectedHashChange(Sender);
       end
       else
@@ -3866,10 +3867,10 @@ end;
 // Saves them re-adding the file again.
 procedure TMainForm.AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
 var
-  HashValue : ansistring;
+  HashValue   : ansistring;
   start, stop : TDateTime;
   elapsed, StartSecondsCounter, EndSecondsCounter : Int64;
-  IsFileE01 : Boolean = Default(Boolean);
+  IsFileE01   : Boolean = Default(Boolean);
   E01HashData : E01HashInfo;
 begin
   if edtFileNameToBeHashed.Text <> 'File being hashed...' then
@@ -3888,12 +3889,33 @@ begin
       IsFileE01 := IsItE01(edtFileNameToBeHashed.Text);
       if IsFileE01 = true then
         begin
-          E01HashData := CalcTheHashE01File(edtFileNameToBeHashed.Text);
-          HashValue := E01HashData.ComputedHash;
-          memFileHashField.Lines.Add(UpperCase(HashValue));
-          Application.ProcessMessages;
-          if Length(E01HashData.ExistingHash) > 0 then
-          lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
+        TaskDialog1_E01Images.Text:=   'Do you want to compute the INTERNAL hash of a '                + lineending
+                                     + 'forensic E01 image, or the hash of a single segment? Proceed  '+ lineending
+                                     + 'only if you understand what this means! Also, this is '        + lineending
+                                     + 'an experimental new feature, added in v3.3.0.';
+        TaskDialog1_E01Images.Execute;
+        if TaskDialog1_E01Images.ModalResult = mrOK then
+        begin
+          // === Hash the full E01 image ===
+          if TaskDialog1_E01Images.RadioButton.Index = 0 then
+          begin
+             E01HashData := CalcTheHashE01File(edtFileNameToBeHashed.Text);
+             HashValue := E01HashData.ComputedHash;
+             memFileHashField.Lines.Add(UpperCase(HashValue));
+             StatusBar1.SimpleText := ' H A S H I N G  C OM P L E T E !';
+             Application.ProcessMessages;
+           end  // End of E01 full image hashing
+          else  // === Hash the single E01 segment file ===
+          if TaskDialog1_E01Images.RadioButton.Index = 1 then
+          begin
+            HashValue := CalcTheHashFile(edtFileNameToBeHashed.Text);
+            memFileHashField.Lines.Add(UpperCase(HashValue));
+          end; // End of E01 segment hashing
+        end  // End of TTaskDialog warning message
+        else
+        begin
+          StatusBar1.SimpleText := 'E01 selection cancelled or aborted.';
+        end;
         end
         else
         begin  // The file is not an E01, so hash as normal
@@ -3906,7 +3928,11 @@ begin
       elapsed := EndSecondsCounter - StartSecondsCounter;
       StatusBar1.SimpleText := 'RECOMPUTED NEW HASH VALUE.';
       lbEndedFileAt.Caption:= 'Ended at : '+ DateTimeToStr(stop);
-      lblFileTimeTaken.Caption := 'Time taken : '+ IntToStr(elapsed DIV 1000);;
+      lblFileTimeTaken.Caption := 'Time taken : '+ IntToStr(elapsed DIV 1000);
+
+      if Length(E01HashData.ExistingHash) > 0 then
+          lbleExpectedHash.Text := UpperCase(E01HashData.ExistingHash);
+
       // If the user has pasted an expected hash value, since the last hash computation,
       // then check if it matches the newly computed hash
        if IsFileE01 = false then lbleExpectedHashChange(self);

@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -294,18 +294,18 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Hint = 'Hash a single file (useful for hashing disks in Linux)'
       Caption = 'F&ile'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       ParentShowHint = False
       object FileHashingGroupBox: TGroupBox
         Left = 120
         Height = 398
         Top = 10
-        Width = 850
+        Width = 852
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Single File Hashing'
         ClientHeight = 376
-        ClientWidth = 846
+        ClientWidth = 848
         Color = clForm
         Font.Height = -13
         ParentColor = False
@@ -341,7 +341,7 @@ object MainForm: TMainForm
           Left = 6
           Height = 25
           Top = 96
-          Width = 824
+          Width = 826
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           ReadOnly = True
@@ -368,7 +368,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 23
           Top = 353
-          Width = 846
+          Width = 848
           Panels = <>
         end
         object lblDragAndDropNudge: TLabel
@@ -383,7 +383,7 @@ object MainForm: TMainForm
           Left = 6
           Height = 58
           Top = 136
-          Width = 824
+          Width = 826
           Anchors = [akTop, akLeft, akRight]
           Color = clSilver
           Lines.Strings = (
@@ -407,10 +407,10 @@ object MainForm: TMainForm
           Height = 25
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated file hash matches it, or not. '
           Top = 264
-          Width = 822
+          Width = 824
           Anchors = [akTop, akLeft, akRight]
           EditLabel.Height = 17
-          EditLabel.Width = 822
+          EditLabel.Width = 824
           EditLabel.Caption = 'Expected Hash Value (paste from other utility before or after file hashing)'
           EditLabel.ParentColor = False
           MaxLength = 128

@@ -60,7 +60,7 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="50">
+    <Units Count="57">
       <Unit0>
         <Filename Value="quickhash.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -268,9 +268,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="4665"/>
-        <CursorPos X="62" Y="4684"/>
+        <TopLine Value="3867"/>
+        <CursorPos X="20" Y="3874"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -351,11 +352,10 @@
         <Filename Value="ulibewf.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="uLibEWF"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="480"/>
-        <CursorPos X="46" Y="488"/>
-        <UsageCount Value="191"/>
+        <TopLine Value="1143"/>
+        <CursorPos X="25" Y="1163"/>
+        <UsageCount Value="193"/>
         <Loaded Value="True"/>
       </Unit30>
       <Unit31>
@@ -486,7 +486,7 @@
         <UnitName Value="uEnvironmentChecker"/>
         <EditorIndex Value="3"/>
         <CursorPos X="4" Y="44"/>
-        <UsageCount Value="64"/>
+        <UsageCount Value="66"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit47>
@@ -504,128 +504,96 @@
         <CursorPos Y="298"/>
         <UsageCount Value="6"/>
       </Unit49>
+      <Unit50>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/lcl/include/customedit.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="512"/>
+        <CursorPos Y="529"/>
+        <UsageCount Value="10"/>
+      </Unit50>
+      <Unit51>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/lcl/include/control.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2226"/>
+        <CursorPos Y="2242"/>
+        <UsageCount Value="10"/>
+      </Unit51>
+      <Unit52>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/lcl/include/wincontrol.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5396"/>
+        <CursorPos Y="5412"/>
+        <UsageCount Value="10"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/lcl/lclmessageglue.pas"/>
+        <UnitName Value="LCLMessageGlue"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="106"/>
+        <CursorPos Y="123"/>
+        <UsageCount Value="10"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/lcl/interfaces/win32/win32callback.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2653"/>
+        <CursorPos Y="2680"/>
+        <UsageCount Value="10"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/lcl/interfaces/win32/win32wsstdctrls.pp"/>
+        <UnitName Value="Win32WSStdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1415"/>
+        <CursorPos Y="1437"/>
+        <UsageCount Value="10"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="../../../../../../lazarus-v2.0.12-x64/lcl/interfaces/win32/win32wscontrols.pp"/>
+        <UnitName Value="Win32WSControls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="469"/>
+        <CursorPos Y="489"/>
+        <UsageCount Value="10"/>
+      </Unit56>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="236" Column="96" TopLine="224"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1559" TopLine="1531"/>
       </Position1>
       <Position2>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1135" Column="19" TopLine="1124"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1530" TopLine="1513"/>
       </Position2>
       <Position3>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1131" Column="81" TopLine="1114"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1559" TopLine="1543"/>
       </Position3>
       <Position4>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1139" Column="19" TopLine="1123"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1541" Column="40" TopLine="1527"/>
       </Position4>
       <Position5>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1146" Column="3" TopLine="1129"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="543" Column="32" TopLine="527"/>
       </Position5>
       <Position6>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1138" Column="20" TopLine="1129"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1032" Column="47" TopLine="1014"/>
       </Position6>
       <Position7>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1131" Column="30" TopLine="1114"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="1259" Column="20" TopLine="1202"/>
       </Position7>
       <Position8>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="236" Column="76" TopLine="236"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="3892" Column="36" TopLine="3876"/>
       </Position8>
       <Position9>
         <Filename Value="unit2.pas"/>
-        <Caret Line="4556" Column="95" TopLine="4540"/>
+        <Caret Line="1210" Column="87" TopLine="1198"/>
       </Position9>
-      <Position10>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1144" Column="41" TopLine="1127"/>
-      </Position10>
-      <Position11>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1132" Column="18" TopLine="1115"/>
-      </Position11>
-      <Position12>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="237" Column="76" TopLine="236"/>
-      </Position12>
-      <Position13>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1153" Column="29" TopLine="1130"/>
-      </Position13>
-      <Position14>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="4556" Column="117" TopLine="4540"/>
-      </Position14>
-      <Position15>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1132" Column="31" TopLine="1130"/>
-      </Position15>
-      <Position16>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="237" Column="26" TopLine="237"/>
-      </Position16>
-      <Position17>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1146" Column="36" TopLine="1129"/>
-      </Position17>
-      <Position18>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="188" Column="69" TopLine="173"/>
-      </Position18>
-      <Position19>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1132" Column="29" TopLine="1124"/>
-      </Position19>
-      <Position20>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1103" Column="21" TopLine="1100"/>
-      </Position20>
-      <Position21>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="4627" Column="13" TopLine="4605"/>
-      </Position21>
-      <Position22>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="397" TopLine="371"/>
-      </Position22>
-      <Position23>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1159" TopLine="1137"/>
-      </Position23>
-      <Position24>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1160" TopLine="1137"/>
-      </Position24>
-      <Position25>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1145" Column="3" TopLine="1128"/>
-      </Position25>
-      <Position26>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1140" Column="5" TopLine="1131"/>
-      </Position26>
-      <Position27>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1148" Column="5" TopLine="1131"/>
-      </Position27>
-      <Position28>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="1147" Column="8" TopLine="1134"/>
-      </Position28>
-      <Position29>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="4684" Column="62" TopLine="4665"/>
-      </Position29>
-      <Position30>
-        <Filename Value="ulibewf.pas"/>
-        <Caret Line="232" Column="14" TopLine="217"/>
-      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
