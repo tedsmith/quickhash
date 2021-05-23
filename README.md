@@ -1,6 +1,14 @@
 QuickHash<br>
 =========<br>
 
+Quickhash-GUI is a cross platform, free, open-source data hashing tool to text strings and text files, a single file, a forensic E01 image, a folder of files, and disks. It can also be used to compare two files, compare two folders, copy folders of files with hashing, and do some Base64 hashing. 
+It ships with some dependancies so if everything is unzipped properly and to the same folder, the pre-compiled binary program 
+should work on all three platforms, perhaps with some security permissions being required or being adjusted to execute.<br>
+
+For Windows, it comes as an exe with some DLLs. For Apple OSX it comes as a .app. For Linux it comes as a Debian package. <br>
+
+For those wishing to compile the program themselves, from source, instructions to do so are below, along with instructions on compiling the dependant files from their respective source libraries too. <br>
+
 Compiling the Project<br>
 ---------------------<br>
 
