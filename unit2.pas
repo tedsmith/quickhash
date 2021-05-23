@@ -19,7 +19,16 @@
     Contributions from members at the Lazarus forums, Stackoverflow and other
     StackExchange groups are welcomed and acknowledged. Contributions from
     DaReal Shinji are also welcomed and acknowledged, particularly helping with
-    Debian package creation and ideas
+    Debian package creation and ideas, and dseligo in the forums for awesome SQL ninjaness
+
+    All users, globally, for their continued support, patience and trust.
+    Their ideas and feedback are always welcomed. To my friends and colleagues
+    who are awesome in every way...you know who you are. You folks inspire
+    this development. It would not be what it is without all of you.
+
+    Lets Encrypt deserve a shout out (https://letsencrypt.org/), for enabling me
+    to save a fortune each month on https delivery and for enabling
+    intergration with AWS so easily. Thank you!
 
     NOTE: Date and time values, as computed in recursive directory hashing, are not
     daylight saving time adjusted. Source file date and time values are recorded.
@@ -59,6 +68,8 @@
 
     SHA-3 is made available only in 256 bit mode in QuickHash-GUI
     (first appearing in v3.1.0) for now.
+
+    See unit uLibEWF.pas for credits and acknowledgements regarding the libewf library
 
     QuickHash is created using the Freepascal Compiler and Lazarus-IDE
     http://www.lazarus-ide.org/ developed by Sourceforge users :

@@ -963,25 +963,25 @@ begin
         if Size > 0 then
         begin
           slDiskSpecs := TStringList.Create;
-          slDiskSpecs.Add('Disk ID: '          + DiskName);
-          slDiskSpecs.Add('Bytes per Sector: ' + IntToStr(BytesPerSector));
-          slDiskSpecs.Add('Description: '      + Description);
-          slDiskSpecs.Add('Interface type: '   + InterfaceType);
-          slDiskSpecs.Add('Model: '            + Model);
-          //slDiskSpecs.Add('Manufacturer: '     + Manufacturer);
-          slDiskSpecs.Add('MBR or GPT? '       + MBRorGPT);
-          slDiskSpecs.Add('No of Partitions: ' + IntToStr(Partitions));
-          slDiskSpecs.Add('Serial Number: '    + SerialNumber);
+          slDiskSpecs.Add('Disk ID: '             + DiskName);
+          slDiskSpecs.Add('Bytes per Sector: '    + IntToStr(BytesPerSector));
+          slDiskSpecs.Add('Description: '         + Description);
+          slDiskSpecs.Add('Interface type: '      + InterfaceType);
+          slDiskSpecs.Add('Model: '               + Model);
+          //slDiskSpecs.Add('Manufacturer: '      + Manufacturer);
+          slDiskSpecs.Add('MBR or GPT? '          + MBRorGPT);
+          slDiskSpecs.Add('No of Partitions: '    + IntToStr(Partitions));
+          slDiskSpecs.Add('Serial Number: '       + SerialNumber);
           slDiskSpecs.Add('Windows Disk Signature (from offset 440d): ' + WinDiskSignatureHex);
-          slDiskSpecs.Add('Size: '             + IntToStr(Size) + ' bytes (' + FormatByteSize(Size) + ').');
-          slDiskSpecs.Add('Status: '           + Status);
-          slDiskSpecs.Add('Cylinders: '        + IntToStr(TotalCylinders));
-          slDiskSpecs.Add('Heads: '            + IntToStr(TotalHeads));
-          slDiskSpecs.Add('Reported Sectors: '  + IntToStr(ReportedSectors));
-          slDiskSpecs.Add('Tracks: '            + IntToStr(TotalTracks));
-          slDiskSpecs.Add('Sectors per Track: ' + IntToStr(SectorsPerTrack));
+          slDiskSpecs.Add('Size: '                + IntToStr(Size) + ' bytes (' + FormatByteSize(Size) + ').');
+          slDiskSpecs.Add('Status: '              + Status);
+          slDiskSpecs.Add('Cylinders: '           + IntToStr(TotalCylinders));
+          slDiskSpecs.Add('Heads: '               + IntToStr(TotalHeads));
+          slDiskSpecs.Add('Reported Sectors: '    + IntToStr(ReportedSectors));
+          slDiskSpecs.Add('Tracks: '              + IntToStr(TotalTracks));
+          slDiskSpecs.Add('Sectors per Track: '   + IntToStr(SectorsPerTrack));
           slDiskSpecs.Add('Tracks per Cylinder: ' + IntToStr(TracksPerCylinder));
-          slDiskSpecs.Add('Default Block Size: ' + IntToStr(DefaultBlockSize));
+          slDiskSpecs.Add('Default Block Size: '  + IntToStr(DefaultBlockSize));
           slDiskSpecs.Add('= = = = = = = = = = = = = = = = = = =');
           // Only add GPT related data if GPT partitioning was detected earlier
           if Pos('GPT', MBRorGPT) > 0 then
@@ -2097,17 +2097,17 @@ end;
 // which I found thanks to this post : https://forum.lazarus.freepascal.org/index.php?topic=47308.0
 // Seemingly, according to : https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getversion
 {
-"With the release of Windows 8.1, the behavior of the GetVersion API
-has changed in the value it will return for the operating system version.
-The value returned by the GetVersion function now depends on how the
-application is manifested.
+    "With the release of Windows 8.1, the behavior of the GetVersion API
+    has changed in the value it will return for the operating system version.
+    The value returned by the GetVersion function now depends on how the
+    application is manifested.
 
-Applications not manifested for Windows 8.1 or Windows 10 will return the
-Windows 8 OS version value (6.2)."
+    Applications not manifested for Windows 8.1 or Windows 10 will return the
+    Windows 8 OS version value (6.2)."
 
 So, using the original GetOSName function, and the inbuilt WindowsVersion value,
-WindowsVersion was still returning "wv8" (Windows 8). So it has had to be replaced
-with this effort, which seems to work well.
+WindowsVersion was still returning "wv8" (Windows 8) for Windows 10.
+So it has had to be replaced with this effort, which seems to work well.
 }
 function GetOSName() : string;
 const
@@ -2124,17 +2124,13 @@ var
                    end;
   Build          : DWORD absolute BuildNumberRec;
 
-{ this function is undocumented but always found in ntdll                     }
+{ this function is undocumented but always found via ntdll.dll :-)    }
 
 begin
   RtlGetNtVersionNumbers(MajorVersion, MinorVersion, Build);
 
   result := ('Windows version : ' + IntToStr(MajorVersion)) + (', Minor version : ' + IntToStr(MinorVersion)) +
             (', Build  number : ' + IntToStr(BuildNumberRec.BuildNumber));
-
-  {if BuildNumberRec.Build <> BUILD_FREE_VAL then BuildString := BUILD_CHKD_STR;
-  writeln('Free/Checked  : ', BuildString);
-  }
 end;
 
 // DEPRECATED as of v3.3.0 of Quickhash. See newer function call above.
