@@ -685,14 +685,6 @@ begin
   StopScan1    := false;
   StopScan2    := false;
 
-  {$ifdef Linux}
-  MenuItem2C.Enabled:= false;  // Disable environment check via About menu for Linux
-  {$endif}
-
-  {$ifdef Darwin}
-  MenuItem2C.Enabled:= false;  // Disable environment check via About menu for OSX
-  {$endif}
-
   {$ifdef Windows}
   // These are the default values to be prefixed before a path to invoke longer
   // NTFS filename length over the 260 MAX_PATH. Where the user opts for UNC paths
@@ -1786,10 +1778,7 @@ end;
 // New to v3.3.0. Launches frmEnvironmentCheck form
 procedure TMainForm.MenuItem2CClick(Sender: TObject);
 begin
-  // Only for Windows platforms
-  {$ifdef Windows}
   frmEnvironmentCheck.Visible:= true;
-  {$endif}
 end;
 
 procedure TMainForm.MenuItem3Click(Sender: TObject);
