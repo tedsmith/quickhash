@@ -270,26 +270,6 @@ object MainForm: TMainForm
         ShowHint = True
         TabOrder = 1
       end
-      object SystemRAMGroupBox: TGroupBox
-        Left = 16
-        Height = 81
-        Top = 224
-        Width = 96
-        Caption = 'System RAM'
-        ClientHeight = 59
-        ClientWidth = 92
-        Font.Height = -13
-        ParentFont = False
-        TabOrder = 2
-        object lblRAM: TLabel
-          Left = 8
-          Height = 17
-          Top = 8
-          Width = 9
-          Caption = '...'
-          ParentColor = False
-        end
-      end
     end
     object TabSheet2: TTabSheet
       Hint = 'Hash a single file (useful for hashing disks in Linux)'
@@ -1566,8 +1546,8 @@ object MainForm: TMainForm
     end
     object TabSheet6: TTabSheet
       Caption = 'Compare Two Folders'
-      ClientHeight = 641
-      ClientWidth = 981
+      ClientHeight = 647
+      ClientWidth = 983
       OnContextPopup = TabSheet6ContextPopup
       ParentShowHint = False
       object GroupBox2: TGroupBox
@@ -1577,12 +1557,12 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 120
         Height = 177
-        Top = 445
-        Width = 837
+        Top = 451
+        Width = 839
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Summary'
         ClientHeight = 155
-        ClientWidth = 833
+        ClientWidth = 835
         Font.Height = -13
         ParentFont = False
         TabOrder = 1
@@ -1631,13 +1611,13 @@ object MainForm: TMainForm
       end
       object GroupBox1: TGroupBox
         Left = 120
-        Height = 414
+        Height = 420
         Top = 10
-        Width = 837
+        Width = 839
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Compare two folders'
-        ClientHeight = 392
-        ClientWidth = 833
+        ClientHeight = 398
+        ClientWidth = 835
         DragMode = dmAutomatic
         Font.Height = -13
         ParentFont = False
@@ -1721,8 +1701,8 @@ object MainForm: TMainForm
         object StatusBar6: TStatusBar
           Left = 8
           Height = 23
-          Top = 367
-          Width = 813
+          Top = 373
+          Width = 815
           Align = alNone
           Anchors = [akLeft, akRight]
           AutoSize = False
@@ -2247,7 +2227,6 @@ object MainForm: TMainForm
   end
   object sysRAMTimer: TTimer
     Interval = 5000
-    OnTimer = sysRAMTimerTimer
     Left = 32
     Top = 352
   end

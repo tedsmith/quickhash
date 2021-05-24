@@ -613,7 +613,7 @@ begin
 end;
 
 // Returns the exact disk size for BOTH physical disks and logical drives as
-// reported by the Windows API and is used during the imaging stage
+// reported by the Windows API and is used during the reading stage
 function GetDiskLengthInBytes(hSelectedDisk : THandle) : Int64;
 {$ifdef Windows}
 const
@@ -690,6 +690,7 @@ begin
   {$ifdef Windows}
   ByteSize      := 0;
   BytesReturned := 0;
+  DLength := Default(TDiskLength);
   // https://msdn.microsoft.com/en-us/library/aa365178%28v=vs.85%29.aspx
   if not DeviceIOControl(hSelectedDisk,
                          IOCTL_DISK_GET_LENGTH_INFO,
@@ -1086,7 +1087,7 @@ const
     hSelectedDisk := SysUtils.FileOpen(SourceDevice, fmOpenRead OR fmShareDenyWrite);
 
     // Check if handle is valid before doing anything else
-    if hSelectedDisk = 0 then
+    if hSelectedDisk = -1 then
     begin
      ShowMessage('Could not get exclusive disk access ' +
      'OS error and code : ' + SysErrorMessageUTF8(GetLastOSError));
@@ -1882,7 +1883,7 @@ begin;
       end
     else Val4 := '0,';
 
-    Val5 := (Format(', Filesystem: %s',[String(FWbemObject.FileSystem)]));                   // string
+    Val5 := (Format('Filesystem: %s',[String(FWbemObject.FileSystem)]));                   // string
 
     Val6 := (Format(', Vol Name: %s',[String(FWbemObject.VolumeName)]));                     // string
 

@@ -163,18 +163,6 @@ type
 
   { TMainForm }
 
-   MEMORYSTATUSEX = record
-     dwLength : DWORD;
-     dwMemoryLoad : DWORD;
-     ullTotalPhys : uint64;
-     ullAvailPhys : uint64;
-     ullTotalPageFile : uint64;
-     ullAvailPageFile : uint64;
-     ullTotalVirtual : uint64;
-     ullAvailVirtual : uint64;
-     ullAvailExtendedVirtual : uint64;
-  end;
-
    E01HashInfo = record
      ComputedHash: string;
      ExistingHash: string;
@@ -333,9 +321,7 @@ type
     ShellTreeView_FolderB                 : TShellTreeView;
     StatusBar6                            : TStatusBar;
     b64StringGrid1File                    : TStringGrid;
-    SystemRAMGroupBox                     : TGroupBox;
     ImageList1                            : TImageList;
-    lblRAM                                : TLabel;
     lbleExpectedHash                      : TLabeledEdit;
     lbleExpectedHashText                  : TLabeledEdit;
     lblURLBanner                          : TLabel;
@@ -402,7 +388,6 @@ type
     SelectDirectoryDialog1                : TSelectDirectoryDialog;
     SelectDirectoryDialog2                : TSelectDirectoryDialog;
     SelectDirectoryDialog3                : TSelectDirectoryDialog;
-    sysRAMTimer                           : TTimer;
     TabSheet1                             : TTabSheet;
     TabSheet2                             : TTabSheet;
     TabSheet3                             : TTabSheet;
@@ -493,7 +478,6 @@ type
     procedure popmenuDBGrid_FilesPopup(Sender: TObject);
     procedure ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode);
     procedure ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode);
-    procedure sysRAMTimerTimer(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2SelectionChanged(Sender: TObject);
     procedure AlgorithmChoiceRadioBox5SelectionChanged(Sender: TObject);
     procedure btnClipboardHashValueClick(Sender: TObject);
@@ -569,7 +553,6 @@ type
     {$IFDEF Windows}
     function DateAttributesOfCurrentFile(var SourceDirectoryAndFileName:string):string;
     function FileTimeToDTime(FTime: TFileTime): TDateTime;
-    function GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in GB, with 2 decimals }
     {$ENDIF}
     {$IFDEF LINUX}
     function DateAttributesOfCurrentFileLinux(var SourceDirectoryAndFileName:string):string;
@@ -658,10 +641,6 @@ begin
   end;
 end;
 
-{$IFDEF WINDOWS}
-// Populate interface with quick view to RAM status
-function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; external 'kernel32' name 'GlobalMemoryStatusEx';
-{$ENDIF}
 
 { TMainForm }
 // The main QH form. On creation, enable or disable various features
@@ -739,9 +718,6 @@ begin
 
     // Remove the advice about using the File tab for hashing files.
     Label6.Caption               := '';
-    SystemRAMGroupBox.Visible    := true;
-    sysRAMTimer.enabled          := true;
-    lblRAM.Caption               := GetSystemMem;
     Edit2SourcePath.Enabled      := true;
     Edit2SourcePath.Visible      := true;
     Edit3DestinationPath.Enabled := true;
@@ -784,10 +760,6 @@ begin
    cbUNCModeCompFolders.Visible  := false;
    Edit2SourcePath.Text          := 'Source directory selection';
    Edit3DestinationPath.Text     := 'Destination directory selection';
-
-   // RAM status stuff needs to be disabled on Linux
-   sysRAMTimer.enabled       := false;
-   SystemRAMGroupBox.Visible := false;
    {$Endif}
 
  {$ifdef UNIX}
@@ -988,7 +960,7 @@ begin
   lblStartedFileAt.Caption := '...';
   lblFileTimeTaken.Caption := '...';
   memFileHashField.Clear;
-
+  E01HashData := Default(E01HashInfo);
   // Ensure when the user drag n drops a file, the "File" tab becomes active.
   // Since v3.3.0 this is additionally important to ensure that E01 files,
   // and the actions needed to check for them, are not triggered when the "FileS"
@@ -1143,6 +1115,7 @@ begin
   filename := '';
   StatusBar1.SimpleText := '';
   LoopCounter := 0;
+  E01HashData := Default(E01HashInfo);
 
   if OpenDialog1.Execute then
     begin
@@ -1429,20 +1402,6 @@ begin
       end;
     end
   else ShowMessage('Unable to open text file for line-by-line analysis');
-end;
-
-
-procedure TMainForm.sysRAMTimerTimer(Sender: TObject);
-{$ifdef windows}
-var
-  MemFigures : string;
-{$endif}
-begin
-  {$IFDEF WINDOWS}
-  MemFigures := GetSystemMem;
-  lblRAM.Caption := MemFigures;
-  {$ENDIF}
-  // Do nothing with Linux
 end;
 
 procedure TMainForm.cbToggleInputDataToOutputFileChange(Sender: TObject);
@@ -2458,27 +2417,6 @@ procedure TMainForm.ShellTreeView_FolderBChange(Sender: TObject; Node: TTreeNode
 begin
   lblFolderBName.Caption := ShellTreeView_FolderB.Path;
 end;
-
-
-{$IFDEF WINDOWS}
-// http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
-function TMainForm.GetSystemMem: string;  { Returns installed RAM (as viewed by your OS) in Gb\Tb}
-VAR
-  MS_Ex : MemoryStatusEx;
-  strTotalPhysMem, strTotalPhysAvail : string;
-begin
- FillChar(MS_Ex{%H-}, SizeOf(MemoryStatusEx), #0);
- MS_Ex.dwLength := SizeOf(MemoryStatusEx);
- if GlobalMemoryStatusEx(MS_Ex) then
-   begin
-     strTotalPhysMem := FormatByteSize(MS_Ex.ullTotalPhys);
-     strTotalPhysAvail := FormatByteSize(MS_Ex.ullAvailPhys);
-     Result:= strTotalPhysMem + ' total' + #10#13 +
-              strTotalPhysAvail + ' avail' + #10#13;
-   end
- else Result := 'No Data';
-end;
-{$ENDIF}
 
 // Procedure SaveOutputAsCSV. Save any given display grid to CSV with a timestamped header
 // DEPRECATED since v3.0.0, where SQLite and DataSources became prominent, but left
@@ -3874,6 +3812,7 @@ var
   IsFileE01   : Boolean = Default(Boolean);
   E01HashData : E01HashInfo;
 begin
+  E01HashData := Default(E01HashInfo);
   if edtFileNameToBeHashed.Text <> 'File being hashed...' then
     begin
       // First, clear the captions from any earlier file hashing actions

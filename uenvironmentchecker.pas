@@ -1,4 +1,4 @@
-unit uEnvironmentChecker;
+unit uEnvironmentChecker;  // New to v3.3.0
 
 {$mode objfpc}
 
@@ -6,18 +6,30 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  FileUtil, sha1, dbases_sqlite;
+  windows, FileUtil, sha1, dbases_sqlite;
 
 type
-
+  MEMORYSTATUSEX = record
+     dwLength     : DWORD;
+     dwMemoryLoad : DWORD;
+     ullTotalPhys : uint64;
+     ullAvailPhys : uint64;
+     ullTotalPageFile : uint64;
+     ullAvailPageFile : uint64;
+     ullTotalVirtual  : uint64;
+     ullAvailVirtual  : uint64;
+     ullAvailExtendedVirtual : uint64;
+  end;
   { TfrmEnvironmentCheck }
 
   TfrmEnvironmentCheck = class(TForm)
     btnCheckNow: TButton;
     memEnvList: TMemo;
-    procedure btnCheckNowClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    function DLLScan(expectedPath : rawbytestring) : Boolean;
+    procedure btnCheckNowClick(Sender: TObject);
+    function DLLScan(expectedPath : rawbytestring) : Boolean;  // To scan Windows DLLs
+    function FormatByteSize(const bytes: QWord): string;
+    function GetSystemMem: string;                             // Returns installed RAM (as viewed by your OS) in GB, with 2 decimals }
   private
 
   public
@@ -31,6 +43,63 @@ implementation
 
 { TfrmEnvironmentCheck }
 
+{$IFDEF WINDOWS}
+// Populate interface with quick view to RAM status
+  function GlobalMemoryStatusEx(var Buffer: MEMORYSTATUSEX): BOOL; stdcall; external 'kernel32' name 'GlobalMemoryStatusEx';
+
+// http://stackoverflow.com/questions/7859978/get-total-and-available-memory-when-4-gb-installed
+// Returns installed RAM (as viewed by your OS) in Gb\Tb} as string. Empty string on failure.
+function TfrmEnvironmentCheck.GetSystemMem: string;
+VAR
+  MS_Ex : MemoryStatusEx;
+  strTotalPhysMem, strTotalPhysAvail : string;
+begin
+ result := '';
+ FillChar(MS_Ex{%H-}, SizeOf(MemoryStatusEx), #0);
+ MS_Ex.dwLength := SizeOf(MemoryStatusEx);
+ if GlobalMemoryStatusEx(MS_Ex) then
+   begin
+     strTotalPhysMem := FormatByteSize(MS_Ex.ullTotalPhys);
+     strTotalPhysAvail := FormatByteSize(MS_Ex.ullAvailPhys);
+     Result:= strTotalPhysMem + ' total' + #10#13 +
+              strTotalPhysAvail + ' avail' + #10#13;
+   end
+ else Result := 'No Data';
+end;
+{$ENDIF}
+
+function TfrmEnvironmentCheck.FormatByteSize(const bytes: QWord): string;
+var
+  B: byte;
+  KB: word;
+  MB: QWord;
+  GB: QWord;
+  TB: QWord;
+begin
+  B  := 1;         //byte
+  KB := 1024 * B;  //kilobyte
+  MB := 1024 * KB; //megabyte
+  GB := 1024 * MB; //gigabyte
+  TB := 1024 * GB; //terabyte
+
+  if bytes > TB then
+    result := FormatFloat('#.## TiB', bytes / TB)
+  else
+    if bytes > GB then
+      result := FormatFloat('#.## GiB', bytes / GB)
+    else
+      if bytes > MB then
+        result := FormatFloat('#.## MiB', bytes / MB)
+      else
+        if bytes > KB then
+          result := FormatFloat('#.## KiB', bytes / KB)
+        else
+          if bytes > B then
+          result := FormatFloat('#.## bytes', bytes)
+        else
+          if bytes = 0 then
+          result := '0 bytes';
+end;
 function TfrmEnvironmentCheck.DLLScan(expectedPath : rawbytestring) : Boolean;
   {// On Windows :
   libewf-x64.dll		5D33227712DA76316613DCD88B2749916DBA5ACA
@@ -141,13 +210,22 @@ var
   AreDLLsPresent  : Boolean = Default(Boolean);
   strActiveDB     : string = Default(string);
   strDBVersion    : string = Default(string);
+  strRAMData      : string = Default(string);
 begin
   memEnvList.Lines.Add('Checking environment. Please wait...');
   {$ifdef Windows}
-    // Check DLLs for Windows installs
+    // Check DLLs for Windows installs and other Windows based checks
     ExpectedDLLPath := ExtractFilePath(Application.ExeName)+IncludeTrailingPathDelimiter(LIB_FOLDER);
-    AreDLLsPresent := DLLScan(ExpectedDLLPath);
-    if AreDLLsPresent = false then memEnvList.Lines.Add('At least 1 DLL is missing. QuickHash may not function fully.');
+    AreDLLsPresent  := DLLScan(ExpectedDLLPath);
+    if AreDLLsPresent = false then
+    begin
+      memEnvList.Lines.Add('At least 1 DLL is missing. QuickHash may not function fully.');
+    end;
+    strRAMData := GetSystemMem;
+    if Length(strRAMData) > 0 then
+    begin
+      memEnvList.Lines.Add('RAM Data : '+ strRAMData);
+    end;
   {$endif}
   {$ifdef Darwin}
      memEnvList.Lines.Add('Libraries are mostly part of OSX natively since Big Sur except libewf which is not available on OSX with Quickhash yet. So skipping library check.');
