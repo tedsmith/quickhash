@@ -61,8 +61,8 @@ begin
    begin
      strTotalPhysMem := FormatByteSize(MS_Ex.ullTotalPhys);
      strTotalPhysAvail := FormatByteSize(MS_Ex.ullAvailPhys);
-     Result:= strTotalPhysMem + ' total' + #10#13 +
-              strTotalPhysAvail + ' avail' + #10#13;
+     Result:= strTotalPhysMem + ' total, ' + #10#13 +
+              strTotalPhysAvail + ' available' + #10#13;
    end
  else Result := 'No Data';
 end;

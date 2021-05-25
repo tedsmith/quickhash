@@ -16,7 +16,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="3"/>
       <MinorVersionNr Value="3"/>
-      <BuildNr Value="14"/>
+      <BuildNr Value="15"/>
       <Language Value="0809"/>
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software" CompanyName="Ted Smith (Ted Technology on Sourceforge)" FileDescription="Quickhash-GUI - Data hashing tool for Linux, Windows and OSX" LegalCopyright="2011 - 2021 (c) Ted Smith" LegalTrademarks="See source code and user manual" ProductName="QuickHash-GUI (www.quickhash-gui.org)" ProductVersion="3.3.0"/>
     </VersionInfo>
@@ -380,7 +380,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="5396"/>
         <CursorPos Y="5412"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit34>
       <Unit35>
         <Filename Value="/lazarus-v2.0.12-x64/lcl/interfaces/win32/win32wsstdctrls.pp"/>
@@ -388,7 +388,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1079"/>
         <CursorPos Y="1101"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit35>
       <Unit36>
         <Filename Value="/lazarus-v2.0.12-x64/lcl/interfaces/win32/win32proc.pp"/>
@@ -396,7 +396,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="822"/>
         <CursorPos Y="842"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit36>
       <Unit37>
         <Filename Value="/lazarus-v2.0.12-x64/components/lazutils/lazutf8.pas"/>
@@ -404,14 +404,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="3802"/>
         <CursorPos Y="3808"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit37>
       <Unit38>
         <Filename Value="/lazarus-v2.0.12-x64/lcl/include/customcombobox.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="201"/>
         <CursorPos Y="207"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit38>
       <Unit39>
         <Filename Value="/lazarus-v2.0.12-x64/lcl/lclmessageglue.pas"/>
@@ -419,7 +419,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="127"/>
         <CursorPos Y="144"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit39>
       <Unit40>
         <Filename Value="/lazarus-v2.0.12-x64/lcl/lclclasses.pp"/>
@@ -427,7 +427,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="139"/>
         <CursorPos Y="157"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit40>
       <Unit41>
         <Filename Value="/lazarus-v2.0.12-x64/lcl/interfaces/win32/win32callback.inc"/>
@@ -476,8 +476,9 @@
         <UnitName Value="uEnvironmentChecker"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="44"/>
-        <UsageCount Value="85"/>
+        <TopLine Value="46"/>
+        <CursorPos X="46" Y="65"/>
+        <UsageCount Value="86"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit46>

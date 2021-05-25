@@ -64,4 +64,6 @@ For OSX users wishing to compile SQLite libsqlite3.dylib files themselves, I ass
     Following the steps for Windows users as above, but then running the following compiler code: <br>
     gcc -shared -o libsqlite3.dylib -fPIC sqlite3.c <br>
   
+Lastly, for 32-bit (x86) compilation and execution, particularly around some functionality areas of QuickHash such as E01 images, you may need up to date versions of the .NET Framework and the Microsoft Visual C++ 2015 (or newer) Redistributable Package, such as the one found here https://www.microsoft.com/en-us/download/details.aspx?id=52685 <br>
+
 I am hopeful this guide might encourage collaborators and also help various Linux distributors include QuickHash into their package management platforms. <br>
