@@ -15,6 +15,7 @@ object frmEnvironmentCheck: TfrmEnvironmentCheck
     Top = 48
     Width = 738
     Anchors = [akTop, akLeft, akRight, akBottom]
+    Lines.Strings = (    )
     ScrollBars = ssAutoBoth
     TabOrder = 0
   end

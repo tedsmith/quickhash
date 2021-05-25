@@ -476,8 +476,8 @@
         <UnitName Value="uEnvironmentChecker"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="46"/>
-        <CursorPos X="46" Y="65"/>
+        <TopLine Value="10"/>
+        <CursorPos X="13" Y="34"/>
         <UsageCount Value="86"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -522,123 +522,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="unit2.pas"/>
-        <Caret Line="5970" TopLine="5937"/>
+        <Caret Line="570" Column="59" TopLine="538"/>
       </Position1>
       <Position2>
         <Filename Value="unit2.pas"/>
-        <Caret Line="571" Column="59" TopLine="79"/>
+        <Caret Line="569" Column="59" TopLine="537"/>
       </Position2>
       <Position3>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="570" Column="59" TopLine="538"/>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <Caret Line="39" Column="19" TopLine="22"/>
       </Position3>
       <Position4>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="569" Column="59" TopLine="537"/>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <Caret Line="9" Column="12"/>
       </Position4>
       <Position5>
         <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="39" Column="19" TopLine="22"/>
+        <Caret Line="22" Column="13"/>
       </Position5>
       <Position6>
-        <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="9" Column="12"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="578" Column="15" TopLine="569"/>
       </Position6>
       <Position7>
         <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="22" Column="13"/>
+        <Caret Line="35" Column="13" TopLine="22"/>
       </Position7>
       <Position8>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="578" Column="15" TopLine="569"/>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <Caret Line="38" Column="13" TopLine="16"/>
       </Position8>
       <Position9>
         <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="35" Column="13" TopLine="22"/>
+        <Caret Line="43" Column="11" TopLine="19"/>
       </Position9>
       <Position10>
         <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="38" Column="13" TopLine="16"/>
+        <Caret Line="42" Column="19" TopLine="24"/>
       </Position10>
       <Position11>
         <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="43" Column="11" TopLine="19"/>
+        <Caret Line="47" Column="3" TopLine="25"/>
       </Position11>
       <Position12>
         <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="42" Column="19" TopLine="24"/>
+        <Caret Line="62" Column="27" TopLine="44"/>
       </Position12>
       <Position13>
-        <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="47" Column="3" TopLine="25"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="639" Column="47" TopLine="620"/>
       </Position13>
       <Position14>
-        <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="62" Column="27" TopLine="44"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="545" Column="28" TopLine="529"/>
       </Position14>
       <Position15>
         <Filename Value="unit2.pas"/>
-        <Caret Line="639" Column="47" TopLine="620"/>
+        <Caret Line="4919" Column="119" TopLine="4892"/>
       </Position15>
       <Position16>
         <Filename Value="unit2.pas"/>
-        <Caret Line="545" Column="28" TopLine="529"/>
+        <Caret Line="4922" Column="97" TopLine="4895"/>
       </Position16>
       <Position17>
         <Filename Value="unit2.pas"/>
-        <Caret Line="4919" Column="119" TopLine="4892"/>
+        <Caret Line="4931" Column="52" TopLine="4904"/>
       </Position17>
       <Position18>
         <Filename Value="unit2.pas"/>
-        <Caret Line="4922" Column="97" TopLine="4895"/>
+        <Caret Line="5521" Column="63" TopLine="5494"/>
       </Position18>
       <Position19>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="4931" Column="52" TopLine="4904"/>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <Caret Line="62" Column="28" TopLine="44"/>
       </Position19>
       <Position20>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="5521" Column="63" TopLine="5494"/>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <Caret Line="31" Column="14" TopLine="10"/>
       </Position20>
       <Position21>
         <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="62" Column="28" TopLine="44"/>
+        <Caret Line="63" Column="27" TopLine="45"/>
       </Position21>
       <Position22>
-        <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="31" Column="14" TopLine="10"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="723" Column="9" TopLine="708"/>
       </Position22>
       <Position23>
-        <Filename Value="uenvironmentchecker.pas"/>
-        <Caret Line="63" Column="27" TopLine="45"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="390" Column="68" TopLine="375"/>
       </Position23>
       <Position24>
         <Filename Value="unit2.pas"/>
-        <Caret Line="723" Column="9" TopLine="708"/>
+        <Caret Line="481" Column="26" TopLine="454"/>
       </Position24>
       <Position25>
         <Filename Value="unit2.pas"/>
-        <Caret Line="390" Column="68" TopLine="375"/>
+        <Caret Line="1412" TopLine="1408"/>
       </Position25>
       <Position26>
         <Filename Value="unit2.pas"/>
-        <Caret Line="481" Column="26" TopLine="454"/>
+        <Caret Line="481" TopLine="465"/>
       </Position26>
       <Position27>
         <Filename Value="unit2.pas"/>
-        <Caret Line="1412" TopLine="1408"/>
+        <Caret Line="721" TopLine="694"/>
       </Position27>
       <Position28>
         <Filename Value="unit2.pas"/>
-        <Caret Line="481" TopLine="465"/>
+        <Caret Line="763"/>
       </Position28>
       <Position29>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="721" TopLine="694"/>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <Caret Line="64" Column="63" TopLine="46"/>
       </Position29>
       <Position30>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="763"/>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <Caret Line="9" Column="38"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

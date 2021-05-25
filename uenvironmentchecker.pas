@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  windows, FileUtil, sha1, dbases_sqlite;
+  {$ifdef Windows} windows, {$endif} FileUtil, sha1, dbases_sqlite;
 
 type
   MEMORYSTATUSEX = record
@@ -29,7 +29,9 @@ type
     procedure btnCheckNowClick(Sender: TObject);
     function DLLScan(expectedPath : rawbytestring) : Boolean;  // To scan Windows DLLs
     function FormatByteSize(const bytes: QWord): string;
+    {$ifdef Windows}
     function GetSystemMem: string;                             // Returns installed RAM (as viewed by your OS) in GB, with 2 decimals }
+    {$endif}
   private
 
   public
