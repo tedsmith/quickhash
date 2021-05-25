@@ -152,7 +152,7 @@ begin
   'libewf-Linux-x64.so' + #9#9 + '2376C9092754ABF401CFA1D17C00801DAAB4D143' + Lineending;
   {$endif}
   try
-    memEnvList.Lines.Add('Found DLLs and computed SHA-1 hashes:');
+    memEnvList.Lines.Add('Found these libraries and computed SHA-1 hashes:');
     sl := TStringList.Create;
     {$ifdef Windows}
     FindAllFiles(sl, expectedPath, '*.dll', true, faAnyFile);
