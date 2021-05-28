@@ -14,7 +14,7 @@
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software"
                    CompanyName="Ted Smith (Ted Technology on Sourceforge)"
                    FileDescription="The easy and convenient way to hash data in Linux, OSX and Windows"
-                   LegalCopyright="2011 - 2019 (c) Ted Smith"
+                   LegalCopyright="2011 - 2021 (c) Ted Smith"
                    ProductName="QuickHash (www.quickhash-gui.org)"
                    />
     </VersionInfo>
@@ -50,37 +50,74 @@
         <HasResources Value="True"/>
       </Unit1>
       <Unit2>
-        <Filename Value="udisplaygrid.pas"/>
-        <HasResources Value="True"/>
+        <Filename Value="unit2.lfm"/>
       </Unit2>
       <Unit3>
-        <Filename Value="diskmodule.pas"/>
-        <HasResources Value="True"/>
+        <Filename Value="dbases_sqlite.pas"/>
       </Unit3>
       <Unit4>
-        <Filename Value="diskmodule.lfm"/>
+        <Filename Value="dbases_sqlite.lfm"/>
       </Unit4>
       <Unit5>
-        <Filename Value="diskspecification.lfm"/>
+        <Filename Value="diskmodule.pas"/>
       </Unit5>
       <Unit6>
-        <Filename Value="diskspecification.pas"/>
-        <HasResources Value="True"/>
+        <Filename Value="diskmodule.lfm"/>
       </Unit6>
       <Unit7>
-        <Filename Value="GPTMBR.pas"/>
+        <Filename Value="diskspecification.pas"/>
       </Unit7>
-      <Unit8>
+      <Unit>
+        <Filename Value="diskspecification.lfm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="FindAllFilesEnhanced.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="frmaboutunit.pas"/>
+        <HasResources Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="frmaboutunit.lfm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="GPTMBR.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="udisplaygrid3.pas"/>
+        <HasResources Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="udisplaygrid3.lfm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="udisplaygrid.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="udisplaygrid.lfm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uenvironmentchecker.pas"/>
+        <HasResources Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uenvironmentchecker.lfm"/>
+      </Unit>
+      <Unit>
         <Filename Value="uGPT.pas"/>
-      </Unit8>
-      <Unit9>
+      </Unit>
+      <Unit>
+        <Filename Value="uKnownHashLists.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ulibewf.pas"/>
+      </Unit>
+      <Unit>
         <Filename Value="uprogress.pas"/>
-        <HasResources Value="True"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="dbases_sqlite.pas"/>
-        <HasResources Value="True"/>
-      </Unit10>
+      </Unit>
+      <Unit>
+        <Filename Value="uprogress.lfm"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -116,7 +153,7 @@
       </Debugging>
       <Options>
         <PassLinkerOptions Value="True"/>
-        <LinkerOptions Value="-z relro -pie --as-needed"/>
+        <LinkerOptions Value="-z relro --as-needed"/>
       </Options>
     </Linking>
     <Other>

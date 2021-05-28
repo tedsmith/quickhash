@@ -1,14 +1,14 @@
-# Makefile for Linux
-# https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.8.4/
+# Makefile for x64 Linux
 
 PREFIX ?= /usr
 BIN = quickhash
+LIBEWF = libewf-Linux-x64.so
 
 LAZARUSDIR ?= /usr/share/lazarus/2.0.12/
 LAZBUILD := $(LAZARUSDIR)lazbuild
 LAZRES := $(LAZARUSDIR)tools/lazres
 
-RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs udisplaygrid3.lrs uenvironmentchecker.lrs
+RESFILES = frmaboutunit.lrs udisplaygrid3.lrs uenvironmentchecker.lrs
 
 PACKAGES := HashLib4Pascal/src/Packages/FPC/HashLib4PascalPackage.lpk \
  DateTimePicker/zvdatetimectrls.lpk \
@@ -43,8 +43,11 @@ $(BIN):
 	$(LAZBUILD) $(OPTIONS) $(PACKAGES) quickhash_linux.lpi
 
 install:
+	install -d -m 755 $(DESTDIR)$(PREFIX)/lib/quickhash/x64
+	install -m 644 libs/$(LIBEWF) $(DESTDIR)$(PREFIX)/lib/quickhash/x64
+	install -m 755 $(BIN) $(DESTDIR)$(PREFIX)/lib/quickhash
 	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
-	install -m 755 $(BIN) $(DESTDIR)$(PREFIX)/bin
+	ln -s ../lib/quickhash/$(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	install -d -m 755 $(DESTDIR)$(PREFIX)/share/applications
 	install -m 644 misc/quickhash.desktop $(DESTDIR)$(PREFIX)/share/applications
 	$(foreach SIZE,16 24 32 48 64 96 128,\
