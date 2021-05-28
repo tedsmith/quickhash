@@ -65,5 +65,6 @@ For OSX users wishing to compile SQLite libsqlite3.dylib files themselves, I ass
     gcc -shared -o libsqlite3.dylib -fPIC sqlite3.c <br>
   
 Lastly, for 32-bit (x86) compilation and execution, particularly around some functionality areas of QuickHash such as E01 images, you may need up to date versions of the .NET Framework and the Microsoft Visual C++ 2015 (or newer) Redistributable Package, such as the one found here https://www.microsoft.com/en-us/download/details.aspx?id=52685 <br>
+The libewf library project is LGPL licensed with Copyright 2006-2021, Joachim Metz <forensics@hoffmannbv.nl>, Hoffmann Investigations License: LGPL-3+ On Debian systems, the complete text of the GNU General Public License can be found in /usr/share/common-licenses/LGPL-3. For a full list of credits and acknowledgments relating to that library see the header of ulibewf.pas and user manual. 
 
 I am hopeful this guide might encourage collaborators and also help various Linux distributors include QuickHash into their package management platforms. <br>
