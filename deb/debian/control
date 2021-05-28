@@ -10,8 +10,7 @@ Vcs-Browser: https://github.com/tedsmith/quickhash
 
 Package: quickhash
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Recommends: libsqlite3-0
+Depends: ${shlibs:Depends}, libsqlite3-0, ${misc:Depends}
 Description: Graphical data hashing tool
  QuickHash is a graphical means for users to easily
  hash data such as text, files, or even disks using Linux

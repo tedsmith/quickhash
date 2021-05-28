@@ -13,17 +13,17 @@ log="../build_${source}_${version}_${arch}.log"
 dpkg-checkbuilddeps || exit 1
 
 if [ "$(dpkg-query -W -f='${Status} ${version} ' lazarus-project fpc-laz fpc-src 2>/dev/null; echo $?)" != \
-     "install ok installed 3.2.0 install ok installed 3.2.0 install ok installed 2.0.10 0" ];
+     "install ok installed 3.2.0 install ok installed 3.2.0 install ok installed 2.0.12 0" ];
 then
   cat <<EOL
 Before you can continue to build Debian packages
 you need to install the packages
- lazarus-project version 2.0.10
+ lazarus-project version 2.0.12
  fpc-laz version 3.2.0
  fpc-src version 3.2.0
 from Sourceforge:
-https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/
-https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20i386%20DEB/Lazarus%202.0.10/
+https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.12/
+https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20i386%20DEB/Lazarus%202.0.12/
 EOL
   exit 1
 fi

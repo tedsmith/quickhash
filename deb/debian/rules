@@ -3,6 +3,8 @@
 %:
 	dh $@
 
+override_dh_makeshlibs:
+
 override_dh_compress:
 	dh_compress -X.pdf
 
