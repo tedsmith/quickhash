@@ -2,7 +2,7 @@
 
 PREFIX ?= /usr
 BIN = quickhash
-QHARCH ?= x64
+HQARCH ?= x64
 LIBEWF = libewf-Linux-$(HQARCH).so
 
 LAZARUSDIR ?= /usr/share/lazarus/2.0.12/
