@@ -1,7 +1,7 @@
 { This is an automatically generated lazarus resource file }
 
 LazarusResources.Add('TfrmAbout','FORMDATA',[
-  'TPF0'#9'TfrmAbout'#8'frmAbout'#4'Left'#3#11#2#6'Height'#3'A'#2#3'Top'#3#158#0
+  'TPF0'#9'TfrmAbout'#8'frmAbout'#4'Left'#3'V'#2#6'Height'#3'A'#2#3'Top'#3#181#0
   +#5'Width'#3'H'#3#7'Caption'#6#19'About QuickHash-GUI'#12'ClientHeight'#3'A'#2
   +#11'ClientWidth'#3'H'#3#8'Position'#7#16'poMainFormCenter'#10'LCLVersion'#6#8
   +'2.0.10.0'#0#5'TMemo'#8'memAbout'#4'Left'#2#16#6'Height'#3#4#2#3'Top'#2#16#5
