@@ -9,7 +9,7 @@ LAZARUSDIR ?= /usr/share/lazarus/2.0.12/
 LAZBUILD := $(LAZARUSDIR)lazbuild
 LAZRES := $(LAZARUSDIR)tools/lazres
 
-RESFILES = frmaboutunit.lrs udisplaygrid3.lrs uenvironmentchecker.lrs
+RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs udisplaygrid3.lrs uenvironmentchecker.lrs
 
 PACKAGES := HashLib4Pascal/src/Packages/FPC/HashLib4PascalPackage.lpk \
  DateTimePicker/zvdatetimectrls.lpk \
