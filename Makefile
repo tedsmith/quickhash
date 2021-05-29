@@ -2,8 +2,8 @@
 
 PREFIX ?= /usr
 BIN = quickhash
-HQARCH ?= x64
-LIBEWF = libewf-Linux-$(HQARCH).so
+QHARCH ?= x64
+LIBEWF = libewf-Linux-$(QHARCH).so
 
 LAZARUSDIR ?= /usr/share/lazarus/2.0.12/
 LAZBUILD := $(LAZARUSDIR)lazbuild
@@ -44,8 +44,8 @@ $(BIN):
 	$(LAZBUILD) $(OPTIONS) $(PACKAGES) quickhash_linux.lpi
 
 install:
-	install -d -m 755 $(DESTDIR)$(PREFIX)/lib/quickhash/$(HQARCH)
-	install -m 644 libs/$(HQARCH)/$(LIBEWF) $(DESTDIR)$(PREFIX)/lib/quickhash/$(HQARCH)
+	install -d -m 755 $(DESTDIR)$(PREFIX)/lib/quickhash/$(QHARCH)
+	install -m 644 libs/$(QHARCH)/$(LIBEWF) $(DESTDIR)$(PREFIX)/lib/quickhash/$(QHARCH)
 	install -m 755 $(BIN) $(DESTDIR)$(PREFIX)/lib/quickhash
 	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
 	ln -s ../lib/quickhash/$(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
