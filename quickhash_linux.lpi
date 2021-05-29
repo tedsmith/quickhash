@@ -5,6 +5,8 @@
     <General>
       <MainUnit Value="0"/>
       <Title Value="QuickHash"/>
+      <Scaled Value="True"/>
+      <Icon Value="0"/><!-- enables application icon; icon name must be the same as this file -->
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
@@ -41,83 +43,10 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="1">
       <Unit0>
         <Filename Value="quickhash.lpr"/>
       </Unit0>
-      <Unit1>
-        <Filename Value="unit2.pas"/>
-        <HasResources Value="True"/>
-      </Unit1>
-      <Unit2>
-        <Filename Value="unit2.lfm"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="dbases_sqlite.pas"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="dbases_sqlite.lfm"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="diskmodule.pas"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="diskmodule.lfm"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="diskspecification.pas"/>
-      </Unit7>
-      <Unit>
-        <Filename Value="diskspecification.lfm"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FindAllFilesEnhanced.pas"/>
-      </Unit>
-      <Unit>
-        <Filename Value="frmaboutunit.pas"/>
-        <HasResources Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="frmaboutunit.lfm"/>
-      </Unit>
-      <Unit>
-        <Filename Value="GPTMBR.pas"/>
-      </Unit>
-      <Unit>
-        <Filename Value="udisplaygrid3.pas"/>
-        <HasResources Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="udisplaygrid3.lfm"/>
-      </Unit>
-      <Unit>
-        <Filename Value="udisplaygrid.pas"/>
-      </Unit>
-      <Unit>
-        <Filename Value="udisplaygrid.lfm"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uenvironmentchecker.pas"/>
-        <HasResources Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uenvironmentchecker.lfm"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uGPT.pas"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uKnownHashLists.pas"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ulibewf.pas"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uprogress.pas"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uprogress.lfm"/>
-      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
