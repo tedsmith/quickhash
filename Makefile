@@ -44,8 +44,8 @@ $(BIN):
 	$(LAZBUILD) $(OPTIONS) $(PACKAGES) quickhash_linux.lpi
 
 install:
-	install -d -m 755 $(DESTDIR)$(PREFIX)/lib/quickhash/$(QHARCH)
-	install -m 644 libs/$(QHARCH)/$(LIBEWF) $(DESTDIR)$(PREFIX)/lib/quickhash/$(QHARCH)
+	install -d -m 755 $(DESTDIR)$(PREFIX)/lib/quickhash/libs/$(QHARCH)
+	install -m 644 libs/$(QHARCH)/$(LIBEWF) $(DESTDIR)$(PREFIX)/lib/quickhash/libs/$(QHARCH)
 	install -m 755 $(BIN) $(DESTDIR)$(PREFIX)/lib/quickhash
 	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
 	ln -s ../lib/quickhash/$(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
