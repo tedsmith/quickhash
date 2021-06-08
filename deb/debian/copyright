@@ -9,7 +9,7 @@ License: GPL-2+
  Public License can be found in `/usr/share/common-licenses/GPL-2'.
 
 Files: */libewf*.so
-Copyright: 2006-2021, Joachim Metz <forensics@hoffmannbv.nl>, Hoffmann Investigations
+Copyright: 2006-2021, Joachim Metz <joachim.metz@gmail.com>, Hoffmann Investigations
 License: LGPL-3+
  On Debian systems, the complete text of the GNU General
  Public License can be found in `/usr/share/common-licenses/LGPL-3'.
