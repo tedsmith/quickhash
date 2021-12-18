@@ -1,6 +1,32 @@
 ﻿Version History
 ===============
 
+v3.3.1 Dec 2021
+
+function CountGridRows has been changed. This function was designed to count the number of rows in any given display grid to determine whether the clipboard could be used, or whether the data would saved to a filestream. And, if the user chose to save the output to CSV or HTML, the same function would check to see if a memory list of strings could be used to then be saved out to a file, or whether a filestream should be used line by line. 
+
+But, when saving the output of very large lists of files to HTML, filestreams were supposed to be incorporated rather than using RAM. However, due to the v3.3.0 adjustment of the function CountGridRows to use .RecordCount, the variable that was used to check the number of rows was only showing what was on screen instead of what was in the table. So, QH was still using RAM even if the row count was many hundreds of thousands!! As such, it would cause QH to crash with large volumes of data. This has now been fixed I hope by the changes to CountGridRows to ensure the actual table row count is returned. Have tested on 400K files. Seems to work OK now. But the syntax of the call has changed to function CountGridRows(AGrid: TDBGrid; ATableName: string): Integer; meaning all parts where the function is called has been adjusted to also pass the table name it is to count. 
+
+The user is now also shown a message on screen, with an OK button, to let them know a Save as HTML has finished. Useful if the data set is very large and the save takes some time.  
+
+The HTML file produced by right clicking in the FileS tab did not have a row 1 header if the row count was over 20K. Now it does. 
+
+The HTML file produced by right clicking in the FileS tab did not have the FileSize column if the row count was over 20K. Now it does. 
+
+(See - there were a lot of things missing in the HTML save for large volumes of data that I had missed - this is how small scale testing of your own does not compete with real world usage - its only when users report issues to me that I often get to know about problems, and then in turn, that unearths other issues that I can then fix)
+
+On Linux, and OSX, the "Curently Hashing" status in the FileS tab was chopping off the first characters of the path. So instead of it saying /home/user/Documents/MyFile.doc it was saying e/users/Documents/MyFile.doc. This was due to the long path override character cleansing that is necessary for Windows, but not for Linux or OSX, and I forgot to use a cross compiler directive. Now fixed in in v3.3.1
+
+The function DatasetToClipBoardFILES checked if the number of rows was less than 20K, but didn't show a message to instruct the user to use a file save if the count was greater than 20K. That has now been applied in v3.3.1, so they dont just sit there wondering what has happened. 
+
+If the user tried to clipboard a volume of data over 20K rows in the FileS tab, although the user was told to use a file save instead, the status still said it was copying to clipbard. Now it will tell the user the clipboard effort has been aborted. 
+
+The Clipboard button in the "Copy" display grid was not as complete as the right-click clipboard option. A remnant of the changes made in v3.3.0. I think. Now both methods produce the same clipboard content. 
+
+
+ 
+
+
 v3.3.0 May 2021<br>
 New : Ability to hash forensic images of the Expert Witness Format (EWF), also known as "E01 Images". Available for Windows and Linux for users who know what they are doing with regard to forensic images. It is not available for OSX, for now. Quickhash will conduct the hash and also report the embedded MD5 or SHA1 hash, if available, placing it in the "Expected Hash" field automatically, depending on the type of hash the user is performing. So if the E01 contains both MD5 and SHA1, but the user selects SHA1, then the embedded SHA1 hash will be reported as well as the computed SHA1 hash, and the same theory for MD5. More features will likely follow in future of this landmark addition to QuickHash GUI. <br> 
 New : CRC32 algorithm added for Text, File, FileS, Compare Two Files, Compare Two Folders and Base64. Not added to disks, and not available for EWF (E01) image hashing. 

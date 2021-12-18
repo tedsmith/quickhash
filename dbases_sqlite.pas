@@ -88,7 +88,7 @@ type
     procedure ShowMissingFilesFolderB(DBGrid : TDBGrid);
     procedure ShowMissingFromFolderAAndFolderB(DBGrid : TDBGrid);
     function DBVersionLookup() : string;
-    function CountGridRows(DBGrid : TDBGrid) : integer;
+    function CountGridRows(AGrid: TDBGrid; ATableName: string): Integer;
 
   private
     { private declarations }
@@ -597,16 +597,49 @@ end;
 
 // Counts rows of current DBGrid. Returns positive integer if successfull and
 // returns active display to top row
-function TfrmSQLiteDBases.CountGridRows(DBGrid : TDBGrid) : integer;
-var
-  NoOfRows : integer = Default(integer);
+function TfrmSQLiteDBases.CountGridRows(AGrid: TDBGrid; ATableName: string): Integer;
 begin
   result := -1;
-  NoOfRows := DBGrid.DataSource.DataSet.RecordCount;
-  If NoOfRows > -1 then result := NoOfRows;
+  with TSQLQuery.Create(nil) do
+  try
+    Database := TSQLQuery(AGrid.DataSource.DataSet).Database;
+    SQL.Text := ('SELECT COUNT(*) FROM '+ATableName);
+    Open;
+    Result := Fields[0].AsInteger;
+    Close;
+  finally
+    Free;
+  end;
+
+  {
+  try
+    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT COUNT(*) FROM TBL_FILES';
+    SQLite3Connection1.Connected := True;
+    SQLTransaction1.Active := True;
+    //MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    DBGrid.DataSource.Dataset.Open;
+    NoOfRows := DBGrid.DataSource.Dataset.Fields[0].AsInteger;
+    If NoOfRows > 0 then result := NoOfRows;
+  except
+    on E: EDatabaseError do
+    begin
+      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
+    end;
+  end;   }
+
+ { DBGrid.DataSource.DataSet.DisableControls;
+  try
+    DBGrid.DataSource.DataSet.Last;                    // Navigate forward to the last record to ensure all are loaded for RecordCount
+    DBGrid.DataSource.DataSet.First;                   // Position the dataset on the first record.
+    NoOfRows := DBGrid.DataSource.DataSet.RecordCount; // Now get the true count
+  finally
+    DBGrid.DataSource.DataSet.EnableControls;
+  end;
+  If NoOfRows > 0 then result := NoOfRows;    }
+
   {pre v3.3.0 method
   result := -1;
-  NoOfRows := -1;
   DBGrid.DataSource.Dataset.DisableControls;
   DBGrid.DataSource.DataSet.First;
   while not DBGrid.DataSource.DataSet.EOF do
@@ -630,7 +663,7 @@ var
   FilePathCell   : string = Default(string);
   FileHashCell   : string = Default(string);
   FileSizeCell   : string = Default(string);
-  NoOfRowsInGrid : integer;
+  NoOfRowsInGrid : integer = Default(integer);
   sl             : TStringList;
   fs             : TFileStreamUTF8;
 
@@ -643,17 +676,17 @@ const
   strTABLEDATAStart  = '<TD>'    ;
   strTABLEDataEnd    = '</TD>'   ;
   strTABLEROWEnd     = '</TR>'   ;
+  strTableRow1       = '<TR><TD><B>Filename</B></TD><TD><B>Filepath</B></TD><TD><B>Filehash</B></TD><TD><B>Filesize</B></TD></TR>';
   strTABLEFooter     = '</TABLE>';
   strBODYFooter      = '</BODY>' ;
   strTITLEFooter     = '</TITLE>';
   strHTMLFooter      = '</HTML>' ;
 
 begin
-  NoOfRowsInGrid := -1;
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
   if DBGrid.Name = 'RecursiveDisplayGrid1' then
     begin
-      NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
+      NoOfRowsInGrid := CountGridRows(DBGrid, 'TBL_FILES');// Count the rows first. If not too many, use memory. Otherwise, use filestreams
       if (NoOfRowsInGrid < 20000) and (NoOfRowsInGrid > -1) then
       try
         MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
@@ -665,7 +698,8 @@ begin
         sl.add('<BODY>');
         sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
         sl.add('<TABLE>');
-        sl.add('<TR><TD>Filename</TD><TD>Filepath</TD><TD>Filehash</TD><TD>Filesize</TD></TR>');
+        sl.add(strTableRow1);
+
         DBGrid.DataSource.DataSet.DisableControls;
         DBGrid.DataSource.DataSet.First;
         while not DBGrid.DataSource.DataSet.EOF do
@@ -717,6 +751,7 @@ begin
         fs.Write(strTitle[1], Length(strTitle));
         fs.Write(#13#10, 2);
         fs.Write(strTABLEHeader[1], Length(strTABLEHeader));
+        fs.Write(strTableRow1[1], Length(strTableRow1));
 
         { strTABLEROWStart   = '<TR>'      = 4 bytes
           strTABLEDATAStart  = '<TD>'      = 4 bytes
@@ -752,6 +787,14 @@ begin
           fs.Write(strTABLEDATAStart[1], 4) ;
           fs.Write(FileHashCell[1], Length(Trim(FileHashCell)));
           fs.Write(strTABLEDATAEnd[1], 5);
+
+          // Get the data from the filesize cell that the user has selected
+          FileSizeCell := DBGrid.DataSource.DataSet.Fields[4].AsString;
+          // Write hash to new row
+          fs.Write(strTABLEDATAStart[1], 4) ;
+          fs.Write(FileSizeCell[1], Length(Trim(FileSizeCell)));
+          fs.Write(strTABLEDATAEnd[1], 5);
+
           // End the row
           fs.Write(strTABLEROWEnd[1], 5);
           fs.Write(#13#10, 2);
@@ -769,6 +812,7 @@ begin
         fs.free;
         MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
         Application.ProcessMessages;
+        ShowMessage(MainForm.StatusBar2.Caption);
       end;
     end
   else
@@ -1146,7 +1190,7 @@ begin
         ChosenDelimiter := #32;
       end;
 
-  RowCount := CountGridRows(DBGrid);
+  RowCount := CountGridRows(DBGrid, 'TBL_FILES');
   if RowCount < 20000 then
   begin
     try
@@ -1191,6 +1235,11 @@ begin
     end;
     Mainform.StatusBar2.SimpleText := 'DONE';
     ShowMessage('Grid data now in clipboard');
+  end
+  else
+  begin
+    ShowMessage('Row count exceeds 20K. Please use "Save to CSV file" instead');
+    Mainform.StatusBar2.SimpleText := 'Cliboarding effort aborted due to volume of data';
   end;
 end;
 
@@ -1199,6 +1248,7 @@ procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
 var
   CSVClipboardList : TStringListUTF8;
   RowCount : integer = Default(integer);
+  tblName : string = Default(string);
 begin
   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
   Application.ProcessMessages;
@@ -1240,7 +1290,11 @@ begin
         ChosenDelimiter := #32;
       end;
 
-  RowCount := CountGridRows(DBGrid);
+  if DBGrid.Name = 'RecursiveDisplayGrid1'     then tblName := 'TBL_FILES';
+  if DBGrid.Name = 'dbGridC2F'                 then tblName := 'TBL_COMPARE_TWO_FOLDERS';
+  if DBGrid.Name = 'RecursiveDisplayGrid_COPY' then tblName := 'TBL_COPY';
+
+  RowCount := CountGridRows(DBGrid, tblName);
   if RowCount < 20000 then
   begin
     try
@@ -2061,7 +2115,7 @@ begin
   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
   Application.ProcessMessages;
   ChosenDelimiter := MainForm.ChosenDelimiter;
-  RowCount := CountGridRows(DBGrid);
+  RowCount := CountGridRows(DBGrid, 'TBL_COPY');
   if RowCount < 20000 then
   begin
     try
@@ -2138,7 +2192,7 @@ var
 
 begin
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
-  NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
+  NoOfRowsInGrid := CountGridRows(DBGrid, 'TBL_COPY');// Count the rows first. If not too many, use memory. Otherwise, use filestreams
   if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
   try
     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
@@ -2316,7 +2370,7 @@ const
 begin
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
   NoOfRowsInGrid := 0;
-  NoOfRowsInGrid := CountGridRows(DBGrid);// Count the rows first. If not too many, use memory. Otherwise, use filestreams
+  NoOfRowsInGrid := CountGridRows(DBGrid, 'TBL_COMPARE_TWO_FOLDERS');// Count the rows first. If not too many, use memory. Otherwise, use filestreams
   if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
   try
     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';

@@ -71,7 +71,7 @@ end;
 
 procedure TfrmDisplayGrid1.btnClipboardResultsCOPYTABClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoard(frmDisplayGrid1.RecursiveDisplayGrid_COPY);
+  frmSQLiteDBases.DatasetToClipBoardCOPYTAB(RecursiveDisplayGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.FormCreate(Sender: TObject);

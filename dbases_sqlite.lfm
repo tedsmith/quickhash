@@ -1,7 +1,7 @@
 object frmSQLiteDBases: TfrmSQLiteDBases
-  Left = 832
+  Left = 1166
   Height = 562
-  Top = 96
+  Top = 354
   Width = 460
   Caption = 'frmSQLiteDBases'
   ClientHeight = 562
@@ -12,9 +12,9 @@ object frmSQLiteDBases: TfrmSQLiteDBases
   LCLVersion = '2.0.12.0'
   object lblConnectionStatus: TLabel
     Left = 32
-    Height = 15
+    Height = 16
     Top = 32
-    Width = 81
+    Width = 91
     Caption = 'Not Connected'
     ParentColor = False
   end

@@ -2639,7 +2639,7 @@ end;
 // The clipboard button on the 'FileS' tab, this will copy the DBGrid to clipboard
 procedure TMainForm.btnClipboardResultsClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid1);
+  frmSQLiteDBases.DatasetToClipBoardFILES(RecursiveDisplayGrid1); // frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid1);
 end;
 
 procedure TMainForm.btnStopScan1Click(Sender: TObject);
@@ -2680,6 +2680,7 @@ end;
 function TMainForm.RemoveLongPathOverrideChars(strPath : string; LongPathOverrideVal : string) : string;
 begin
   result := '';
+  {$ifdef Windows}
   if LongPathOverrideVal = '\\?\' then
   begin
     // Delete the UNC API prefix of '\\?\' from the display
@@ -2690,6 +2691,15 @@ begin
     // Delete the UNC API prefix and restore the UNC path chars of '\\'
     result := '\' + Copy(strPath, 8, (Length(strPath)));
   end
+  {$endif}
+  // If not Windows, we need not do anything
+  {$ifdef Darwin}
+    result := strPath;
+  {$endif}
+
+  {$ifdef Linux}
+    result := strPath;
+  {$endif}
 end;
 
 // Get the list of all files from a folder, including hidden ones
