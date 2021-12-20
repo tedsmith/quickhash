@@ -242,7 +242,7 @@ type
     HashListChooserDialog                 : TOpenDialog;
     pbCompareDirA                         : TProgressBar;
     pbCompareDirB                         : TProgressBar;
-    RecursiveDisplayGrid1                 : TDBGrid;
+    DBGrid_FILES                 : TDBGrid;
     MenuItem_CopyFilepathOfSelectedCell   : TMenuItem;
     MenuItem_CopyHashOfSelectedCell       : TMenuItem;
     MenuItem_CopyFileNameOfSelectedCell   : TMenuItem;
@@ -690,7 +690,7 @@ begin
   DirListB.AlphaSort;
 
   // The DBGrid in FileS tab to be hidden initially
-  RecursiveDisplayGrid1.Visible:= false;
+  DBGrid_FILES.Visible:= false;
 
   {$ifdef CPU64}
   AlgorithmChoiceRadioBox1.Items.Strings[5] := 'xxHash64';
@@ -1806,52 +1806,52 @@ begin
      WriteToFile := true;
    end;
   end;
-  frmSQLiteDBases.CopyAllHashesFILESTAB(RecursiveDisplayGrid1, WriteToFile);
+  frmSQLiteDBases.CopyAllHashesFILESTAB(DBGrid_FILES, WriteToFile);
 end;
 
 procedure TMainForm.MenuItem_DeleteDupsClick(Sender: TObject);
 
 begin
   // Firstly change the grid to list only the files with duplicates
-  frmSQLiteDBases.ShowDuplicates(RecursiveDisplayGrid1);
+  frmSQLiteDBases.ShowDuplicates(DBGrid_FILES);
   // Now go through and delete duplicate entries
-  frmSQLiteDBases.DeleteDuplicates(RecursiveDisplayGrid1);
+  frmSQLiteDBases.DeleteDuplicates(DBGrid_FILES);
 end;
 
 // Copy entire FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyGridToClipboardFILESClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoardFILES(RecursiveDisplayGrid1);
+  frmSQLiteDBases.DatasetToClipBoardFILES(DBGrid_FILES);
 end;
 
 // Copy file path of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyFilepathOfSelectedCellClick(Sender: TObject);
 begin
-  frmSQLiteDBases.CopyFilePathOfSelectedCell(RecursiveDisplayGrid1);
+  frmSQLiteDBases.CopyFilePathOfSelectedCell(DBGrid_FILES);
 end;
 
 // Copy file name of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyFileNameOfSelectedCellClick(Sender: TObject);
 begin
-  frmSQLiteDBases.CopyFileNameOfSelectedCell(RecursiveDisplayGrid1);
+  frmSQLiteDBases.CopyFileNameOfSelectedCell(DBGrid_FILES);
 end;
 
 // Copy entire selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopySelectedRowFILESTABClick(Sender: TObject);
 begin
-  frmSQLiteDBases.CopySelectedRowFILESTAB(RecursiveDisplayGrid1);
+  frmSQLiteDBases.CopySelectedRowFILESTAB(DBGrid_FILES);
 end;
 
 // Copy hash value of selected row from FILES tab grid to clipboard
 procedure TMainForm.MenuItem_CopyHashOfSelectedCellClick(Sender: TObject);
 begin
-  frmSQLiteDBases.CopyHashOfSelectedCell(RecursiveDisplayGrid1);
+  frmSQLiteDBases.CopyHashOfSelectedCell(DBGrid_FILES);
 end;
 
 // Restore list of all values in FILES grid
 procedure TMainForm.MenuItem_RestoreListFILESClick(Sender: TObject);
 begin
-  frmSQLiteDBases.ShowAll(RecursiveDisplayGrid1);
+  frmSQLiteDBases.ShowAll(DBGrid_FILES);
 end;
 
 procedure TMainForm.MenuItem_SaveToCSVClick(Sender: TObject);
@@ -1862,7 +1862,7 @@ begin
   FilesDBGrid_SaveCSVDialog.DefaultExt := 'csv';
   if FilesDBGrid_SaveCSVDialog.Execute then
   begin
-    frmSQLiteDBases.SaveFileSDBToCSV(RecursiveDisplayGrid1, FilesDBGrid_SaveCSVDialog.Filename);
+    frmSQLiteDBases.SaveFileSDBToCSV(DBGrid_FILES, FilesDBGrid_SaveCSVDialog.Filename);
   end;
 end;
 
@@ -1874,56 +1874,56 @@ begin
   FilesSaveAsHTMLDialog.Filter := 'HTML|*.html';
   FilesSaveAsHTMLDialog.DefaultExt := 'html';
   if FilesSaveAsHTMLDialog.Execute then
-  frmSQLiteDBases.SaveFILESTabToHTML(RecursiveDisplayGrid1, FilesSaveAsHTMLDialog.FileName);
+  frmSQLiteDBases.SaveFILESTabToHTML(DBGrid_FILES, FilesSaveAsHTMLDialog.FileName);
 end;
 
 procedure TMainForm.MenuItem_ShowDuplicatesClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.ShowDuplicates(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.ShowDuplicates(DBGrid_FILES);
 end;
 
 procedure TMainForm.MenuItem_SortByFilenameClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.SortByFilename(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.SortByFilename(DBGrid_FILES);
 end;
 
 procedure TMainForm.MenuItem_SortByFilePathClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.SortByFilePath(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.SortByFilePath(DBGrid_FILES);
 end;
 
 procedure TMainForm.MenuItem_SortByHashClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.SortByHash(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.SortByHash(DBGrid_FILES);
 end;
 
 procedure TMainForm.MenuItem_SortByHashListClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.SortByHashList(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.SortByHashList(DBGrid_FILES);
 end;
 
 procedure TMainForm.MenuItem_FilterOutNoClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.FilterOutHashListNO(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.FilterOutHashListNO(DBGrid_FILES);
 end;
 
 procedure TMainForm.MenuItem_FilterOutYesClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.FilterOutHashListYES(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.FilterOutHashListYES(DBGrid_FILES);
 end;
 
 
 procedure TMainForm.MenuItem_SortByIDClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid1.Clear;
-  frmSQLiteDBases.SortByID(RecursiveDisplayGrid1);
+  DBGrid_FILES.Clear;
+  frmSQLiteDBases.SortByID(DBGrid_FILES);
 end;
 
 procedure TMainForm.PageControl1Change(Sender: TObject);
@@ -2461,7 +2461,7 @@ var
   FS := nil;
   // Empty database table TBL_FILES from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
-  frmSQLiteDBases.EmptyDBTable('TBL_FILES', RecursiveDisplayGrid1);
+  frmSQLiteDBases.EmptyDBTable('TBL_FILES', DBGrid_FILES);
 
   // Set any custom delimiter. Uses ',' by default, unless chosen otherwise
   ChosenDelimiter := FileSDelimiterComboBox.Text;
@@ -2510,8 +2510,8 @@ var
         end;
       end;
 
-      RecursiveDisplayGrid1.Visible := false;
-      RecursiveDisplayGrid1.Clear;
+      DBGrid_FILES.Visible := false;
+      DBGrid_FILES.Clear;
       // If a scheduler has been set, wait for that future time to arrive
       if lblschedulertickboxFileSTab.Checked then
       begin
@@ -2564,7 +2564,7 @@ var
 
     lblNoFilesInDir.Caption := IntToStr(TotalFilesToExamine.count);
     NoOfFilesInDir2 := StrToInt(lblNoFilesInDir.Caption);  // A global var
-    //RecursiveDisplayGrid1.rowcount := TotalFilesToExamine.Count +1;
+    //DBGrid_FILES.rowcount := TotalFilesToExamine.Count +1;
     Application.ProcessMessages;
 
     // Create and assign a File Searcher instance and dictate its behaviour.
@@ -2619,7 +2619,7 @@ var
     // content in DBGrid
     frmSQLiteDBases.SQLTransaction1.CommitRetaining;
     frmSQLiteDBases.UpdateGridFILES(nil);
-    RecursiveDisplayGrid1.Visible := true;
+    DBGrid_FILES.Visible := true;
 
     // and conclude timings and update display
     stop := Now;
@@ -2639,7 +2639,7 @@ end;
 // The clipboard button on the 'FileS' tab, this will copy the DBGrid to clipboard
 procedure TMainForm.btnClipboardResultsClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoardFILES(RecursiveDisplayGrid1); // frmSQLiteDBases.DatasetToClipBoard(RecursiveDisplayGrid1);
+  frmSQLiteDBases.DatasetToClipBoardFILES(DBGrid_FILES); // frmSQLiteDBases.DatasetToClipBoard(DBGrid_FILES);
 end;
 
 procedure TMainForm.btnStopScan1Click(Sender: TObject);
@@ -2889,9 +2889,9 @@ begin
 
   // Empty database table TBL_COMPARE_TWO_FOLDERS from earlier runs, otherwise entries from
   // previous runs will be listed with this new run
-  frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS_MATCH', frmDisplayGrid3.dbGridC2F);
-  frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS_DUPLICATES', frmDisplayGrid3.dbGridC2F);
-  //frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS', frmDisplayGrid3.dbGridC2F);
+  frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS_MATCH', frmDisplayGrid3.DBGrid_C2F);
+  frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS_DUPLICATES', frmDisplayGrid3.DBGrid_C2F);
+  //frmSQLiteDBases.EmptyDBTableC2F('TBL_COMPARE_TWO_FOLDERS', frmDisplayGrid3.DBGrid_C2F);
 
   if cbUNCModeCompFolders.Checked then
   begin
@@ -3412,7 +3412,7 @@ var
   LoopCounter       : Integer;
   slSubDirListing, slSubDirAndFilesListing     : TStringList;
 begin
-  frmDisplayGrid1.RecursiveDisplayGrid_COPY.Visible := false; // Hide the grid if it was left visible from an earlier run
+  frmDisplayGrid1.DBGrid_COPY.Visible := false; // Hide the grid if it was left visible from an earlier run
   lblNoOfFilesToExamine.Caption    := '';
   lblNoOfFilesToExamine2.Caption   := '';
   lblFilesCopiedPercentage.Caption := '';
@@ -3482,7 +3482,7 @@ begin
           begin
             // Empty database table TBL_COPY from any earlier runs, otherwise entries from
             // previous runs will be listed with this new run
-            frmSQLiteDBases.EmptyDBTableCOPY('TBL_COPY', frmDisplayGrid1.RecursiveDisplayGrid_COPY);
+            frmSQLiteDBases.EmptyDBTableCOPY('TBL_COPY', frmDisplayGrid1.DBGrid_COPY);
 
             Application.ProcessMessages;
 
@@ -4386,7 +4386,11 @@ begin
        // i.e. if the loop counter is 40, then the last 40 reads won't be in the
        // progress updater. So you end up with "95%" complete when its actually finished.
        // This will clear that up.
-       pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+       // Also, fixed in v3.3.1, if user tries to hash a zero byte file do not do division of zero
+       if IntFileSize > 0 then
+       begin
+         pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+       end else pbFile.Position := 100;
        lblPercentageProgressFileTab.Caption:= IntToStr(pbFile.Position) + '%';
        LoopCounter := 0;
      end;
@@ -5529,7 +5533,7 @@ begin
       // Now we can show the grid. Having it display for every file as it processes
       // wastes time and isn't especially necessary given the other progress indicators
 
-      frmDisplayGrid1.RecursiveDisplayGrid_COPY.Visible := true;
+      frmDisplayGrid1.DBGrid_COPY.Visible := true;
       frmDisplayGrid1.Show;
       EndTime := Now;
       lblTimeTaken6B.Caption  := FormatDateTime('YYYY/MM/DD HH:MM:SS', EndTime);
@@ -5549,7 +5553,7 @@ begin
         if SaveDialog3.Execute then
           begin
             CSVLogFile2 := SaveDialog3.FileName;
-            frmSQLiteDBases.SaveFileSDBToCSV(frmDisplayGrid1.RecursiveDisplayGrid_COPY, CSVLogFile2);
+            frmSQLiteDBases.SaveFileSDBToCSV(frmDisplayGrid1.DBGrid_COPY, CSVLogFile2);
           end;
       end;
 

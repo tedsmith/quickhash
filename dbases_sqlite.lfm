@@ -1,5 +1,5 @@
 object frmSQLiteDBases: TfrmSQLiteDBases
-  Left = 1166
+  Left = 940
   Height = 562
   Top = 354
   Width = 460
@@ -24,6 +24,7 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Top = 144
   end
   object sqlFILES: TSQLQuery
+    PacketRecords = 1
     FieldDefs = <>
     Database = SQLite3Connection1
     Transaction = SQLTransaction1

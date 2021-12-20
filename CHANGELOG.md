@@ -5,7 +5,13 @@ v3.3.1 Dec 2021
 
 function CountGridRows has been changed. This function was designed to count the number of rows in any given display grid to determine whether the clipboard could be used, or whether the data would saved to a filestream. And, if the user chose to save the output to CSV or HTML, the same function would check to see if a memory list of strings could be used to then be saved out to a file, or whether a filestream should be used line by line. 
 
-But, when saving the output of very large lists of files to HTML, filestreams were supposed to be incorporated rather than using RAM. However, due to the v3.3.0 adjustment of the function CountGridRows to use .RecordCount, the variable that was used to check the number of rows was only showing what was on screen instead of what was in the table. So, QH was still using RAM even if the row count was many hundreds of thousands!! As such, it would cause QH to crash with large volumes of data. This has now been fixed I hope by the changes to CountGridRows to ensure the actual table row count is returned. Have tested on 400K files. Seems to work OK now. But the syntax of the call has changed to function CountGridRows(AGrid: TDBGrid; ATableName: string): Integer; meaning all parts where the function is called has been adjusted to also pass the table name it is to count. 
+But, when saving the output of very large lists of files to HTML, filestreams were supposed to be incorporated rather than using RAM. However, due to the v3.3.0 adjustment of the function CountGridRows to use .RecordCount, .First and .Last, the variable that was used to check the number of rows was only showing what was on screen instead of what was in the table. So, QH was still using RAM even if the row count was many hundreds of thousands!! As such, it would cause QH to crash with large volumes of data. Fixing this required tow significant changes: 
+
+1) Changes to CountGridRows means a dedicated TSQLQuery is used on the fly, instead of the DBGrid itself. 
+2) Changes to the function call of CountGridRows now means the Grid and the table to query is passed. 
+3) Major changes to functions SaveFILESTabToHTML SaveCOPYWindowToHTML SaveC2FWindowToHTML to use TSQLQueries too, instead of DBGrid queries. All three can now handle many thousands of rows more easily and are executed in just a few seconds. A test of 407K rows was saved as a 56Mb HTML file in under 10 seconds. 
+
+These changes described above are the largest service release aspects to this version. 
 
 The user is now also shown a message on screen, with an OK button, to let them know a Save as HTML has finished. Useful if the data set is very large and the save takes some time.  
 
@@ -13,7 +19,7 @@ The HTML file produced by right clicking in the FileS tab did not have a row 1 h
 
 The HTML file produced by right clicking in the FileS tab did not have the FileSize column if the row count was over 20K. Now it does. 
 
-(See - there were a lot of things missing in the HTML save for large volumes of data that I had missed - this is how small scale testing of your own does not compete with real world usage - its only when users report issues to me that I often get to know about problems, and then in turn, that unearths other issues that I can then fix)
+(See - there were a lot of things missing in the HTML save for large volumes of data that I had missed - this is how small scale testing on your own does not compare with real world usage - its only when users report issues to me that I often get to know about problems, and then in turn, that unearths other issues that I can then fix)
 
 On Linux, and OSX, the "Curently Hashing" status in the FileS tab was chopping off the first characters of the path. So instead of it saying /home/user/Documents/MyFile.doc it was saying e/users/Documents/MyFile.doc. This was due to the long path override character cleansing that is necessary for Windows, but not for Linux or OSX, and I forgot to use a cross compiler directive. Now fixed in in v3.3.1
 

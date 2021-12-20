@@ -19,7 +19,7 @@ type
 
   TfrmDisplayGrid1 = class(TForm)
     btnClipboardResultsCOPYTAB: TButton;
-    RecursiveDisplayGrid_COPY: TDBGrid;
+    DBGrid_COPY: TDBGrid;
     CopyTabDBNavigator: TDBNavigator;
     MenuItem_SaveDBToCSV: TMenuItem;
     MenuItem_CopySelectedRowCOPYGRID: TMenuItem;
@@ -66,12 +66,12 @@ dbases_sqlite;
 procedure TfrmDisplayGrid1.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
-  RecursiveDisplayGrid_COPY.Clear
+  DBGrid_COPY.Clear
 end;
 
 procedure TfrmDisplayGrid1.btnClipboardResultsCOPYTABClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoardCOPYTAB(RecursiveDisplayGrid_COPY);
+  frmSQLiteDBases.DatasetToClipBoardCOPYTAB(DBGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.FormCreate(Sender: TObject);
@@ -81,12 +81,12 @@ end;
 
 procedure TfrmDisplayGrid1.MenuItem_CopySelectedRowCOPYGRIDClick(Sender: TObject);
 begin
-  frmSQLiteDBases.CopySelectedRowCOPYTAB(RecursiveDisplayGrid_COPY);
+  frmSQLiteDBases.CopySelectedRowCOPYTAB(DBGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.MenuItem_CopyToClipboardClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoardCOPYTAB(RecursiveDisplayGrid_COPY);
+  frmSQLiteDBases.DatasetToClipBoardCOPYTAB(DBGrid_COPY);
 end;
 
 // Save the COPY Window results pane to HTML File
@@ -103,7 +103,7 @@ begin
   if frmDisplayGridSaveDialog1.Execute then
   begin
     ExportFilename := frmDisplayGridSaveDialog1.FileName;
-    frmSQLiteDBases.SaveCOPYWindowToHTML(RecursiveDisplayGrid_COPY, ExportFilename);
+    frmSQLiteDBases.SaveCOPYWindowToHTML(DBGrid_COPY, ExportFilename);
   end;
 end;
 
@@ -121,39 +121,39 @@ begin
   if frmDisplayGridSaveDialog1.Execute then
   begin
     ExportFilename := frmDisplayGridSaveDialog1.FileName;
-    frmSQLiteDBases.SaveCopyDBToCSV(RecursiveDisplayGrid_COPY, ExportFilename);
+    frmSQLiteDBases.SaveCopyDBToCSV(DBGrid_COPY, ExportFilename);
   end;
 end;
 
 
 procedure TfrmDisplayGrid1.MenuItem_ShowAllCOPYGRIDClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid_COPY.Clear;
-  frmSQLiteDBases.ShowAllCOPYGRID(RecursiveDisplayGrid_COPY);
+  DBGrid_COPY.Clear;
+  frmSQLiteDBases.ShowAllCOPYGRID(DBGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.MenuItem_SortByDestinationHashCOPYGRIDClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid_COPY.Clear;
-  frmSQLiteDBases.SortByDestinationHash(RecursiveDisplayGrid_COPY);
+  DBGrid_COPY.Clear;
+  frmSQLiteDBases.SortByDestinationHash(DBGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.MenuItem_SortBySourceHashCOPYGRIDClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid_COPY.Clear;
-  frmSQLiteDBases.SortBySourceHash(RecursiveDisplayGrid_COPY);
+  DBGrid_COPY.Clear;
+  frmSQLiteDBases.SortBySourceHash(DBGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.MenuItem_SortBySourceNameCOPYGRIDClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid_COPY.Clear;
-  frmSQLiteDBases.SortBySourceFilename(RecursiveDisplayGrid_COPY);
+  DBGrid_COPY.Clear;
+  frmSQLiteDBases.SortBySourceFilename(DBGrid_COPY);
 end;
 
 procedure TfrmDisplayGrid1.MenuItem_SortByDestinationNameCOPYGRIDClick(Sender: TObject);
 begin
-  RecursiveDisplayGrid_COPY.Clear;
-  frmSQLiteDBases.SortByDestinationFilename(RecursiveDisplayGrid_COPY);
+  DBGrid_COPY.Clear;
+  frmSQLiteDBases.SortByDestinationFilename(DBGrid_COPY);
 end;
 
 

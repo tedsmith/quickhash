@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 657
+  Left = 228
   Height = 733
-  Top = 265
+  Top = 161
   Width = 1023
   AllowDropFiles = True
   Caption = 'QuickHash v3.3.1 (Jan 2022) - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 671
     Top = 24
     Width = 991
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -294,16 +294,16 @@ object MainForm: TMainForm
         TabOrder = 0
         object Label6: TLabel
           Left = 552
-          Height = 34
+          Height = 32
           Top = 47
-          Width = 270
+          Width = 267
           Caption = 'As root, this section can be used to hash disks'#10'e.g. /dev/sdX or /dev/sdaX, or /dev/hdX'
           ParentColor = False
           WordWrap = True
         end
         object lblStartedFileAt: TLabel
           Left = 272
-          Height = 17
+          Height = 16
           Top = 8
           Width = 9
           Caption = '...'
@@ -311,7 +311,7 @@ object MainForm: TMainForm
         end
         object lblFileTimeTaken: TLabel
           Left = 272
-          Height = 17
+          Height = 16
           Top = 56
           Width = 9
           Caption = '...'
@@ -319,7 +319,7 @@ object MainForm: TMainForm
         end
         object edtFileNameToBeHashed: TEdit
           Left = 6
-          Height = 25
+          Height = 28
           Top = 96
           Width = 826
           Anchors = [akTop, akLeft, akRight]
@@ -330,10 +330,10 @@ object MainForm: TMainForm
         end
         object btnHashFile: TButton
           Left = 6
-          Height = 25
+          Height = 30
           Hint = 'Choose a single file to hash (or Linux physical device e.g. /dev/sda)'
           Top = 64
-          Width = 83
+          Width = 82
           AutoSize = True
           Caption = 'Select &File'
           Color = 8454016
@@ -346,16 +346,16 @@ object MainForm: TMainForm
         end
         object StatusBar1: TStatusBar
           Left = 0
-          Height = 23
-          Top = 353
-          Width = 848
+          Height = 18
+          Top = 363
+          Width = 850
           Panels = <>
         end
         object lblDragAndDropNudge: TLabel
           Left = 112
-          Height = 17
+          Height = 16
           Top = 64
-          Width = 121
+          Width = 118
           Caption = 'or drag n drop a file'
           ParentColor = False
         end
@@ -384,12 +384,12 @@ object MainForm: TMainForm
         end
         object lbleExpectedHash: TLabeledEdit
           Left = 8
-          Height = 25
+          Height = 28
           Hint = 'Paste an existing hash value here to see if'#13#10'the generated file hash matches it, or not. '
           Top = 264
           Width = 824
           Anchors = [akTop, akLeft, akRight]
-          EditLabel.Height = 17
+          EditLabel.Height = 16
           EditLabel.Width = 824
           EditLabel.Caption = 'Expected Hash Value (paste from other utility before or after file hashing)'
           EditLabel.ParentColor = False
@@ -400,7 +400,7 @@ object MainForm: TMainForm
         end
         object lbEndedFileAt: TLabel
           Left = 272
-          Height = 17
+          Height = 16
           Top = 32
           Width = 9
           Caption = '...'
@@ -408,10 +408,10 @@ object MainForm: TMainForm
         end
         object ZVDateTimePickerFileTab: TZVDateTimePicker
           Left = 8
-          Height = 25
+          Height = 22
           Hint = 'Enter date and time (hours and minutes) '#13#10'to start the process. Must be in the future!'
           Top = 32
-          Width = 136
+          Width = 134
           CenturyFrom = 1941
           MaxDate = 72686
           MinDate = 42736
@@ -435,10 +435,10 @@ object MainForm: TMainForm
         end
         object lblschedulertickboxFileTab: TCheckBox
           Left = 8
-          Height = 21
+          Height = 23
           Hint = 'Tick and set a date and time ahead of current time'#13#10'and then select the file to hash.'
           Top = 8
-          Width = 105
+          Width = 112
           Caption = 'Start at a time:'
           OnChange = lblschedulertickboxFileTabChange
           ParentShowHint = False
@@ -467,7 +467,7 @@ object MainForm: TMainForm
           AnchorSideTop.Control = pbFile
           AnchorSideTop.Side = asrBottom
           Left = 456
-          Height = 17
+          Height = 16
           Top = 324
           Width = 9
           Caption = '...'
@@ -475,9 +475,9 @@ object MainForm: TMainForm
         end
         object cbFlipCaseFILE: TCheckBox
           Left = 8
-          Height = 21
+          Height = 23
           Top = 208
-          Width = 86
+          Width = 93
           Caption = 'Switch case'
           OnChange = cbFlipCaseFILEChange
           TabOrder = 9
@@ -784,7 +784,7 @@ object MainForm: TMainForm
           OnChange = lblschedulertickboxFileSTabChange
           TabOrder = 10
         end
-        object RecursiveDisplayGrid1: TDBGrid
+        object DBGrid_FILES: TDBGrid
           Left = 8
           Height = 369
           Top = 200
@@ -811,8 +811,8 @@ object MainForm: TMainForm
           ChildSizing.ShrinkVertical = crsScaleChilds
           ChildSizing.Layout = cclLeftToRightThenTopToBottom
           ChildSizing.ControlsPerLine = 100
-          ClientHeight = 25
-          ClientWidth = 177
+          ClientHeight = 21
+          ClientWidth = 173
           DataSource = frmSQLiteDBases.DataSource1
           Options = []
           TabOrder = 12
@@ -935,8 +935,8 @@ object MainForm: TMainForm
           Top = 8
           Width = 830
           Anchors = [akTop, akLeft, akRight]
-          ClientHeight = 184
-          ClientWidth = 830
+          ClientHeight = 180
+          ClientWidth = 826
           TabOrder = 3
           OnClick = Panel1CopyAndHashOptionsClick
           object CheckBoxListOfDirsOnly: TCheckBox
@@ -1095,9 +1095,9 @@ object MainForm: TMainForm
             AnchorSideTop.Control = pbCopy
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = pbCopy
-            Left = 396
+            Left = 398
             Height = 16
-            Top = 163
+            Top = 167
             Width = 9
             Anchors = []
             Caption = '...'
@@ -2057,7 +2057,7 @@ object MainForm: TMainForm
         end
         object b64ProgressFileS: TEdit
           Left = 184
-          Height = 25
+          Height = 28
           Hint = 'Progress of Base64 decoding of FileS will show here'
           Top = 216
           Width = 641
@@ -2067,7 +2067,7 @@ object MainForm: TMainForm
         end
         object b64DecoderProgress: TEdit
           Left = 184
-          Height = 25
+          Height = 28
           Hint = 'Progress of Base64 decoding of FileS will show here'
           Top = 512
           Width = 641
@@ -2077,18 +2077,18 @@ object MainForm: TMainForm
         end
         object lblB64DecoderWarning: TLabel
           Left = 16
-          Height = 34
+          Height = 32
           Top = 552
-          Width = 235
+          Width = 232
           Caption = '(Simply for creating decoded copies of '#13#10'encoded Base64 files. No hashing done)'
           ParentColor = False
           WordWrap = True
         end
         object lblB64Warning: TLabel
           Left = 200
-          Height = 34
+          Height = 32
           Top = 7
-          Width = 454
+          Width = 452
           Caption = 'Only minimal checks are conducted to check supplied data is Base64 encoded'#13#10'Ideally, ensure your source data is Base64 encoded to start with'
           ParentColor = False
         end

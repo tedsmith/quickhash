@@ -15,7 +15,7 @@ type
 
   TfrmDisplayGrid3 = class(TForm)
     btnC2FClipboard: TButton;
-    dbGridC2F: TDBGrid;
+    DBGrid_C2F: TDBGrid;
     DBNavigator_C2F: TDBNavigator;
     MenuItem_C2F_ShowDuplicates: TMenuItem;
     MenuItem_C2F_MissingFromFolderAAndFolderB: TMenuItem;
@@ -65,46 +65,46 @@ implementation
 // and wants to see it again
 procedure TfrmDisplayGrid3.MenuItem_ShowAllClick(Sender: TObject);
 begin
-  dbGridC2F.Clear;
-  frmSQLiteDBases.ShowAllC2FGRID(dbGridC2F);
+  DBGrid_C2F.Clear;
+  frmSQLiteDBases.ShowAllC2FGRID(DBGrid_C2F);
 end;
 
 // Copies the entire "Compare Two Folders" DB grid to clipboard via pop up menu option
 procedure TfrmDisplayGrid3.MenuItem_ClipboardAllRowsClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoard(dbGridC2F);
+  frmSQLiteDBases.DatasetToClipBoard(DBGrid_C2F);
 end;
 
 // Copies the entire "Compare Two Folders" DB grid to clipboard if user presses button
 procedure TfrmDisplayGrid3.btnC2FClipboardClick(Sender: TObject);
 begin
-  frmSQLiteDBases.DatasetToClipBoard(dbGridC2F);
+  frmSQLiteDBases.DatasetToClipBoard(DBGrid_C2F);
 end;
 
 // Used by "Compare Two Folders" DB grid to show files that are missing from folder A
 procedure TfrmDisplayGrid3.MenuItem_C2F_MissingFolderAFilesClick(Sender: TObject
   );
 begin
-  frmSQLiteDBases.ShowMissingFilesFolderA(dbGridC2F);
+  frmSQLiteDBases.ShowMissingFilesFolderA(DBGrid_C2F);
 end;
 
 // Used by "Compare Two Folders" DB grid to show files that are missing from folder B
 procedure TfrmDisplayGrid3.MenuItem_C2F_MissingFolderBFilesClick(Sender: TObject
   );
 begin
-  frmSQLiteDBases.ShowMissingFilesFolderB(dbGridC2F);
+  frmSQLiteDBases.ShowMissingFilesFolderB(DBGrid_C2F);
 end;
 // Used by "Compare Two Folders" DB grid to show files that are missing from folder A or B
 procedure TfrmDisplayGrid3.MenuItem_C2F_MissingFromFolderAAndFolderBClick(
   Sender: TObject);
 begin
-  frmSQLiteDBases.ShowMissingFromFolderAAndFolderB(dbGridC2F);
+  frmSQLiteDBases.ShowMissingFromFolderAAndFolderB(DBGrid_C2F);
 end;
 
 // Used by "Compare Two Folders" DB grid to show files that have differing hashes
 procedure TfrmDisplayGrid3.MenuItem_C2F_ShowDiffHashesClick(Sender: TObject);
 begin
-  frmSQLiteDBases.ShowDiffHashes(dbGridC2F);
+  frmSQLiteDBases.ShowDiffHashes(DBGrid_C2F);
 end;
 
 // Save the "Compare Two Folders" Window results pane to HTML File
@@ -123,7 +123,7 @@ begin
     if frmDisplayGrid3SaveDialog.Execute then
     begin
       ExportFilename := frmDisplayGrid3SaveDialog.FileName;
-      frmSQLiteDBases.SaveC2FWindowToHTML(dbGridC2F, ExportFilename);
+      frmSQLiteDBases.SaveC2FWindowToHTML(DBGrid_C2F, ExportFilename);
     end;
   end
   else Showmessage('HTML output not possible with "Show Duplicates" active. Restore default view or use "Save to CSV" instead');
@@ -132,7 +132,7 @@ end;
 // Show mis-matched values, where a hash was found in one folder but not the other
 procedure TfrmDisplayGrid3.MenuItem_C2F_ShowMismatchesClick(Sender: TObject);
 begin
-  frmSQLiteDBases.ShowMismatchesC2F(dbGridC2F);
+  frmSQLiteDBases.ShowMismatchesC2F(DBGrid_C2F);
 end;
 // Save the "Compare Two Folders" results pane to CSV File
 procedure TfrmDisplayGrid3.MenuItem_C2F_SaveResultsCSVClick(Sender: TObject);
@@ -153,7 +153,7 @@ begin
   if frmDisplayGrid3SaveDialog.Execute then
   begin
     ExportFilename := frmDisplayGrid3SaveDialog.FileName;
-    frmSQLiteDBases.SaveC2FDBToCSV(dbGridC2F, ExportFilename);
+    frmSQLiteDBases.SaveC2FDBToCSV(DBGrid_C2F, ExportFilename);
   end;
 end;
 
@@ -161,25 +161,25 @@ end;
 procedure TfrmDisplayGrid3.MenuItem_CopySelectedRowC2FGRIDClick(Sender: TObject
   );
 begin
-  frmSQLiteDBases.CopySelectedRowC2FTAB(dbGridC2F);
+  frmSQLiteDBases.CopySelectedRowC2FTAB(DBGrid_C2F);
 end;
 
 // Copies the selected rowS (plural) of "Compare Two Folders" DB grid to clipboard via pop up menu option
 procedure TfrmDisplayGrid3.MenuItem_C2F_SelectedRowsC2FGRIDClick(Sender: TObject);
 begin
-  frmSQLiteDBases.CopySelectedRowsC2FTAB(dbGridC2F);
+  frmSQLiteDBases.CopySelectedRowsC2FTAB(DBGrid_C2F);
 end;
 
 procedure TfrmDisplayGrid3.MenuItem_C2F_ShowDuplicatesClick(Sender: TObject);
 begin
-  frmSQLiteDBases.ShowDuplicatesC2FTAB(dbGridC2F);
+  frmSQLiteDBases.ShowDuplicatesC2FTAB(DBGrid_C2F);
 end;
 
 // Shows hashes that match in "Compare Two Folders" DB grid
 procedure TfrmDisplayGrid3.MenuItem_C2F_ShowMatchingHashesClick(Sender: TObject
   );
 begin
-  frmSQLiteDBases.ShowMatchingHashes(dbGridC2F);
+  frmSQLiteDBases.ShowMatchingHashes(DBGrid_C2F);
 end;
 
 initialization

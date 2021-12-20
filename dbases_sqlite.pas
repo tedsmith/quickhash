@@ -384,7 +384,7 @@ begin
 
       // New to v3.2.0 to enable a display grid for the comparison of two folders
       // Here we're setting up a table named "TBL_COMPARE_TWO_FOLDERS" in the new database for Comapre Two Folders tab
-      // VARCHAR is set as 32767 to ensure max length of NFTS based filename and paths can be utilised
+      // VARCHAR is set as 4096 to ensure max length of NFTS based filename and paths can be utilised
       SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COMPARE_TWO_FOLDERS"('+
                                        ' "id" Integer NOT NULL PRIMARY KEY,'+
                                        ' "FilePath" VARCHAR(4096) NULL,'    +
@@ -611,33 +611,6 @@ begin
     Free;
   end;
 
-  {
-  try
-    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT COUNT(*) FROM TBL_FILES';
-    SQLite3Connection1.Connected := True;
-    SQLTransaction1.Active := True;
-    //MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
-    DBGrid.DataSource.Dataset.Open;
-    NoOfRows := DBGrid.DataSource.Dataset.Fields[0].AsInteger;
-    If NoOfRows > 0 then result := NoOfRows;
-  except
-    on E: EDatabaseError do
-    begin
-      MessageDlg('Error','A database error has occurred. Technical error message: ' + E.Message,mtError,[mbOK],0);
-    end;
-  end;   }
-
- { DBGrid.DataSource.DataSet.DisableControls;
-  try
-    DBGrid.DataSource.DataSet.Last;                    // Navigate forward to the last record to ensure all are loaded for RecordCount
-    DBGrid.DataSource.DataSet.First;                   // Position the dataset on the first record.
-    NoOfRows := DBGrid.DataSource.DataSet.RecordCount; // Now get the true count
-  finally
-    DBGrid.DataSource.DataSet.EnableControls;
-  end;
-  If NoOfRows > 0 then result := NoOfRows;    }
-
   {pre v3.3.0 method
   result := -1;
   DBGrid.DataSource.Dataset.DisableControls;
@@ -659,14 +632,16 @@ end;
 procedure TfrmSQLiteDBases.SaveFILESTabToHTML(DBGrid : TDBGrid; Filename : string);
 var
   strTitle       : string = Default(string);
+  FileIDCell     : string = Default(string);
   FileNameCell   : string = Default(string);
   FilePathCell   : string = Default(string);
   FileHashCell   : string = Default(string);
   FileSizeCell   : string = Default(string);
+  KnownHashCell  : string = Default(string);
   NoOfRowsInGrid : integer = Default(integer);
   sl             : TStringList;
   fs             : TFileStreamUTF8;
-
+  ExportSQLQuery : TSQLQuery;
 const
   strHTMLHeader      = '<HTML>'  ;
   strTITLEHeader     = '<TITLE>QuickHash HTML Output' ;
@@ -676,7 +651,7 @@ const
   strTABLEDATAStart  = '<TD>'    ;
   strTABLEDataEnd    = '</TD>'   ;
   strTABLEROWEnd     = '</TR>'   ;
-  strTableRow1       = '<TR><TD><B>Filename</B></TD><TD><B>Filepath</B></TD><TD><B>Filehash</B></TD><TD><B>Filesize</B></TD></TR>';
+  strTableRow1       = strTABLEROWStart+'<TD><B>ID</B></TD><TD><B>Filename</B></TD><TD><B>Filepath</B></TD><TD><B>Filehash</B></TD><TD><B>Filesize</B></TD>';
   strTABLEFooter     = '</TABLE>';
   strBODYFooter      = '</BODY>' ;
   strTITLEFooter     = '</TITLE>';
@@ -684,7 +659,7 @@ const
 
 begin
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
-  if DBGrid.Name = 'RecursiveDisplayGrid1' then
+  if DBGrid.Name = 'DBGrid_FILES' then
     begin
       NoOfRowsInGrid := CountGridRows(DBGrid, 'TBL_FILES');// Count the rows first. If not too many, use memory. Otherwise, use filestreams
       if (NoOfRowsInGrid < 20000) and (NoOfRowsInGrid > -1) then
@@ -698,118 +673,157 @@ begin
         sl.add('<BODY>');
         sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
         sl.add('<TABLE>');
-        sl.add(strTableRow1);
+        if MainForm.cbLoadHashList.Checked then
+        begin
+          sl.add(strTableRow1 + '<TD>Known Hash Flag</TD>' + strTABLEROWEnd)
+        end else sl.add(strTableRow1 + strTABLEROWEnd);
 
-        DBGrid.DataSource.DataSet.DisableControls;
-        DBGrid.DataSource.DataSet.First;
-        while not DBGrid.DataSource.DataSet.EOF do
-          begin
-            sl.add('<tr>');
-            // Get the data from the filename cell
-            FileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
-            sl.add('<td>'+FileNameCell+'</td>');
-            // Get the data from the filepath cell
-            FilePathCell := DBGrid.DataSource.DataSet.Fields[2].AsString;
-            sl.add('<td>'+FilePathCell+'</td>');
-            // Get the data from the filehash cell
-            FileHashCell := DBGrid.DataSource.DataSet.Fields[3].AsString;
-            sl.add('<td>'+FileHashCell+'</td>');
-            // Get the data from the filesize cell
-            FileSizeCell := DBGrid.DataSource.DataSet.Fields[4].AsString;
-            sl.add('<td>'+FileSizeCell+'</td>');
-            sl.add('</tr>');
-            DBGrid.DataSource.DataSet.Next;
-          end;
-        sl.add('</TABLE>');
-        sl.add('</BODY> ');
-        sl.add('</HTML> ');
-        DBGrid.DataSource.DataSet.EnableControls;
-        sl.SaveToFile(Filename);
+        try
+          DBGrid.DataSource.DataSet.DisableControls;
+          DBGrid.DataSource.DataSet.First;
+          while not DBGrid.DataSource.DataSet.EOF do
+            begin
+              sl.add('<tr>');
+              // Get the data from the filename cell
+              FileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
+              sl.add('<td>'+FileNameCell+'</td>');
+              // Get the data from the filepath cell
+              FilePathCell := DBGrid.DataSource.DataSet.Fields[2].AsString;
+              sl.add('<td>'+FilePathCell+'</td>');
+              // Get the data from the filehash cell
+              FileHashCell := DBGrid.DataSource.DataSet.Fields[3].AsString;
+              sl.add('<td>'+FileHashCell+'</td>');
+              // Get the data from the filesize cell
+              FileSizeCell := DBGrid.DataSource.DataSet.Fields[4].AsString;
+              sl.add('<td>'+FileSizeCell+'</td>');
+              sl.add('</tr>');
+              DBGrid.DataSource.DataSet.Next;
+            end;
+          sl.add('</TABLE>');
+          sl.add('</BODY> ');
+          sl.add('</HTML> ');
+        finally
+          DBGrid.DataSource.DataSet.EnableControls;
+        end;
       finally
         sl.free;
         MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
+        ShowMessage(MainForm.StatusBar2.Caption);
         Application.ProcessMessages;
       end
       else // Use filestream method because there's more than 10K rows. Too many to add HTML tags and store in memory
         try
-        if not FileExists(filename) then
-          begin
-            fs := TFileStreamUTF8.Create(Filename, fmCreate);
-          end
-        else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
+          if not FileExists(filename) then
+            begin
+              fs := TFileStreamUTF8.Create(Filename, fmCreate);
+            end
+          else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
 
-        MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
-        strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
-        Application.ProcessMessages;
+          MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+          strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
+          Application.ProcessMessages;
 
-        fs.Write(strHTMLHeader[1], Length(strHTMLHeader));
-        fs.Write(#13#10, 2);
-        fs.Write(strTITLEHeader[1], Length(strTITLEHeader));
-        fs.Write(strTITLEFooter[1], Length(strTITLEFooter));
-        fs.Write(#13#10, 2);
-        fs.Write(strBODYHeader[1], Length(strBODYHeader));
-        fs.Write(strTitle[1], Length(strTitle));
-        fs.Write(#13#10, 2);
-        fs.Write(strTABLEHeader[1], Length(strTABLEHeader));
-        fs.Write(strTableRow1[1], Length(strTableRow1));
-
-        { strTABLEROWStart   = '<TR>'      = 4 bytes
-          strTABLEDATAStart  = '<TD>'      = 4 bytes
-          strTABLEDataEnd    = '</TD>'     = 5 bytes
-          strTABLEROWEnd     = '</TR>'     = 5 bytes
-          strTABLEFooter     = '</TABLE>'  = 8 bytes
-          strBODYFooter      = '</BODY>'   = 7 bytes
-          strTITLEFooter     = '</TITLE>'  = 8 bytes
-          strHTMLFooter      = '</HTML>'   = 7 bytes}
-        DBGrid.DataSource.DataSet.DisableControls;
-        DBGrid.DataSource.DataSet.First;
-        while not DBGrid.DataSource.DataSet.EOF do
-        begin
-          // Start new row
-          fs.Write(strTABLEROWStart[1], 4);
-          // Get the data from the filename cell that the user has selected
-          FileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
-          // Write filename to new row
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Write(FileNameCell[1], Length(FileNameCell));
-          fs.Write(strTABLEDataEnd[1], 5);
-
-          // Get the data from the filepath cell that the user has selected
-          FilePathCell := DBGrid.DataSource.DataSet.Fields[2].AsString;
-          // Write filepath to new row
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Write(FilePathCell[1], Length(FilePathCell));
-          fs.Write(strTABLEDATAEnd[1], 5);
-
-          // Get the data from the filehash cell that the user has selected
-          FileHashCell := DBGrid.DataSource.DataSet.Fields[3].AsString;
-          // Write hash to new row
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(FileHashCell[1], Length(Trim(FileHashCell)));
-          fs.Write(strTABLEDATAEnd[1], 5);
-
-          // Get the data from the filesize cell that the user has selected
-          FileSizeCell := DBGrid.DataSource.DataSet.Fields[4].AsString;
-          // Write hash to new row
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(FileSizeCell[1], Length(Trim(FileSizeCell)));
-          fs.Write(strTABLEDATAEnd[1], 5);
-
-          // End the row
-          fs.Write(strTABLEROWEnd[1], 5);
+          fs.Write(strHTMLHeader[1], Length(strHTMLHeader));
           fs.Write(#13#10, 2);
-          DBGrid.DataSource.DataSet.Next;
-        end;
-        fs.Write(strTABLEFooter, 8);
-        fs.Write(#13#10, 2);
-        fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
-        fs.Write(strBODYFooter, 7);
-        fs.Write(#13#10, 2);
-        fs.Write(strHTMLFooter, 7);
-        fs.Write(#13#10, 2);
-        DBGrid.DataSource.DataSet.EnableControls;
+          fs.Write(strTITLEHeader[1], Length(strTITLEHeader));
+          fs.Write(strTITLEFooter[1], Length(strTITLEFooter));
+          fs.Write(#13#10, 2);
+          fs.Write(strBODYHeader[1], Length(strBODYHeader));
+          fs.Write(strTitle[1], Length(strTitle));
+          fs.Write(#13#10, 2);
+          fs.Write(strTABLEHeader[1], Length(strTABLEHeader));
+          fs.Write(strTableRow1[1], Length(strTableRow1));
+
+          { strTABLEROWStart   = '<TR>'      = 4 bytes
+            strTABLEDATAStart  = '<TD>'      = 4 bytes
+            strTABLEDataEnd    = '</TD>'     = 5 bytes
+            strTABLEROWEnd     = '</TR>'     = 5 bytes
+            strTABLEFooter     = '</TABLE>'  = 8 bytes
+            strBODYFooter      = '</BODY>'   = 7 bytes
+            strTITLEFooter     = '</TITLE>'  = 8 bytes
+            strHTMLFooter      = '</HTML>'   = 7 bytes}
+
+          // v3.3.0 highlighted that the exporting of large volumes of data in the
+          // DBGrid, even as a filestream, was causing QH to crash dueo the DBGrid controls.
+          // So for v3.3.1 onwards, we create temporary dedicated pure SQLQueries to handle this instead.
+          try
+            ExportSQLQuery := TSQLQuery.Create(nil);
+            try
+              ExportSQLQuery.SQL.Text := 'SELECT * FROM TBL_FILES';  // Get all the data from Files tab table
+              ExportSQLQuery.Database := SQLite3Connection1;
+              ExportSQLQuery.UniDirectional := True; //<- this is the important part for memory handling reasons but cant be used in an active DBGrid - only for SQLQueries
+              ExportSQLQuery.Open;
+              ExportSQLQuery.First;
+              while not ExportSQLQuery.EOF do
+              begin
+                fs.Write(strTABLEROWStart[1], 4);
+
+                // Get the data from the ID cell
+                FileIDCell := ExportSQLQuery.FieldByName('id').AsString;
+                // Write filename to new row
+                fs.Write(strTABLEDATAStart[1], 4);
+                fs.Write(FileIDCell[1], Length(FileIDCell));
+                fs.Write(strTABLEDataEnd[1], 5);
+
+                // Get the data from the filename cell
+                FileNameCell := ExportSQLQuery.FieldByName('FileName').AsString;
+                // Write filename to new row
+                fs.Write(strTABLEDATAStart[1], 4);
+                fs.Write(FileNameCell[1], Length(FileNameCell));
+                fs.Write(strTABLEDataEnd[1], 5);
+
+                // Get the data from the filepath cell
+                FilePathCell := ExportSQLQuery.FieldByName('FilePath').AsString;
+                // Write filepath to new row
+                fs.Write(strTABLEDATAStart[1], 4);
+                fs.Write(FilePathCell[1], Length(FilePathCell));
+                fs.Write(strTABLEDATAEnd[1], 5);
+
+                // Get the data from the filehash cell
+                FileHashCell := ExportSQLQuery.FieldByName('HashValue').AsString;
+                // Write hash to new row
+                fs.Write(strTABLEDATAStart[1], 4) ;
+                fs.Write(FileHashCell[1], Length(Trim(FileHashCell)));
+                fs.Write(strTABLEDATAEnd[1], 5);
+
+                // Get the data from the filesize cell
+                FileSizeCell := ExportSQLQuery.FieldByName('FileSize').AsString;
+                // Write hash to new row
+                fs.Write(strTABLEDATAStart[1], 4) ;
+                fs.Write(FileSizeCell[1], Length(Trim(FileSizeCell)));
+                fs.Write(strTABLEDATAEnd[1], 5);
+
+                //Get the data from the KnownHashFlag cell, if it has been selected for use by the user
+                if MainForm.cbLoadHashList.Checked then
+                begin
+                  KnownHashCell := ExportSQLQuery.FieldByName('KnownHashFlag').AsString;
+                  // Write hash to new row
+                  fs.Write(strTABLEDATAStart[1], 4) ;
+                  fs.Write(KnownHashCell[1], Length(Trim(KnownHashCell)));
+                  fs.Write(strTABLEDATAEnd[1], 5);
+                end;
+
+                // End the row
+                fs.Write(strTABLEROWEnd[1], 5);
+                fs.Write(#13#10, 2);
+                // Repeat for the next row
+                ExportSQLQuery.next;
+              end;
+            finally
+              // Nothing to free here
+            end;
+            fs.Write(strTABLEFooter, 8);
+            fs.Write(#13#10, 2);
+            fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
+            fs.Write(strBODYFooter, 7);
+            fs.Write(#13#10, 2);
+            fs.Write(strHTMLFooter, 7);
+            fs.Write(#13#10, 2);
+          finally
+            ExportSQLQuery.free; // Free the temp SQL Query
+          end;
       finally
-        fs.free;
+        fs.free;                 // Free the filestream
         MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
         Application.ProcessMessages;
         ShowMessage(MainForm.StatusBar2.Caption);
@@ -818,7 +832,7 @@ begin
   else
     if DBGrid.Name = 'frmDisplayGrid1' then
     begin
-      // Same as above but use the 5 columns from COPY grid instead of the 3 of FILES
+      // See SaveCOPYWindowToHTML
     end;
 end;
 
@@ -1290,9 +1304,9 @@ begin
         ChosenDelimiter := #32;
       end;
 
-  if DBGrid.Name = 'RecursiveDisplayGrid1'     then tblName := 'TBL_FILES';
-  if DBGrid.Name = 'dbGridC2F'                 then tblName := 'TBL_COMPARE_TWO_FOLDERS';
-  if DBGrid.Name = 'RecursiveDisplayGrid_COPY' then tblName := 'TBL_COPY';
+  if DBGrid.Name = 'DBGrid_FILES'     then tblName := 'TBL_FILES';
+  if DBGrid.Name = 'DBGrid_C2F'                 then tblName := 'TBL_COMPARE_TWO_FOLDERS';
+  if DBGrid.Name = 'DBGrid_COPY' then tblName := 'TBL_COPY';
 
   RowCount := CountGridRows(DBGrid, tblName);
   if RowCount < 20000 then
@@ -1367,7 +1381,7 @@ begin
                                                    'GROUP BY HashValue HAVING COUNT(*) > 1) ORDER BY hashvalue';
   SQLite3Connection1.Connected := True;
   SQLTransaction1.Active := True;
-  MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+  MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
   DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -1504,7 +1518,7 @@ begin
                                                      'FROM TBL_FILES ORDER BY Id';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1523,7 +1537,7 @@ begin
                                                      'FROM TBL_FILES ORDER BY FileName';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1542,7 +1556,7 @@ begin
                                                     'FROM TBL_FILES ORDER BY FilePath';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
-   MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+   MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
    DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -1561,7 +1575,7 @@ begin
                                                     'FROM TBL_FILES ORDER BY HashValue';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
-   MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+   MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
    DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -1580,7 +1594,7 @@ begin
                                                     'FROM TBL_FILES ORDER BY KnownHashFlag';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
-   MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+   MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
    DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -1603,7 +1617,7 @@ begin
 
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -1625,7 +1639,7 @@ begin
                                                       'FROM TBL_FILES WHERE KnownHashFlag LIKE ''Yes''';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
   except
   on E: EDatabaseError do
@@ -1643,7 +1657,7 @@ begin
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_FILES';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -1821,7 +1835,7 @@ begin
     DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1843,7 +1857,7 @@ begin
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'select * from TBL_COMPARE_TWO_FOLDERS_DUPLICATES';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1866,7 +1880,7 @@ begin
     DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1888,7 +1902,7 @@ begin
     DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1910,7 +1924,7 @@ begin
     DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1932,7 +1946,7 @@ begin
     DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1953,7 +1967,7 @@ begin
     DBGrid.DataSource.DataSet.Filtered:=True;
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -1972,7 +1986,7 @@ begin
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text:='select * from TBL_COMPARE_TWO_FOLDERS_MATCH';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -2021,7 +2035,7 @@ begin
                                                      'FROM TBL_COPY ORDER BY SourceFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+    frmDisplayGrid1.DBGrid_COPY.Options:= frmDisplayGrid1.DBGrid_COPY.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -2040,7 +2054,7 @@ begin
                                                      'FROM TBL_COPY ORDER BY DestinationFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+    frmDisplayGrid1.DBGrid_COPY.Options:= frmDisplayGrid1.DBGrid_COPY.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
     except
       on E: EDatabaseError do
@@ -2059,7 +2073,7 @@ begin
                                                     'FROM TBL_COPY ORDER BY SourceHash';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
-   frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+   frmDisplayGrid1.DBGrid_COPY.Options:= frmDisplayGrid1.DBGrid_COPY.Options + [dgAutoSizeColumns];
    DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -2078,7 +2092,7 @@ begin
                                                     'FROM TBL_COPY ORDER BY DestinationHash';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
-   frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+   frmDisplayGrid1.DBGrid_COPY.Options:= frmDisplayGrid1.DBGrid_COPY.Options + [dgAutoSizeColumns];
    DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -2096,7 +2110,7 @@ begin
     TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT * FROM TBL_COPY';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+    frmDisplayGrid1.DBGrid_COPY.Options:= frmDisplayGrid1.DBGrid_COPY.Options + [dgAutoSizeColumns];
     DBGrid.DataSource.Dataset.Open;
   except
     on E: EDatabaseError do
@@ -2163,6 +2177,7 @@ procedure TfrmSQLiteDBases.SaveCOPYWindowToHTML(DBGrid : TDBGrid; Filename : str
 var
   strTitle             : string = Default(string);
   strTableHeader       : string = Default(string);
+  FileIDCell           : string = Default(string);
   SourceFilename       : string = Default(string);
   DestinationFileName  : string = Default(string);
   DateAttributes       : string = Default(string);
@@ -2171,6 +2186,7 @@ var
   NoOfRowsInGrid       : integer = Default(integer);
   sl                   : TStringList;
   fs                   : TFileStreamUTF8;
+  ExportSQLQuery       : TSQLQuery;
 
   const
     strHTMLHeader      = '<HTML>'  ;
@@ -2178,6 +2194,7 @@ var
     strBODYHeader      = '<BODY>'  ;
     strTABLEROWStart   = '<TR>'    ;
     strTABLEDATAStart  = '<TD>'    ;
+    strID              = '<td>ID</td>';
     strSrcFilenameHead = '<td>Source Filename</td>';
     strSrcHashHead     = '<td>Source Hash</td>';
     strDestFilenameHead= '<td>Destination Filename</td>';
@@ -2206,10 +2223,11 @@ begin
     sl.add('<table border=1>');
     sl.add('<tr><td>Source Filename</td><td>Source Hash</td><td>Destination Filename</td><td>Destination Hash</td><td>Original Date Attributes</td></tr>');
 
-    DBGrid.DataSource.DataSet.DisableControls;
-    DBGrid.DataSource.DataSet.First;
-    while not DBGrid.DataSource.DataSet.EOF do
-      begin
+    try
+      DBGrid.DataSource.DataSet.DisableControls;
+      DBGrid.DataSource.DataSet.First;
+      while not DBGrid.DataSource.DataSet.EOF do
+        begin
           sl.add('<tr>');
           // Get the data from the source filename cell
           SourceFilename := DBGrid.DataSource.DataSet.Fields[1].AsString;
@@ -2229,10 +2247,12 @@ begin
           sl.add('</tr>');
           DBGrid.DataSource.DataSet.Next;
         end;
+    finally
+      DBGrid.DataSource.DataSet.EnableControls;
+    end;
     sl.add('</TABLE>');
     sl.add('</BODY> ');
     sl.add('</HTML> ');
-    DBGrid.DataSource.DataSet.EnableControls;
     sl.SaveToFile(Filename);
   finally
     sl.free;
@@ -2263,7 +2283,7 @@ begin
     fs.Write('<table border=1>', 16);
 
     // Add a header row to the HTML
-    strTableHeader := '<tr>'+ strSrcFilenameHead + strSrcHashHead + strDestFilenameHead + strDestHashHead + strDateAttr + '</tr>';
+    strTableHeader := '<tr>'+ strID + strSrcFilenameHead + strSrcHashHead + strDestFilenameHead + strDestHashHead + strDateAttr + '</tr>';
     fs.Write(strTableHeader[1], Length(strTableHeader));
 
     // Now write the main table content, row by row
@@ -2276,64 +2296,73 @@ begin
       strBODYFooter      = '</BODY>'   = 7 bytes
       strTITLEFooter     = '</TITLE>'  = 8 bytes
       strHTMLFooter      = '</HTML>'   = 7 bytes}
-      DBGrid.DataSource.DataSet.DisableControls;
-      DBGrid.DataSource.DataSet.First;
-    while not DBGrid.DataSource.DataSet.EOF do
-      begin
-        // Start new row
-        fs.Write(strTABLEROWStart[1], 4);
-          // Get the source filename cell
-          SourceFilename := DBGrid.DataSource.DataSet.Fields[1].AsString;
-          // Write source filename to new row
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Write(SourceFilename[1], Length(SourceFilename));
-          fs.Write(strTABLEDataEnd[1], 5);
 
-          // Get the source hash value
-          SourceFileHash := DBGrid.DataSource.DataSet.Fields[2].AsString;
-          // Write the source hash value
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Write(SourceFileHash[1], Length(SourceFileHash));
-          fs.Write(strTABLEDATAEnd[1], 5);
+      try
+        ExportSQLQuery := TSQLQuery.Create(nil);
+        try
+          ExportSQLQuery.SQL.Text := 'SELECT * FROM TBL_COPY';  // Get all the data from Copy tab table
+          ExportSQLQuery.Database := SQLite3Connection1;
+          ExportSQLQuery.UniDirectional := True; //<- this is the important part for memory handling reasons but cant be used in an active DBGrid - only for SQLQueries
+          ExportSQLQuery.Open;
+          ExportSQLQuery.First;
+          while not ExportSQLQuery.EOF do
+          begin
+            fs.Write(strTABLEROWStart[1], 4);
 
-          // Get the destination filename
-          DestinationFileName := DBGrid.DataSource.DataSet.Fields[3].AsString;
-          // Write the destination hash
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(DestinationFileName[1], Length(Trim(DestinationFileName)));
-          fs.Write(strTABLEDATAEnd[1], 5);
+            // Get the data from the ID cell
+            FileIDCell := ExportSQLQuery.FieldByName('id').AsString;
+            // Write filename to new row
+            fs.Write(strTABLEDATAStart[1], 4);
+            fs.Write(FileIDCell[1], Length(FileIDCell));
+            fs.Write(strTABLEDataEnd[1], 5);
 
-          // Get the destination hash
-          DestinationFileHash := DBGrid.DataSource.DataSet.Fields[4].AsString;
-          // Write the destination hash
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(DestinationFileHash[1], Length(Trim(DestinationFileHash)));
-          fs.Write(strTABLEDATAEnd[1], 5);
+            SourceFilename := ExportSQLQuery.FieldByName('SourceFilename').AsString;
+            fs.Write(strTABLEDATAStart[1], 4);
+            fs.Write(SourceFilename[1], Length(SourceFilename));
+            fs.Write(strTABLEDataEnd[1], 5);
 
-          // Get the date attributes from the filesystem
-          DateAttributes := DBGrid.DataSource.DataSet.Fields[5].AsString;
-          // Write the date attributes
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(DateAttributes[1], Length(Trim(DateAttributes)));
-          fs.Write(strTABLEDATAEnd[1], 5);
+            SourceFileHash := ExportSQLQuery.FieldByName('SourceHash').AsString;
+            fs.Write(strTABLEDATAStart[1], 4);
+            fs.Write(SourceFileHash[1], Length(SourceFileHash));
+            fs.Write(strTABLEDATAEnd[1], 5);
 
-        // End the row
-        fs.Write(strTABLEROWEnd[1], 5);
+            DestinationFileName := ExportSQLQuery.FieldByName('DestinationFileName').AsString;
+            fs.Write(strTABLEDATAStart[1], 4) ;
+            fs.Write(DestinationFileName[1], Length(Trim(DestinationFileName)));
+            fs.Write(strTABLEDATAEnd[1], 5);
+
+            DestinationFileHash := ExportSQLQuery.FieldByName('DestinationHash').AsString;
+            fs.Write(strTABLEDATAStart[1], 4) ;
+            fs.Write(DestinationFileHash[1], Length(Trim(DestinationFileHash)));
+            fs.Write(strTABLEDATAEnd[1], 5);
+
+            DateAttributes := ExportSQLQuery.FieldByName('DateAttributes').AsString;
+            fs.Write(strTABLEDATAStart[1], 4) ;
+            fs.Write(DateAttributes[1], Length(Trim(DateAttributes)));
+            fs.Write(strTABLEDATAEnd[1], 5);
+
+            // End the row
+            fs.Write(strTABLEROWEnd[1], 5);
+            fs.Write(#13#10, 2);
+            // Repeat for the next row
+            ExportSQLQuery.next;
+          end;
+        finally
+          // Nothing to free here
+        end;
+        fs.Write(strTABLEFooter, 8);
         fs.Write(#13#10, 2);
-        DBGrid.DataSource.DataSet.Next;
+        fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
+        fs.Write(strBODYFooter, 7);
+        fs.Write(#13#10, 2);
+        fs.Write(strHTMLFooter, 7);
+        fs.Write(#13#10, 2);
+      finally
+        ExportSQLQuery.free; // Free the temp SQL Query
       end;
-    fs.Write(strTABLEFooter, 8);
-    fs.Write(#13#10, 2);
-    fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
-    fs.Write(strBODYFooter, 7);
-    fs.Write(#13#10, 2);
-    fs.Write(strHTMLFooter, 7);
-    fs.Write(#13#10, 2);
     finally
-      DBGrid.DataSource.DataSet.EnableControls;
       fs.free;
-      MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
-      Showmessage('Data saved to HTML file ' + Filename);
+      Showmessage('Data saved to HTML file ' + Filename + '...OK');
       Application.ProcessMessages;
     end;
 end;
@@ -2353,7 +2382,7 @@ var
   NoOfRowsInGrid    : integer = Default(integer);
   sl                : TStringList;
   fs                : TFileStreamUTF8;
-
+  ExportSQLQuery    : TSQLQuery;
 const
   strHTMLHeader     = '<HTML>'  ;
   strTITLEHeader    = '<TITLE>QuickHash HTML Output' ;
@@ -2370,7 +2399,7 @@ const
 begin
   // If database volume not too big, use memory and stringlists. Otherwise, use file writes
   NoOfRowsInGrid := 0;
-  NoOfRowsInGrid := CountGridRows(DBGrid, 'TBL_COMPARE_TWO_FOLDERS');// Count the rows first. If not too many, use memory. Otherwise, use filestreams
+  NoOfRowsInGrid := CountGridRows(DBGrid, 'TBL_COMPARE_TWO_FOLDERS_MATCH');// Count the rows first. If not too many, use memory. Otherwise, use filestreams
   if (NoOfRowsInGrid < 10000) and (NoOfRowsInGrid > -1) then
   try
     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
@@ -2384,6 +2413,7 @@ begin
     sl.add('<table border=1>');
     sl.add('<tr><td>ID</td><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
 
+    try
     DBGrid.DataSource.DataSet.DisableControls;
     DBGrid.DataSource.DataSet.First;
     while not DBGrid.DataSource.DataSet.EOF do
@@ -2407,9 +2437,12 @@ begin
     sl.add('</TABLE>');
     sl.add('</BODY> ');
     sl.add('</HTML> ');
-    DBGrid.DataSource.DataSet.EnableControls;
-    sl.SaveToFile(Filename);
+    finally
+      DBGrid.DataSource.DataSet.EnableControls;
+    end;
+
   finally
+    sl.SaveToFile(Filename);
     sl.free;
     MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
     Application.ProcessMessages;
@@ -2447,122 +2480,72 @@ begin
       strBODYFooter      = '</BODY>'   = 7 bytes
       strTITLEFooter     = '</TITLE>'  = 8 bytes
       strHTMLFooter      = '</HTML>'   = 7 bytes}
-      DBGrid.DataSource.DataSet.DisableControls;
-      DBGrid.DataSource.DataSet.First;
-    while not DBGrid.DataSource.DataSet.EOF do
-      begin
-        // Start new row
-        fs.Write(strTABLEROWStart[1], 4);
 
-        // Column1
-        if Length(DBGrid.DataSource.DataSet.Fields[0].AsString) > 0 then
-        begin
-          strID := DBGrid.DataSource.DataSet.Fields[0].AsString;
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Write(strID[1], Length(strID));
-          fs.Write(strTABLEDataEnd[1], 5);
-        end
-        else
-        begin
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Writeansistring('ID not found');
-          fs.Write(strTABLEDataEnd[1], 5);
+       try
+        ExportSQLQuery := TSQLQuery.Create(nil);
+        try
+          ExportSQLQuery.SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS_MATCH';  // Get all the data from Compare Two Folders tab table
+          ExportSQLQuery.Database := SQLite3Connection1;
+          ExportSQLQuery.UniDirectional := True; //<- this is the important part for memory handling reasons but cant be used in an active DBGrid - only for SQLQueries
+          ExportSQLQuery.Open;
+          ExportSQLQuery.First;
+          while not ExportSQLQuery.EOF do
+          begin
+            fs.Write(strTABLEROWStart[1], 4);
+
+            strID := ExportSQLQuery.FieldByName('id').AsString;
+            fs.Write(strTABLEDATAStart[1], 4);
+            fs.Write(strID[1], Length(strID));
+            fs.Write(strTABLEDataEnd[1], 5);
+
+            strFileName := ExportSQLQuery.FieldByName('FileName').AsString;
+            fs.Write(strTABLEDATAStart[1], 4);
+            fs.Write(strFileName[1], Length(strFileName));
+            fs.Write(strTABLEDataEnd[1], 5);
+
+            FilepathA := ExportSQLQuery.FieldByName('FilePathA').AsString;
+            fs.Write(strTABLEDATAStart[1], 4);
+            fs.Write(FilepathA[1], Length(FilepathA));
+            fs.Write(strTABLEDATAEnd[1], 5);
+
+            FileHashA := ExportSQLQuery.FieldByName('FileHashA').AsString;
+            fs.Write(strTABLEDATAStart[1], 4) ;
+            fs.Write(FileHashA[1], Length(Trim(FileHashA)));
+            fs.Write(strTABLEDATAEnd[1], 5);
+
+            FilepathB := ExportSQLQuery.FieldByName('FilePathB').AsString;
+            fs.Write(strTABLEDATAStart[1], 4) ;
+            fs.Write(FilepathB[1], Length(Trim(FilepathB)));
+            fs.Write(strTABLEDATAEnd[1], 5);
+
+            FileHashB := ExportSQLQuery.FieldByName('FileHashB').AsString;
+            fs.Write(strTABLEDATAStart[1], 4) ;
+            fs.Write(FileHashB[1], Length(Trim(FileHashB)));
+            fs.Write(strTABLEDATAEnd[1], 5);
+
+            fs.Write(strTABLEROWEnd[1], 5);
+            fs.Write(#13#10, 2);
+            // Repeat for the next row
+            ExportSQLQuery.next;
+          end;
+        finally
+          // Nothing to free here
         end;
-
-        // Column2
-        if Length(DBGrid.DataSource.DataSet.Fields[1].AsString) > 0 then
-        begin
-          strFileName := DBGrid.DataSource.DataSet.Fields[1].AsString;
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Write(strFileName[1], Length(strFileName));
-          fs.Write(strTABLEDataEnd[1], 5);
-        end
-        else
-        begin
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Writeansistring('File not found');
-          fs.Write(strTABLEDataEnd[1], 5);
-        end;
-
-        // Column3
-        if Length(DBGrid.DataSource.DataSet.Fields[2].AsString) > 0 then
-        begin
-          FilepathA := DBGrid.DataSource.DataSet.Fields[2].AsString;
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Write(FilepathA[1], Length(FilepathA));
-          fs.Write(strTABLEDATAEnd[1], 5);
-        end
-        else
-        begin
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Writeansistring('File not found in path');
-          fs.Write(strTABLEDataEnd[1], 5);
-        end;
-
-        // Column4
-        if Length(DBGrid.DataSource.DataSet.Fields[3].AsString) > 0 then
-        begin
-          FileHashA := DBGrid.DataSource.DataSet.Fields[3].AsString;
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(FileHashA[1], Length(FileHashA));
-          fs.Write(strTABLEDATAEnd[1], 5);
-        end
-        else
-        begin
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Writeansistring('Hash not available');
-          fs.Write(strTABLEDataEnd[1], 5);
-        end;
-
-        // Column5
-        if Length(DBGrid.DataSource.DataSet.Fields[4].AsString) > 0 then
-        begin
-          FilepathB := DBGrid.DataSource.DataSet.Fields[5].AsString;
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(FilepathB[1], Length(FilepathB));
-          fs.Write(strTABLEDATAEnd[1], 5);
-        end
-        else
-        begin
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Writeansistring('File not found in path');
-          fs.Write(strTABLEDataEnd[1], 5);
-        end;
-
-        // Column6
-        if Length(DBGrid.DataSource.DataSet.Fields[5].AsString) > 0 then
-        begin
-          FileHashB := DBGrid.DataSource.DataSet.Fields[5].AsString;
-          fs.Write(strTABLEDATAStart[1], 4) ;
-          fs.Write(FileHashB[1], Length(FileHashB));
-          fs.Write(strTABLEDATAEnd[1], 5);
-        end
-        else
-        begin
-          fs.Write(strTABLEDATAStart[1], 4);
-          fs.Writeansistring('Hash not available');
-          fs.Write(strTABLEDataEnd[1], 5);
-        end;
-
-        // End the row
-        fs.Write(strTABLEROWEnd[1], 5);
+        fs.Write(strTABLEFooter, 8);
         fs.Write(#13#10, 2);
-        DBGrid.DataSource.DataSet.Next;
-      end;
-    fs.Write(strTABLEFooter, 8);
-    fs.Write(#13#10, 2);
-    fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
-    fs.Write(strBODYFooter, 7);
-    fs.Write(#13#10, 2);
-    fs.Write(strHTMLFooter, 7);
-    fs.Write(#13#10, 2);
+        fs.writeansistring(IntToStr(NoOfRowsInGrid) + ' grid entries saved.');
+        fs.Write(strBODYFooter, 7);
+        fs.Write(#13#10, 2);
+        fs.Write(strHTMLFooter, 7);
+        fs.Write(#13#10, 2);
+        finally
+          ExportSQLQuery.free; // Free the temp SQL Query
+        end;
     finally
       fs.free;
-      MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
-      Showmessage('Data saved to HTML file ' + Filename);
+      Showmessage('Data saved to HTML file ' + Filename + '...OK');
       Application.ProcessMessages;
     end;
-  DBGrid.DataSource.DataSet.EnableControls;
 end;
 
 // There is an UpdateGridXXX routine for each tab where a DBGrid is used.
@@ -2577,7 +2560,7 @@ procedure TfrmSQLiteDBases.UpdateGridFILES(Sender: TObject);
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     sqlFILES.Open;
-    MainForm.RecursiveDisplayGrid1.Options:= MainForm.RecursiveDisplayGrid1.Options + [dgAutoSizeColumns];
+    MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
     except
     on E: EDatabaseError do
     begin
@@ -2595,7 +2578,7 @@ procedure TfrmSQLiteDBases.UpdateGridCOPYTAB(Sender: TObject);
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     sqlCOPY.Open;
-    frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options:= frmDisplayGrid1.RecursiveDisplayGrid_COPY.Options + [dgAutoSizeColumns];
+    frmDisplayGrid1.DBGrid_COPY.Options:= frmDisplayGrid1.DBGrid_COPY.Options + [dgAutoSizeColumns];
     except
     on E: EDatabaseError do
     begin
@@ -2655,7 +2638,7 @@ procedure TfrmSQLiteDBases.UpdateGridCOMPARETWOFOLDERSTAB(Sender: TObject);
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     sqlCOMPARETWOFOLDERS.Open;
-    frmDisplayGrid3.dbGridC2F.Options := frmDisplayGrid3.dbGridC2F.Options + [dgAutoSizeColumns];
+    frmDisplayGrid3.DBGrid_C2F.Options := frmDisplayGrid3.DBGrid_C2F.Options + [dgAutoSizeColumns];
     except
     on E: EDatabaseError do
     begin

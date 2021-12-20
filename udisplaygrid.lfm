@@ -22,7 +22,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
     OnClick = btnClipboardResultsCOPYTABClick
     TabOrder = 0
   end
-  object RecursiveDisplayGrid_COPY: TDBGrid
+  object DBGrid_COPY: TDBGrid
     Left = 16
     Height = 466
     Top = 24
