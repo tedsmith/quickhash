@@ -1,5 +1,7 @@
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
 
+// Rule of thumb - For INSERT, UPDATE, DELETE, use SQLQuery.ExecSQL, for SELECT use SQLQuery.Open:
+
 {$mode objfpc}{$H+} // {$H+} ensures all strings are of unlimited size, and set as ansistring
 
 interface
@@ -1305,8 +1307,8 @@ begin
       end;
 
   if DBGrid.Name = 'DBGrid_FILES'     then tblName := 'TBL_FILES';
-  if DBGrid.Name = 'DBGrid_C2F'                 then tblName := 'TBL_COMPARE_TWO_FOLDERS';
-  if DBGrid.Name = 'DBGrid_COPY' then tblName := 'TBL_COPY';
+  if DBGrid.Name = 'DBGrid_C2F'       then tblName := 'TBL_COMPARE_TWO_FOLDERS';
+  if DBGrid.Name = 'DBGrid_COPY'      then tblName := 'TBL_COPY';
 
   RowCount := CountGridRows(DBGrid, tblName);
   if RowCount < 20000 then

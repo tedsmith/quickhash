@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 228
   Height = 733
-  Top = 161
+  Top = 115
   Width = 1023
   AllowDropFiles = True
   Caption = 'QuickHash v3.3.1 (Jan 2022) - The easy and convenient way to hash data in Linux, OSX and Windows'
@@ -811,8 +811,8 @@ object MainForm: TMainForm
           ChildSizing.ShrinkVertical = crsScaleChilds
           ChildSizing.Layout = cclLeftToRightThenTopToBottom
           ChildSizing.ControlsPerLine = 100
-          ClientHeight = 21
-          ClientWidth = 173
+          ClientHeight = 25
+          ClientWidth = 177
           DataSource = frmSQLiteDBases.DataSource1
           Options = []
           TabOrder = 12
@@ -935,8 +935,8 @@ object MainForm: TMainForm
           Top = 8
           Width = 830
           Anchors = [akTop, akLeft, akRight]
-          ClientHeight = 180
-          ClientWidth = 826
+          ClientHeight = 184
+          ClientWidth = 830
           TabOrder = 3
           OnClick = Panel1CopyAndHashOptionsClick
           object CheckBoxListOfDirsOnly: TCheckBox
@@ -1095,9 +1095,9 @@ object MainForm: TMainForm
             AnchorSideTop.Control = pbCopy
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = pbCopy
-            Left = 398
+            Left = 400
             Height = 16
-            Top = 167
+            Top = 171
             Width = 9
             Anchors = []
             Caption = '...'

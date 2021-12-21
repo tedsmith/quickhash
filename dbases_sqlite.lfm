@@ -1,7 +1,7 @@
 object frmSQLiteDBases: TfrmSQLiteDBases
   Left = 940
   Height = 562
-  Top = 354
+  Top = 286
   Width = 460
   Caption = 'frmSQLiteDBases'
   ClientHeight = 562
