@@ -2101,7 +2101,7 @@ object MainForm: TMainForm
     Top = 1
     Width = 248
     AutoSize = False
-    Caption = 'Copyright © 2011-2021  Ted Smith'
+    Caption = 'Copyright © 2011-2022  Ted Smith'
     Font.Height = 14
     Font.Style = [fsBold]
     ParentColor = False
