@@ -7,7 +7,7 @@ unit uGPT;
     Quick Hash GUI - A Linux, Windows and Apple Mac GUI for quickly selecting one or more files
                      and generating hash values for them.
 
-    Copyright (C) 2011-2019  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2022  Ted Smith www.quickhash-gui.org
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

@@ -708,6 +708,7 @@ begin
           DBGrid.DataSource.DataSet.EnableControls;
         end;
       finally
+        sl.SaveToFile(Filename);
         sl.free;
         MainForm.StatusBar2.Caption:= ' Data saved to HTML file ' + Filename + '...OK';
         ShowMessage(MainForm.StatusBar2.Caption);
