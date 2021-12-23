@@ -3099,7 +3099,6 @@ begin
       memFolderCompareSummary.Lines.Add('Results saved to ' + fsSaveFolderComparisonsLogFile.FileName);
       fsSaveFolderComparisonsLogFile.Free;
     end;
-  Application.ProcessMessages;
   end // End of If DirectoryExists...
   else
   begin
@@ -3107,6 +3106,8 @@ begin
     exit;
   end;
 
+  memFolderCompareSummary.Lines.Add('Preparing and sorting display grid. Might take several minutes. Please wait...');
+  Application.ProcessMessages;
    // Commit any final database values that may not have yet been comitted
    // and make the display grid of compared folder content visible
   frmSQLiteDBases.SQLTransaction1.CommitRetaining;
@@ -3125,6 +3126,7 @@ begin
   {$endif}
   frmSQLiteDBases.PrepareData_COMPARE_TWO_FOLDERS; // prepares matches and duplicates with row id
   frmSQLiteDBases.UpdateGridCOMPARETWOFOLDERSTAB(nil);
+  memFolderCompareSummary.Lines.Add('Display grid populated.');
   frmDisplayGrid3.Visible := true;
   frmDisplayGrid3.Show;
 end;

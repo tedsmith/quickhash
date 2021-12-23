@@ -145,11 +145,6 @@ begin
   frmDisplayGrid3SaveDialog.Filter := 'Comma Sep|*.csv';
   frmDisplayGrid3SaveDialog.DefaultExt := 'csv';
 
-  if FileExists(frmDisplayGrid3SaveDialog.FileName) = true then
-  begin
-    ShowMessage('Chosen file already exists. Maybe specify a different filename.');
-  end;
-
   if frmDisplayGrid3SaveDialog.Execute then
   begin
     ExportFilename := frmDisplayGrid3SaveDialog.FileName;

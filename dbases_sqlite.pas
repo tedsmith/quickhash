@@ -924,13 +924,21 @@ begin
 end;
 
 // SaveDBToCSV exports the DBGrid (DBGridName) to a CSV file (filename) for the user
-// Based on example in FPC\3.0.2\source\packages\fcl-db\tests\testdbexport.pas
-// Requires the lazdbexport package be installed in Lazarus IDE
+// using a filestream and dedicated TSQLQuery due to DBGrid poor perfomance for large data.
+// Note if the user has filtered the display, such as show all duplicates, the whole
+// tabe of data will still be dumped to text for sorting etc in Excel or similar.
 procedure TfrmSQLiteDBases.SaveFILESDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
-  linetowrite : ansistring;
-  CSVFileToWrite : TFilestreamUTF8;
-  n : integer = Default(integer);
+  linetowrite   : ansistring = Default(ansistring);
+  FileIDCell    : string = Default(string);
+  FileNameCell  : string = Default(string);
+  FilePathCell  : string = Default(string);
+  FileHashCell  : string = Default(string);
+  FileSizeCell  : string = Default(string);
+  KnownHashCell : string = Default(string);
+  CSVFileToWrite: TFilestreamUTF8;
+  ExportSQLQuery: TSQLQuery;
+  n             : integer = Default(integer);
   KnownHashFlagIsSet : boolean = Default(boolean);
 begin
   Mainform.StatusBar2.SimpleText := 'Writing data to file...please wait';
@@ -943,9 +951,11 @@ begin
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
     if CSVFileToWrite.Handle > 0 then
       begin
-        linetowrite := '';
-        linetowrite := ('Filename'  + ChosenDelimiter + 'FilePath' + ChosenDelimiter +
-                        'HashValue' + ChosenDelimiter + 'FileSize' + ChosenDelimiter +
+        linetowrite := ('ID' + ChosenDelimiter +
+                        'Filename'  + ChosenDelimiter +
+                        'FilePath'  + ChosenDelimiter +
+                        'HashValue' + ChosenDelimiter +
+                        'FileSize'  + ChosenDelimiter +
                         'KnownHashFlag' + LineEnding);
 
         n := Length(LineToWrite);
@@ -956,101 +966,160 @@ begin
         if MainForm.cbLoadHashList.checked then KnownHashFlagIsSet := true
           else KnownHashFlagIsSet := false;
 
-        DBGrid.DataSource.Dataset.DisableControls;
         try
-          DBGrid.DataSource.Dataset.First;
-          while not DBGrid.DataSource.Dataset.EoF do
-          begin
-            if KnownHashFlagIsSet then
+          ExportSQLQuery := TSQLQuery.Create(nil);
+          try
+            ExportSQLQuery.SQL.Text := 'SELECT * FROM TBL_FILES';  // Get all the data from Files tab table
+            ExportSQLQuery.Database := SQLite3Connection1;
+            ExportSQLQuery.UniDirectional := True; //<- this is the important part for memory handling reasons but cant be used in an active DBGrid - only for SQLQueries
+            ExportSQLQuery.Open;
+            ExportSQLQuery.First;
+            while not ExportSQLQuery.EOF do
             begin
               // Include all columns, inc hash flag, but exclude the row count (not needed for a CSV output).
-              linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[4].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[5].Text) + LineEnding;
-            end
-            else
+              // Get the data from the ID cell
+              FileIDCell := ExportSQLQuery.FieldByName('id').AsString;
+              // Get the data from the filename cell
+              FileNameCell := ExportSQLQuery.FieldByName('FileName').AsString;
+              // Get the data from the filepath cell
+              FilePathCell := ExportSQLQuery.FieldByName('FilePath').AsString;
+              // Get the data from the filehash cell
+              FileHashCell := ExportSQLQuery.FieldByName('HashValue').AsString;
+              // Get the data from the filesize cell
+              FileSizeCell := ExportSQLQuery.FieldByName('FileSize').AsString;
+
+              //Get the data from the KnownHashFlag cell, if it has been selected for use by the user
+              if KnownHashFlagIsSet then
               begin
-              // Include all columns, exc hash flag, but exclude the row count (not needed for a CSV output).
-              linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
-                             (DBGrid.DataSource.DataSet.Fields[4].Text) + LineEnding;
+                KnownHashCell := ExportSQLQuery.FieldByName('KnownHashFlag').AsString;
               end;
-            n := 0;
-            n := Length(linetowrite);
-            CSVFileToWrite.Write(linetowrite[1], n);
-            DBGrid.DataSource.Dataset.Next;
-          end;
+
+              linetowrite := (FileIDCell    + ChosenDelimiter +
+                              FileNameCell  + ChosenDelimiter +
+                              FilePathCell  + ChosenDelimiter +
+                              FileHashCell  + ChosenDelimiter +
+                              FileSizeCell  + ChosenDelimiter +
+                              KnownHashCell + LineEnding);
+
+              // Write row to file
+              n := 0;
+              n := Length(linetowrite);
+              CSVFileToWrite.Write(linetowrite[1], n);
+
+              // Repeat for the next row
+              ExportSQLQuery.next;
+            end;
+          finally
+            // Nothing to free here
+          end;  // End of ExportSQLQuery.Open;
         finally
-          DBGrid.DataSource.Dataset.EnableControls;
-        end;
+          ExportSQLQuery.free; // Free the temp SQL Query
+        end; // End of SQLQuery.Create
       end; // End of CSVFileToWrite.Handle check
     finally
       CSVFileToWrite.Free;
+      Mainform.StatusBar2.SimpleText := 'DONE';
+      ShowMessage('Grid data now in ' + Filename);
     end;
-    Mainform.StatusBar2.SimpleText := 'DONE';
-    ShowMessage('Grid data now in ' + Filename);
 end;
 
-// Used by the COPY tab to save the display grid to CSV
+// exports the DBGrid (DBGridName) to a CSV file (filename) from the COPY tab
+// using a filestream and dedicated TSQLQuery due to DBGrid poor perfomance for large data.
+// Note if the user has filtered the display, such as show all duplicates, the whole
+// table of data will still be dumped to text for sorting etc in Excel or similar.
 procedure TfrmSQLiteDBases.SaveCopyDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
-  linetowrite : ansistring;
+  linetowrite         : ansistring = Default(ansistring);
+  FileIDCell          : string = Default(string);
+  SourceFilename      : string = Default(string);
+  SourceFileHash      : string = Default(string);
+  DestinationFileName : string = Default(string);
+  DestinationFileHash : string = Default(string);
+  DateAttributes      : string = Default(string);
   n : integer = Default(integer);
   CSVFileToWrite : TFilestreamUTF8;
+  ExportSQLQuery : TSQLQuery;
+
 begin
   Mainform.StatusBar2.SimpleText := 'Writing data to file...please wait';
-   Application.ProcessMessages;
-   linetowrite := '';
-   ChosenDelimiter := MainForm.ChosenDelimiter;
+  Application.ProcessMessages;
+  ChosenDelimiter := MainForm.ChosenDelimiter;
 
-   try
-     // Create a filestream for the output CSV.
-     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
-     // Add header
-     linetowrite := 'Source Filename'          +ChosenDelimiter+
-                    'Source Hash'              +ChosenDelimiter+
-                    'Destination Filename'     +ChosenDelimiter+
-                    'Destination Hash'         +ChosenDelimiter+
-                    'Original Date Attributes' + LineEnding;
+  try
+  // Create a filestream for the output CSV.
+  CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+  // Add header
+  linetowrite := 'ID'                       + ChosenDelimiter +
+                'Source Filename'          + ChosenDelimiter +
+                'Source Hash'              + ChosenDelimiter +
+                'Destination Filename'     + ChosenDelimiter +
+                'Destination Hash'         + ChosenDelimiter +
+                'Original Date Attributes' + LineEnding;
 
-     n := Length(linetowrite);
-     CSVFileToWrite.Write(linetowrite[1], n);
+  n := Length(linetowrite);
+  CSVFileToWrite.Write(linetowrite[1], n);
 
-     DBGrid.DataSource.Dataset.DisableControls;
-     try
-       DBGrid.DataSource.Dataset.First;
-       while not DBGrid.DataSource.Dataset.EoF do
-       begin
-         // Include all columns, inc hash flag, but exclude the row count (not needed for a CSV output).
-         linetowrite := (DBGrid.DataSource.DataSet.Fields[1].Text) + ChosenDelimiter+
-                        (DBGrid.DataSource.DataSet.Fields[2].Text) + ChosenDelimiter+
-                        (DBGrid.DataSource.DataSet.Fields[3].Text) + ChosenDelimiter+
-                        (DBGrid.DataSource.DataSet.Fields[4].Text) + ChosenDelimiter+
-                        (DBGrid.DataSource.DataSet.Fields[5].Text) + LineEnding;
+    try
+    ExportSQLQuery := TSQLQuery.Create(nil);
+      try
+        ExportSQLQuery.SQL.Text := 'SELECT * FROM TBL_COPY';  // Get all the data from Files tab table
+        ExportSQLQuery.Database := SQLite3Connection1;
+        ExportSQLQuery.UniDirectional := True; //<- this is the important part for memory handling reasons but cant be used in an active DBGrid - only for SQLQueries
+        ExportSQLQuery.Open;
+        ExportSQLQuery.First;
+        while not ExportSQLQuery.EOF do
+        begin
+          FileIDCell          := ExportSQLQuery.FieldByName('id').AsString;
+          SourceFilename      := ExportSQLQuery.FieldByName('SourceFilename').AsString;
+          SourceFileHash      := ExportSQLQuery.FieldByName('SourceHash').AsString;
+          DestinationFileName := ExportSQLQuery.FieldByName('DestinationFileName').AsString;
+          DestinationFileHash := ExportSQLQuery.FieldByName('DestinationHash').AsString;
+          DateAttributes      := ExportSQLQuery.FieldByName('DateAttributes').AsString;
+
+          linetowrite := (FileIDCell          + ChosenDelimiter +
+                          SourceFilename      + ChosenDelimiter +
+                          SourceFileHash      + ChosenDelimiter +
+                          DestinationFileName + ChosenDelimiter +
+                          DestinationFileHash + ChosenDelimiter +
+                          DateAttributes      + LineEnding);
+          // Write row to file
           n := 0;
           n := Length(linetowrite);
           CSVFileToWrite.Write(linetowrite[1], n);
-          DBGrid.DataSource.Dataset.Next;
-       end;
-     finally
-       DBGrid.DataSource.Dataset.EnableControls;
-     end;
-   finally
-     CSVFileToWrite.Free;
-   end;
+
+          // Repeat for the next row
+          ExportSQLQuery.next;
+        end;
+      finally
+        // Nothing to free here
+      end;  // End of ExportSQLQuery.Open;
+    finally
+      ExportSQLQuery.free; // Free the temp SQL Query
+    end; // End of SQLQuery.Create
+  finally
+   CSVFileToWrite.Free;
    Mainform.StatusBar2.SimpleText := 'DONE';
    ShowMessage('Grid data now in ' + Filename);
+  end;
 end;
 
 procedure TfrmSQLiteDBases.SaveC2FDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
   linetowrite : ansistring;
+  // For when FC2Fquery = false
+  strID       : string = Default(string);
+  FilePath    : string = Default(string);
+  strFileName : string = Default(string);
+  FileHash    : string = Default(string);
+  // For when FC2Fquery = true
+  FilePathA   : string = Default(string);
+  FileHashA   : string = Default(string);
+  FilePathB   : string = Default(string);
+  FileHashB   : string = Default(string);
+
   n : integer = Default(integer);
   CSVFileToWrite : TFilestreamUTF8;
-
+  ExportSQLQuery : TSQLQuery;
 begin
   Mainform.StatusBar2.SimpleText := 'Writing results to file...please wait';
   Application.ProcessMessages;
@@ -1060,7 +1129,7 @@ begin
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
     if CSVFileToWrite.Handle > 0 then
     begin
-      // Add header and adjust column headings depending on which filter is active
+      // Add headers and adjust column headings depending on which filter is active
       If FC2Fquery = false  then
       begin
         linetowrite := 'ID'        +ChosenDelimiter+
@@ -1081,46 +1150,84 @@ begin
         n := Length(linetowrite);
         CSVFileToWrite.Write(linetowrite[1], n);
       end;
+
       // Add content of grid  depending on which filter is active
-      DBGrid.DataSource.Dataset.DisableControls;
-      try
-        DBGrid.DataSource.Dataset.First;
-        while not DBGrid.DataSource.Dataset.EoF do
-        begin
-          If FC2Fquery = false  then
-          begin
-          linetowrite := (DBGrid.DataSource.DataSet.Fields[0].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[3].Text) +LineEnding;
+      If FC2Fquery = false  then
+      begin
+        try
+          ExportSQLQuery := TSQLQuery.Create(nil);
+          try
+            ExportSQLQuery.SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS';  // Get all the data from Compare Two Folders tab table
+            ExportSQLQuery.Database := SQLite3Connection1;
+            ExportSQLQuery.UniDirectional := True; //<- this is the important part for memory handling reasons but cant be used in an active DBGrid - only for SQLQueries
+            ExportSQLQuery.Open;
+            ExportSQLQuery.First;
+            while not ExportSQLQuery.EOF do
+            begin
+              strID       := ExportSQLQuery.FieldByName('id').AsString;
+              Filepath    := ExportSQLQuery.FieldByName('FilePath').AsString;
+              strFileName := ExportSQLQuery.FieldByName('FileName').AsString;
+              FileHash    := ExportSQLQuery.FieldByName('FileHash').AsString;
 
-          n := 0;
-          n := Length(linetowrite);
-          CSVFileToWrite.Write(linetowrite[1], n);
-          DBGrid.DataSource.Dataset.Next;
-          end
-          else
-          begin
-          linetowrite := (DBGrid.DataSource.DataSet.Fields[0].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[1].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[2].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[3].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[4].Text) +ChosenDelimiter+
-                         (DBGrid.DataSource.DataSet.Fields[5].Text) + LineEnding;
+              linetowrite := (strID       + ChosenDelimiter +
+                              FilePath    + ChosenDelimiter +
+                              strFileName + ChosenDelimiter +
+                              FileHash    + LineEnding);
 
-          n := 0;
-          n := Length(linetowrite);
-          CSVFileToWrite.Write(linetowrite[1], n);
-          DBGrid.DataSource.Dataset.Next;
+              n := 0;
+              n := Length(linetowrite);
+              CSVFileToWrite.Write(linetowrite[1], n);
+              // Repeat for the next row
+              ExportSQLQuery.next;
+            end;
+          finally
+            // Nothing to free here
           end;
+        finally
+          ExportSQLQuery.free; // Free the temp SQL Query
+        end;
+      end
+      else // FC2Fquery is TRUE
+      try
+      ExportSQLQuery := TSQLQuery.Create(nil);
+        try
+          ExportSQLQuery.SQL.Text := 'SELECT * FROM TBL_COMPARE_TWO_FOLDERS_MATCH';  // Get all the data from Compare Two Folders tab table
+          ExportSQLQuery.Database := SQLite3Connection1;
+          ExportSQLQuery.UniDirectional := True; //<- this is the important part for memory handling reasons but cant be used in an active DBGrid - only for SQLQueries
+          ExportSQLQuery.Open;
+          ExportSQLQuery.First;
+          while not ExportSQLQuery.EOF do
+          begin
+            strID       := ExportSQLQuery.FieldByName('id').AsString;
+            strFileName := ExportSQLQuery.FieldByName('FileName').AsString;
+            FilePathA   := ExportSQLQuery.FieldByName('FilePathA').AsString;
+            FileHashA   := ExportSQLQuery.FieldByName('FileHashA').AsString;
+            FilePathB   := ExportSQLQuery.FieldByName('FilePathB').AsString;
+            FileHashB   := ExportSQLQuery.FieldByName('FileHashB').AsString;
+
+            linetowrite := (strID       + ChosenDelimiter +
+                            strFileName + ChosenDelimiter +
+                            FilePathA   + ChosenDelimiter +
+                            FileHashA   + ChosenDelimiter +
+                            FilePathB   + ChosenDelimiter +
+                            FileHashB   + LineEnding);
+
+            n := 0;
+            n := Length(linetowrite);
+            CSVFileToWrite.Write(linetowrite[1], n);
+            // Repeat for the next row
+            ExportSQLQuery.next;
+          end;
+        finally
+          // Nothing to free here
         end;
       finally
-        DBGrid.DataSource.Dataset.EnableControls;
+        ExportSQLQuery.free; // Free the temp SQL Query
       end;
-      Mainform.StatusBar2.SimpleText := 'DONE';
     end;
   finally
     CSVFileToWrite.Free;
+    Mainform.StatusBar2.SimpleText := 'DONE';
     ShowMessage('Grid data now in ' + Filename);
   end;
 end;
@@ -2591,6 +2698,7 @@ procedure TfrmSQLiteDBases.UpdateGridCOPYTAB(Sender: TObject);
 end;
 
 // New to v3.3.0 thanks to community support. Enables a much more varied option for filtering results
+// But this takes a long time with tens of thousands of rows. Need a better way!
 procedure TfrmSQLiteDBases.PrepareData_COMPARE_TWO_FOLDERS; // prepares matches and duplicates with row id
 begin
   try
@@ -2612,7 +2720,6 @@ begin
     sqlCOMPARETWOFOLDERS.ParamByName('FilePathA').AsString:=FFilePathA;
     sqlCOMPARETWOFOLDERS.ParamByName('FilePathB').AsString:=FFilePathB;
     sqlCOMPARETWOFOLDERS.ExecSQL;
-
     sqlCOMPARETWOFOLDERS.SQL.Text :=
       'INSERT into TBL_COMPARE_TWO_FOLDERS_DUPLICATES (FilePath,FileName,FileHash) ' +
       'SELECT distinct a.FilePath, a.FileName, a.FileHash ' +
