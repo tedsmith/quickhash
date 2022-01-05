@@ -17,7 +17,7 @@
       <MajorVersionNr Value="3"/>
       <MinorVersionNr Value="3"/>
       <RevisionNr Value="1"/>
-      <BuildNr Value="19"/>
+      <BuildNr Value="21"/>
       <Language Value="0809"/>
       <StringTable Comments="Free, cross platform, open-source file and disk hashing software" CompanyName="Ted Smith (Ted Technology on Sourceforge)" FileDescription="Quickhash-GUI - Data hashing tool for Linux, Windows and OSX" LegalCopyright="2011 - 2022 (c) Ted Smith" LegalTrademarks="See source code and user manual" ProductName="QuickHash-GUI (www.quickhash-gui.org)" ProductVersion="3.3.1"/>
     </VersionInfo>
@@ -196,7 +196,6 @@
         <ComponentName Value="frmSQLiteDBases"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
         <TopLine Value="595"/>
         <CursorPos X="43" Y="602"/>
@@ -259,9 +258,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="3105"/>
-        <CursorPos X="37" Y="3127"/>
+        <CursorPos X="15" Y="13"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -565,6 +564,8 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
+      <TargetCPU Value="i386"/>
+      <TargetOS Value="win32"/>
       <Optimizations>
         <OptimizationLevel Value="2"/>
       </Optimizations>
