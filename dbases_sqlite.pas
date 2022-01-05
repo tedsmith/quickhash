@@ -597,8 +597,9 @@ begin
   end;
 end;
 
-// Counts rows of current DBGrid. Returns positive integer if successfull and
-// returns active display to top row
+// Counts rows of the calling display tab using dedicated SQLQuery instead of
+// DBGrid.DataSet.RecordCount, which only gives the count shown on screen.
+// Returns positive integer if successfull
 function TfrmSQLiteDBases.CountGridRows(AGrid: TDBGrid; ATableName: string): Integer;
 begin
   result := -1;
