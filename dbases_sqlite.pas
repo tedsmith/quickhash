@@ -686,6 +686,9 @@ begin
           while not DBGrid.DataSource.DataSet.EOF do
             begin
               sl.add('<tr>');
+              // Get the data from the ID cell
+              FileIDCell := DBGrid.DataSource.DataSet.Fields[0].AsString;
+              sl.add('<td>'+FileIDCell+'</td>');
               // Get the data from the filename cell
               FileNameCell := DBGrid.DataSource.DataSet.Fields[1].AsString;
               sl.add('<td>'+FileNameCell+'</td>');
@@ -698,6 +701,12 @@ begin
               // Get the data from the filesize cell
               FileSizeCell := DBGrid.DataSource.DataSet.Fields[4].AsString;
               sl.add('<td>'+FileSizeCell+'</td>');
+              // Get the data from the Known Hash Cell, if required
+              if MainForm.cbLoadHashList.Checked then
+              begin
+                KnownHashCell := DBGrid.DataSource.DataSet.Fields[5].AsString;
+                sl.add('<td>'+KnownHashCell+'</td>');
+              end;
               sl.add('</tr>');
               DBGrid.DataSource.DataSet.Next;
             end;

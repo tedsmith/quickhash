@@ -19,6 +19,8 @@ The HTML file produced by right clicking in the FileS tab did not have a row 1 h
 
 The HTML file produced by right clicking in the FileS tab did not have the FileSize column if the row count was over 20K. Now it does. 
 
+The HTML file produced by right clicking in the FileS tab did not have the ID column if the row count was LESS than 20K. Now it does. (note that this has not been added for clipboard output on the assumption it would be pasted into spreadsheets where rows are automatically then counted)
+
 (See - there were a lot of things missing in the HTML save for large volumes of data that I had missed - this is how small scale testing on your own does not compare with real world usage - its only when users report issues to me that I often get to know about problems, and then in turn, that unearths other issues that I can then fix)
 
 On Linux, and OSX, the "Curently Hashing" status in the FileS tab was chopping off the first characters of the path. So instead of it saying /home/user/Documents/MyFile.doc it was saying e/users/Documents/MyFile.doc. This was due to the long path override character cleansing that is necessary for Windows, but not for Linux or OSX, and I forgot to use a cross compiler directive. Now fixed in in v3.3.1
