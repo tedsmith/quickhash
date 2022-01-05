@@ -9,7 +9,7 @@ But, when saving the output of very large lists of files to HTML, filestreams we
 
 1) Changes to CountGridRows means a dedicated TSQLQuery is used on the fly, instead of the DBGrid itself. 
 2) Changes to the function call of CountGridRows now means the Grid and the table to query is passed. 
-3) Major changes to functions SaveFILESTabToHTML SaveCOPYWindowToHTML SaveC2FWindowToHTML to use TSQLQueries too, instead of DBGrid queries. All three can now handle many thousands of rows more easily and are executed in just a few seconds. A test of 407K rows was saved as a 56Mb HTML file in under 10 seconds. 
+3) Major changes to functions SaveFILESTabToHTML SaveCOPYWindowToHTML SaveC2FWindowToHTML to use TSQLQueries too, instead of DBGrid queries. All three can now handle many thousands of rows more easily and are executed in just a few seconds. A test of 407K rows was saved as a 56Mb HTML file in under 10 seconds. However, I have noticed that the step of preparing the data for display in the Compare Two Folders does take a long time for many tens of thousands of files. It gets there eventually, but it can take a while. This is due to the enormous SQL statement that was added in v3.3.0 in the repareData_COMPARE_TWO_FOLDERS function. This was added to give users greater abilities to find and sort, following earlier pre v3.3.0 complaints that the compairson was not granular enough. It is more granular now, but has come at the cost of taking longer to prepare. Something to work on for v3.3.2.  
 
 These changes described above are the largest service release aspects to this version. 
 
@@ -25,7 +25,7 @@ On Linux, and OSX, the "Curently Hashing" status in the FileS tab was chopping o
 
 The function DatasetToClipBoardFILES checked if the number of rows was less than 20K, but didn't show a message to instruct the user to use a file save if the count was greater than 20K. That has now been applied in v3.3.1, so they dont just sit there wondering what has happened. 
 
-If the user tried to clipboard a volume of data over 20K rows in the FileS tab, although the user was told to use a file save instead, the status still said it was copying to clipbard. Now it will tell the user the clipboard effort has been aborted. 
+If the user tried to clipboard a volume of data over 20K rows in the FileS tab, although the user was told to use a file save instead, the status still said it was copying to clipboard. Now it will tell the user the clipboard effort has been aborted. 
 
 The Clipboard button in the "Copy" display grid was not as complete as the right-click clipboard option. A remnant of the changes made in v3.3.0. I think. Now both methods produce the same clipboard content. 
 
