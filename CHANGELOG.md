@@ -1,7 +1,19 @@
 ﻿Version History
 ===============
 
-v3.3.1 Dec 2021
+v3.3.2 Jan 2022
+The column heading of "ID" in text output seems to cause the almighty Microsoft Excel a headache because it thinks it is an "SYLK" file. And users of Quickhash were being told "Excel has detected ‘file.csv’ is a SYLK file, but cannot load it. Either the file has errors or it is not a SYLK file format. Click OK to try to open the file in a different format." I was unaware a two byte string of "ID" at the starts of a CSV file somehow meant "all such files are SYLK files and cannot be anything else" but there we are. So yes, I have changed the value of "ID" to "No" (as in "Number") for now. 
+Users of v3.3.1 can do the following if they do not want to upgrade to v3.3.2 : 
+  Open the CSV with a text editor like Notepad and change ID into some text that doesn’t start with ID e.g No or Number
+  Save the CSV then open it with Excel. This time it won’t throw you the SYLK file error. Do your editing and save the CSV.
+  Open the CSV with the text editor again and change the edited text back to ID. Save the file. It will now be OK. 
+
+In the Copy tab, if the user had checked the box "Save results (CSV)?", they were getting a largely empty output file. But if they right clicked the display grid of results and saved to CSV, it was OK. That was fixed. It was another error remaining of my v3.3.0 fixes back in May 2021 and I didnt catch it in the v3.3.1 release. Sorry for that
+
+In the Copy tab, the little text based percentage indicator (as controlled by lblFilesCopiedPercentage object) had somehow got buried in blankets like a small child at a crazy feather pillow-fight party at some stage in development history and was not visible. Now it is. 
+
+
+v3.3.1 6th Jan 2022
 
 function CountGridRows has been changed. This function was designed to count the number of rows in any given display grid to determine whether the clipboard could be used, or whether the data would saved to a filestream. And, if the user chose to save the output to CSV or HTML, the same function would check to see if a memory list of strings could be used to then be saved out to a file, or whether a filestream should be used line by line. 
 

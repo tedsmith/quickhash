@@ -363,38 +363,38 @@ begin
       // Besides, SQLite advice is not to use it unless entirely necessary (http://sqlite.org/autoinc.html)
       // VARCHAR is set as 32767 to ensure max length of NFTS based filename and paths can be utilised
       SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_FILES"('           +
-                                       ' "id" Integer NOT NULL PRIMARY KEY,' +
+                                       ' "No" Integer NOT NULL PRIMARY KEY,' +
                                        ' "FileName" VARCHAR(4096) NOT NULL,' +
                                        ' "FilePath" VARCHAR(4096) NOT NULL,' +
                                        ' "HashValue" VARCHAR NOT NULL,'      +
                                        ' "FileSize" VARCHAR NULL,'           +
                                        ' "KnownHashFlag" VARCHAR NULL);');
       // Creating an index based upon id in the TBL_FILES Table
-      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FILES_id_idx" ON "TBL_FILES"( "id" );');
+      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "FILES_id_idx" ON "TBL_FILES"( "No" );');
 
       // Here we're setting up a table named "TBL_COPY" in the new database for Copy tab
       // VARCHAR is set as 32767 to ensure max length of NFTS based filename and paths can be utilised
       SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COPY"('                      +
-                                       ' "id" Integer NOT NULL PRIMARY KEY,'           +
+                                       ' "No" Integer NOT NULL PRIMARY KEY,'           +
                                        ' "SourceFilename" VARCHAR(4096) NOT NULL,'     +
                                        ' "SourceHash" VARCHAR NULL,'                   +
                                        ' "DestinationFilename" VARCHAR(4096) NOT NULL,'+
                                        ' "DestinationHash" VARCHAR NULL,'              +
                                        ' "DateAttributes" VARCHAR NULL);');
       // Creating an index based upon id in the TBL_COPY Table
-      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COPIED_FILES_id_idx" ON "TBL_COPY"( "id" );');
+      SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COPIED_FILES_id_idx" ON "TBL_COPY"( "No" );');
 
       // New to v3.2.0 to enable a display grid for the comparison of two folders
       // Here we're setting up a table named "TBL_COMPARE_TWO_FOLDERS" in the new database for Comapre Two Folders tab
       // VARCHAR is set as 4096 to ensure max length of NFTS based filename and paths can be utilised
       SQLite3Connection1.ExecuteDirect('CREATE TABLE "TBL_COMPARE_TWO_FOLDERS"('+
-                                       ' "id" Integer NOT NULL PRIMARY KEY,'+
+                                       ' "No" Integer NOT NULL PRIMARY KEY,'+
                                        ' "FilePath" VARCHAR(4096) NULL,'    +
                                        ' "FileName" VARCHAR(4096) NULL,'    +
                                        ' "FileHash" VARCHAR NULL);');
 
       // Creating an index based upon id in the TBL_COMPARE_TWO_FOLDERS Table
-      // Pre v3.3.0 was : SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COMPARE_TWO_FOLDERS_id_idx" ON "TBL_COMPARE_TWO_FOLDERS"( "id" );'); //DS (original) - no need because it is primary key
+      // Pre v3.3.0 was : SQLite3Connection1.ExecuteDirect('CREATE UNIQUE INDEX "COMPARE_TWO_FOLDERS_id_idx" ON "TBL_COMPARE_TWO_FOLDERS"( "No" );'); //DS (original) - no need because it is primary key
       // The following is new to v3.3.0 following extensive improvement with community help:
       SQLite3Connection1.ExecuteDirect('CREATE INDEX COMPARE_TWO_FOLDERS_path_name_hash_idx '+
                                        '  ON TBL_COMPARE_TWO_FOLDERS (FilePath, FileName, FileHash)');
@@ -402,7 +402,7 @@ begin
                                        '  ON TBL_COMPARE_TWO_FOLDERS (FilePath, FileHash, FileName)');
 
       SQLite3Connection1.ExecuteDirect('CREATE TABLE TBL_COMPARE_TWO_FOLDERS_MATCH ( '+
-                                       'id Integer NOT NULL PRIMARY KEY, '+
+                                       'No Integer NOT NULL PRIMARY KEY, '+
                                        'FileName VARCHAR NULL, '+
                                        'FilePathA VARCHAR NULL, '+
                                        'FileHashA VARCHAR NULL, '+
@@ -410,7 +410,7 @@ begin
                                        'FileHashB VARCHAR NULL) ');
 
       SQLite3Connection1.ExecuteDirect('CREATE TABLE TBL_COMPARE_TWO_FOLDERS_DUPLICATES ( '+
-                                       'id Integer NOT NULL PRIMARY KEY, '+
+                                       'No Integer NOT NULL PRIMARY KEY, '+
                                        'FilePath VARCHAR NULL, '+
                                        'FileName VARCHAR NULL, '+
                                        'FileHash VARCHAR NULL) ');
@@ -772,7 +772,7 @@ begin
                 fs.Write(strTABLEROWStart[1], 4);
 
                 // Get the data from the ID cell
-                FileIDCell := ExportSQLQuery.FieldByName('id').AsString;
+                FileIDCell := ExportSQLQuery.FieldByName('No').AsString;
                 // Write filename to new row
                 fs.Write(strTABLEDATAStart[1], 4);
                 fs.Write(FileIDCell[1], Length(FileIDCell));
@@ -936,7 +936,7 @@ end;
 // SaveDBToCSV exports the DBGrid (DBGridName) to a CSV file (filename) for the user
 // using a filestream and dedicated TSQLQuery due to DBGrid poor perfomance for large data.
 // Note if the user has filtered the display, such as show all duplicates, the whole
-// tabe of data will still be dumped to text for sorting etc in Excel or similar.
+// tabel of data will still be dumped to text for sorting etc in Excel or similar.
 procedure TfrmSQLiteDBases.SaveFILESDBToCSV(DBGrid : TDBGrid; Filename : string);
 var
   linetowrite   : ansistring = Default(ansistring);
@@ -961,7 +961,7 @@ begin
     CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
     if CSVFileToWrite.Handle > 0 then
       begin
-        linetowrite := ('ID' + ChosenDelimiter +
+        linetowrite := ('No' + ChosenDelimiter +
                         'Filename'  + ChosenDelimiter +
                         'FilePath'  + ChosenDelimiter +
                         'HashValue' + ChosenDelimiter +
@@ -988,7 +988,7 @@ begin
             begin
               // Include all columns, inc hash flag, but exclude the row count (not needed for a CSV output).
               // Get the data from the ID cell
-              FileIDCell := ExportSQLQuery.FieldByName('id').AsString;
+              FileIDCell := ExportSQLQuery.FieldByName('No').AsString;
               // Get the data from the filename cell
               FileNameCell := ExportSQLQuery.FieldByName('FileName').AsString;
               // Get the data from the filepath cell
@@ -1046,9 +1046,9 @@ var
   DestinationFileName : string = Default(string);
   DestinationFileHash : string = Default(string);
   DateAttributes      : string = Default(string);
-  n : integer = Default(integer);
-  CSVFileToWrite : TFilestreamUTF8;
-  ExportSQLQuery : TSQLQuery;
+  n                   : integer = Default(integer);
+  CSVFileToWrite      : TFilestreamUTF8;
+  ExportSQLQuery      : TSQLQuery;
 
 begin
   Mainform.StatusBar2.SimpleText := 'Writing data to file...please wait';
@@ -1059,7 +1059,7 @@ begin
   // Create a filestream for the output CSV.
   CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
   // Add header
-  linetowrite := 'ID'                       + ChosenDelimiter +
+  linetowrite := 'No'                       + ChosenDelimiter +
                 'Source Filename'          + ChosenDelimiter +
                 'Source Hash'              + ChosenDelimiter +
                 'Destination Filename'     + ChosenDelimiter +
@@ -1079,7 +1079,7 @@ begin
         ExportSQLQuery.First;
         while not ExportSQLQuery.EOF do
         begin
-          FileIDCell          := ExportSQLQuery.FieldByName('id').AsString;
+          FileIDCell          := ExportSQLQuery.FieldByName('No').AsString;
           SourceFilename      := ExportSQLQuery.FieldByName('SourceFilename').AsString;
           SourceFileHash      := ExportSQLQuery.FieldByName('SourceHash').AsString;
           DestinationFileName := ExportSQLQuery.FieldByName('DestinationFileName').AsString;
@@ -1142,7 +1142,7 @@ begin
       // Add headers and adjust column headings depending on which filter is active
       If FC2Fquery = false  then
       begin
-        linetowrite := 'ID'        +ChosenDelimiter+
+        linetowrite := 'No'        +ChosenDelimiter+
                        'Filepath'  +ChosenDelimiter+
                        'FileName'  +ChosenDelimiter+
                        'FileHash'  +LineEnding;
@@ -1151,7 +1151,7 @@ begin
       end
       else
       begin
-        linetowrite := 'ID'        +ChosenDelimiter+
+        linetowrite := 'No'        +ChosenDelimiter+
                        'Filename'  +ChosenDelimiter+
                        'FilePathA' +ChosenDelimiter+
                        'FileHashA' +ChosenDelimiter+
@@ -1174,7 +1174,7 @@ begin
             ExportSQLQuery.First;
             while not ExportSQLQuery.EOF do
             begin
-              strID       := ExportSQLQuery.FieldByName('id').AsString;
+              strID       := ExportSQLQuery.FieldByName('No').AsString;
               Filepath    := ExportSQLQuery.FieldByName('FilePath').AsString;
               strFileName := ExportSQLQuery.FieldByName('FileName').AsString;
               FileHash    := ExportSQLQuery.FieldByName('FileHash').AsString;
@@ -1208,7 +1208,7 @@ begin
           ExportSQLQuery.First;
           while not ExportSQLQuery.EOF do
           begin
-            strID       := ExportSQLQuery.FieldByName('id').AsString;
+            strID       := ExportSQLQuery.FieldByName('No').AsString;
             strFileName := ExportSQLQuery.FieldByName('FileName').AsString;
             FilePathA   := ExportSQLQuery.FieldByName('FilePathA').AsString;
             FileHashA   := ExportSQLQuery.FieldByName('FileHashA').AsString;
@@ -1255,7 +1255,7 @@ begin
     try
       CSVClipboardList := TStringListUTF8.Create;
       // Add the grid headers
-      CSVClipboardList.Add('ID'      + ChosenDelimiter + 'Filepath'  + ChosenDelimiter +
+      CSVClipboardList.Add('No'      + ChosenDelimiter + 'Filepath'  + ChosenDelimiter +
                            'FileName'+ ChosenDelimiter + 'HashValue');
       DBGrid.DataSource.Dataset.DisableControls;
       try
@@ -1436,13 +1436,13 @@ begin
       // Add the grid headers. If "Show Duplicates" was just active, adjust header layout
       If FC2Fquery = false  then
       begin
-      CSVClipboardList.Add('ID'      + ChosenDelimiter + 'Filepath'  + ChosenDelimiter +
+      CSVClipboardList.Add('No'      + ChosenDelimiter + 'Filepath'  + ChosenDelimiter +
                            'FileName'+ ChosenDelimiter + 'HashValue' + ChosenDelimiter);
       end
       else
       begin
       // Add the grid headers as normal
-      CSVClipboardList.Add('ID'      + ChosenDelimiter + 'Filename'  + ChosenDelimiter +
+      CSVClipboardList.Add('No'      + ChosenDelimiter + 'Filename'  + ChosenDelimiter +
                            'FolderAPath'+ ChosenDelimiter + 'FolderAHashValue' + ChosenDelimiter +
                            'FolderBPath'+ ChosenDelimiter + 'FolderBHashValue');
       end;
@@ -2255,7 +2255,7 @@ begin
     try
       CSVClipboardList := TStringListUTF8.Create;
       // Add the grid headers
-      CSVClipboardList.Add('ID'                   + ChosenDelimiter +
+      CSVClipboardList.Add('No'                   + ChosenDelimiter +
                            'Source Filename'      + ChosenDelimiter +
                            'Source FileHash'      + ChosenDelimiter +
                            'Destination Filename' + ChosenDelimiter +
@@ -2430,7 +2430,7 @@ begin
             fs.Write(strTABLEROWStart[1], 4);
 
             // Get the data from the ID cell
-            FileIDCell := ExportSQLQuery.FieldByName('id').AsString;
+            FileIDCell := ExportSQLQuery.FieldByName('No').AsString;
             // Write filename to new row
             fs.Write(strTABLEDATAStart[1], 4);
             fs.Write(FileIDCell[1], Length(FileIDCell));
@@ -2613,7 +2613,7 @@ begin
           begin
             fs.Write(strTABLEROWStart[1], 4);
 
-            strID := ExportSQLQuery.FieldByName('id').AsString;
+            strID := ExportSQLQuery.FieldByName('No').AsString;
             fs.Write(strTABLEDATAStart[1], 4);
             fs.Write(strID[1], Length(strID));
             fs.Write(strTABLEDataEnd[1], 5);

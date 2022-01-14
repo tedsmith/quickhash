@@ -5555,7 +5555,8 @@ begin
         if SaveDialog3.Execute then
           begin
             CSVLogFile2 := SaveDialog3.FileName;
-            frmSQLiteDBases.SaveFileSDBToCSV(frmDisplayGrid1.DBGrid_COPY, CSVLogFile2);
+            frmSQLiteDBases.SaveCopyDBToCSV(frmDisplayGrid1.DBGrid_COPY, CSVLogFile2);
+//            frmSQLiteDBases.SaveFileSDBToCSV(frmDisplayGrid1.DBGrid_COPY, CSVLogFile2);
           end;
       end;
 
