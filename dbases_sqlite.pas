@@ -1,5 +1,5 @@
 unit dbases_sqlite; // New to v3.0.0 of QuickHash
-
+// Copyright (C) 2011-2023  Ted Smith www.quickhash-gui.org
 // Rule of thumb - For INSERT, UPDATE, DELETE, use SQLQuery.ExecSQL, for SELECT use SQLQuery.Open:
 
 {$mode objfpc}{$H+} // {$H+} ensures all strings are of unlimited size, and set as ansistring

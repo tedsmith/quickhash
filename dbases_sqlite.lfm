@@ -9,7 +9,7 @@ object frmSQLiteDBases: TfrmSQLiteDBases
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
+  LCLVersion = '2.2.4.0'
   object lblConnectionStatus: TLabel
     Left = 32
     Height = 15
@@ -29,6 +29,7 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Database = SQLite3Connection1
     Transaction = SQLTransaction1
     Params = <>
+    Macros = <>
     Left = 48
     Top = 80
   end
@@ -69,6 +70,7 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Database = SQLite3Connection1
     Transaction = SQLTransaction1
     Params = <>
+    Macros = <>
     Left = 160
     Top = 80
   end
@@ -98,6 +100,7 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Database = SQLite3Connection1
     Transaction = SQLTransaction1
     Params = <>
+    Macros = <>
     Left = 296
     Top = 80
   end

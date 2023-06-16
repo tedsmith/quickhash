@@ -2,7 +2,7 @@
     Quick Hash - A Linux, Windows and Apple Mac OSX GUI for quickly selecting one or more files
     and generating hash values for them.
 
-    Copyright (C) 2011-2022  Ted Smith www.quickhash-gui.org
+    Copyright (C) 2011-2023  Ted Smith www.quickhash-gui.org
 
     The use of the word 'quick' refers to the ease in which the software operates
     in both Linux, Apple Mac and Windows (very few options to worry about, no
@@ -5556,7 +5556,7 @@ begin
           begin
             CSVLogFile2 := SaveDialog3.FileName;
             frmSQLiteDBases.SaveCopyDBToCSV(frmDisplayGrid1.DBGrid_COPY, CSVLogFile2);
-//            frmSQLiteDBases.SaveFileSDBToCSV(frmDisplayGrid1.DBGrid_COPY, CSVLogFile2);
+//          frmSQLiteDBases.SaveFileSDBToCSV(frmDisplayGrid1.DBGrid_COPY, CSVLogFile2); // This was the 3.3.1 bug, fixed in v3.3.2
           end;
       end;
 
