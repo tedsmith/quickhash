@@ -654,7 +654,7 @@ const
   strTABLEDATAStart  = '<TD>'    ;
   strTABLEDataEnd    = '</TD>'   ;
   strTABLEROWEnd     = '</TR>'   ;
-  strTableRow1       = strTABLEROWStart+'<TD><B>ID</B></TD><TD><B>Filename</B></TD><TD><B>Filepath</B></TD><TD><B>Filehash</B></TD><TD><B>Filesize</B></TD>';
+  strTableRow1       = strTABLEROWStart+'<TD><B>NO</B></TD><TD><B>Filename</B></TD><TD><B>Filepath</B></TD><TD><B>Filehash</B></TD><TD><B>Filesize</B></TD>';
   strTABLEFooter     = '</TABLE>';
   strBODYFooter      = '</BODY>' ;
   strTITLEFooter     = '</TITLE>';
@@ -1495,7 +1495,7 @@ procedure TfrmSQLiteDBases.ShowDuplicates(DBGrid : TDBGrid);
 begin
   try
   DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-  TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize ' +
+  TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, Filename, FilePath, HashValue, FileSize ' +
                                                    'FROM TBL_FILES WHERE HashValue IN ' +
                                                    '(SELECT HashValue FROM TBL_FILES ' +
                                                    'GROUP BY HashValue HAVING COUNT(*) > 1) ORDER BY hashvalue';
@@ -1634,8 +1634,8 @@ procedure TfrmSQLiteDBases.SortByID(DBGrid : TDBGrid);
 begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
-                                                     'FROM TBL_FILES ORDER BY Id';
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+                                                     'FROM TBL_FILES ORDER BY No';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
     MainForm.DBGrid_FILES.Options:= MainForm.DBGrid_FILES.Options + [dgAutoSizeColumns];
@@ -1653,7 +1653,7 @@ procedure TfrmSQLiteDBases.SortByFileName(DBGrid : TDBGrid);
 begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                                                      'FROM TBL_FILES ORDER BY FileName';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
@@ -1672,7 +1672,7 @@ procedure TfrmSQLiteDBases.SortByFilePath(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                                                     'FROM TBL_FILES ORDER BY FilePath';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
@@ -1691,7 +1691,7 @@ procedure TfrmSQLiteDBases.SortByHash(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                                                     'FROM TBL_FILES ORDER BY HashValue';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
@@ -1710,7 +1710,7 @@ procedure TfrmSQLiteDBases.SortByHashList(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                                                     'FROM TBL_FILES ORDER BY KnownHashFlag';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
@@ -1732,7 +1732,7 @@ begin
     DBGrid.DataSource.Dataset.Close;
     // This SQL query may not scale to large data sets as it uses the LIKE word
     // But it should be OK for many thousands of rows, but perhas not millions.
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text :=  'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text :=  'SELECT No, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                                                       'FROM TBL_FILES WHERE KnownHashFlag LIKE ''No''';
 
     SQLite3Connection1.Connected := True;
@@ -1755,7 +1755,7 @@ begin
     DBGrid.DataSource.Dataset.Close;
     // This SQL query may not scale to large data sets as it uses the LIKE word
     // But it should be OK for many thousands of rows, but perhas not millions.
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text :=  'SELECT Id, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text :=  'SELECT No, Filename, FilePath, HashValue, FileSize, KnownHashFlag ' +
                                                       'FROM TBL_FILES WHERE KnownHashFlag LIKE ''Yes''';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
@@ -2151,7 +2151,7 @@ procedure TfrmSQLiteDBases.SortBySourceFilename(DBGrid : TDBGrid);
 begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                                                      'FROM TBL_COPY ORDER BY SourceFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
@@ -2170,7 +2170,7 @@ procedure TfrmSQLiteDBases.SortByDestinationFilename(DBGrid : TDBGrid);
 begin
   try
     DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+    TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                                                      'FROM TBL_COPY ORDER BY DestinationFilename';
     SQLite3Connection1.Connected := True;
     SQLTransaction1.Active := True;
@@ -2189,7 +2189,7 @@ procedure TfrmSQLiteDBases.SortBySourceHash(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                                                     'FROM TBL_COPY ORDER BY SourceHash';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
@@ -2208,7 +2208,7 @@ procedure TfrmSQLiteDBases.SortByDestinationHash(DBGrid : TDBGrid);
 begin
  try
    DBGrid.DataSource.Dataset.Close; // <--- we don't use sqlFILES but the query connected to the grid
-   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT Id, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
+   TSQLQuery(DBGrid.DataSource.Dataset).SQL.Text := 'SELECT No, SourceFilename, SourceHash, DestinationFilename, DestinationHash, DateAttributes ' +
                                                     'FROM TBL_COPY ORDER BY DestinationHash';
    SQLite3Connection1.Connected := True;
    SQLTransaction1.Active := True;
@@ -2314,7 +2314,7 @@ var
     strBODYHeader      = '<BODY>'  ;
     strTABLEROWStart   = '<TR>'    ;
     strTABLEDATAStart  = '<TD>'    ;
-    strID              = '<td>ID</td>';
+    strID              = '<td>No</td>';
     strSrcFilenameHead = '<td>Source Filename</td>';
     strSrcHashHead     = '<td>Source Hash</td>';
     strDestFilenameHead= '<td>Destination Filename</td>';
@@ -2531,7 +2531,7 @@ begin
     sl.add('<BODY>');
     sl.add('<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>');
     sl.add('<table border=1>');
-    sl.add('<tr><td>ID</td><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
+    sl.add('<tr><td>No</td><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
 
     try
     DBGrid.DataSource.DataSet.DisableControls;
@@ -2589,7 +2589,7 @@ begin
     fs.Write(#13#10, 2);
     fs.Write('<table border=1>', 16);
     HeaderRow := '';
-    HeaderRow := ('<tr><td>ID</td><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
+    HeaderRow := ('<tr><td>No</td><td>Filename</td><td>FilepathA</td><td>FileHashA</td><td>FilePathB</td><td>FileHashB</td></tr>');
     fs.Write(HeaderRow[1], Length(HeaderRow));
 
     { strTABLEROWStart   = '<TR>'      = 4 bytes
@@ -2736,7 +2736,7 @@ begin
       'FROM tbl_compare_two_folders a, ' +
       '     tbl_compare_two_folders b ' +
       'WHERE a.FileHash = b.FileHash ' +
-      '  and a.id <> b.id ';
+      '  and a.no <> b.no ';
 
     SQLTransaction1.Active := True;
     sqlCOMPARETWOFOLDERS.ExecSQL;

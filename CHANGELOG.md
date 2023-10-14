@@ -1,7 +1,16 @@
 ﻿Version History
 ===============
 
-v3.3.2 Jan 2022
+v3.3.3 - Oct 2023
+By popular request, the last selected hash algorithm will now be saved on exit and re-used on next launch. Settings saved in QHConfig.xml file.  
+The correction and conversion from "ID" to "No" was not fully integrated in the "Compare Two Folders" tab, causing an SQLite error message to appear. That was fixed. 
+Fixed countless deprecated references to "ID" column in SQL syntax - another remnant of previous changes from "ID" to "No".
+Removed some unnecessary logging data from the log file of "Compare Two Folders" tab, notably entries that just mirrored the UI during the process such as "Currently searching for...".
+SQLite version 3.43.2 bundled in 32 and 64 bit modes. 
+This changelog corrected to show the release date of v3.3.2 as June 2023, instead of Jan 2022! *
+About page updated some more. 
+ 
+v3.3.2 June 2023  *
 The column heading of "ID" in text output seems to cause the almighty Microsoft Excel a headache because it thinks it is an "SYLK" file. And users of Quickhash were being told "Excel has detected ‘file.csv’ is a SYLK file, but cannot load it. Either the file has errors or it is not a SYLK file format. Click OK to try to open the file in a different format." I was unaware a two byte string of "ID" at the starts of a CSV file somehow meant "all such files are SYLK files and cannot be anything else" but there we are. So yes, I have changed the value of "ID" to "No" (as in "Number") for now. 
 Users of v3.3.1 can do the following if they do not want to upgrade to v3.3.2 : 
   Open the CSV with a text editor like Notepad and change ID into some text that doesn’t start with ID e.g No or Number

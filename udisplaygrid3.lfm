@@ -1,13 +1,13 @@
 object frmDisplayGrid3: TfrmDisplayGrid3
-  Left = 278
+  Left = 504
   Height = 559
-  Top = 240
+  Top = 377
   Width = 1008
   Caption = 'Compare Two Folders Results'
   ClientHeight = 559
   ClientWidth = 1008
   Position = poDesktopCenter
-  LCLVersion = '2.0.12.0'
+  LCLVersion = '2.2.4.0'
   object DBGrid_C2F: TDBGrid
     Left = 16
     Height = 472

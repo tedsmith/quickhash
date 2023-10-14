@@ -650,6 +650,8 @@ var
   x, y : integer;
 
 begin
+
+
   x := screen.Width;
   y := screen.Height;
   tmp := 1;
@@ -2405,7 +2407,6 @@ begin
   end;
 end;
 
-
 procedure TMainForm.ShellTreeView_FolderAChange(Sender: TObject; Node: TTreeNode
   );
 begin
@@ -2986,15 +2987,12 @@ begin
     try
        {$ifdef Windows}
           StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride);
-          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderA, LongPathOverride));
           {$else}
             {$ifdef Darwin}
             StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderA);
-            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderA));
             {$endif}
             {$IFDEF UNIX and !$ifdef Darwin}
             StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderA);
-            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderA));
             {$ENDIF}
         {$endif}
 
@@ -3006,15 +3004,12 @@ begin
       try
         {$ifdef Windows}
           StatusBar6.SimpleText:= 'Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride);
-          memFolderCompareSummary.Lines.Add('Currently searching for files in ' + RemoveLongPathOverrideChars(FolderB, LongPathOverride));
           {$else}
             {$ifdef Darwin}
             StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderB);
-            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderB));
             {$endif}
             {$IFDEF UNIX and !$ifdef Darwin}
             StatusBar6.SimpleText:= 'Currently searching for files in ' + (FolderB);
-            memFolderCompareSummary.Lines.Add('Currently searching for files in ' + (FolderB));
             {$ENDIF}
         {$endif}
 
@@ -3143,15 +3138,12 @@ begin
   try
     {$ifdef Windows}
     StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
-    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
     {$else}
       {$ifdef Darwin}
         StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
-        memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
       {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
           StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
-          memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
         {$ENDIF}
       {$endif}
 
@@ -3257,15 +3249,12 @@ begin
   try
     {$ifdef Windows}
     StatusBar6.SimpleText:= 'Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride);
-    memFolderCompareSummary.Lines.Add('Now hashing files in ' + RemoveLongPathOverrideChars(Path, LongPathOverride));
     {$else}
       {$ifdef Darwin}
         StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
-        memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
       {$endif}
         {$IFDEF UNIX and !$ifdef Darwin}
           StatusBar6.SimpleText:= 'Now hashing files in ' + (Path);
-          memFolderCompareSummary.Lines.Add('Now hashing files in ' + (Path));
         {$ENDIF}
       {$endif}
 

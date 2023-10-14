@@ -1,7 +1,7 @@
 object frmDisplayGrid1: TfrmDisplayGrid1
-  Left = 327
+  Left = 478
   Height = 561
-  Top = 306
+  Top = 369
   Width = 1010
   Caption = 'QuickHash-GUI - Copy Results'
   ClientHeight = 561
@@ -9,7 +9,7 @@ object frmDisplayGrid1: TfrmDisplayGrid1
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
+  LCLVersion = '2.2.4.0'
   object btnClipboardResultsCOPYTAB: TButton
     Left = 280
     Height = 25

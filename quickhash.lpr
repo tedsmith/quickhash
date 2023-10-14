@@ -108,7 +108,7 @@ begin
   {$IFDEF UNIX and !$ifdef Darwin}
   {$ENDIF}
   {$ENDIF}
-  Application.CreateForm(TfrmEnvironmentCheck, frmEnvironmentCheck);
+  //Application.CreateForm(TfrmEnvironmentCheck, frmEnvironmentCheck);
   Application.Run;
 end.
 

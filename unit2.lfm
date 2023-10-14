@@ -1,10 +1,10 @@
 object MainForm: TMainForm
-  Left = 228
+  Left = 440
   Height = 733
-  Top = 115
+  Top = 138
   Width = 1023
   AllowDropFiles = True
-  Caption = 'QuickHash v3.3.2 (June 2023) - The easy and convenient way to hash data in Linux, OSX and Windows'
+  Caption = 'QuickHash v3.3.3 (Oct 2023) - The easy and convenient way to hash data in Linux, OSX and Windows'
   ClientHeight = 713
   ClientWidth = 1023
   Menu = MainMenu1
@@ -12,18 +12,18 @@ object MainForm: TMainForm
   OnCreate = FormCreate
   OnDropFiles = FormDropFiles
   Position = poScreenCenter
-  SessionProperties = 'Position'
+  SessionProperties = 'Position;AlgorithmChoiceRadioBox1.ItemIndex;AlgorithmChoiceRadioBox2.ItemIndex;AlgorithmChoiceRadioBox3.ItemIndex;AlgorithmChoiceRadioBox4.ItemIndex;AlgorithmChoiceRadioBox5.ItemIndex;AlgorithmChoiceRadioBox6.ItemIndex;AlgorithmChoiceRadioBox7.ItemIndex'
   LCLVersion = '2.2.4.0'
   object PageControl1: TPageControl
     Left = 24
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -2208,6 +2208,7 @@ object MainForm: TMainForm
   end
   object QH_MainFormXMLPropStorage: TXMLPropStorage
     StoredValues = <>
+    FileName = 'QHConfig.xml'
     Left = 32
     Top = 584
   end

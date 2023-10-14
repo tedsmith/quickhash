@@ -7,7 +7,7 @@ object frmAbout: TfrmAbout
   ClientHeight = 577
   ClientWidth = 840
   Position = poMainFormCenter
-  LCLVersion = '2.0.10.0'
+  LCLVersion = '2.2.4.0'
   object memAbout: TMemo
     Left = 16
     Height = 516
@@ -15,13 +15,11 @@ object frmAbout: TfrmAbout
     Width = 810
     Anchors = [akTop, akLeft, akRight, akBottom]
     Lines.Strings = (
-      'v3.3.0, Developed by Ted Smith (c) 2011-2021'
+      'v3.3.3, Developed by Ted Smith (c) 2011-2023'
       ''
       'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''
-      'Github Page is : https://github.com/tedsmith/quickhash'
-      ''
-      'Bug Tracker http://www.quickhash-gui.org/bug-tracker/  '
+      'Github Page and Bug Tracker is : https://github.com/tedsmith/quickhash'
       ''
       'Donations using PayPal at https://paypal.me/quickhashgui'
       ''

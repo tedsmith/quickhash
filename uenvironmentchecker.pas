@@ -104,12 +104,13 @@ begin
 end;
 function TfrmEnvironmentCheck.DLLScan(expectedPath : rawbytestring) : Boolean;
   {// On Windows :
+
   libewf-x64.dll		5D33227712DA76316613DCD88B2749916DBA5ACA
   libewf-x86.dll		915E3F26E170A062312A8CD73462AE6ECA6EF7BA
   libgcc_s_dw2-1.dll		201924954A5A593C4CA24EE0FE799A764B41598D
   libwinpthread-1.dll		34E84ED8F69F05FCAD212B02C2B064A5C7377904
-  sqlite3-win32.dll		0B25A2BA06DD5B8FE2A5F33C5C8442D4C12A2B70
-  sqlite3-win64.dll		2092405B3755C71E12E2F6EE4D193B321999CB62
+  sqlite3-win32.dll		220680d789e002bf2822aa3ef428d2af01496033
+  sqlite3-win64.dll		c82d5cfe8ffb243a670d65258c25e9c101820ab7
   zlib1.dll (32-bit copy)	B1D1FECBB568EDCF712232738BA3805B47BC6036
   zlib1.dll (64-bit copy)	A10687C37DEB2CE5422140B541A64AC15534250F
   // On Linux :
@@ -131,7 +132,7 @@ begin
                       'libewf-x86.dll'		+ #9#9 + '915E3F26E170A062312A8CD73462AE6ECA6EF7BA' + Lineending+
                       'libgcc_s_dw2-1.dll'	+ #9#9 + '201924954A5A593C4CA24EE0FE799A764B41598D' + Lineending+
                       'libwinpthread-1.dll'	+ #9#9 + '34E84ED8F69F05FCAD212B02C2B064A5C7377904' + Lineending+
-                      'sqlite3-win32.dll'       + #9#9 + '0B25A2BA06DD5B8FE2A5F33C5C8442D4C12A2B70' + Lineending+
+                      'sqlite3-win32.dll'       + #9#9 + '220680d789e002bf2822aa3ef428d2af01496033' + Lineending+
                       'zlib1.dll (x86 copy)'	+ #9#9 + 'B1D1FECBB568EDCF712232738BA3805B47BC6036' + Lineending+
                       '==================================================================='           + Lineending;
     {$else ifdef CPU64}
@@ -140,7 +141,7 @@ begin
                       'libewf-x64.dll'             + #9#9 + '5D33227712DA76316613DCD88B2749916DBA5ACA' + Lineending +
                       'libgcc_s_dw2-1.dll'	   + #9#9 + '201924954A5A593C4CA24EE0FE799A764B41598D' + Lineending +
                       'libwinpthread-1.dll'        + #9#9 + '34E84ED8F69F05FCAD212B02C2B064A5C7377904' + Lineending +
-                      'sqlite3-win64.dll'	   + #9#9 + '2092405B3755C71E12E2F6EE4D193B321999CB62' + Lineending +
+                      'sqlite3-win64.dll'	   + #9#9 + 'C82D5CFE8FFB243A670D65258C25E9C101820AB7' + Lineending +
                       'zlib1.dll (x64 copy)'	   + #9#9 + 'A10687C37DEB2CE5422140B541A64AC15534250F' + Lineending +
                       '========================================================================='      + Lineending;
     {$endif}
@@ -156,11 +157,9 @@ begin
     sl := TStringList.Create;
     {$ifdef Windows}
     FindAllFiles(sl, expectedPath, '*.dll', true, faAnyFile);
-    if sl.count = 5 then
     {$endif}
     {$ifdef Linux}
     FindAllFiles(sl, expectedPath, '*.so', true, faAnyFile);
-    if sl.count = 1 then
     {$endif}
 
     {$ifdef Darwin}
@@ -175,9 +174,8 @@ begin
         ComputedHash :=  Uppercase(SHA1Print(SHA1File(sl.strings[i])));
         memEnvList.Lines.Add(LibraryName + #9#9 + ComputedHash);
       end;
-    end
-    else memEnvList.Lines.Add(IntToStr(ExpectedFileCount) + ' library files were expected but '
-                              + IntToStr(sl.count) + ' were found.');
+    end;
+
   finally
     memEnvList.Lines.Add('Number of libraries found : ' + IntToStr(sl.count));
     memEnvList.Lines.Add('========================================================================='  + Lineending);
