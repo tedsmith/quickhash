@@ -1,3 +1,0 @@
-# must be linked without '-pie', otherwise linking fails
-hardening-no-pie */quickhash
-

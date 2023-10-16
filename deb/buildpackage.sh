@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 LANG=C
 LANGUAGE=C
@@ -25,7 +25,8 @@ from Sourceforge:
 https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.2.4/
 https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20i386%20DEB/Lazarus%202.2.4/
 EOL
-  exit 1
+  read -e -p "Do you want to continue anyway? " choice
+  [[ "$choice" == [Yy]* ]] || exit 1
 fi
 
 echo "Note: log filtering will replace '$PWD' with '<<BUILDDIR>>'" | tee $log
