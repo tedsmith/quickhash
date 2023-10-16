@@ -5,7 +5,7 @@ BIN = quickhash
 QHARCH ?= x64
 LIBEWF = libewf-Linux-$(QHARCH).so
 
-LAZARUSDIR ?= /usr/share/lazarus/2.0.12/
+LAZARUSDIR ?= /usr/share/lazarus/2.2.4/
 LAZBUILD := $(LAZARUSDIR)lazbuild
 LAZRES := $(LAZARUSDIR)tools/lazres
 
