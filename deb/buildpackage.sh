@@ -4,9 +4,6 @@ LANG=C
 LANGUAGE=C
 LC_ALL=C
 
-laz_ver="2.2.6"
-fpc_ver="3.2.2"
-
 packages="$(grep '^Package: ' debian/control | cut -d ' ' -f2)"
 source=$(dpkg-parsechangelog | grep '^Source:' | cut -d ' ' -f2)
 version=$(dpkg-parsechangelog | grep '^Version:' | cut -d ' ' -f2)
@@ -14,23 +11,6 @@ arch=$(dpkg-architecture -qDEB_HOST_ARCH)
 log="../build_${source}_${version}_${arch}.log"
 
 dpkg-checkbuilddeps || exit 1
-
-if [ "$(dpkg-query -W -f='${Status} ${version} ' lazarus-project fpc-laz fpc-src 2>/dev/null; echo $?)" != \
-     "install ok installed $fpc_ver install ok installed $fpc_ver install ok installed $laz_ver 0" ];
-then
-  cat <<EOL
-Before you can continue to build Debian packages
-you need to install the packages
- lazarus-project version $laz_ver
- fpc-laz version $fpc_ver
- fpc-src version $fpc_ver
-from Sourceforge:
-https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%20$laz_ver
-
-EOL
-  read -e -p "Do you want to continue anyway? [y/N] " choice
-  [[ "$choice" == [Yy]* ]] || exit 1
-fi
 
 echo "Note: log filtering will replace '$PWD' with '<<BUILDDIR>>'" | tee $log
 dpkg-buildpackage -j`nproc` -rfakeroot -b -us -uc 2>&1 | sed "s|$PWD|<<BUILDDIR>>|g" | tee -a $log
