@@ -6,8 +6,8 @@ QHARCH ?= x64
 LIBEWF = libewf-Linux-$(QHARCH).so
 
 LAZBUILD ?= lazbuild
-LAZARUSDIR ?= /usr/share/lazarus/$(shell $(LAZBUILD) --version)/
-LAZRES := $(LAZARUSDIR)tools/lazres
+LAZRES ?= lazres
+LAZARUSDIR ?= /usr/lib/lazarus/default/
 
 RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs udisplaygrid3.lrs uenvironmentchecker.lrs
 
