@@ -5,9 +5,9 @@ BIN = quickhash
 QHARCH ?= x64
 LIBEWF = libewf-Linux-$(QHARCH).so
 
-LAZARUSDIR ?= /usr/share/lazarus/2.0.12/
-LAZBUILD := $(LAZARUSDIR)lazbuild
-LAZRES := $(LAZARUSDIR)tools/lazres
+LAZBUILD ?= lazbuild
+LAZRES ?= lazres
+LAZARUSDIR ?= /usr/lib/lazarus/default/
 
 RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs udisplaygrid3.lrs uenvironmentchecker.lrs
 
