@@ -28,13 +28,13 @@ endef
 all: $(BIN)
 
 clean:
-	rm -rf lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
 	rm -f $(BIN) quickhash_linux.ico *.o *.or *.ppu *.res *.compiled
-	rm -f DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
 	$(foreach FILE,$(RESFILES),\
 	  test ! -f $(FILE).backup || mv -f $(FILE).backup $(FILE) ; ${\n})
 
 distclean: clean
+	rm -rf lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
+	rm -f DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
 
 $(BIN):
 	$(foreach FILE,$(RESFILES),\
