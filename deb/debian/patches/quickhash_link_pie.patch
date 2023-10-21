@@ -1,0 +1,31 @@
+--- a/Makefile
++++ b/Makefile
+@@ -41,6 +41,7 @@
+ 	  test -f $(FILE).backup || cp $(FILE) $(FILE).backup ; ${\n}\
+ 	  $(LAZRES) $(FILE) $(FILE:.lrs=.lfm) ; ${\n})
+ 	cp -f quickhash.ico quickhash_linux.ico
++	touch si_c.o
+ 	$(LAZBUILD) $(OPTIONS) $(PACKAGES) quickhash_linux.lpi
+ 
+ install:
+--- a/quickhash_linux.lpi
++++ b/quickhash_linux.lpi
+@@ -82,7 +82,7 @@
+       </Debugging>
+       <Options>
+         <PassLinkerOptions Value="True"/>
+-        <LinkerOptions Value="-z relro --as-needed"/>
++        <LinkerOptions Value="-z relro --as-needed -pie"/>
+       </Options>
+     </Linking>
+     <Other>
+@@ -90,7 +90,8 @@
+         <IgnoredMessages idx5024="True"/><!-- "Param XX is unused" -->
+       </CompilerMessages>
+       <CustomOptions Value="-OoREGVAR
+--OoPEEPHOLE"/>
++-OoPEEPHOLE
++-Fasi_prc"/>
+     </Other>
+   </CompilerOptions>
+ </CONFIG>
