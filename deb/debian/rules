@@ -11,3 +11,6 @@ override_dh_compress:
 override_dh_installchangelogs:
 	dh_installchangelogs CHANGELOG.md
 
+# Ubuntu uses zstd but that doesn't work on Debian
+override_dh_builddeb:
+	dh_builddeb -- -Zxz
