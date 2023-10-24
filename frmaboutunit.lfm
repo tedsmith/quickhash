@@ -15,7 +15,7 @@ object frmAbout: TfrmAbout
     Width = 810
     Anchors = [akTop, akLeft, akRight, akBottom]
     Lines.Strings = (
-      'v3.3.3, Developed by Ted Smith (c) 2011-2023'
+      'v3.3.4, Developed by Ted Smith (c) 2011-2023'
       ''
       'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''

@@ -106,7 +106,7 @@ uses
   Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
   LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
   XMLPropStorage,  diskmodule,
-  clipbrd, DBGrids, DbCtrls, ZVDateTimePicker, frmAboutUnit, base64,
+  clipbrd, DBGrids, DbCtrls, DateTimePicker, frmAboutUnit, base64,
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
@@ -400,11 +400,11 @@ type
     QH_MainFormXMLPropStorage             : TXMLPropStorage;
     SchedulerTimer                        : TTimer;
     TextHashingGroupBox1                  : TGroupBox;
-    ZVDateTimePickerCompareDirsTab        : TZVDateTimePicker;
-    ZVDateTimePickerCopyTab               : TZVDateTimePicker;
-    ZVDateTimePickerCompareTab            : TZVDateTimePicker;
-    ZVDateTimePickerFileTab               : TZVDateTimePicker;
-    ZVDateTimePickerFileSTab              : TZVDateTimePicker;
+    DateTimePickerCompareDirsTab        : TDateTimePicker;
+    DateTimePickerCopyTab               : TDateTimePicker;
+    DateTimePickerCompareTab            : TDateTimePicker;
+    DateTimePickerFileTab               : TDateTimePicker;
+    DateTimePickerFileSTab              : TDateTimePicker;
     // Procedures
     procedure AlgorithmChoiceRadioBox1Click(Sender: TObject);
     procedure AlgorithmChoiceRadioBox2Click(Sender: TObject);
@@ -834,14 +834,14 @@ begin
   // File Tab scheduling
   if PageControl1.ActivePage = TabSheet2 then  // File tab
     begin
-    if ZVDateTimePickerFileTab.DateTime < Now then
+    if DateTimePickerFileTab.DateTime < Now then
       begin
         ShowMessage('Scheduled start time is in the past. Correct it.');
         exit;
       end
       else begin
         StartHashing := false;
-        scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
+        scheduleStartTime     := DateTimePickerFileTab.DateTime;
         StatusBar1.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
         // Set the interval as the milliseconds remaining until the future start time
         SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
@@ -857,14 +857,14 @@ begin
   // FileS Tab scheduling
   else if PageControl1.ActivePage = TabSheet3 then  // FileS tab
     begin
-    if ZVDateTimePickerFileSTab.DateTime < Now then
+    if DateTimePickerFileSTab.DateTime < Now then
       begin
         ShowMessage('Scheduled start time is in the past. Correct it.');
         exit;
       end
       else begin
         StartHashing := false;
-        scheduleStartTime     := ZVDateTimePickerFileSTab.DateTime;
+        scheduleStartTime     := DateTimePickerFileSTab.DateTime;
         StatusBar2.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
         // Set the interval as the milliseconds remaining until the future start time
         SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
@@ -879,14 +879,14 @@ begin
     end
   else if PageControl1.ActivePage = TabSheet4 then  // Copy tab
     begin
-    if ZVDateTimePickerCopyTab.DateTime < Now then
+    if DateTimePickerCopyTab.DateTime < Now then
       begin
         ShowMessage('Scheduled start time is in the past. Correct it.');
         exit;
       end
       else begin
         StartHashing := false;
-        scheduleStartTime     := ZVDateTimePickerCopyTab.DateTime;
+        scheduleStartTime     := DateTimePickerCopyTab.DateTime;
         StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
         // Set the interval as the milliseconds remaining until the future start time
         SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
@@ -902,14 +902,14 @@ begin
   // Compare Two Files scheduler
   else if PageControl1.ActivePage = TabSheet5 then  // Compare Two Files tab
     begin
-    if ZVDateTimePickerCompareTab.DateTime < Now then
+    if DateTimePickerCompareTab.DateTime < Now then
       begin
         ShowMessage('Scheduled start time is in the past. Correct it.');
         exit;
       end
     else begin
         StartHashing := false;
-        scheduleStartTime     := ZVDateTimePickerCompareTab.DateTime;
+        scheduleStartTime     := DateTimePickerCompareTab.DateTime;
         StatusBar4.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
         // Set the interval as the milliseconds remaining until the future start time
         SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
@@ -924,14 +924,14 @@ begin
     end
   else if PageControl1.ActivePage = TabSheet6 then  // Compare Two Folders tab
     begin
-    if ZVDateTimePickerCompareDirsTab.DateTime < Now then
+    if DateTimePickerCompareDirsTab.DateTime < Now then
       begin
         ShowMessage('Scheduled start time is in the past. Correct it.');
         exit;
       end
     else begin
         StartHashing := false;
-        scheduleStartTime     := ZVDateTimePickerCompareDirsTab.DateTime;
+        scheduleStartTime     := DateTimePickerCompareDirsTab.DateTime;
         StatusBar6.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
         // Set the interval as the milliseconds remaining until the future start time
         SchedulerTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
@@ -1136,13 +1136,13 @@ begin
       begin
         if lblschedulertickboxFileTab.Checked then
         begin
-          if ZVDateTimePickerFileTab.DateTime < Now then
+          if DateTimePickerFileTab.DateTime < Now then
           begin
             ShowMessage('Scheduled start time is in the past. Correct it.');
             exit;
           end
           else
-          scheduleStartTime     := ZVDateTimePickerFileTab.DateTime;
+          scheduleStartTime     := DateTimePickerFileTab.DateTime;
           StatusBar1.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
             repeat
               // This sleep loop avoids straining the CPU too much but also ensures the
@@ -1657,13 +1657,13 @@ procedure TMainForm.lblschedulertickboxFileSTabChange(Sender: TObject);
 begin
   if lblschedulertickboxFileSTab.Checked then
   begin
-    ZVDateTimePickerFileSTab.Visible := true;
-    ZVDateTimePickerFileSTab.Enabled := true;
+    DateTimePickerFileSTab.Visible := true;
+    DateTimePickerFileSTab.Enabled := true;
   end
   else
   begin
-    ZVDateTimePickerFileSTab.Visible := false;
-    ZVDateTimePickerFileSTab.Enabled := false;
+    DateTimePickerFileSTab.Visible := false;
+    DateTimePickerFileSTab.Enabled := false;
   end;
 end;
 
@@ -1672,13 +1672,13 @@ procedure TMainForm.lblschedulertickboxFileTabChange(Sender: TObject);
 begin
   if lblschedulertickboxFileTab.Checked then
   begin
-    ZVDateTimePickerFileTab.Visible := true;
-    ZVDateTimePickerFileTab.Enabled := true;
+    DateTimePickerFileTab.Visible := true;
+    DateTimePickerFileTab.Enabled := true;
   end
   else
   begin
-    ZVDateTimePickerFileTab.Visible := false;
-    ZVDateTimePickerFileTab.Enabled := false;
+    DateTimePickerFileTab.Visible := false;
+    DateTimePickerFileTab.Enabled := false;
   end;
 end;
 
@@ -1687,13 +1687,13 @@ procedure TMainForm.lblschedulertickboxCopyTabChange(Sender: TObject);
 begin
   if lblschedulertickboxCopyTab.Checked then
   begin
-    ZVDateTimePickerCopyTab.Visible := true;
-    ZVDateTimePickerCopyTab.Enabled := true;
+    DateTimePickerCopyTab.Visible := true;
+    DateTimePickerCopyTab.Enabled := true;
   end
   else
   begin
-    ZVDateTimePickerCopyTab.Visible := false;
-    ZVDateTimePickerCopyTab.Enabled := false;
+    DateTimePickerCopyTab.Visible := false;
+    DateTimePickerCopyTab.Enabled := false;
   end;
 end;
 
@@ -1702,13 +1702,13 @@ procedure TMainForm.lblschedulertickboxCompareTabChange(Sender: TObject);
 begin
   if lblschedulertickboxCompareTab.Checked then
   begin
-    ZVDateTimePickerCompareTab.Visible := true;
-    ZVDateTimePickerCompareTab.Enabled := true;
+    DateTimePickerCompareTab.Visible := true;
+    DateTimePickerCompareTab.Enabled := true;
   end
   else
   begin
-    ZVDateTimePickerCompareTab.Visible := false;
-    ZVDateTimePickerCompareTab.Enabled := false;
+    DateTimePickerCompareTab.Visible := false;
+    DateTimePickerCompareTab.Enabled := false;
   end;
 end;
 
@@ -1717,13 +1717,13 @@ procedure TMainForm.lblschedulertickboxCompareTwoDirectoriesTabChange(Sender: TO
 begin
   if lblschedulertickboxCompareDirsTab.Checked then
   begin
-    ZVDateTimePickerCompareDirsTab.Visible := true;
-    ZVDateTimePickerCompareDirsTab.Enabled := true;
+    DateTimePickerCompareDirsTab.Visible := true;
+    DateTimePickerCompareDirsTab.Enabled := true;
   end
   else
   begin
-    ZVDateTimePickerCompareDirsTab.Visible := false;
-    ZVDateTimePickerCompareDirsTab.Enabled := false;
+    DateTimePickerCompareDirsTab.Visible := false;
+    DateTimePickerCompareDirsTab.Enabled := false;
   end;
 end;
 
@@ -3480,14 +3480,14 @@ begin
             // First, wait for the scheduler time to arrive, if set by the user
             if lblschedulertickboxCopyTab.Checked then
               begin
-                if ZVDateTimePickerCopyTab.DateTime < Now then
+                if DateTimePickerCopyTab.DateTime < Now then
                 begin
                   ShowMessage('Scheduled start time is in the past. Correct it.');
                   Button8CopyAndHash.Enabled       := true;
                   exit;
                 end
                 else
-                scheduleStartTime     := ZVDateTimePickerCopyTab.DateTime;
+                scheduleStartTime     := DateTimePickerCopyTab.DateTime;
                 StatusBar3.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
                 repeat
                   // This sleep loop avoids straining the CPU too much but also ensures the
@@ -3639,13 +3639,13 @@ begin
   end
   else if lblschedulertickboxCompareTab.Checked then
     begin
-      if ZVDateTimePickerCompareTab.DateTime < Now then
+      if DateTimePickerCompareTab.DateTime < Now then
       begin
        ShowMessage('Scheduled start time is in the past. Correct it.');
        exit;
       end
       else
-      scheduleStartTime     := ZVDateTimePickerCompareTab.DateTime;
+      scheduleStartTime     := DateTimePickerCompareTab.DateTime;
       StatusBar4.SimpleText := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM:SS', schedulestarttime);
        repeat
          // This sleep loop avoids straining the CPU too much but also ensures the

@@ -1,10 +1,10 @@
 object MainForm: TMainForm
-  Left = 440
+  Left = 395
   Height = 733
-  Top = 138
+  Top = 180
   Width = 1023
   AllowDropFiles = True
-  Caption = 'QuickHash v3.3.3 (Oct 2023) - The easy and convenient way to hash data in Linux, OSX and Windows'
+  Caption = 'QuickHash v3.3.4 (Oct 2023) - The easy and convenient way to hash data in Linux, OSX and Windows'
   ClientHeight = 713
   ClientWidth = 1023
   Menu = MainMenu1
@@ -19,11 +19,11 @@ object MainForm: TMainForm
     Height = 675
     Top = 24
     Width = 991
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -408,7 +408,7 @@ object MainForm: TMainForm
           Caption = '...'
           ParentColor = False
         end
-        object ZVDateTimePickerFileTab: TZVDateTimePicker
+        object DateTimePickerFileTab: TDateTimePicker
           Left = 8
           Height = 25
           Hint = 'Enter date and time (hours and minutes) '#13#10'to start the process. Must be in the future!'
@@ -416,7 +416,7 @@ object MainForm: TMainForm
           Width = 136
           CenturyFrom = 1941
           MaxDate = 72686
-          MinDate = 42736
+          MinDate = 45223
           TabOrder = 5
           Enabled = False
           TrailingSeparator = False
@@ -429,7 +429,7 @@ object MainForm: TMainForm
           TimeFormat = tf24
           TimeDisplay = tdHM
           DateMode = dmComboBox
-          Date = 42736
+          Date = 45223
           Time = 0.673620821762597
           UseDefaultSeparators = True
           HideDateTimeParts = []
@@ -753,14 +753,14 @@ object MainForm: TMainForm
           OnChange = FileTypeMaskCheckBox2Change
           TabOrder = 8
         end
-        object ZVDateTimePickerFileSTab: TZVDateTimePicker
+        object DateTimePickerFileSTab: TDateTimePicker
           Left = 128
           Height = 25
           Top = 36
           Width = 136
           CenturyFrom = 1941
           MaxDate = 72686
-          MinDate = 42736
+          MinDate = 45223
           TabOrder = 9
           Enabled = False
           TrailingSeparator = False
@@ -771,7 +771,7 @@ object MainForm: TMainForm
           TimeFormat = tf24
           TimeDisplay = tdHM
           DateMode = dmComboBox
-          Date = 42736
+          Date = 45223
           Time = 0.673620821762597
           UseDefaultSeparators = True
           HideDateTimeParts = []
@@ -1144,7 +1144,7 @@ object MainForm: TMainForm
             OnChange = lblschedulertickboxCopyTabChange
             TabOrder = 9
           end
-          object ZVDateTimePickerCopyTab: TZVDateTimePicker
+          object DateTimePickerCopyTab: TDateTimePicker
             Left = 272
             Height = 25
             Hint = 'Enter date and time (hours and minutes) '
@@ -1152,7 +1152,7 @@ object MainForm: TMainForm
             Width = 136
             CenturyFrom = 1941
             MaxDate = 73050
-            MinDate = 42736
+            MinDate = 45223
             TabOrder = 10
             Enabled = False
             TrailingSeparator = False
@@ -1163,7 +1163,7 @@ object MainForm: TMainForm
             TimeFormat = tf24
             TimeDisplay = tdHM
             DateMode = dmComboBox
-            Date = 42736
+            Date = 45223
             Time = 0.673620821762597
             UseDefaultSeparators = True
             HideDateTimeParts = []
@@ -1521,7 +1521,7 @@ object MainForm: TMainForm
           OnChange = lblschedulertickboxCompareTabChange
           TabOrder = 7
         end
-        object ZVDateTimePickerCompareTab: TZVDateTimePicker
+        object DateTimePickerCompareTab: TDateTimePicker
           Left = 128
           Height = 25
           Hint = 'Enter date and time (hours and minutes) '
@@ -1529,7 +1529,7 @@ object MainForm: TMainForm
           Width = 136
           CenturyFrom = 1941
           MaxDate = 2958465
-          MinDate = 42736
+          MinDate = 45223
           TabOrder = 8
           Enabled = False
           TrailingSeparator = False
@@ -1540,7 +1540,7 @@ object MainForm: TMainForm
           TimeFormat = tf24
           TimeDisplay = tdHM
           DateMode = dmComboBox
-          Date = 42736
+          Date = 45223
           Time = 0.673621041663864
           UseDefaultSeparators = True
           HideDateTimeParts = []
@@ -1667,7 +1667,7 @@ object MainForm: TMainForm
           ShowHint = True
           TabOrder = 0
         end
-        object ZVDateTimePickerCompareDirsTab: TZVDateTimePicker
+        object DateTimePickerCompareDirsTab: TDateTimePicker
           Left = 347
           Height = 25
           Hint = 'Enter date and time (hours and minutes) '
@@ -1675,7 +1675,7 @@ object MainForm: TMainForm
           Width = 136
           CenturyFrom = 1941
           MaxDate = 2958465
-          MinDate = 42736
+          MinDate = 45223
           TabOrder = 1
           Enabled = False
           TrailingSeparator = False
@@ -1686,7 +1686,7 @@ object MainForm: TMainForm
           TimeFormat = tf24
           TimeDisplay = tdHM
           DateMode = dmComboBox
-          Date = 42736
+          Date = 45223
           Time = 0.673621041663864
           UseDefaultSeparators = True
           HideDateTimeParts = []
@@ -2208,7 +2208,6 @@ object MainForm: TMainForm
   end
   object QH_MainFormXMLPropStorage: TXMLPropStorage
     StoredValues = <>
-    FileName = ''
     Left = 32
     Top = 584
   end

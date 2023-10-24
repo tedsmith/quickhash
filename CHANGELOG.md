@@ -1,6 +1,15 @@
 ﻿Version History
 ===============
 
+v3.3.4 - Oct 2023
+
+Removed default XML file name specification that is used for storing some last used settings for greater cross platform suitability, so it just uses a system default instead
+Corrected project version specification for Windows (as it was left at v3.3.1 in error)
+Adjusted the "start at a time" date to a more current default value to save users having to scroll from 2017!
+Removed dependancy on the no longer maintained ZVDateTimePicker in favour of the native TDateTimePicker, again for easier cross platform compilation
+Apple OSX version released again that should now work on newer Mac OSX versions, in theory
+
+
 v3.3.3 - Oct 2023
 By popular request, the last selected hash algorithm will now be saved on exit and re-used on next launch. Settings saved in QHConfig.xml file.  
 The correction and conversion from "ID" to "No" was not fully integrated in the "Compare Two Folders" tab, causing an SQLite error message to appear. That was fixed. 
