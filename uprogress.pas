@@ -57,10 +57,7 @@ end;
 procedure TfrmProgress.btnAbortHashingClick(Sender: TObject);
 begin
   diskmodule.Stop := true; // Stops any further buffer reads
-  frmDiskHashingModule.ledtComputedHashA.Text := 'Aborted';
-  frmDiskHashingModule.ledtComputedHashB.Text := 'Aborted';
-  frmDiskHashingModule.ledtComputedHashC.Text := 'Aborted';
-  frmDiskHashingModule.ledtComputedHashD.Text := 'Aborted';
+  frmDiskHashingModule.ledtComputedHash.Text := 'Aborted';
   frmProgress.Close;
 end;
 

@@ -110,7 +110,7 @@ uses
 
   FindAllFilesEnhanced, // an enhanced version of FindAllFiles, to ensure hidden files are found, if needed
 
-  // New as of v2.8.0 - HashLib4Pascal Unit, superseeds DCPCrypt.
+  // New as of v2.8.0 - HashLib4Pascal Unit, superseeds DCPCrypt and part of Lazarus package system.
   HlpHashFactory,
   HlpIHash,
   HlpIHashResult,

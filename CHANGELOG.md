@@ -6,7 +6,10 @@ v3.3.4 - Oct 2023
 Removed default XML file name specification that is used for storing some last used settings for greater cross platform suitability, so it just uses a system default instead
 Corrected project version specification for Windows (as it was left at v3.3.1 in error)
 Adjusted the "start at a time" date to a more current default value to save users having to scroll from 2017!
-Removed dependancy on the no longer maintained ZVDateTimePicker in favour of the native TDateTimePicker, again for easier cross platform compilation
+Added CRC32 to the disk hashing module
+Made big changes to the disk hashing module display. Simpler layout, ensured the results screen was not disabled after saving the log file, ensured the drop down was not disabled at annoying moments. 
+Tweaked the scheduler of the disk module to equal to or greater than specified start time, to account for missing second precision
+Removed dependancy on the no longer maintained ZVDateTimePicker throughout, in favour of the native TDateTimePicker, again for easier cross platform compilation
 Apple OSX version released again that should now work on newer Mac OSX versions, in theory
 
 
