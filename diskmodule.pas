@@ -18,7 +18,7 @@ uses
   {$endif}
     diskspecification, uProgress, Classes, SysUtils, FileUtil,
     Forms, Controls, Graphics, LazUTF8, strutils,
-    Dialogs, StdCtrls, ComCtrls, ExtCtrls, Menus, ZVDateTimePicker,
+    Dialogs, StdCtrls, ComCtrls, ExtCtrls, Menus, DateTimePicker,
 
     // DEPRECATED as of v2.8.0
     // sha1Customised, md5Customised,
@@ -65,7 +65,7 @@ type
     sdLogFile: TSaveDialog;
     DiskHashingTimer: TTimer;
     TreeView1: TTreeView;
-    ZVDateTimePickerDiskModule: TZVDateTimePicker;
+    DateTimePickerDiskModule: TDateTimePicker;
     procedure btnAbortHashingClick(Sender: TObject);
     procedure btnRefreshDiskListClick(Sender: TObject);
     procedure btnStartHashingClick(Sender: TObject);
@@ -194,13 +194,13 @@ procedure TfrmDiskHashingModule.lblschedulertickboxDiskModuleChange(
 begin
   if lblschedulertickboxDiskModule.Checked then
     begin
-     ZVDateTimePickerDiskModule.Enabled := true;
-     ZVDateTimePickerDiskModule.Visible := true;
+     DateTimePickerDiskModule.Enabled := true;
+     DateTimePickerDiskModule.Visible := true;
     end
   else
   begin
-    ZVDateTimePickerDiskModule.Enabled := false;
-    ZVDateTimePickerDiskModule.Visible := false;
+    DateTimePickerDiskModule.Enabled := false;
+    DateTimePickerDiskModule.Visible := false;
   end;
 end;
 
@@ -258,14 +258,14 @@ procedure TfrmDiskHashingModule.InvokeDiskHashScheduler (Sender : TObject);
 var
   scheduleStartTime : TDateTime;
 begin
-  if ZVDateTimePickerDiskModule.DateTime < Now then
+  if DateTimePickerDiskModule.DateTime < Now then
     begin
       ShowMessage('Scheduled start time is in the past. Correct it.');
       exit;
     end
     else begin
       StartHashing := false;
-      scheduleStartTime     := ZVDateTimePickerDiskModule.DateTime;
+      scheduleStartTime     := DateTimePickerDiskModule.DateTime;
       lblDiskHashSchedulerStatus.Caption := 'Waiting....scheduled for a start time of ' + FormatDateTime('YY/MM/DD HH:MM', schedulestarttime);
       // Set the interval as the milliseconds remaining until the future start time
       DiskHashingTimer.Interval:= trunc((schedulestarttime - Now) * 24 * 60 * 60 * 1000);
