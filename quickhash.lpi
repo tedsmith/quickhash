@@ -448,7 +448,7 @@
         <UsageCount Value="10"/>
       </Unit43>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="diskmodule.pas"/>
         <Caret Line="153" Column="18" TopLine="121"/>
@@ -565,10 +565,6 @@
         <Filename Value="unit2.pas"/>
         <Caret Line="114" Column="25" TopLine="106"/>
       </Position29>
-      <Position30>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="20" Column="23" TopLine="79"/>
-      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -585,8 +581,6 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
-      <TargetCPU Value="i386"/>
-      <TargetOS Value="win32"/>
       <Optimizations>
         <OptimizationLevel Value="2"/>
       </Optimizations>
