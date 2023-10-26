@@ -194,7 +194,6 @@
         <ComponentName Value="frmDiskHashingModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
         <CursorPos X="52" Y="28"/>
         <UsageCount Value="206"/>
@@ -246,9 +245,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="111"/>
-        <CursorPos X="31" Y="118"/>
+        <CursorPos X="25" Y="114"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -452,7 +452,7 @@
         <UsageCount Value="9"/>
       </Unit43>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="diskmodule.pas"/>
         <Caret Line="153" Column="18" TopLine="121"/>
@@ -551,24 +551,20 @@
       </Position24>
       <Position25>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1072" Column="87" TopLine="1085"/>
+        <Caret Line="1223" Column="95" TopLine="1197"/>
       </Position25>
       <Position26>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1223" Column="95" TopLine="1197"/>
+        <Caret Line="1227" Column="28" TopLine="1197"/>
       </Position26>
       <Position27>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1227" Column="28" TopLine="1197"/>
+        <Caret Line="1304" Column="65" TopLine="1280"/>
       </Position27>
       <Position28>
         <Filename Value="diskmodule.pas"/>
-        <Caret Line="1304" Column="65" TopLine="1280"/>
-      </Position28>
-      <Position29>
-        <Filename Value="diskmodule.pas"/>
         <Caret Line="1386" Column="55" TopLine="1361"/>
-      </Position29>
+      </Position28>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -591,6 +587,7 @@
     </CodeGeneration>
     <Linking>
       <Debugging>
+        <GenerateDebugInfo Value="False"/>
         <DebugInfoType Value="dsDwarf2Set"/>
         <StripSymbols Value="True"/>
       </Debugging>
