@@ -158,7 +158,7 @@
         <ComponentName Value="frmTechSpecs"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="10"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -182,7 +182,7 @@
         <ComponentName Value="frmSQLiteDBases"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="12"/>
         <CursorPos X="129" Y="1895"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
@@ -194,7 +194,7 @@
         <ComponentName Value="frmDiskHashingModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="6"/>
         <CursorPos X="52" Y="28"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
@@ -224,7 +224,7 @@
       <Unit17>
         <Filename Value="uGPT.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="8"/>
         <CursorPos X="28" Y="10"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
@@ -247,8 +247,8 @@
         <UnitName Value="Unit2"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="111"/>
-        <CursorPos X="25" Y="114"/>
+        <TopLine Value="79"/>
+        <CursorPos X="20" Y="84"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -260,7 +260,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uProgress"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="36"/>
         <CursorPos X="40" Y="60"/>
         <UsageCount Value="206"/>
@@ -272,7 +272,7 @@
         <ComponentName Value="frmDisplayGrid3"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="11"/>
         <CursorPos X="51" Y="147"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -312,7 +312,7 @@
         <Filename Value="ulibewf.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="uLibEWF"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="5"/>
         <UsageCount Value="208"/>
         <Loaded Value="True"/>
       </Unit26>
@@ -339,7 +339,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uEnvironmentChecker"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="98"/>
         <CursorPos X="9" Y="101"/>
         <UsageCount Value="200"/>
@@ -413,46 +413,42 @@
       </Unit38>
       <Unit39>
         <Filename Value="GPTMBR.pas"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="9"/>
         <CursorPos X="28" Y="9"/>
         <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit39>
       <Unit40>
         <Filename Value="../../../../../../lazarus/fpc/3.2.2/source/rtl/objpas/sysutils/osutilsh.inc"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos X="10" Y="39"/>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../../../lazarus/fpc/3.2.2/source/rtl/objpas/sysutils/osutil.inc"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="204"/>
         <CursorPos X="3" Y="216"/>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit41>
       <Unit42>
         <Filename Value="../../../../../../lazarus/lcl/xmlpropstorage.pas"/>
         <UnitName Value="XMLPropStorage"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="55"/>
         <CursorPos X="18" Y="62"/>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit42>
       <Unit43>
         <Filename Value="../../../../../../lazarus/components/datetimectrls/datetimepicker.pas"/>
         <UnitName Value="DateTimePicker"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="429"/>
-        <CursorPos X="19" Y="439"/>
-        <UsageCount Value="9"/>
+        <CursorPos X="32" Y="24"/>
+        <UsageCount Value="10"/>
       </Unit43>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="diskmodule.pas"/>
         <Caret Line="153" Column="18" TopLine="121"/>
@@ -565,6 +561,14 @@
         <Filename Value="diskmodule.pas"/>
         <Caret Line="1386" Column="55" TopLine="1361"/>
       </Position28>
+      <Position29>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="114" Column="25" TopLine="106"/>
+      </Position29>
+      <Position30>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="20" Column="23" TopLine="79"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -581,6 +585,8 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
+      <TargetCPU Value="i386"/>
+      <TargetOS Value="win32"/>
       <Optimizations>
         <OptimizationLevel Value="2"/>
       </Optimizations>
