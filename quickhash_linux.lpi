@@ -12,32 +12,36 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="False"/>
       <MajorVersionNr Value="3"/>
+      <MinorVersionNr Value="3"/>
+      <RevisionNr Value="4"/>
       <Language Value="0809"/>
-      <StringTable Comments="Free, cross platform, open-source file and disk hashing software"
-                   CompanyName="Ted Smith (Ted Technology on Sourceforge)"
-                   FileDescription="The easy and convenient way to hash data in Linux, OSX and Windows"
-                   LegalCopyright="2011 - 2021 (c) Ted Smith"
-                   ProductName="QuickHash (www.quickhash-gui.org)"
-                   />
+      <StringTable
+        Comments="Free, cross platform, open-source file and disk hashing software"
+        CompanyName="Ted Smith (Quickhash-GUI)"
+        FileDescription="Quickhash-GUI - Data hashing tool for Linux, Windows and OSX"
+        LegalCopyright="2011 - 2023 (c) Ted Smith"
+        LegalTrademarks="See source code and user manual"
+        ProductName="QuickHash-GUI (www.quickhash-gui.org)"
+        ProductVersion="3.3.4"/>
     </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="default" Default="True"/>
     </BuildModes>
     <RequiredPackages Count="6">
       <Item1>
-        <PackageName Value="lazdbexport"/>
+        <PackageName Value="HashLib4PascalPackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="SQLDBLaz"/>
+        <PackageName Value="lazdbexport"/>
       </Item2>
       <Item3>
-        <PackageName Value="FCL"/>
+        <PackageName Value="SQLDBLaz"/>
       </Item3>
       <Item4>
-        <PackageName Value="ZVDateTimeCtrls"/>
+        <PackageName Value="FCL"/>
       </Item4>
       <Item5>
-        <PackageName Value="HashLib4PascalPackage"/>
+        <PackageName Value="DateTimeCtrls"/>
       </Item5>
       <Item6>
         <PackageName Value="LCL"/>
