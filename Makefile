@@ -12,7 +12,6 @@ LAZARUSDIR ?= /usr/lib/lazarus/default/
 RESFILES = dbases_sqlite.lrs frmaboutunit.lrs udisplaygrid.lrs unit2.lrs udisplaygrid3.lrs uenvironmentchecker.lrs
 
 PACKAGES := HashLib4Pascal/src/Packages/FPC/HashLib4PascalPackage.lpk \
- DateTimePicker/zvdatetimectrls.lpk \
  $(LAZARUSDIR)components/dbexport/lazdbexport.lpk
 
 # use a local temporary config directory to not register
@@ -33,8 +32,7 @@ clean:
 	  test ! -f $(FILE).backup || mv -f $(FILE).backup $(FILE) ; ${\n})
 
 distclean: clean
-	rm -rf lazarus_cfg/ DateTimePicker/lib/ HashLib4Pascal/HashLib/src/Packages/FPC/lib/
-	rm -f DateTimePicker/zvdatetimectrls.pas HashLib4Pascal/HashLib/src/Packages/FPC/HashLib4PascalPackage.pas
+	rm -rf lazarus_cfg/ HashLib4Pascal/src/Packages/FPC/lib/
 
 $(BIN):
 	$(foreach FILE,$(RESFILES),\
