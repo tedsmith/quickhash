@@ -10,7 +10,7 @@
  install:
 --- a/quickhash_linux.lpi
 +++ b/quickhash_linux.lpi
-@@ -85,7 +85,7 @@
+@@ -86,7 +86,7 @@
        </Debugging>
        <Options>
          <PassLinkerOptions Value="True"/>
@@ -19,7 +19,7 @@
        </Options>
      </Linking>
      <Other>
-@@ -93,7 +93,8 @@
+@@ -94,7 +94,8 @@
          <IgnoredMessages idx5024="True"/><!-- "Param XX is unused" -->
        </CompilerMessages>
        <CustomOptions Value="-OoREGVAR

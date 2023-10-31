@@ -5,6 +5,9 @@
 
 override_dh_makeshlibs:
 
+override_dh_strip:
+	dh_strip -X.so
+
 override_dh_compress:
 	dh_compress -X.pdf
 
