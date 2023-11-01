@@ -148,9 +148,8 @@ begin
   {$endif}
 
   {$ifdef Linux}
-  memEnvList.Text:= 'Number of SO files expected : 1'                       + LineEnding +
-  'Expected SO files and SHA-1 hashes: '                                    + LineEnding +
-  'libewf-Linux-x64.so' + #9#9 + '2376C9092754ABF401CFA1D17C00801DAAB4D143' + Lineending;
+  memEnvList.Text:= 'Number of SO files expected : 1' + LineEnding +
+  'Expected SO file: libewf-Linux-x64.so'             + Lineending;
   {$endif}
   try
     memEnvList.Lines.Add('Found these libraries and computed SHA-1 hashes:');
