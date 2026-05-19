@@ -1,0 +1,318 @@
+--- a/FindAllFilesEnhanced.pas
++++ b/FindAllFilesEnhanced.pas
+@@ -7,10 +7,10 @@ unit FindAllFilesEnhanced;
+ 
+ interface
+ uses
+-  LazUTF8Classes, Classes;
++  Classes;
+ 
+ function FindAllFilesEx(const SearchPath: string; SearchMask: string;
+-    SearchSubDirs: boolean; IncludeHiddenDirs: boolean): TStringListUTF8;
++    SearchSubDirs: boolean; IncludeHiddenDirs: boolean): TStringList;
+ 
+ implementation
+ uses
+@@ -43,11 +43,11 @@ begin
+ end;
+ 
+ function FindAllFilesEx(const SearchPath: string; SearchMask: string;
+-  SearchSubDirs: boolean; IncludeHiddenDirs: boolean): TStringListUTF8;
++  SearchSubDirs: boolean; IncludeHiddenDirs: boolean): TStringList;
+ var
+   Searcher: TListFileSearcher;
+ begin
+-  Result   := TStringListUTF8.Create;
++  Result   := TStringList.Create;
+   Searcher := TListFileSearcher.Create(Result);
+   Searcher.DirectoryAttribute := Searcher.DirectoryAttribute or faHidden;
+   try
+--- a/dbases_sqlite.pas
++++ b/dbases_sqlite.pas
+@@ -15,7 +15,7 @@ uses
+ {$endif}
+   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
+   LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
+-  sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes;
++  sqlite3dyn, clipbrd, DbCtrls, LazUTF8;
+ 
+ type
+ 
+@@ -643,7 +643,7 @@ var
+   KnownHashCell  : string = Default(string);
+   NoOfRowsInGrid : integer = Default(integer);
+   sl             : TStringList;
+-  fs             : TFileStreamUTF8;
++  fs             : TFileStream;
+   ExportSQLQuery : TSQLQuery;
+ const
+   strHTMLHeader      = '<HTML>'  ;
+@@ -728,9 +728,9 @@ begin
+         try
+           if not FileExists(filename) then
+             begin
+-              fs := TFileStreamUTF8.Create(Filename, fmCreate);
++              fs := TFileStream.Create(Filename, fmCreate);
+             end
+-          else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
++          else fs := TFileStream.Create(Filename, fmOpenReadWrite);
+ 
+           MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+           strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
+@@ -946,7 +946,7 @@ var
+   FileHashCell  : string = Default(string);
+   FileSizeCell  : string = Default(string);
+   KnownHashCell : string = Default(string);
+-  CSVFileToWrite: TFilestreamUTF8;
++  CSVFileToWrite: TFileStream;
+   ExportSQLQuery: TSQLQuery;
+   n             : integer = Default(integer);
+   KnownHashFlagIsSet : boolean = Default(boolean);
+@@ -958,7 +958,7 @@ begin
+ 
+   try
+     // Create a filestream for the output CSV.
+-    CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
++    CSVFileToWrite := TFileStream.Create(Filename, fmCreate);
+     if CSVFileToWrite.Handle > 0 then
+       begin
+         linetowrite := ('No' + ChosenDelimiter +
+@@ -1047,7 +1047,7 @@ var
+   DestinationFileHash : string = Default(string);
+   DateAttributes      : string = Default(string);
+   n                   : integer = Default(integer);
+-  CSVFileToWrite      : TFilestreamUTF8;
++  CSVFileToWrite      : TFileStream;
+   ExportSQLQuery      : TSQLQuery;
+ 
+ begin
+@@ -1057,7 +1057,7 @@ begin
+ 
+   try
+   // Create a filestream for the output CSV.
+-  CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
++  CSVFileToWrite := TFileStream.Create(Filename, fmCreate);
+   // Add header
+   linetowrite := 'No'                       + ChosenDelimiter +
+                 'Source Filename'          + ChosenDelimiter +
+@@ -1128,7 +1128,7 @@ var
+   FileHashB   : string = Default(string);
+ 
+   n : integer = Default(integer);
+-  CSVFileToWrite : TFilestreamUTF8;
++  CSVFileToWrite : TFileStream;
+   ExportSQLQuery : TSQLQuery;
+ begin
+   Mainform.StatusBar2.SimpleText := 'Writing results to file...please wait';
+@@ -1136,7 +1136,7 @@ begin
+   linetowrite := '';
+   ChosenDelimiter := MainForm.ChosenDelimiter;
+   try
+-    CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
++    CSVFileToWrite := TFileStream.Create(Filename, fmCreate);
+     if CSVFileToWrite.Handle > 0 then
+     begin
+       // Add headers and adjust column headings depending on which filter is active
+@@ -1246,14 +1246,14 @@ end;
+ // and asks to list duplicates. As the column layout is different, this is its own clipboard event
+ procedure TfrmSQLiteDBases.Copy_C2F_DuplicatesList(DBGrid : TDBGrid);
+ var
+-  CSVClipboardList : TStringListUTF8;
++  CSVClipboardList : TStringList;
+   RowCount : integer = Default(integer);
+ begin
+   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
+   Application.ProcessMessages;
+   ChosenDelimiter := MainForm.ChosenDelimiter;
+     try
+-      CSVClipboardList := TStringListUTF8.Create;
++      CSVClipboardList := TStringList.Create;
+       // Add the grid headers
+       CSVClipboardList.Add('No'      + ChosenDelimiter + 'Filepath'  + ChosenDelimiter +
+                            'FileName'+ ChosenDelimiter + 'HashValue');
+@@ -1284,7 +1284,7 @@ end;
+ // Used to clipboard the entire FILES display grid
+ procedure TfrmSQLiteDBases.DatasetToClipBoardFILES(DBGrid : TDBGrid);
+ var
+-  CSVClipboardList : TStringListUTF8;
++  CSVClipboardList : TStringList;
+   RowCount : integer = Default(integer);
+   KnownHashFlagIsSet : boolean = Default(boolean);
+ begin
+@@ -1328,7 +1328,7 @@ begin
+   if RowCount < 20000 then
+   begin
+     try
+-      CSVClipboardList := TStringListUTF8.Create;
++      CSVClipboardList := TStringList.Create;
+       CSVClipboardList.Add('Filename'  + ChosenDelimiter + 'FilePath' + ChosenDelimiter +
+                         'HashValue' + ChosenDelimiter + 'FileSize' + ChosenDelimiter +
+                         'KnownHashFlag');
+@@ -1380,7 +1380,7 @@ end;
+ // Copies the DBGrid content to clipboard
+ procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
+ var
+-  CSVClipboardList : TStringListUTF8;
++  CSVClipboardList : TStringList;
+   RowCount : integer = Default(integer);
+   tblName : string = Default(string);
+ begin
+@@ -1432,7 +1432,7 @@ begin
+   if RowCount < 20000 then
+   begin
+     try
+-      CSVClipboardList := TStringListUTF8.Create;
++      CSVClipboardList := TStringList.Create;
+       // Add the grid headers. If "Show Duplicates" was just active, adjust header layout
+       If FC2Fquery = false  then
+       begin
+@@ -2243,7 +2243,7 @@ end;
+ // Used by the COPY display grid to clipboard data from the grid
+ procedure TfrmSQLiteDBases.DatasetToClipBoardCOPYTAB(DBGrid : TDBGrid);
+ var
+-  CSVClipboardList : TStringListUTF8;
++  CSVClipboardList : TStringList;
+   RowCount : integer = Default(integer);
+ begin
+   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
+@@ -2253,7 +2253,7 @@ begin
+   if RowCount < 20000 then
+   begin
+     try
+-      CSVClipboardList := TStringListUTF8.Create;
++      CSVClipboardList := TStringList.Create;
+       // Add the grid headers
+       CSVClipboardList.Add('No'                   + ChosenDelimiter +
+                            'Source Filename'      + ChosenDelimiter +
+@@ -2305,7 +2305,7 @@ var
+   DestinationFileHash  : string = Default(string);
+   NoOfRowsInGrid       : integer = Default(integer);
+   sl                   : TStringList;
+-  fs                   : TFileStreamUTF8;
++  fs                   : TFileStream;
+   ExportSQLQuery       : TSQLQuery;
+ 
+   const
+@@ -2383,9 +2383,9 @@ begin
+     try
+     if not FileExists(filename) then
+       begin
+-        fs := TFileStreamUTF8.Create(Filename, fmCreate);
++        fs := TFileStream.Create(Filename, fmCreate);
+       end
+-    else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
++    else fs := TFileStream.Create(Filename, fmOpenReadWrite);
+ 
+     // Create HTML Header Data
+     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+@@ -2501,7 +2501,7 @@ var
+   FileHashB         : string = Default(string);
+   NoOfRowsInGrid    : integer = Default(integer);
+   sl                : TStringList;
+-  fs                : TFileStreamUTF8;
++  fs                : TFileStream;
+   ExportSQLQuery    : TSQLQuery;
+ const
+   strHTMLHeader     = '<HTML>'  ;
+@@ -2571,9 +2571,9 @@ begin
+     try
+     if not FileExists(filename) then
+       begin
+-        fs := TFileStreamUTF8.Create(Filename, fmCreate);
++        fs := TFileStream.Create(Filename, fmCreate);
+       end
+-    else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
++    else fs := TFileStream.Create(Filename, fmOpenReadWrite);
+ 
+     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
+     strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
+--- a/unit2.pas
++++ b/unit2.pas
+@@ -103,7 +103,7 @@ uses
+     Strutils,
+   {$ENDIF}
+   Classes, SysUtils, FileUtil, LResources, Forms, Controls,
+-  Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
++  Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8,
+   LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
+   XMLPropStorage,  diskmodule,
+   clipbrd, DBGrids, DbCtrls, DateTimePicker, frmAboutUnit, base64,
+@@ -1244,7 +1244,7 @@ end;
+ // https://support.google.com/adwords/answer/6276125?hl=en-GB
+ procedure TMainForm.btnLBLClick(Sender: TObject);
+ var
+-  slLBL : TStringListUTF8;
++  slLBL : TStringList;
+   i     : Longword;
+   strToHash : string;
+ begin
+@@ -1272,7 +1272,7 @@ begin
+           ChosenDelimiter := #32;
+         end;
+ 
+-    slLBL := TStringListUTF8.Create;
++    slLBL := TStringList.Create;
+     if not cbToggleInputDataToOutputFile.Checked then
+       begin
+       for i := 0 to memoHashText.Lines.Count -1 do
+@@ -1311,7 +1311,7 @@ end;
+ // Similar to the procedure for hashing the memo line-by-line in "Text" tab
+ procedure TMainForm.btnFLBLClick(Sender: TObject);
+ var
+-  slFLBLInput, slFLBLOutput : TStringListUTF8; // FLBL = File, Line by Line
++  slFLBLInput, slFLBLOutput : TStringList; // FLBL = File, Line by Line
+   i : Longword;
+ begin
+   i := 0;
+@@ -1335,8 +1335,8 @@ begin
+             ChosenDelimiter := #32;
+           end;
+ 
+-      slFLBLInput := TStringListUTF8.Create;
+-      slFLBLOutput:= TStringListUTF8.Create;
++      slFLBLInput := TStringList.Create;
++      slFLBLOutput:= TStringList.Create;
+       slFLBLInput.Sorted:= false;
+       slFLBLOutput.Sorted:= false;
+ 
+@@ -4983,7 +4983,7 @@ begin
+   {$ENDIF}
+   SizeOfCurrentFile       := -1;
+ 
+-  SLCopyErrors := TStringListUTF8.Create;
++  SLCopyErrors := TStringList.Create;
+ 
+   // Ensures the selected source directory is set as the directory to be searched
+   // and then finds all the files and directories within, storing as a StringList.
+@@ -5032,13 +5032,13 @@ begin
+     if not chkNoRecursiveCopy.Checked then        // and does want recursive
+      begin
+        try
+-       FilesFoundToCopy := TStringListUTF8.Create;
++       FilesFoundToCopy := TStringList.Create;
+        FilesFoundToCopy.Sorted := true;
+        for i := 0 to slMultipleDirNames.Count -1 do
+          begin
+            SourceDirName := slMultipleDirNames.Strings[i];
+            try
+-             slTemp        := TStringListUTF8.Create;
++             slTemp        := TStringList.Create;
+              slTemp.Sorted := true;
+              slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, True, True);
+              for j := 0 to slTemp.Count -1 do
+@@ -5057,13 +5057,13 @@ begin
+       else
+       begin
+         try
+-        FilesFoundToCopy := TStringListUTF8.Create;
++        FilesFoundToCopy := TStringList.Create;
+         FilesFoundToCopy.Sorted := true;
+         for i := 0 to slMultipleDirNames.Count -1 do
+          begin
+            SourceDirName    := slMultipleDirNames.Strings[i];
+            try
+-             slTemp           := TStringListUTF8.Create;
++             slTemp           := TStringList.Create;
+              slTemp.Sorted    := true;
+              slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, False, True);
+              for j := 0 to slTemp.Count -1 do

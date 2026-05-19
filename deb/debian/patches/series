@@ -1,1 +1,5 @@
+# workaround to enable linking with -pie
 quickhash_link_pie.patch
+
+# fix to build with Lazarus 4.4
+LazUTF8Classes.patch
