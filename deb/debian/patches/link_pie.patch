@@ -1,3 +1,5 @@
+workaround to enable linking with -pie (force using si_prc entry point)
+
 --- a/Makefile
 +++ b/Makefile
 @@ -39,6 +39,7 @@

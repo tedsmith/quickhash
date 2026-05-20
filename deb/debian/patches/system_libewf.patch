@@ -1,0 +1,30 @@
+use system-wide installed library
+
+--- a/Makefile
++++ b/Makefile
+@@ -43,11 +43,8 @@ $(BIN):
+ 	$(LAZBUILD) $(OPTIONS) $(PACKAGES) quickhash_linux.lpi
+ 
+ install:
+-	install -d -m 755 $(DESTDIR)$(PREFIX)/lib/quickhash/libs/$(QHARCH)
+-	install -m 644 libs/$(QHARCH)/$(LIBEWF) $(DESTDIR)$(PREFIX)/lib/quickhash/libs/$(QHARCH)
+-	install -m 755 $(BIN) $(DESTDIR)$(PREFIX)/lib/quickhash
+ 	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
+-	ln -s ../lib/quickhash/$(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
++	install -m 755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
+ 	install -d -m 755 $(DESTDIR)$(PREFIX)/share/applications
+ 	install -m 644 misc/quickhash.desktop $(DESTDIR)$(PREFIX)/share/applications
+ 	$(foreach SIZE,16 24 32 48 64 96 128,\
+--- a/ulibewf.pas
++++ b/ulibewf.pas
+@@ -393,7 +393,9 @@ begin
+     {$endif}
+   {$endif}
+ 
+-  if FileExists(libFileName) then
++  libFileName:='libewf.so.2';
++
++  if True then
+   begin
+     {$ifdef Windows}
+     //fLibHandle := LoadLibraryA(PAnsiChar(libFileName)); // The usual route, but LoadLibraryEx enables me to ensure QH DLLs are loaded

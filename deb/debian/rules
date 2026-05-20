@@ -3,10 +3,10 @@
 %:
 	dh $@
 
-override_dh_makeshlibs:
+#override_dh_makeshlibs:
 
-override_dh_strip:
-	dh_strip -X.so
+#override_dh_strip:
+#	dh_strip -X.so
 
 override_dh_compress:
 	dh_compress -X.pdf
@@ -14,6 +14,6 @@ override_dh_compress:
 override_dh_installchangelogs:
 	dh_installchangelogs CHANGELOG.md
 
-# Ubuntu uses zstd but that doesn't work on Debian
+# Ubuntu uses zstd but that doesn't seem to work on Debian
 override_dh_builddeb:
 	dh_builddeb -- -Zxz
